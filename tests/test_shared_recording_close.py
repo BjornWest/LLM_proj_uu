@@ -51,7 +51,8 @@ def test_saved_original_close_runs_independent_resources_once(failed):
     assert (env.browser is None) == (failed != 'browser')
 
 
-def test_explicit_close_proof_rejects_wrong_receiver_native_custom_and_subclass():
+def test_close_guards_reject_foreign_receivers_subclasses_and_changed_native_source():
+    from intent_browser.shared_browsergym import qualified_shared_environment
     first = SharedBrowserEnv(task_entrypoint=type('Task', (), {}),
                              pool_episode=PoolEpisode(object(), 'first'))
     second = SharedBrowserEnv(task_entrypoint=type('Task', (), {}),
@@ -60,15 +61,40 @@ def test_explicit_close_proof_rejects_wrong_receiver_native_custom_and_subclass(
         pass
     custom = Custom(task_entrypoint=type('Task', (), {}),
                     pool_episode=PoolEpisode(object(), 'subclass'))
-    native = BrowserEnv.__new__(BrowserEnv)
-    for env, close in ((first, second.close), (first, lambda: None),
-                       (native, first.close), (custom, custom.close)):
-        with pytest.raises(ValueError):
-            close_resources(env, lambda *a, **k: pytest.fail('guard bypassed'), shared_close=close)
     first.close = second.close
     assert not supported_shared(first)
+    assert qualified_shared_environment(first)
+    assert not qualified_shared_environment(custom)
+    with pytest.raises(ValueError):
+        close_resources(first, None)
+    with pytest.raises(ValueError):
+        custom.close()
     with patch.object(BrowserEnv, 'close', lambda self: None), pytest.raises(PoolError):
-        close_resources(second, None, shared_close=second.close)
+        SharedBrowserEnv.close(second)
+
+
+def test_strict_recording_wrapper_preserves_provider_and_browser_cleanup_errors():
+    from training.browser_training.fact_recording_installation import recording_env_factory as strict_factory
+    calls = []
+    def failed(name):
+        def operation():
+            calls.append(name)
+            raise RuntimeError('injected ' + name)
+        return operation
+    env = SharedBrowserEnv.__new__(SharedBrowserEnv)
+    env.pool_episode = PoolEpisode(object(), 'strict-failure')
+    env.task_entrypoint = type('Task', (), {})
+    env.task = SimpleNamespace(teardown=failed('task'))
+    env.chat = SimpleNamespace(close=lambda: calls.append('chat'))
+    env.context = SimpleNamespace(close=lambda: calls.append('context'))
+    env.browser = SimpleNamespace(close=lambda: calls.append('browser'))
+    env.page = None
+    strict_factory(SimpleNamespace(make_env=lambda _: env),
+                   SimpleNamespace(enabled=True, close=failed('provider')))()
+    with pytest.raises(RuntimeError, match='Fact provider cleanup failed.*injected provider.*browser cleanup failed.*injected task'):
+        env.close()
+    assert calls == ['provider', 'task', 'chat', 'context', 'browser']
+    assert env.context is None and env.browser is None
 
 
 @pytest.mark.parametrize('case', ['correct', 'wrong', 'missing'])
@@ -159,6 +185,10 @@ def test_recorded_actual_runner_after_close_native_grade(tmp_path, case):
             assert summary['error'] is None
             metadata = json.loads((trace / 'metadata.json').read_text())
             assert metadata['fact_recording']['capture_boundary'] == 'native-full-v1'
+            assert metadata['shared_chromium']['owner'] == episode.owner
+            assert metadata['shared_chromium']['manifest'] == client.descriptor['manifest']
+            assert len(metadata['shared_chromium']['contexts']) == 2
+            assert all(row['released'] for row in metadata['shared_chromium']['contexts'])
             assert list(trace.glob('fact-*.json*'))
             projection = json.loads((trace / 'automatic-grade-projection.json').read_text())
             assert projection['verified']

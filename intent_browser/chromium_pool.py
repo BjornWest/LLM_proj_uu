@@ -51,6 +51,7 @@ def installed_manifest():
                 'broker_asset_sha256': _sha(Path(__file__).parent/'assets/chromium_pool.cjs'),
                 'python_client_sha256': _sha(__file__),
                 'browsergym_adapter_sha256': _sha(Path(__file__).parent/'shared_browsergym.py'),
+                'browsergym_shutdown_sha256': _sha(Path(__file__).parent/'browser_shutdown.py'),
                 'loopback_patch': 'qualified-1.44-launchServer-loopback-v1'}
     return package, executable, manifest
 

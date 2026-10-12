@@ -20,15 +20,13 @@ def supported(env):
             'f8ecb729634b9b0c56876d3bee8a3205620ec517c66c5f39173f6860bbc55a45')
 
 
-def close_resources(env,phase,*,shared_close=None):
-    # Only the qualified pooled method supplies its bound original. External
-    # shutdown callers still inspect env.close and cannot skip instrumentation.
-    if shared_close is None:
-        qualified = supported(env)
-    else:
-        from .shared_browsergym import _supported_shared_close
-        qualified = _supported_shared_close(env, shared_close)
-    if not qualified:raise ValueError('Resource shutdown requires native BrowserGym close')
+def close_resources(env,phase):
+    if not supported(env):raise ValueError('Resource shutdown requires native BrowserGym close')
+    return _close_qualified_resources(env,phase)
+
+
+def _close_qualified_resources(env,phase):
+    """Private cleanup body; entrypoints must qualify their actual close first."""
     failures=[]
     def attempt(name,fn,seconds=2):
         try:phase(name,fn,seconds=seconds);return True

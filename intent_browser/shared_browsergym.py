@@ -276,23 +276,25 @@ class SharedBrowserEnv(BrowserEnv):
             raise
 
     def close(self):
-        from .browser_shutdown import close_resources
-        failures = close_resources(self, lambda name, fn, **kwargs: fn(),
-            shared_close=SharedBrowserEnv.close.__get__(self))
+        from .browser_shutdown import _close_qualified_resources
+        if not qualified_shared_environment(self):
+            raise ValueError('Resource shutdown requires native BrowserGym close')
+        failures = _close_qualified_resources(self, lambda name, fn, **kwargs: fn())
         if failures: raise PoolError('Shared environment close failed: '+repr(failures))
         self.page = None
 
 
-def _supported_shared_close(env, close):
-    # The original method can be called by an instance-local recording wrapper.
-    # Qualify the bound original, never an arbitrary replacement on the instance.
-    if (type(env) is not SharedBrowserEnv
-            or getattr(close, '__self__', None) is not env
-            or getattr(close, '__func__', None) is not SharedBrowserEnv.close):
+def qualified_shared_environment(env):
+    """Qualify pooled identity for metadata, independently of close wrappers."""
+    if type(env) is not SharedBrowserEnv or not isinstance(env.pool_episode, PoolEpisode):
         return False
     qualify_browsergym()
-    return isinstance(env.pool_episode, PoolEpisode)
+    return True
 
 
 def supported_shared(env):
-    return _supported_shared_close(env, getattr(env, 'close', None))
+    # Generic shutdown may only bypass the installed method when it is original.
+    close = getattr(env, 'close', None)
+    return (getattr(close, '__self__', None) is env
+            and getattr(close, '__func__', None) is SharedBrowserEnv.close
+            and qualified_shared_environment(env))

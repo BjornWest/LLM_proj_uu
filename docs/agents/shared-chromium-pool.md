@@ -156,13 +156,15 @@ artifacts and worker-death recordings remain until their browser member exits;
 clean successful transfers delete the remote copy.
 
 Fact-recording instrumentation may wrap an instance's `close()` and invoke the
-saved original pooled method after provider cleanup. The original method passes
-its own qualified bound close into resource shutdown; the exact environment
-type, receiver, method identity and BrowserGym source checks still apply. Generic
-shutdown checks continue to reject replacement close methods, so callers must
+saved original pooled method after provider cleanup. The original method qualifies
+the exact pooled environment and pinned BrowserGym before invoking the private
+resource cleanup body. Generic shutdown checks continue to reject replacement close methods, so callers must
 invoke the recording wrapper rather than bypass it. Cleanup errors stay visible
 and do not certify a native grade. `tests/test_shared_recording_close.py` covers
 this boundary and recorded, zero-provider runner/after-close grading controls;
 set `HARNESS_TEST_TOKENIZER` to an existing qualified Qwen tokenizer if the
 repository-local test asset is absent. Recompose service and client from the same
-release: changing the adapter invalidates older pool source manifests.
+release: the adapter and shutdown helper hashes are both checked by pool manifests.
+Trace pool metadata uses qualified environment identity independently of close
+wrappers. The once-only cleanup assertions cover a clean terminal close; existing
+idempotent providers may be closed again during reset or after a failed cleanup.

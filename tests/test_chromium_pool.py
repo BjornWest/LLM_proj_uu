@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from browsergym.core.env import BrowserEnv
 from browsergym.core.task import OpenEndedTask
-from intent_browser.chromium_pool import PoolClient, PoolError, PoolSupervisor, VERSION
+from intent_browser.chromium_pool import PoolClient, PoolError, PoolSupervisor, VERSION, installed_manifest
 from intent_browser.shared_browsergym import PoolEpisode, SharedBrowserEnv, qualify_browsergym
 
 
@@ -24,6 +24,18 @@ class PoolBoundaries(unittest.TestCase):
                 PoolClient({'version':VERSION,'manifest':{'qualified':'other'}})
             for timeout in (0,-1,True,31,float('inf')):
                 with self.assertRaises(ValueError):PoolClient({'version':VERSION},timeout=timeout)
+
+    def test_manifest_qualifies_shutdown_helper_before_attachment(self):
+        import hashlib
+        import intent_browser.browser_shutdown as shutdown
+        _, _, manifest = installed_manifest()
+        self.assertEqual(manifest['browsergym_shutdown_sha256'],
+                         hashlib.sha256(Path(shutdown.__file__).read_bytes()).hexdigest())
+        missing = dict(manifest); missing.pop('browsergym_shutdown_sha256')
+        changed = dict(manifest); changed['browsergym_shutdown_sha256'] = 'different'
+        for stale in (missing, changed):
+            with self.subTest(stale=stale['browsergym_adapter_sha256']), self.assertRaises(PoolError):
+                PoolClient({'version': VERSION, 'manifest': stale})
 
     def test_browsergym_changed_binding_is_rejected(self):
         qualify_browsergym()

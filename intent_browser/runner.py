@@ -520,8 +520,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         from .chat_ui import repo_chat_ui
         with repo_chat_ui(env):
             obs, info = env.reset(seed=seed)
-        from .shared_browsergym import supported_shared
-        if supported_shared(base_env):
+        from .shared_browsergym import qualified_shared_environment
+        if qualified_shared_environment(base_env):
             trace.metadata['shared_chromium'] = base_env.pool_episode.metadata()
             write_json(trace.directory/'metadata.json',trace.metadata)
         reset_complete = True
@@ -1577,8 +1577,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     try:cleanup_phase('chat_browser_close_fallback',chat.browser.close)
                     except Exception as close_exc:
                         trace.event('chat_browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
-            from .shared_browsergym import supported_shared
-            if supported_shared(base_env):
+            from .shared_browsergym import qualified_shared_environment
+            if qualified_shared_environment(base_env):
                 trace.metadata['shared_chromium'] = base_env.pool_episode.metadata()
                 write_json(trace.directory/'metadata.json',trace.metadata)
             trace.event("environment_close_completed", error=error)
