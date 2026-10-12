@@ -6,8 +6,9 @@ from experiments.answer_grading.extraction import MONEY, claim, money_minor, _qu
 from . import basic_offer_task, catalog_shipping_claim_task as native
 from .adapter import digest
 from .listed_offer_grading import ListedOfferGrader
+from .canonical_claims import VERSION as CANONICAL_VERSION, validate_variant_claims
 
-VERSION = 'website-catalog-shipping-claim-grading-v2'
+VERSION = 'website-catalog-shipping-claim-grading-v3'
 MONEY_FIELDS = ('unit_price', 'subtotal', 'advertised_threshold', 'minimum_shipping', 'maximum_shipping')
 ENUMS = {'subtotal_test': ['no_threshold', 'below_threshold', 'meets_threshold'],
          'assessment': ['unavailable', 'none_free', 'some_free', 'all_free']}
@@ -53,6 +54,7 @@ class ShippingClaimGrader:
             'delivery_types': task['delivery_types'], 'price_basis': 'one exact SKU basket, no extras/coupons/new memberships',
             'threshold_basis': 'merchandise subtotal; actual option fee is independent',
             'scope': 'complete admitted basket options in declared destination modes'}
+        self.contract['canonical_options_version'] = CANONICAL_VERSION
         self.extraction_instructions = INSTRUCTIONS
 
     def validate_claims(self, claims, answer):
@@ -63,12 +65,7 @@ class ShippingClaimGrader:
             c['variant'].setdefault(key, {'value': None, 'evidence': None})
         c = validate_claims(c, answer, schema=self.schema,
                             semantic_fields=tuple(ENUMS))
-        for row in c['variant'].values():
-            if row['value'] is None:
-                if row['evidence'] is not None:raise ValueError('Absent variant needs absent evidence')
-            else:
-                _quote(row['evidence'], answer)
-                if row['value'] not in row['evidence']:raise ValueError('Variant absent from quoted answer')
+        validate_variant_claims(c['variant'], answer, self.schema['properties']['variant'])
         for key in MONEY_FIELDS:
             if c[key] is not None:
                 _quote(c[key]['evidence'], answer); money_minor(c[key])

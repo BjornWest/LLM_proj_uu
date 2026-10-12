@@ -173,3 +173,5 @@ maintained copies as part of this transition.
 - [Opt-in AX fact provenance](ax-fact-provenance.md): unchanged policy requests, exact private source/output spans, retained delivery and synthetic-only adoption scope.
 
 - [Optional suite inspection recording](inspection-suite-recording.md): pinned provider hook, task adapters and partial prefix coverage.
+
+- [Canonical answer schemas](canonical-answer-schemas.md): declared finite product options, semantic extraction and native comparison boundaries.

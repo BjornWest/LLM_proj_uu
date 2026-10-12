@@ -9,12 +9,13 @@ from copy import deepcopy
 from urllib.parse import parse_qsl, urlsplit
 
 from experiments.answer_grading.extraction import (
-    MONEY, claim, obj, money_minor, validate_claims as validate_flat, _quote,
+    MONEY, claim, obj, money_minor, validate_claims as validate_flat,
 )
 from . import basic_offer_task
 from .adapter import digest
+from .canonical_claims import VERSION as CANONICAL_VERSION, variant_schema, validate_variant_claims
 
-VERSION = 'website-listed-offer-grading-v3'
+VERSION = 'website-listed-offer-grading-v4'
 
 
 def _text(value):
@@ -131,12 +132,15 @@ class ListedOfferGrader:
         self.contract = {'version': VERSION, 'identity_grading_version': VERSION, 'operation': task['kind'], 'variant_fields': fields,
                          'price_basis': 'listed price for one sale unit, excluding shipping/coupons/cart deals',
                          'statuses': ['selection', 'no_match', 'uncertain']}
+        self.contract['canonical_options_version'] = CANONICAL_VERSION
+        variants = variant_schema([p for p in world['products']
+            if p['public']['concept_id'] == task['concept_id']], fields)
         self.schema = obj({
             'interpretation': {'type': 'string', 'enum': ['extracted', 'ambiguous']},
             'issues': {'type': 'array', 'items': {'type': 'string'}},
             'status': claim(enum=self.contract['statuses'] + [None]),
             'product_name': claim(), 'retailer_name': claim(), 'offer_url': claim(), 'sku_id': claim(),
-            'variant': obj({field: claim() for field in fields}),
+            'variant': variants,
             'total': {'anyOf': [deepcopy(MONEY), {'type': 'null'}],
                       'description': self.contract['price_basis']},
             'source_urls': {'type': 'array', 'items': obj({'value': {'type': 'string'},
@@ -152,14 +156,7 @@ class ListedOfferGrader:
         for key in self.contract['variant_fields']:
             value['variant'].setdefault(key, {'value': None, 'evidence': None})
         value = validate_flat(value, answer, schema=self.schema)
-        for c in value['variant'].values():
-            if c['value'] is None:
-                if c['evidence'] is not None:
-                    raise ValueError('Absent variant needs absent evidence')
-            else:
-                _quote(c['evidence'], answer)
-                if c['value'] not in c['evidence']:
-                    raise ValueError('Variant value absent from exact answer quote')
+        validate_variant_claims(value['variant'], answer, self.schema['properties']['variant'])
         return value
 
     def resolve(self, claims):

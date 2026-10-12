@@ -2,12 +2,13 @@
 from copy import deepcopy
 
 from jsonschema import Draft202012Validator
-from experiments.answer_grading.extraction import MONEY, claim, obj, validate_claims, money_minor, _quote
+from experiments.answer_grading.extraction import MONEY, claim, obj, validate_claims, money_minor
 from experiments.accepted_catalog_commerce.prepared_quote import prepare
 from . import basic_offer_task, catalog_basket_grading as structured, catalog_checkout_domain
 from .listed_offer_grading import ListedOfferGrader
+from .canonical_claims import VERSION as CANONICAL_VERSION, variant_schema, validate_variant_claims
 
-VERSION = 'website-catalog-basket-answer-grading-v2'
+VERSION = 'website-catalog-basket-answer-grading-v3'
 SERVICE_FIELDS = ('carrier_name', 'tier', 'delivery_type', 'location_id', 'location_name')
 INSTRUCTIONS = '''Extract only the final answer into the supplied schema. You are a
 formatter, not a solver. No private world, matching set, reference or expected
@@ -51,7 +52,7 @@ class CatalogBasketAnswerGrader:
         self.identity = ListedOfferGrader(world, base, basic_offer_task.reference(world, base), bindings)
         self.variant_fields = sorted({k for p in world['products'] for k in p['variant_fields']})
         self.line_schema = obj({'product_name': claim(), 'offer_url': claim(), 'sku_id': claim(),
-            'variant': obj({k: claim() for k in self.variant_fields}), 'quantity': claim('integer'),
+            'variant': variant_schema(world['products'], self.variant_fields), 'quantity': claim('integer'),
             'delivery': obj({k: claim(enum=['home', 'parcel_locker', 'staffed_counter', 'retailer_branch', None])
                               if k == 'delivery_type' else claim() for k in SERVICE_FIELDS})})
         self.order_schema = obj({'retailer_name': claim(), 'split': claim('boolean'),
@@ -73,6 +74,7 @@ class CatalogBasketAnswerGrader:
             'variant_fields': self.variant_fields, 'price_basis': 'combined_payable_including_shipping',
             'account_coupons': 'unsupported', 'identity': 'public_links_and_explicit_variant_service_claims',
             'effects': 'recommendation_only_no_purchase'}
+        self.contract['canonical_options_version'] = CANONICAL_VERSION
         self.extraction_instructions = INSTRUCTIONS
 
     def validate_claims(self, claims, answer):
@@ -83,12 +85,7 @@ class CatalogBasketAnswerGrader:
             _ground(order, self.order_schema, answer, normalized=('split',))
             for line in order['lines']:
                 _ground(line, self.line_schema, answer)
-                for value in line['variant'].values():
-                    if value['value'] is None:
-                        if value['evidence'] is not None: raise ValueError('Absent variant needs absent evidence')
-                    else:
-                        _quote(value['evidence'], answer)
-                        if value['value'] not in value['evidence']: raise ValueError('Variant is absent from its quote')
+                validate_variant_claims(line['variant'], answer, self.line_schema['properties']['variant'])
                 _ground(line['delivery'], self.line_schema['properties']['delivery'], answer, normalized=('delivery_type',))
         return c
 

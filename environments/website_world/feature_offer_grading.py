@@ -18,7 +18,8 @@ interpretation ambiguous. total is the listed price of one whole sale unit in
 the stated currency, excluding shipping, discounts and normalized per-unit costs.
 Do not infer variants from prices, requirements, default page state or opaque IDs.
 Every claim needs an exact contiguous final-answer quote. Preserve cited URLs.
-Normalize decimal money notation only; do not perform arithmetic or conversion.
+Use declared canonical option labels for unambiguous wording, retaining original quotes.
+Normalize decimal money notation only; do not perform arithmetic or size/unit conversion.
 Return JSON only, without code fences.'''
 
 

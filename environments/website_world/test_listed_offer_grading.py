@@ -332,9 +332,9 @@ def test_inherited_offer_grade_reports_changed_identity_version():
     grader = ListedOfferGrader(*fixture())
     text, claims = answer()
     result = grader.grade(claims, text)
-    assert result['grading_version'] == 'website-listed-offer-grading-v3'
-    assert result['identity_grading_version'] == 'website-listed-offer-grading-v3'
-    assert grader.contract['identity_grading_version'] == 'website-listed-offer-grading-v3'
+    assert result['grading_version'] == 'website-listed-offer-grading-v4'
+    assert result['identity_grading_version'] == 'website-listed-offer-grading-v4'
+    assert grader.contract['identity_grading_version'] == 'website-listed-offer-grading-v4'
 
 
 @pytest.mark.parametrize("adapter_name", ["adapter", "catalog_adapter"])
@@ -408,7 +408,7 @@ def test_shared_width_alias_and_wrong_width_through_inherited_graders(family,gra
     c['variant']['width']['value']='standard width';original=deepcopy(c)
     result=g.grade(c,text)
     assert result['structured_claims_correct']
-    assert result['identity_grading_version']=='website-listed-offer-grading-v3'
+    assert result['identity_grading_version']=='website-listed-offer-grading-v4'
     assert result['claims']['variant']['width']==original['variant']['width'] and c==original
     text+=' Wide width.';c['variant']['width']={'value':'wide','evidence':'wide'}
     # Ground the exact case-sensitive word while keeping a wrong native width.
