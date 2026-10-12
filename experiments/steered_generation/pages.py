@@ -40,6 +40,12 @@ hundreds of small powers and a large multinomial number, far outside the
 floats on its own while their product is an ordinary probability, so each
 term is one exponent of a sum of logarithms and sums of terms are taken
 relative to their largest. Sampling chooses among logarithms likewise.
+
+One review's probabilities themselves are taken as ordinary floats, as a
+reader of reviews gives them: a comment at the cut and one below it are
+mixed, `x * at + below`, before the logarithm is taken, so a probability so
+small that a fraction of it is no float at all (a subnormal one) can drop
+out there. The sizes above do not exclude that; the readers' numbers do.
 """
 from functools import lru_cache
 from math import cos, exp, fsum, inf, lgamma, log, pi

@@ -718,6 +718,9 @@ kept as logarithms, each term one exponent of a sum of logarithms: the
 integrand at a point is a product of hundreds of small powers and a large
 multinomial number, far outside the floats on its own while their product is
 an ordinary probability. At most 200 reviews and a page of 100 are taken.
+One review's own probabilities are taken as ordinary floats, as the pilot's
+reader gives them; a table with subnormal entries could still lose an
+outcome where two of its entries are mixed before a logarithm is taken.
 
 How it meets the producer. A session reseeds the planned review streams of
 the product and manufactures that one product again instead of taking it
