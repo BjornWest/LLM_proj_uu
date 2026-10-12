@@ -4,8 +4,9 @@ A block is the set of draws one requirement resamples. It names the leaves it
 decides and the leaves its probability was computed from as resources:
 ("stock", retailer, product), ("price", retailer, product), for a
 retailer's free-shipping threshold ("threshold", retailer, ""), for a
-product's review corpus ("reviews", "", product) and for a carrier's
-("carrier_reviews", "", carrier). The producer
+product's review corpus ("reviews", "", product), for a carrier's
+("carrier_reviews", "", carrier) and for its shipments' histories
+("carrier_shipments", "", carrier). The producer
 gives every draw its own stream, so blocks whose resources do not meet are
 independent given everything upstream: each can be sampled on its own, all of
 them replayed in one pass, and the probability that every requirement holds is
@@ -170,8 +171,9 @@ def background(world, writes):
     rating summary counted from them. A carrier's reviews: its reviews and the
     summary counted from them, the corpus identity, and the wording of every
     other carrier review, since the producer picks a phrase by how often each
-    was used before it. JSON text, unlike Python equality, keeps true, 1 and
-    1.0 apart.
+    was used before it. A carrier's shipments: their histories and the
+    metrics counted from them. JSON text, unlike Python equality, keeps true,
+    1 and 1.0 apart.
     """
     def retailer(value):
         rid = value["retailer_id"]
@@ -220,6 +222,17 @@ def background(world, writes):
                        "reviews": [worded(row) for row in corpus["public"]["reviews"]]},
             "private": {**{k: v for k, v in corpus["private"].items() if k != "corpus_id"},
                         "reviews": [worded(row) for row in corpus["private"]["reviews"]]}}
+    shipped = {carrier for kind, _, carrier in writes if kind == "carrier_shipments"}
+    if shipped:
+        if not shipped <= carriers:
+            raise AssertionError("A block that redraws a carrier's shipments redraws its reviews")
+        private = view["carrier_evidence"]["private"]
+        view["carrier_evidence"]["private"] = {
+            **private,
+            "shipments": [{"shipment_id": row["shipment_id"]} if row["carrier_id"] in shipped else row
+                          for row in private["shipments"]],
+            "carrier_parameters": [{k: v for k, v in row.items() if k != "observed_history_metrics"}
+                                   if row["carrier_id"] in shipped else row for row in private["carrier_parameters"]]}
     reviewed = {product for kind, _, product in writes if kind == "reviews"}
     if reviewed:
         view["products"] = [{k: v for k, v in item.items() if k not in ("reviews", "rating_summary")}

@@ -24,12 +24,12 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import (blocks, carriers, cheapest, combined, listed, price_bounds, prices, reviews, shortlist, stock, streams,
-               threshold)
+from . import (blocks, carriers, cheapest, combined, listed, price_bounds, prices, reviews, shipments, shortlist, stock,
+               streams, threshold)
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
-              "listed.py", "shortlist.py", "threshold.py", "reviews.py", "carriers.py", "combined.py", "run.py"),
+              "listed.py", "shortlist.py", "threshold.py", "reviews.py", "carriers.py", "shipments.py", "combined.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -398,8 +398,8 @@ def threshold_case(args, session, natural, opened, api, requirement, case, folde
 
 
 def reviews_case(args, session, natural, opened, api, requirement, case, folder):
-    """A product's reviews or a carrier's: the two modules answer to the same names."""
-    module = carriers if requirement["schema"] == carriers.VERSION else reviews
+    """A product's reviews, a carrier's, or a carrier's shipments with them: the modules answer to the same names."""
+    module = {carriers.VERSION: carriers, shipments.VERSION: shipments}.get(requirement["schema"], reviews)
     try:
         block = module.model(natural, requirement, api)
     except prices.ZeroMass as error:
@@ -414,6 +414,8 @@ def reviews_case(args, session, natural, opened, api, requirement, case, folder)
                 **({"carrier_id": place.carrier_id,
                     "shipments_that_could_mention": {sign: len(found) for sign, found in block.groups.items()}}
                    if module is carriers else
+                   {"carrier_id": place.carrier_id, "shipments": place.count, "shipment_class_probabilities": block.shares}
+                   if module is shipments else
                    {"product_id": place.product_id, "reviews": place.count, "review_class_probabilities": block.shares}))
     for index in range(args.samples):
         clock = time.monotonic()
@@ -430,7 +432,7 @@ def reviews_case(args, session, natural, opened, api, requirement, case, folder)
         files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
         case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
                                 "counts": found["counts"], "verdict": found["verdict"],
-                                "review_redraws": record["review_redraws"],
+                                "review_redraws": record.get("review_redraws", record.get("shipment_redraws")),
                                 "streams_steered": record["streams_steered"], "files": files})
     if args.producer_redraws:
         producer_redraws(args, session, natural, [module.trial(natural, requirement, api)], case)
@@ -485,6 +487,7 @@ CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_c
          listed.VERSION: ("listed_prices", listed_case), shortlist.VERSION: ("shortlist", shortlist_case),
          threshold.VERSION: ("threshold", threshold_case), reviews.VERSION: ("reviews", reviews_case),
          carriers.VERSION: ("carrier_reviews", reviews_case),
+         shipments.VERSION: ("carrier_shipments", reviews_case),
          combined.VERSION: ("combined", combined_case)}
 
 

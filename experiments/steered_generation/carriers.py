@@ -52,11 +52,11 @@ def weight(aspect):
     return 2 if aspect == "punctuality" else .35 if aspect.startswith("notification_") else 1
 
 
-def resolve(requirement):
+def resolve(requirement, version=VERSION):
     required, stated = {"schema", "carrier_id", "aspect"}, {"verdict", POSITIVE, NEGATIVE}
     scope = {"shipping_class", "date_from", "date_to"}
     if (type(requirement) is not dict or not required <= set(requirement) <= required | stated | scope | {"min_assessed"} or
-            requirement["schema"] != VERSION or not stated & set(requirement) or
+            requirement["schema"] != version or not stated & set(requirement) or
             any(type(requirement[key]) is not str or not requirement[key]
                 for key in (required | scope) & set(requirement))):
         raise ValueError("Declare a carrier, an aspect and a verdict, a number of positive or of negative comments")
@@ -71,11 +71,12 @@ def resolve(requirement):
 
 
 def footprint(world, requirement, api):
-    """What the block decides: the carrier's reviews."""
+    """What the block decides, the carrier's reviews, and what its probability reads: its shipments' histories."""
     requirement = resolve(requirement)
     if not any(c["carrier_id"] == requirement["carrier_id"] for c in world["carrier_evidence"]["public"]["carriers"]):
         raise ValueError("Unknown carrier")
-    return SimpleNamespace(writes={("carrier_reviews", "", requirement["carrier_id"])}, reads=set())
+    return SimpleNamespace(writes={("carrier_reviews", "", requirement["carrier_id"])},
+                           reads={("carrier_shipments", "", requirement["carrier_id"])})
 
 
 def task(world, requirement):
@@ -106,15 +107,18 @@ def site(world, requirement, api):
                 stated["shipping_class"] not in ("all", review["shipping_class"]) or
                 not stated.get("date_from", "0001-01-01") <= review["date"] <= stated.get("date_to", "9999-12-31")):
             continue
-        weights = {name: weight(name) for name in aspects}
-        chance = text * fsum(share * included(weights, requirement["aspect"], min(len(aspects), slots))
-                             for slots, share in MENTIONED.items())
         shipments.append(SimpleNamespace(
-            id=history["shipment_id"], history=history, chance=chance,
+            id=history["shipment_id"], history=history, chance=mention(text, aspects, requirement["aspect"]),
             sign=next(found["sentiment"] for found in history["observations"] if found["aspect"] == requirement["aspect"]),
             key=(streams.CARRIER, producer.VERSION + "/review/" + history["shipment_id"])))
     return SimpleNamespace(requirement=requirement, carrier_id=requirement["carrier_id"], aspect=requirement["aspect"],
                            seed=corpus["seed"], text=text, shipments=shipments, producer=producer, native=native)
+
+
+def mention(text, aspects, aspect):
+    """The probability that a review mentions an aspect, given the aspects its shipment's history observed."""
+    weights = {name: weight(name) for name in aspects}
+    return text * fsum(share * included(weights, aspect, min(len(aspects), slots)) for slots, share in MENTIONED.items())
 
 
 def drawn(place, shipment, seed):
@@ -216,6 +220,25 @@ def check(world, requirement, api):
             "written_review_count": reference["written_review_count"], "assessed_count": reference["assessed_count"]}
 
 
+def placed(rng, shipments, tails, count):
+    """Which of some shipments mention the aspect, given that `count` of them do.
+
+    Decided one after another: a shipment mentions it with its chance times
+    the probability that the rest make up the remainder, over the probability
+    that it and the rest make up what is left. The ratio is formed in
+    logarithms, since the tails can be far below the float range while it is
+    not; when as many are still needed as are left, all of them must.
+    """
+    found, left = [], count
+    for index, shipment in enumerate(shipments):
+        found.append(bool(left) and (left == len(shipments) - index or shipment.chance > 0 and rng.random() < exp(
+            log(shipment.chance) + tails[index + 1][left - 1] - tails[index][left])))
+        left -= found[-1]
+    if left:
+        raise AssertionError("The mentions placed do not add up to the count")
+    return found
+
+
 def prepare(natural, requirement, api, rng):
     """Sample the block on the natural world; the step replays it and reads the result."""
     block = model(natural, requirement, api)
@@ -223,21 +246,13 @@ def prepare(natural, requirement, api, rng):
     picked = dict(zip(SIGNS, pick_log(rng, list(block.log_terms), list(block.log_terms.values()))))
     seeds, tries = {}, 0
     for sign, shipments in block.groups.items():
-        left, tails = picked[sign], block.tails[sign]
-        for index, shipment in enumerate(shipments):
-            # Given how many of the remaining shipments mention the aspect, whether this one does.
-            # All of them must when as many are still needed as are left.
-            mention = bool(left) and (left == len(shipments) - index or rng.random() < shipment.chance * exp(
-                tails[index + 1][left - 1] - tails[index][left]))
-            left -= mention
+        for shipment, mention in zip(shipments, placed(rng, shipments, block.tails[sign], picked[sign])):
             for _ in range(TRIES):
                 seeds[shipment.id], tries = rng.getrandbits(64), tries + 1
                 if (place.aspect in drawn(place, shipment, seeds[shipment.id])) == mention:
                     break
             else:
                 raise NumericalLimit("A review's class is too rare to reach by redrawing the review")
-        if left:
-            raise AssertionError("The mentions placed do not add up to the count picked")
     script = {shipment.key: streams.Reseeded(seeds[shipment.id]) for shipment in place.shipments}
 
     def record(world):

@@ -577,9 +577,12 @@ the review is of its class. The rejection is inside one review, where a class
 is as likely as `reviews.shares` says (a few percent for a topic's praise or
 complaint at the defaults) and does not get rarer with the requirement; what
 makes a requirement rare is the counts, and those are chosen exactly. The
-record states how many redraws a sample took. A review whose class had a
-probability below about one in a million would exhaust the limit of redraws
-and is refused as a numerical limit; no input so far is near that. None of
+record states how many redraws a sample took. Each review gets at most
+1,000,000 proposals; for class probability p, the chance of exhausting that
+limit is (1 − p)^1,000,000. Exhaustion raises `NumericalLimit`; this is not a
+deterministic cutoff at p ≈ 10^-6, and no input so far is near it. Retaining
+only successful complete runs can reweight the chosen count mixture when
+rejection-limit failures are appreciable. None of
 the seed's own block draws is kept, also for reviews that say nothing. Every
 other draw of a review is the seed's own (the option bought, the sizing
 remarks, the other aspects' normal draws, the phrasing), and reads the
@@ -653,11 +656,9 @@ What it cannot do follows from the choice of block: **what happened to the
 shipments is not steered**. A carrier whose handovers all went well has no
 complaint about handover to write, and a requirement of one has probability
 zero given upstream; so does any count above the number of shipments with
-such an observation in scope. To steer that, the histories would have to
-join the block, and a history is one long stream of dependent draws (dates,
-collection or home, failures, each outcome by the carrier's quality level)
-for which this code has no closed form. The candidates tool leaves out
-verdicts the histories rule out.
+such an observation in scope. The tenth requirement puts the histories into
+the block for the two aspects where that has a short closed form. The
+candidates tool leaves out verdicts the histories rule out.
 
 The resource is `("carrier_reviews", "", carrier)`: independent of commerce
 blocks, of product reviews and of other carriers' reviews, coupled with
@@ -677,6 +678,70 @@ The check reads the steered world with the native
 `carrier_review_task.reference` in the task's scope and compares it with the
 recorded reviews.
 
+Carrier count weights are computed in logarithms, and the sequential choice
+of which shipments mention the aspect forms its ratio in logarithms too, so
+per-shipment probabilities far below the float range of their products do
+not overflow it (`carriers.placed`; the fourteenth review found the earlier
+form could).
+
+## The tenth requirement: what happened to a carrier's shipments, and what its reviews say of it
+
+Requirement (`steered-carrier-shipments-topic-v1`): the fields of the ninth,
+for the aspects `handoff` and `punctuality`.
+
+```json
+{"schema": "steered-carrier-shipments-topic-v1",
+ "carrier_id": "carrier-01", "aspect": "handoff",
+ "shipping_class": "regular", "date_from": "2026-08-14",
+ "verdict": "more_negative", "min_assessed": 3}
+```
+
+Here the block is every shipment of the carrier, history and review. Both
+aspects are observed for a shipment delivered to the door at the first
+attempt, and what decides that and its outcome is a short chain of draws in
+`carrier_service_pilot.model.history`, each of fixed probability: which of
+the carrier's two services the shipment used (0.7 for the first), whether it
+went to a collection point (a quarter of regular shipments when the carrier
+has points), whether the first attempt failed (the recipient is at home nine
+times in ten; otherwise the parcel must be allowed to be left and the
+carrier must get in), the dates (a start 10 to 90 days back, the retailer's
+delay, transit, the day chosen, one to three days late when not on time),
+and whether the promise was kept, by the carrier's quality level.
+`shipments.shares` multiplies these out per service, with the review's
+chance of mentioning the aspect given what such a shipment observes, into
+the probability that one shipment yields a positive comment in the task's
+scope, a negative one, or neither. The date part is an enumeration of the
+days, since the review is dated by the first attempt and lateness is the
+punctuality observation itself. A carrier's shipments draw independently and
+alike, so the counts are multinomial, as for product reviews.
+
+A sample picks the counts, places them on shipments at random and redraws
+each shipment's two streams (history and review) under fresh seeds until it
+is of its class. The class is read with the producer's own `history`
+function under the reseeded stream, and the review's lines as in the ninth;
+only the probabilities are this code's arithmetic. Nothing of the carrier's
+own shipments is kept. The carrier's quality levels, its policy and its
+services are upstream: a carrier with strong handover keeps its promise 95
+times in 100 and complaints stay rare, but they are possible, and the
+probability says how rare.
+
+The block writes two resources, the carrier's reviews and its shipments
+`("carrier_shipments", "", carrier)`; the reviews-only block of the ninth
+requirement declares the shipments as what it reads, so the two are coupled
+on one carrier in either order and independent across carriers.
+`blocks.background` leaves out, besides what the ninth does, this carrier's
+histories and the metrics counted from them, and compares the other
+carriers' histories, every carrier's policy and quality levels, and the
+commerce world.
+
+The fixed shares in `history` (0.7, 0.25, 0.15, 0.9, 0.5, 0.25, 0.35, 0.8,
+the 10 to 90 days) are the producer's own constants, written out in
+`shipments.py`; `test_shipments.py` checks each factor by itself against the
+producer's draws as well as the class probabilities. Other aspects are not
+modelled at this level: tracking and notices have longer chains, and
+handling and collection are observed for collected parcels, whose receipt
+date depends on opening hours.
+
 ## Requirement candidates for a native task
 
 `variants.of(world, task, api)` takes a native task specification (the
@@ -692,7 +757,7 @@ the block model gives each:
 | `comparison_cheapest_exact_sku_stock` (with the bound `sku_id`) | the retailer shown cheapest holds the variant, has it only on supplier order, or has it unavailable |
 | `audit_free_shipping_claim` | no threshold; meets; below; just below; just meets |
 | `summarize_product_reviews` (topic counts over a pilot product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed` |
-| `summarize_carrier_reviews` (topic counts) | the same four verdicts in the task's scope, without those the shipments' histories rule out |
+| `summarize_carrier_reviews` (topic counts) | the same four verdicts in the task's scope, without those the shipments' histories rule out; for `handoff` and `punctuality` also `redrawn_shipments_verdict_...`, the four verdicts with the carrier's shipments redrawn |
 
 A task is translated field by field, and a task with a field the tool does
 not carry into the requirement is refused with a `ValueError` that names the
@@ -729,7 +794,7 @@ only that matching offers exist, not which is cheapest.
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the nine kinds above, that must all hold.
+of the ten kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -750,7 +815,8 @@ price of one retailer/product:
 | Which models make the shortlist | stock and price of every listed pair of the concept with an offer that competes | nothing |
 | A basket against the free-shipping threshold | the retailer's threshold, and the price of the retailer/product unless no threshold is required | nothing |
 | What a product's reviews say about a topic | the product's reviews | nothing |
-| What a carrier's reviews say about an aspect | the carrier's reviews (and the wording of other carriers' reviews, which nothing is judged on) | nothing |
+| What a carrier's reviews say about an aspect | the carrier's reviews (and the wording of other carriers' reviews, which nothing is judged on) | the carrier's shipments |
+| What happened to a carrier's shipments and what its reviews say | the carrier's shipments and its reviews | nothing |
 
 `blocks.independent` accepts a list of blocks when no block decides a
 resource that another decides or depends on. The producer draws separate
@@ -826,6 +892,7 @@ ever be cheapest. Receipts and worlds are under
 | `suite/variants/CASE/run-v1/` for twelve suite tasks | `3d99dd0`, `19a2562` | every candidate the tool writes for the task, sampled and checked; 10,000 redraws |
 | `suite/variants/B09/`, `H10/` (`run-v1`) | `6040664` | the product-review tasks' candidates; 10,000 redraws |
 | `suite/variants/B09-rare/`, `B16/`, `B16-tracking/` (`run-v1`) | `51aefce` | rarer review requirements (200,000 redraws); the carrier-review task's candidates (10,000) |
+| `suite/variants/B16-shipments/`, `B16-punctuality/` (`run-v1`) | `e837e7f` | the carrier-review task with the carrier's shipments redrawn; 50,000 redraws |
 
 Requirement files are in `steering/`, `steering/stock/`, `steering/price/`,
 `steering/cheapest/` and `steering/combined/`. Commit `832238a6` moved the
@@ -1283,6 +1350,40 @@ does not offer them. Of that world's eight carriers one has any bad handover
 in scope. This is the limit stated under the ninth requirement, met on the
 suite's own task.
 
+The same task with the carrier's shipments redrawn (the tenth requirement),
+and the same on punctuality with at least two assessing comments
+(`suite/variants/B16-shipments/`, `B16-punctuality/`, launched by
+`launch-shipments.sh`; `variants` now writes both families of candidates;
+50,000 redraws), at steering commit `e837e7f`:
+
+| Task | World (retailers / products; reviews) | Candidate | Probability given upstream | Natural counts | Samples (positive, negative; redraws; seconds) | Hits in redraws | Expected |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| B16-shipments | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_insufficient_evidence` | 0.977 | 2 positive, 0 negative | 1, 0; 0, 0; 0, 0; 32–264 redraws; 0.52–0.65 s | 48812 of 50,000 | 48838 ± 34 |
+| B16-shipments | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_more_negative` | 0.000147 | 2 positive, 0 negative | 1, 2; 1, 2; 1, 2; 142–3610 redraws; 0.52–0.67 s | 9 of 50,000 | 7.4 ± 2.7 |
+| B16-shipments | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_more_positive` | 0.023 | 2 positive, 0 negative | 4, 0; 3, 0; 3, 0; 190–344 redraws; 0.52–0.55 s | 1178 of 50,000 | 1152 ± 34 |
+| B16-shipments | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_tie` | 3.86e-05 | 2 positive, 0 negative | 2, 2; 2, 2; 2, 2; 1563–6782 redraws; 0.61–0.80 s | 1 of 50,000 | 1.9 ± 1.4 |
+| B16-shipments | 7 / 30; 8 shipments in the block | `verdict_insufficient_evidence` | 0.978 | 2 positive, 0 negative, 0 neutral | 1, 0; 0, 0; 0, 0; 8–14 redraws; 0.53–0.54 s | 48817 of 50,000 | 48884 ± 33 |
+| B16-shipments | 7 / 30; 8 shipments in the block | `verdict_more_positive` | 0.0223 | 2 positive, 0 negative, 0 neutral | 3, 0; 3, 0; 3, 0; 17–83 redraws; 0.52–0.53 s | 1183 of 50,000 | 1116 ± 33 |
+| B16-punctuality | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_insufficient_evidence` | 0.731 | 1 positive, 0 negative | 0, 0; 1, 0; 1, 0; 34–50 redraws; 0.52–0.65 s | 36612 of 50,000 | 36556 ± 99 |
+| B16-punctuality | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_more_negative` | 0.00102 | 1 positive, 0 negative | 0, 2; 1, 2; 1, 2; 1019–1950 redraws; 0.58–0.62 s | 54 of 50,000 | 51 ± 7 |
+| B16-punctuality | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_more_positive` | 0.249 | 1 positive, 0 negative | 2, 0; 2, 0; 2, 0; 50–184 redraws; 0.53–0.57 s | 12418 of 50,000 | 12443 ± 97 |
+| B16-punctuality | 7 / 30; 32 shipments, all redrawn | `redrawn_shipments_verdict_tie` | 0.019 | 1 positive, 0 negative | 1, 1; 1, 1; 1, 1; 94–891 redraws; 0.53–0.57 s | 916 of 50,000 | 950 ± 31 |
+| B16-punctuality | 7 / 30; 8 shipments in the block | `verdict_insufficient_evidence` | 0.706 | 1 positive, 0 negative, 0 neutral | 1, 0; 0, 0; 0, 0; 8–15 redraws; 0.52–0.54 s | 35185 of 50,000 | 35315 ± 102 |
+| B16-punctuality | 7 / 30; 8 shipments in the block | `verdict_more_positive` | 0.294 | 1 positive, 0 negative, 0 neutral | 2, 0; 2, 0; 2, 0; 18–24 redraws; 0.50–0.53 s | 14815 of 50,000 | 14685 ± 102 |
+
+With the shipments in the block all four verdicts can occur on B16's own
+input. "More negative" with at least three assessing comments has
+probability 1.5e-4 (one world in about 6,800) and "tie" 3.9e-5 (one in about
+26,000); each sample takes 0.5 to 0.8 s, of which up to 6,800 redraws of
+single shipments are a small part. The rows without the prefix are the
+reviews-only candidates again at this commit. All 36 samples satisfied their
+requirement by the native task's reference and by the direct reading of the
+saved shipments and reviews; the largest deviation among the twelve redraw
+counts is 2.0 standard errors (the reviews-only `verdict_more_positive`,
+1,183 against 1,116 ± 33). The two rarest rows have one and nine hits, so
+their counts test little; their probabilities rest on the factors that
+`test_shipments.py` checks one by one.
+
 All of these are dev-producer worlds from the suite's inputs, not the
 suite's frozen worlds, and nothing here is published or bound to a task
 instance.
@@ -1430,8 +1531,10 @@ carries review and description text that the checks also digest.
   carrier's reviews mention an aspect. Not steered: reviews of the other
   concepts, which a package program draws under one hashed seed per review;
   the star summaries; one option's reviews; the topics that depend on the
-  option bought or the wearer; and what happened to a carrier's shipments,
-  which bounds what its reviews can be made to say. Which reviews a review
+  option bought or the wearer. What happened to a carrier's shipments is
+  steered for handover and punctuality only; for the other aspects it bounds
+  what the reviews can be made to say. A carrier's quality levels and
+  services are the seed's. Which reviews a review
   site shows, and which products a comparison site lists, are the seed's.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
   against a basket's subtotal. Carrier fees, which carriers and service tiers

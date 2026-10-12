@@ -288,9 +288,11 @@ class Session:
         """Returns the world and the stream keys the producer opened."""
         options = {k: v for k, v in self.inputs.items() if k != "seed"}
         opened, plan = [], plan or {}
-        reviews = {key[1:]: entry for key, entry in plan.items() if type(key) is tuple and key[0] == REVIEW}
-        carriers = {key[1]: entry for key, entry in plan.items()
-                    if type(key) is tuple and len(key) == 2 and key[0] == CARRIER}
+        # A key is a commerce stream's name, (REVIEW, product seed, stream name) or (CARRIER, stream name).
+        named = lambda key, kind, length: (type(key) is tuple and len(key) == length and key[0] == kind and
+                                           type(key[-1]) is str and bool(key[-1]))
+        reviews = {key[1:]: entry for key, entry in plan.items() if named(key, REVIEW, 3) and type(key[1]) is int}
+        carriers = {key[1]: entry for key, entry in plan.items() if named(key, CARRIER, 2)}
         commerce = {key: entry for key, entry in plan.items() if type(key) is str}
         if len(reviews) + len(carriers) + len(commerce) != len(plan):
             raise PlanMismatch("A plan names commerce streams, product review streams and carrier review streams")

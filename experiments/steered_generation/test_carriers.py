@@ -7,6 +7,7 @@ carrier corpus, its histories and its reviews are the producer's, and the
 native carrier-review task reads the steered worlds.
 """
 from collections import Counter
+from fractions import Fraction
 from itertools import product as combinations
 from math import exp, prod
 from pathlib import Path
@@ -106,6 +107,23 @@ class ModelTests(Carriers):
                 for number, value in enumerate(tails[start]):
                     self.assertAlmostEqual(exp(value), direct[number], places=12, msg=(chances, start, number))
 
+    def test_mentions_are_placed_by_their_conditional_probabilities(self):
+        rng = Random(21)
+        for chances, count in (([.07, .08, .2, .9, .33], 2), ([.5, 0, 1, .25], 2), ([.3, .3, .3], 3), ([.3, .6], 0),
+                               # Chances far below what a product of them can hold as a float.
+                               ([1e-320, 1e-320], 1), ([1e-200, 3e-200, 1e-200, .5], 2)):
+            shipments = [SimpleNamespace(chance=chance) for chance in chances]
+            tails, trials = carriers.counts(shipments), 20000
+            seen = Counter(tuple(carriers.placed(rng, shipments, tails, count)) for _ in range(trials))
+            weights = {outcome: prod(c if hit else 1 - c for c, hit in zip(map(Fraction, chances), outcome))
+                       for outcome in combinations((False, True), repeat=len(chances)) if sum(outcome) == count}
+            total = sum(weights.values())
+            for outcome, mass in weights.items():
+                chance = float(mass / total)
+                self.assertLess(abs(seen[outcome] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 1e-12,
+                                (chances, outcome))
+            self.assertEqual(sum(seen.values()), sum(seen[outcome] for outcome in weights))
+
     def test_probabilities_match_other_seeds(self):
         trials = 5000
         for requirement in self.requirements():
@@ -158,7 +176,8 @@ class ModelTests(Carriers):
         step = carriers.prepare(self.natural, requirement, self.api, Random(3))
         self.assertEqual(set(step.script), {shipment.key for shipment in place.shipments})
         self.assertEqual(len({entry.seed for entry in step.script.values()}), len(place.shipments))
-        self.assertEqual((step.writes, step.reads), ({("carrier_reviews", "", self.mixed)}, set()))
+        self.assertEqual((step.writes, step.reads), ({("carrier_reviews", "", self.mixed)},
+                                                     {("carrier_shipments", "", self.mixed)}))
 
 
 class ProducerTests(Carriers):

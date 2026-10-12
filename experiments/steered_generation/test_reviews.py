@@ -310,8 +310,15 @@ class ProducerTests(Reviews):
                 self.assertNotIsInstance(caught.exception, prices.ZeroMass)
         with self.assertRaises(streams.PlanMismatch):
             self.session.generate({(streams.REVIEW, 1, "reviews/walking_shoes/0/rating"): [("random", .5)]})
-        with self.assertRaises(streams.PlanMismatch):
-            self.session.generate({("other", 1, "key"): streams.Reseeded(1)})
+        for key in (("other", 1, "key"), (), (streams.REVIEW,), (streams.REVIEW, 1), (streams.REVIEW, 1, 42),
+                    (streams.REVIEW, "1", "key"), (streams.REVIEW, 1, "key", "more"), (streams.CARRIER, 42),
+                    (streams.CARRIER,), (streams.CARRIER, "key", "more"), (streams.CARRIER, ""), 7, None):
+            with self.subTest(key=key), self.assertRaises(streams.PlanMismatch):
+                self.session.generate({key: streams.Reseeded(1)})
+        # A well-formed key the producer never opens is not an error for a reseeded stream.
+        untouched = self.session.generate({(streams.REVIEW, 1, "no/such/stream"): streams.Reseeded(1),
+                                           (streams.CARRIER, "no/such/stream"): streams.Reseeded(1)})[0]
+        self.assertEqual(untouched["world_id"], self.natural["world_id"])
 
     def test_candidates_for_the_review_summary_task(self):
         task = {"kind": "summarize_product_reviews", "concept_id": SHOES, "operation": "topic_counts", "product_index": 2,

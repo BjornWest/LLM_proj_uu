@@ -210,23 +210,34 @@ def holds(requirement, positive, negative):
             within(requirement.get(POSITIVE, {}), positive) and within(requirement.get(NEGATIVE, {}), negative))
 
 
-def model(world, requirement, api):
-    """The counts that satisfy the requirement, with the logarithm of each one's probability."""
-    place = site(world, requirement, api)
-    share, count = shares(place), place.count
+def multinomial(count, share, accepts):
+    """The accepted (positive, negative) counts among `count` alike, independent draws, with log probabilities.
+
+    Returns the terms and the logarithm of their sum, or None when no count
+    with a positive probability is accepted.
+    """
     terms = {}
     for positive in range(count + 1):
         for negative in range(count + 1 - positive):
             parts = ((positive, share[POSITIVE]), (negative, share[NEGATIVE]), (count - positive - negative, share[REST]))
-            if holds(place.requirement, positive, negative) and all(mass > 0 or not number for number, mass in parts):
+            if accepts(positive, negative) and all(mass > 0 or not number for number, mass in parts):
                 terms[positive, negative] = lgamma(count + 1) + fsum(
                     number * log(mass) - lgamma(number + 1) for number, mass in parts if number)
     if not terms:
-        raise ZeroMass("no_outcome", "No counts of this product's reviews satisfy the requirement in this world")
+        return None
     top = max(terms.values())
-    log_probability = top + log(fsum(exp(value - top) for value in terms.values()))
-    return SimpleNamespace(site=place, shares=share, log_terms=terms, log_probability=min(0.0, log_probability),
-                           probability=exp(min(0.0, log_probability)))
+    return terms, min(0.0, top + log(fsum(exp(value - top) for value in terms.values())))
+
+
+def model(world, requirement, api):
+    """The counts that satisfy the requirement, with the logarithm of each one's probability."""
+    place = site(world, requirement, api)
+    share = shares(place)
+    found = multinomial(place.count, share, lambda positive, negative: holds(place.requirement, positive, negative))
+    if found is None:
+        raise ZeroMass("no_outcome", "No counts of this product's reviews satisfy the requirement in this world")
+    return SimpleNamespace(site=place, shares=share, log_terms=found[0], log_probability=found[1],
+                           probability=exp(found[1]))
 
 
 def written(world, place):

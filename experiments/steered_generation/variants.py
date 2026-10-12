@@ -25,7 +25,7 @@ import json
 from math import log
 from pathlib import Path
 
-from . import carriers, cheapest, combined, listed, prices, reviews, shortlist, stock, streams, threshold
+from . import carriers, cheapest, combined, listed, prices, reviews, shipments, shortlist, stock, streams, threshold
 
 # Native task kinds read by the cheapest-available block, with the fields of the task that state the reading.
 # A comparison site goes with the surrounding-site controls the world is published with (`surrounding`).
@@ -220,20 +220,22 @@ def review_verdicts(world, task, api):
     return verdicts(world, base, api, reviews)
 
 
-def verdicts(world, base, api, module):
+def verdicts(world, base, api, module, prefix="", note=""):
     words = {"more_positive": "more comments report the topic favourably than unfavourably",
              "more_negative": "more comments report the topic unfavourably than favourably",
              "tie": "as many comments report the topic favourably as unfavourably",
              "insufficient_evidence": "fewer comments assess the topic than the task asks for"}
-    return [entry("verdict_" + row[1]["verdict"], words[row[1]["verdict"]], row)
+    return [entry(prefix + "verdict_" + row[1]["verdict"], words[row[1]["verdict"]] + note, row)
             for row in ranked(world, [{**base, "verdict": verdict} for verdict in reviews.VERDICTS], api, module)]
 
 
 def carrier_verdicts(world, task, api):
     """The carrier-review task's verdict on one carrier and aspect: one candidate per verdict that can occur.
 
-    What happened to the carrier's shipments is not steered, so a verdict the
-    shipments' histories rule out is not among them.
+    Twice over where the aspect allows it: with what happened to the
+    carrier's shipments kept, so that a verdict their histories rule out is
+    not among the candidates, and (`redrawn_shipments_...`) with the shipments
+    redrawn as well.
     """
     if task.get("operation") != "topic_counts":
         raise ValueError("Steering states topic counts over a carrier's reviews, not ratings")
@@ -244,7 +246,11 @@ def carrier_verdicts(world, task, api):
     base = {"schema": carriers.VERSION, "carrier_id": names[index], "aspect": task.get("aspect"),
             "min_assessed": task.get("min_assessed", 1),
             **{key: task[key] for key in ("shipping_class", "date_from", "date_to") if key in task}}
-    return verdicts(world, base, api, carriers)
+    found = verdicts(world, base, api, carriers, note="; what happened to the shipments is kept")
+    if base["aspect"] in shipments.MODELLED:
+        found += verdicts(world, {**base, "schema": shipments.VERSION}, api, shipments, "redrawn_shipments_",
+                          "; the carrier's shipments are redrawn")
+    return found
 
 
 def of(world, task, api):
