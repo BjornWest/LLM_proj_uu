@@ -25,6 +25,8 @@ SOURCES={
     'scripts/cpu_kv_offload_probe.py':'/opt/training/scripts/cpu_kv_offload_probe.py',
     'scripts/spec_decode_benchmark.py':'/opt/training/scripts/spec_decode_benchmark.py',
     'scripts/modal_rl_image.py':'/opt/training/scripts/modal_rl_image.py',
+    'scripts/apply_vllm_cpu_kv_patch.py':'/opt/training/scripts/apply_vllm_cpu_kv_patch.py',
+    'patches/vllm028_mtp_cpu_offload.patch':'/opt/training/patches/vllm028_mtp_cpu_offload.patch',
     'browser_training/compiler_environment.py':'/opt/training/browser_training/compiler_environment.py',
     'browser_training/browser_benchmark_prompts.py':'/opt/training/browser_training/browser_benchmark_prompts.py',
     'browser_training/__init__.py':'/opt/training/browser_training/__init__.py',
@@ -52,8 +54,12 @@ def forward_log(path, offset):
 if modal.is_local():
     from modal_rl_image import build_image
     image=build_image(ROOT)
+    # Backport only this diagnostic's image; the reusable default image is unchanged.
+    copied=('scripts/apply_vllm_cpu_kv_patch.py','patches/vllm028_mtp_cpu_offload.patch')
+    for name in copied:image=image.add_local_file(ROOT/name,SOURCES[name],copy=True)
+    image=image.run_commands(PYTHON+' -B /opt/training/scripts/apply_vllm_cpu_kv_patch.py --install-in-place --receipt /opt/rl/mtp-offload-backport.json')
     for name,path in SOURCES.items():
-        if not name.startswith('envs/rl/'):image=image.add_local_file(ROOT/name,path)
+        if not name.startswith('envs/rl/')and name not in copied:image=image.add_local_file(ROOT/name,path)
 else:image=None
 cache=modal.Volume.from_name('browser-training-model-cache')
 results=modal.Volume.from_name('browser-training-results')
@@ -72,12 +78,14 @@ from huggingface_hub import snapshot_download
 from transformers import AutoTokenizer
 from safetensors import safe_open
 from cpu_kv_offload_probe import server_command,PROMPT_TOKENS
+from apply_vllm_cpu_kv_patch import apply_patch
 from browser_training.browser_benchmark_prompts import make_prompt
 from vllm.entrypoints.openai.cli_args import make_arg_parser,validate_parsed_serve_args
 from vllm.utils.argparse_utils import FlexibleArgumentParser
 from vllm.entrypoints.openai.completion.protocol import CompletionRequest
 import torch
 assert version('vllm')=='0.28.0' and version('torch').split('+')[0]=='2.13.0' and torch.version.cuda=='13.0'
+backport=apply_patch(verify_only=True)
 base=Path(snapshot_download({MODEL!r},revision={REVISION!r},local_files_only=True))
 index=json.loads((base/'model.safetensors.index.json').read_text())
 assert all((base/name).is_file() for name in set(index['weight_map'].values()))
@@ -109,7 +117,8 @@ cuda=Path(distribution('nvidia-cuda-nvcc').locate_file('nvidia/cu13'))
 assert (cuda/'bin/nvcc').is_file() and (cuda/'lib/libcudart.so.13').is_file()
 print(json.dumps(dict(snapshot=str(base),revision={REVISION!r},prompts=str(path),prompt_sha256=sha,
     cuda_home=str(cuda),fp8_weight=fp8,vllm=version('vllm'),torch=version('torch'),cuda=torch.version.cuda,
-    transformers=version('transformers'),checkpoint_config_sha256=hashlib.sha256((base/'config.json').read_bytes()).hexdigest())))
+    transformers=version('transformers'),vllm_backport=backport,
+    checkpoint_config_sha256=hashlib.sha256((base/'config.json').read_bytes()).hexdigest())))
 '''
     proc=subprocess.run([PYTHON,'-c',code],text=True,capture_output=True,timeout=840,
         env=dict(os.environ,VLLM_TARGET_DEVICE='cpu',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1'))
@@ -196,6 +205,7 @@ if receipt.exists():
 
 
 def main():
+    from apply_vllm_cpu_kv_patch import PATCH_ID,RESULT_SHA256
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env-file',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
@@ -207,6 +217,7 @@ def main():
     plan=dict(model=MODEL,revision=REVISION,gpu='RTX-PRO-6000',GPU_count=1,CPU_bytes=CPU_BYTES,
         mtp=3,input_tokens=PROMPT_TOKENS,output_tokens=OUTPUT_TOKENS,request_upper_bound=MAX_REQUESTS,
         main_requests=7,retries=0,model_downloads=False,prepare_only=args.prepare_only,job_cap_seconds=args.job_cap_seconds,
+        vllm_backport=dict(patch_id=PATCH_ID,source_sha256=RESULT_SHA256),
         allow_ungraded=True,ungraded_reason='Isolated inference/KV restoration diagnostic, no browser task quality claims',
         source_sha256=hashes(),git_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
     if args.dry_run:print(json.dumps(plan,indent=2));return

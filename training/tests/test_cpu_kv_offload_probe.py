@@ -90,12 +90,14 @@ class ProbeGateTests(unittest.TestCase):
         argv=p.server_command('/snapshot')
         config={'model_config':{'model':'/snapshot'},'speculative_config':{'method':'mtp','num_speculative_tokens':3},
             'kv_transfer_config':json.loads(argv[argv.index('--kv-transfer-config')+1]),
-            'cache_config':{'block_size':p.CACHE_BLOCK_SIZE}}
+            'cache_config':{'block_size':p.CACHE_BLOCK_SIZE,'prefix_match_unit':None}}
         self.assertEqual(p.validate_server({'vllm_config':config},'/snapshot'),config)
         for key,value in [('num_speculative_tokens',2),('method','eagle')]:
             bad=copy.deepcopy(config);bad['speculative_config'][key]=value
             with self.assertRaises(ValueError):p.validate_server({'vllm_config':bad},'/snapshot')
         bad=copy.deepcopy(config);bad['kv_transfer_config']['kv_connector']='Other'
+        with self.assertRaises(ValueError):p.validate_server({'vllm_config':bad},'/snapshot')
+        bad=copy.deepcopy(config);bad['cache_config']['prefix_match_unit']=416
         with self.assertRaises(ValueError):p.validate_server({'vllm_config':bad},'/snapshot')
 
     def test_latency_excludes_artifact_writes_and_response_is_saved_once(self):
@@ -222,7 +224,7 @@ class DriverLifecycleTests(unittest.TestCase):
         argv=p.server_command(snapshot)
         config={'model_config':{'model':snapshot},'speculative_config':{'method':'mtp','num_speculative_tokens':3},
             'kv_transfer_config':json.loads(argv[argv.index('--kv-transfer-config')+1]),
-            'cache_config':{'block_size':p.CACHE_BLOCK_SIZE}}
+            'cache_config':{'block_size':p.CACHE_BLOCK_SIZE,'prefix_match_unit':None}}
         for ignore_final,slow_cleanup in [(False,False),(True,False),(False,True)]:
             with self.subTest(ignore_final=ignore_final,slow_cleanup=slow_cleanup),tempfile.TemporaryDirectory()as tmp:
                 root=Path(tmp);prompts=root/'prompts.json'
@@ -252,6 +254,7 @@ class DriverLifecycleTests(unittest.TestCase):
                 server=Mock(pid=999999);server.poll.return_value=None
                 if slow_cleanup:server.wait.side_effect=p.subprocess.TimeoutExpired('test-server',15)
                 with patch('importlib.metadata.version',return_value='0.28.0'),patch.object(p,'Probe',FakeProbe),\
+                        patch('apply_vllm_cpu_kv_patch.apply_patch',return_value={'patch_id':'mock-driver-only'}),\
                         patch.object(p.os,'statvfs',return_value=SimpleNamespace(f_bavail=32<<30,f_frsize=1)),\
                         patch.object(p.subprocess,'Popen',return_value=server),patch.object(p.os,'killpg')as kill:
                     report=p.run(SimpleNamespace(output=root/'result',prompts=prompts,snapshot=snapshot,deadline=time.time()+900))
@@ -269,9 +272,23 @@ class DriverLifecycleTests(unittest.TestCase):
         with tempfile.TemporaryDirectory()as tmp:
             root=Path(tmp);prompts=root/'prompts.json'
             prompts.write_text(json.dumps(dict(main=[[1]*p.PROMPT_TOKENS,[2]*p.PROMPT_TOKENS],tick=[3])))
-            with patch('importlib.metadata.version',return_value='0.28.0'),patch.object(p.subprocess,'Popen')as popen:
+            with patch('importlib.metadata.version',return_value='0.28.0'),patch.object(p.subprocess,'Popen')as popen,\
+                    patch('apply_vllm_cpu_kv_patch.apply_patch',return_value={'patch_id':'mock-driver-only'}):
                 result=p.run(SimpleNamespace(output=root/'out',prompts=prompts,snapshot='/snapshot',deadline=time.time()+60))
                 popen.assert_not_called()
             self.assertFalse(result['passed']);self.assertIn('refuse model startup',result['error'])
+
+    def test_real_unpatched_package_is_rejected_before_model_start(self):
+        import tempfile,time
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory()as tmp:
+            root=Path(tmp)
+            with patch.object(p.subprocess,'Popen')as popen:
+                result=p.run(SimpleNamespace(output=root/'out',prompts=root/'unused-prompts',
+                    snapshot='/unused',deadline=time.time()+900))
+                popen.assert_not_called()
+            self.assertFalse(result['passed'])
+            self.assertIn('Required MTP offload backport is not installed',result['error'])
 
 if __name__=='__main__':unittest.main()

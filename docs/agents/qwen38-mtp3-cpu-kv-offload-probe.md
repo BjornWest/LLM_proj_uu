@@ -65,6 +65,56 @@ is required; finite but incorrect KV values require the separate token-ID check.
 screenshots, policy-versioned adapters, browser freshness or capacity parking.**
 Those follow after this isolated combination passes.
 
+## Pinned upstream backport
+
+The stock0.28 GPU diagnostic on2026-10-12 completed seven requests but restored
+zero tokens from CPU on both histories. GPU replay reused58,240 tokens. Each
+cold request recorded3,497,656,320 bytes in ten CPU-store transfers before the
+GPU-only reset. This connector writes completed KV to CPU proactively; it does
+not require GPU pressure to start those writes. Original evidence remains in
+`.local/coordination/cpu-kv-mtp3-20261012-v1/gpu-run-v1/`.
+
+The prospective probe image now includes the source-only
+`vllm028-mtp-cpu-offload-v1` backport in one scheduler file:
+
+| Upstream change | Merge commit | Purpose |
+| --- | --- | --- |
+| [54288](https://github.com/vllm-project/vllm/pull/54288) | `dc02934a07672eb778a8d819f4e35d0f93ee427b` | Do not offload the final sampled token before its KV is computed. |
+| [52807](https://github.com/vllm-project/vllm/pull/52807) | `da8ec2826898d47bd2fb424bc607052a6dc515c1` | Start partial-hit load scans at the locally computed boundary. |
+| [52771](https://github.com/vllm-project/vllm/pull/52771) | `4a806d08ee94b35356dd749bf814ee91ee93f8d0` | Remove the all-groups MTP fallback, widen draft lookups and publish stable finished tails. |
+
+The only production adaptation is using0.28's existing `use_eagle()` predicate
+where the newer patch context uses `use_eagle_block_drop()`. All upstream
+production changes are retained. The installer checks version0.28.0 plus exact
+original, patch and resulting file hashes; unknown bytes fail before mutation.
+Reapplication is idempotent. It must run before importing vLLM or starting
+workers, with no concurrent package installation. No binary kernels or model
+weights change. The common `build_image` factory and other serving apps stay
+unchanged; only this probe's image applies the backport.
+Installed-package modification requires explicit `--install-in-place` (the
+image build supplies it); default verification and explicit scratch-file tests
+do not mutate the shared local environment.
+
+Scope guard: this probe requires `prefix_match_unit: null` and1664-token blocks.
+In0.28, removing the all-groups fallback can also enable partial-tail offload
+when hash units are finer than physical blocks. That unqualified interaction
+must be resolved before using this patch with finer hash units or outside the
+isolated probe. Live configuration validation rejects non-null hash units.
+
+CPU preflight and GPU driver both verify the installed patched source, and save
+its identity. Stock0.28 cannot silently serve this prospective probe. These
+guards establish source identity, not GPU restoration correctness. A new
+isolated GPU result is still required before capacity/browser adoption.
+Local installer/probe controls include an actual native lookup with identical
+**synthetic** sparse checkpoint keys derived from0.28's MTP backoff: stock
+classification misses, patched classification restores exactly58,240 tokens,
+and a GPU-warm reference loads zero external tokens. Actual GPU retained keys
+have not been captured. An external, saved0.28 upstream test closure plus
+ported regression fixtures passes166 scheduler/config cases on a patched
+scratch module. Its baseline control fails the new classification and recurrent
+load-boundary checks. Fixtures use local OPT configuration only (no weights),
+mock transfers and a stubbed hybrid-capability check; no GPU kernels run.
+
 ## Reproducible preparation
 
 Use the exact reviewed source checkout, with the pinned dependencies present.
@@ -104,8 +154,8 @@ or GPU imports. The separate Modal SDK environment performs the offline dry-run.
 
 ```bash
 PYTHONPATH=training/scripts python3 scripts/run_bounded_job.py \
-  --memory-mib 2048 --tasks 128 -- training/envs/rl/.venv/bin/python -B \
-  -m unittest discover -s training/tests -p test_cpu_kv_offload_probe.py -v
+  --memory-mib 4096 --tasks 256 -- training/envs/rl/.venv/bin/python -B \
+  -m unittest discover -s training/tests -p '*cpu_kv*py' -v
 ```
 
 

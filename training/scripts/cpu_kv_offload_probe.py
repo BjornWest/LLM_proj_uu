@@ -81,7 +81,8 @@ def validate_server(info, snapshot):
             or config['kv_transfer_config']['kv_connector'] != 'OffloadingConnector'
             or extra['cpu_bytes_to_use'] != CPU_BYTES or extra['eviction_policy'] != 'lru'
             or extra['offload_prompt_only'] is not True
-            or config['cache_config']['block_size'] != CACHE_BLOCK_SIZE):
+            or config['cache_config']['block_size'] != CACHE_BLOCK_SIZE
+            or config['cache_config']['prefix_match_unit'] is not None):
         raise ValueError('MTP/offloading/cache configuration differs')
     return config
 
@@ -248,6 +249,8 @@ def run(args):
         from importlib.metadata import version
         if version('vllm') != '0.28.0':raise ValueError('Wrong installed vLLM version')
         report['vllm_version']=version('vllm')
+        from apply_vllm_cpu_kv_patch import apply_patch
+        report['vllm_backport']=apply_patch(verify_only=True)
         prompts=json.loads(args.prompts.read_text())
         if (len(prompts['main']) != 2 or any(len(p) != PROMPT_TOKENS for p in prompts['main'])
                 or not prompts['tick'] or len(prompts['tick']) > 64
