@@ -15,8 +15,8 @@ evaluates every derived value and condition (`resolve`, `_eval`); what is
 written here is the order of the steps, as `sample` runs them, and the
 probability of each outcome of a resolved draw: a weighted or uniform choice,
 a whole number from a range, the star rating, the set of topics, and a normal
-draw that the program reads through one threshold. A loop is followed where
-it only derives and collects values.
+draw that the program reads only through `>=` thresholds. A loop is followed
+where it only derives and collects values.
 
 The producer may wrap a package's review program in checks that refuse
 anything but a whole sample. The reading here runs on a plain copy made from
@@ -37,8 +37,9 @@ from types import SimpleNamespace
 
 from . import reviews, streams
 
-# A derived value that reads a normal draw through one threshold.
-THRESHOLD = re.compile(r"\s*([A-Za-z_][\w.]*)\s*>=\s*(\d+(?:\.\d*)?|\.\d+)\s*")
+# A path compared with a number by `>=` and nothing more: no arithmetic or further comparison on either side.
+# Read on text whose runs of white space are single spaces.
+ALONE, NUMBER = r"(?<![\w.])(?<![-+*/%<>=!])(?<![-+*/%<>=!] )", r" ?>= ?(\d+(?:\.\d*)?|\.\d+)(?![\w.])(?! ?[-+*/%<>=!])"
 # Review programs rebuilt from a world, by the producer module, the world's seed and the product.
 BUILT = {}
 
@@ -151,14 +152,16 @@ def site(world, item, api, native, **common):
         else:
             block.add(name)
         if step["sample"] == "normal":
-            users = [other for other in steps if other is not step and
-                     any(touches(step["target"], path) for path in read_by(twin, other))]
-            match = THRESHOLD.fullmatch(users[0].get("derive", "")) if len(users) == 1 else None
-            if (match is None or match[1] != step["target"] or "when" in users[0] or
-                    "applicable_when" in twin.fields[users[0]["target"]] or
-                    any(touches(step["target"], path) for path in read)):
-                raise unmodelled("a continuous draw the statements read other than through one threshold")
-            bounds[step["id"]] = (users[0]["target"], float(match[2]))
+            # Every mention of the draw, in the other steps and in the statements' conditions, is a threshold.
+            texts = [re.sub(r"\s+", " ", text) for text in [json.dumps(other) for other in steps if other is not step] + [
+                pool["when"] for rows in pools.values() for pool in rows if "when" in pool]]
+            name = re.escape(step["target"]) + r"(?![\w.])"
+            cuts = [re.findall(ALONE + name + NUMBER, text) for text in texts]
+            if (not any(cuts) or
+                    any(len(found) != len(re.findall(r"(?<![\w.])" + name, text)) for found, text in zip(cuts, texts)) or
+                    any(touches(step["target"], path) and path != step["target"] for path in needed)):
+                raise unmodelled("a continuous draw read other than through thresholds it must reach")
+            bounds[step["id"]] = sorted({float(cut) for found in cuts for cut in found})
     return SimpleNamespace(
         **common, reader=sys.modules[__name__], program=found, pools=pools, steps=steps, bounds=bounds,
         block=frozenset(block), drawn=frozenset(drawn), rating=rating[0],
@@ -215,6 +218,21 @@ def topic_sets(policy, eligible, lengths):
         if value < 1:
             fill([], others, int(slots), weight / total * (1 - value))
     return {topics: fsum(parts) for topics, parts in found.items()}
+
+
+def bands(params, cuts):
+    """A resolved normal draw by the thresholds it reaches: a value for each case, with its probability.
+
+    The value stands for every draw that reaches the same thresholds: the
+    range's lower end where it reaches none, otherwise the highest it reaches.
+    """
+    ends = [tails(params, cut) for cut in cuts]
+    for index in range(len(cuts) + 1):
+        above, below = ends[index - 1] if index else (1.0, 0.0), ends[index] if index < len(cuts) else (0.0, 1.0)
+        # The band between two thresholds, by whichever pair of tails is the smaller.
+        share = above[0] - below[0] if above[0] <= .5 else below[1] - above[1]
+        if share > 0:
+            yield (cuts[index - 1] if index else params["min"]), share
 
 
 def tails(params, bound):
@@ -288,9 +306,8 @@ def told(place, entities):
 def follow(place, choose, visit):
     """Run the steps the reading needs from the product's entities, once for every way the draws can fall.
 
-    `choose` gives a draw's outcomes with their probabilities (for a normal
-    draw, the sides of its threshold); `visit` gets the entities and the
-    probability at the end of each way. The order and the handling of a step
+    `choose` gives a draw's outcomes with their probabilities; `visit` gets
+    the entities and the probability at the end of each way. The order and the handling of a step
     are `sample`'s: a step whose condition fails is not applicable, a loop
     runs its steps for each value under the group's bindings, and collected
     rows add to their list. A package gives every path one producing step, so
@@ -330,7 +347,7 @@ def follow(place, choose, visit):
                 else:
                     holder[names[-1]] = deepcopy(start[row["target"]])
 
-    def walk(position, mass, decided):
+    def walk(position, mass):
         if position == len(place.steps):
             visit(context, mass)
             return
@@ -348,30 +365,23 @@ def follow(place, choose, visit):
                     for row in step["steps"]:
                         settle(row)
                 context["group"] = saved
-            walk(ahead, mass, decided)
+            walk(ahead, mass)
         elif "sample" not in step:
-            if step["target"] in decided:
-                module.set_path(context, step["target"], decided[step["target"]])
-            else:
-                renew(step)
-                settle(step)
-            walk(ahead, mass, decided)
+            renew(step)
+            settle(step)
+            walk(ahead, mass)
         else:
             target, definition = step["target"], twin.fields[step["target"]]
             conditions = [text for text in (definition.get("applicable_when"), step.get("when")) if text is not None]
             if conditions and not all(twin._eval(text, context) for text in conditions):
                 module.set_path(context, target, module.NOT_APPLICABLE)
-                walk(ahead, mass, decided)
+                walk(ahead, mass)
                 return
             for value, share in choose(step, context):
-                if step["sample"] == "normal":
-                    # The draw itself is never set: only its threshold's side is read.
-                    walk(ahead, mass * share, {**decided, place.bounds[step["id"]][0]: value})
-                else:
-                    module.set_path(context, target, value)
-                    walk(ahead, mass * share, decided)
+                module.set_path(context, target, value)
+                walk(ahead, mass * share)
 
-    walk(0, 1.0, {})
+    walk(0, 1.0)
 
 
 def cells(place):
@@ -388,8 +398,7 @@ def cells(place):
     def choose(step, context):
         if step["sample"] != "normal":
             return outcomes(place, step, context)
-        return [(side, share) for side, share in zip(
-            (True, False), tails(twin.resolve(step, context), place.bounds[step["id"]][1])) if share > 0]
+        return bands(twin.resolve(step, context), place.bounds[step["id"]])
 
     follow(place, choose, lambda context, mass: found[
         module.get_path(context, place.rating["target"]), told(place, context)].append(mass))
@@ -404,11 +413,7 @@ def replayed(place, found):
     """What following the steps from a review's recorded block draws says of it: the topic's class and the rating."""
     recorded, module, seen = {name: json.loads(outcome) for name, outcome in found[0]}, place.program.module, []
 
-    def choose(step, context):
-        value = recorded[step["id"]]
-        return [(value >= place.bounds[step["id"]][1] if step["sample"] == "normal" else value, 1.0)]
-
-    follow(place, choose, lambda context, mass: seen.append(
+    follow(place, lambda step, context: [(recorded[step["id"]], 1.0)], lambda context, mass: seen.append(
         (told(place, context), module.get_path(context, place.rating["target"]))))
     return seen[0]
 

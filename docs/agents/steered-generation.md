@@ -594,9 +594,10 @@ the order of the steps as the program's `sample` runs them (a step whose
 condition fails is not applicable; a loop that only derives and collects
 values runs its steps for each value) and the probability of each outcome of
 a resolved draw: a weighted or a uniform choice, a whole number from a range,
-the rating, the set of topics, and a normal draw that the program reads
-through one threshold (the value score, at one half, after the program's
-clipping and rounding). Because the order of the steps is written here a
+the rating, the set of topics, and a normal draw that the program reads only
+through `>=` thresholds (the value score, at one half, after the program's
+clipping and rounding). Such a draw is followed as the thresholds it
+reaches, with one value standing for each case. Because the order of the steps is written here a
 second time, every recorded review of a natural world is also followed from
 its recorded draws alone, and the world is refused if that gives another
 rating or says another thing than the review does.
@@ -675,10 +676,14 @@ option bought or the wearer (`size_fit`, `forefoot_room`). A review program
 is refused ("Not modelled") where what the topic depends on includes a loop
 that draws or holds another loop, a collected value under a condition of its
 own, a draw of another kind than the six above, a normal draw read otherwise
-than through one threshold, a statement about the topic that is neither for
-nor against, or a review that would be both. None of the 37 review programs
-in git does any of these (see the evidence for the concepts whose data is
-not in git).
+than by `>=` against a number written out (any arithmetic on either side, a
+strict comparison or a use of the value itself refuses it), a statement about
+the topic that is neither for nor against, or a review that would be both.
+None of the 37 review programs in git does any of these (see the evidence
+for the concepts whose data is not in git). The walk branches on every
+outcome of every draw the topic depends on, so its cost is the product of
+their numbers: at most a few seconds per topic for the programs in git, but
+about 50 s where a program draws a whole number from 61 and another from 5.
 Only the topic count over all of a product's reviews and the mean of its
 stars: not the count of each star, not one option's reviews. No producer
 writes a neutral or a mixed comment, or a second statement on a topic under
@@ -1549,9 +1554,16 @@ topics of the first 118 concepts before its time limit (every one of the 36
 git concepts with a product among them), each compared with 1,200 whole
 reviews drawn by the program under seeds of their own (largest deviation of
 a class's frequency 3.1 standard errors over about 2,100 comparisons), and
-refused 58 topics in 22 concepts whose data is not in git, for three
-reasons: the value threshold written `.5`, a whole-number draw, and a loop
-that collects rows. The commit after it reads all three.
+refused 58 topics in 22 concepts whose data is not in git, for four
+reasons: the value threshold written `.5`, the same threshold repeated inside
+the statements' conditions, a whole-number draw, and a loop that collects
+rows. The reading now follows all four. Checked again on the saved world for
+those 22 concepts: 19 are read in full (143 topics, against 300 to 1,200
+whole reviews each, largest deviation 2.7 standard errors); two pet concepts
+are read at about 50 s a topic (14 topics checked), and for the third (padded
+harnesses) the check was stopped after 25 minutes without a result, which is
+the cost named under "Limits". The eight concepts the first pass did not
+reach are unchecked.
 
 All of these are dev-producer worlds from the suite's inputs, not the
 suite's frozen worlds, and nothing here is published or bound to a task

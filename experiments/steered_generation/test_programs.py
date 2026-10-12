@@ -205,9 +205,9 @@ class ModelTests(Programs):
             if "constant" in definition:
                 place.program.module.set_path(context, path, deepcopy(definition["constant"]))
         for other in place.steps:
-            if "derive" in other and other["target"] != place.bounds[step["id"]][0]:
+            if "derive" in other and other["id"] != "sentiment_value":
                 place.program.module.set_path(context, other["target"], twin._eval(other["derive"], context))
-        self.assertEqual(place.bounds, {"value_favourability": ("review.positive_value", .5)})
+        self.assertEqual(place.bounds, {"value_favourability": [.5]})
         for rating in (1, 3, 4):
             place.program.module.set_path(context, "review.rating", rating)
             params = twin.resolve(step, context)
@@ -388,6 +388,13 @@ class RefusalTests(Programs):
         step(document, "sentiment_value")["derive"] = "review.value_favourability >= .5"
 
     @staticmethod
+    def banded(document):
+        """The value score read through two more thresholds: one in a statement's condition, one in a derived value."""
+        document["fields"]["review.keen"] = {"type": "boolean"}
+        document["steps"].append({"id": "keen", "target": "review.keen", "derive": "review.value_favourability  >=  0.9"})
+        pool(document, "value.positive")["when"] += " and review.value_favourability >= .7 and not review.keen"
+
+    @staticmethod
     def counted(document):
         """A whole-number draw that the comfort statements' conditions read."""
         document["fields"]["review.wears"] = {"type": "integer", "min": 1, "max": 4}
@@ -426,8 +433,8 @@ class RefusalTests(Programs):
     def test_steps_no_program_in_git_has_are_followed(self):
         plain = programs.cells(self.place())
         worth = programs.cells(self.place(TRAINERS, "value"))
-        for change, aspect in ((self.half, "value"), (self.counted, "everyday_comfort"), (self.looped, "everyday_comfort"),
-                               (self.gated, "everyday_comfort")):
+        for change, aspect in ((self.half, "value"), (self.banded, "value"), (self.counted, "everyday_comfort"),
+                               (self.looped, "everyday_comfort"), (self.gated, "everyday_comfort")):
             with self.subTest(change=change.__name__):
                 self.altered(change)
                 place = self.place(TRAINERS, aspect)
@@ -445,6 +452,13 @@ class RefusalTests(Programs):
                     self.assertLess(abs(seen[cell] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 1e-9, cell)
                 if change is self.half:
                     self.assertEqual(cells, worth)
+                elif change is self.banded:
+                    # Praise needs a score from 0.7 up to 0.9; the complaints are as they were.
+                    self.assertEqual(place.bounds, {"value_favourability": [.5, .7, .9]})
+                    for rating in range(1, 6):
+                        self.assertAlmostEqual(cells[rating, reviews.NEGATIVE], worth[rating, reviews.NEGATIVE], places=12)
+                        self.assertLess(cells[rating, reviews.POSITIVE], worth[rating, reviews.POSITIVE])
+                    self.assertGreater(sum(seen[rating, reviews.POSITIVE] for rating in range(1, 6)), 20)
                 elif change is self.counted:
                     self.assertIn("wears", place.drawn)
                     self.assertIn("wears", place.block)
@@ -465,13 +479,20 @@ class RefusalTests(Programs):
         def both(document):
             pool(document, "everyday_comfort.negative")["when"] = "'everyday_comfort' in review.topics"
 
-        def raw(document):
-            pool(document, "value.positive")["when"] = "'value' in review.topics and review.value_favourability >= 0.7"
+        def strict(document):
+            pool(document, "value.positive")["when"] += " and review.value_favourability > 0.7"
 
-        def twice(document):
-            document["fields"]["review.keen"] = {"type": "boolean"}
-            document["steps"].append({"id": "keen", "target": "review.keen", "derive": "review.value_favourability >= 0.9"})
-            pool(document, "value.positive")["when"] += " and not review.keen"
+        def scaled(document):
+            pool(document, "value.positive")["when"] += " and review.value_favourability >= 0.7 * 1"
+
+        def doubled(document):
+            pool(document, "value.positive")["when"] += " and 2 * review.value_favourability >= 1.4"
+
+        def chained(document):
+            pool(document, "value.positive")["when"] += " and 1 >= review.value_favourability >= 0.7"
+
+        def whole(document):
+            pool(document, "value.positive")["when"] += " and known(review.value_favourability)"
 
         def unclipped(document):
             step(document, "value_favourability")["bounds_mode"] = "truncate"
@@ -484,7 +505,8 @@ class RefusalTests(Programs):
             self.looped(document)
             step(document, "rows")["steps"][0]["when"] = "review.rating >= 2"
 
-        for change, topic in ((neutral, "everyday_comfort"), (both, "everyday_comfort"), (raw, "value"), (twice, "value"),
+        for change, topic in ((neutral, "everyday_comfort"), (both, "everyday_comfort"), (strict, "value"), (scaled, "value"),
+                              (doubled, "value"), (chained, "value"), (whole, "value"),
                               (unclipped, "value"), (wide, "everyday_comfort"), (guarded, "everyday_comfort")):
             with self.subTest(change=change.__name__):
                 self.altered(change)
@@ -503,7 +525,8 @@ class RefusalTests(Programs):
         rows = programs.written(self.natural, place)
         self.assertEqual([programs.replayed(place, row) for row in rows], [row[1:] for row in rows])
         programs.reads(self.natural, place)
-        place.bounds = {"value_favourability": ("review.positive_value", 1.5)}
+        place.steps = [{**row, "derive": "review.value_favourability >= 1.5"} if row["id"] == "sentiment_value" else row
+                       for row in place.steps]
         with self.assertRaises(ValueError) as caught:
             programs.reads(self.natural, place)
         self.assertIn("Following", str(caught.exception))
