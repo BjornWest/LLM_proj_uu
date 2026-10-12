@@ -83,7 +83,12 @@ def expressions(twin, step):
 
 
 def read_by(twin, step):
-    """The paths a step, or a loop with its steps, reads: the program's own account, which `expressions` must match."""
+    """The paths a step, or a loop with its steps, reads: the program's own account, which `expressions` must match.
+
+    The match is a guard against an expression this module does not list, not
+    a proof that it lists them all: one that reads only paths another
+    already reads would not show.
+    """
     found = set().union(twin._step_refs(step), *(twin._step_refs(row) for row in inner(step)))
     found = found | twin.expression(step["for_each"]["from"]).references if "for_each" in step else found
     if found != set().union(*(twin.expression(text).references for text in expressions(twin, step))):
@@ -208,6 +213,9 @@ def site(world, item, api, native, **common):
             cuts = [thresholds(twin, text, step["target"]) for text in texts]
             if None in cuts or not any(cuts):
                 raise unmodelled("a continuous draw read other than through thresholds it must reach")
+            # One value stands for all that reach the same thresholds: none of them may read differently.
+            if twin.fields[step["target"]].get("unknown_values"):
+                raise unmodelled("a continuous draw some of whose values count as unknown")
             bounds[step["id"]] = sorted({cut for found in cuts for cut in found})
     # Whether the rating can be redrawn on its own: no other draw sets its parameters.
     above, staged = read_by(twin, rating[0]), True
@@ -277,6 +285,9 @@ def bands(params, cuts):
 
     The value stands for every draw that reaches the same thresholds: the
     range's lower end where it reaches none, otherwise the highest it reaches.
+    That is sound where the expressions tell values apart by those thresholds
+    alone, which `site` requires: only `>=` comparisons mention the draw, and
+    its field marks no value as unknown.
     """
     ends = [tails(params, cut) for cut in cuts]
     for index in range(len(cuts) + 1):

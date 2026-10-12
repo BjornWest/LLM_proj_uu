@@ -601,7 +601,9 @@ reaches, with one value standing for each case. The thresholds are found on
 the expressions as the program parses them, in everything the needed steps
 and the topic's statements evaluate, the conditions of the fields they write
 included; a mention of the draw that is not the draw alone, `>=`, and a
-number written out refuses the program. Because the order of the steps is written here a
+number written out refuses the program, and so does a field that marks some
+value of the draw as unknown, since one value could then not stand for its
+neighbours. Because the order of the steps is written here a
 second time, every recorded review of a natural world is also followed from
 its recorded draws alone, and the world is refused if that gives another
 rating or says another thing than the review does.
@@ -686,8 +688,11 @@ is refused ("Not modelled") where what the topic depends on includes a loop
 that draws or holds another loop, a collected value under a condition of its
 own, a draw of another kind than the six above, a normal draw read otherwise
 than by `>=` against a number written out (any arithmetic on either side, a
-strict comparison or a use of the value itself refuses it), a step that
-reads something the reading's own list of its expressions does not show, a statement about
+strict comparison or a use of the value itself refuses it; so does a field
+that counts some value of the draw as unknown), a step that
+reads something the reading's own list of its expressions does not show (a
+guard: an unlisted expression that reads only what a listed one reads would
+pass it), a statement about
 the topic that is neither for nor against, or a review that would be both.
 None of the 37 review programs in git does any of these (see the evidence
 for the concepts whose data is not in git). The walk branches on every

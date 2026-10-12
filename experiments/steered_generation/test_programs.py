@@ -549,6 +549,12 @@ class RefusalTests(Programs):
         def whole(document):
             pool(document, "value.positive")["when"] += " and known(review.value_favourability)"
 
+        def unknown(document):
+            # A value the field counts as unknown reads differently from its neighbours within one band.
+            document["fields"]["review.value_favourability"]["unknown_values"] = [.5]
+            step(document, "sentiment_value")["derive"] = (
+                "known(review.value_favourability >= .5) and review.value_favourability >= .5")
+
         def unclipped(document):
             step(document, "value_favourability")["bounds_mode"] = "truncate"
 
@@ -561,7 +567,7 @@ class RefusalTests(Programs):
             step(document, "rows")["steps"][0]["when"] = "review.rating >= 2"
 
         for change, topic in ((neutral, "everyday_comfort"), (both, "everyday_comfort"), (strict, "value"), (scaled, "value"),
-                              (doubled, "value"), (chained, "value"), (whole, "value"),
+                              (doubled, "value"), (chained, "value"), (whole, "value"), (unknown, "value"),
                               (unclipped, "value"), (wide, "everyday_comfort"), (guarded, "everyday_comfort")):
             with self.subTest(change=change.__name__):
                 self.altered(change)
