@@ -382,27 +382,18 @@ def viewer_html(*, preview=False):
         '<option value="newest">Recently updated</option>':'<option value="newest">Newest run first</option>',
         "s.message_count+' events · '+s.decision_count+' decisions'":"s.summary_pending?'Open trace to load totals':s.message_count+' events · '+s.decision_count+' decisions'",
         "window.onhashchange=()=>{refresh()};":"window.onhashchange=()=>{refresh({navigate:true})};",
-        "setInterval(async()=>{if(el('live').checked&&!refreshing){refreshing=true;try{await refresh()}finally{refreshing=false}}},3000);refresh();":"setInterval(()=>{if(el('live').checked)refresh({background:true})},3000);refresh();",
+        "setInterval(async()=>{if(el('live').checked&&!refreshing){refreshing=true;try{await refresh()}finally{refreshing=false}}},3000);refresh();":"setInterval(()=>{if(el('live').checked)refresh({background:true})},3000);",
     }
     for before,after in replacements.items():
         if html.count(before)!=1:raise ValueError('Shared viewer integration anchor changed: '+before[:80])
         html=html.replace(before,after)
-    suite_client=Path(__file__).with_name('trace_suite_client.js').read_text()
-    before = """list=function(){
- originalList();const items=[...sessions];if(el('order').value==='oldest')items.reverse();
- [...el('sessions').children].forEach((button,index)=>{
-  if(document.querySelector('main').dataset.suiteMode==='true')button.classList.remove('selected');
-  const member=items[index]?.suite;if(!member)return;
-  const badge=node('a','suite-badge',member.title+' · '+member.case_id);badge.href='#suite/'+encodeURIComponent(member.id);
-  badge.title=(member.tags||[]).join(' · ');badge.onclick=event=>{event.stopPropagation()};button.append(badge);
- });
-};"""
-    if suite_client.count(before)!=1:raise ValueError('Shared suite sidebar anchor changed')
-    suite_client=suite_client.replace(before,'list=function(){originalList();renderSidebarSuiteBadges()};')
-    suite_client+='\n'+Path(__file__).with_name('trace_sidebar_suite.js').read_text()
-    html=html.replace('</script>',suite_client+'\n</script>',1)
     from agent_trace.viewer import enhance_viewer
     html=enhance_viewer(html)
+    # Suite refresh needs initialized collection/sidebar state. Install it last
+    # and start once, rather than racing the shared runtime's initialization.
+    suite_client=Path(__file__).with_name('trace_sidebar_suite.js').read_text()
+    suite_client+='\n'+Path(__file__).with_name('trace_suite_client.js').read_text()
+    html=html.replace('</script>',suite_client+'\n</script>',1)
     if preview:
         html=html.replace('Agent · Session traces','Agent · Ledger preview').replace('Agent / Session traces','Agent / Ledger preview')
     return html.encode()

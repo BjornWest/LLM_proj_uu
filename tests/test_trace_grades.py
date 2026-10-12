@@ -5,6 +5,7 @@ import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1].parent/'common_agent_util'))
 from scripts.trace_grades import BOUND_FILES,FILENAME,SCHEMA,sha,read_grade,project_grade
 from scripts.trace_hub import Hub,viewer_html
+from agent_trace.value_ledger import LedgerReader
 from experiments.answer_grading.publish import publish
 
 
@@ -101,7 +102,7 @@ def test_only_empty_manual_placeholder_replaced(tmp_path,meaningful):
     replacement=next(m for m in messages if m['title']=='Answer grading — not model input')
     assert original['diagnostic'] is (not meaningful)
     assert not replacement['diagnostic']
-    assert json.loads(original['text'])==value
+    assert LedgerReader(group['value_ledger']).resolve(original['text_ref'])==value
     if not meaningful:assert messages.index(replacement)==messages.index(original)-1
     assert group['visible_message_count']==sum(not m.get('diagnostic') for m in messages)
     # If evidence changes, neither the placeholder nor a known outcome is hidden.

@@ -7,17 +7,11 @@ main[data-suite-mode="true"]>:not(#suite-view){display:none!important}
 const suitesButton=node('button','','Suites');suitesButton.id='show-suites';suitesButton.onclick=()=>{location.hash='suites'};
 const suitesToolbar=node('div','suite-toolbar');suitesToolbar.append(suitesButton);el('sessions').before(suitesToolbar);
 const suitePanel=node('section');suitePanel.id='suite-view';suitePanel.hidden=true;document.querySelector('main').append(suitePanel);
-let suiteGeneration=0,suiteSignature=null,suiteRequest=null;
+let suiteGeneration=0,suiteSignature=null,suiteRequest=null,suiteRoute=null;
 const suiteFilters=new Map();
 const originalList=list;
 list=function(){
- originalList();const items=[...sessions];if(el('order').value==='oldest')items.reverse();
- [...el('sessions').children].forEach((button,index)=>{
-  if(document.querySelector('main').dataset.suiteMode==='true')button.classList.remove('selected');
-  const member=items[index]?.suite;if(!member)return;
-  const badge=node('a','suite-badge',member.title+' · '+member.case_id);badge.href='#suite/'+encodeURIComponent(member.id);
-  badge.title=(member.tags||[]).join(' · ');badge.onclick=event=>{event.stopPropagation()};button.append(badge);
- });
+ originalList();renderSidebarSuiteBadges();
 };
 function suiteMode(enabled){
  document.querySelector('main').dataset.suiteMode=String(enabled);
@@ -79,7 +73,12 @@ refresh=async function(options={}){
  const hash=decodeURIComponent(location.hash.slice(1)),enabled=hash==='suites'||hash.startsWith('suite/');
  const changed=document.querySelector('main').dataset.suiteMode!==String(enabled);
  suiteMode(enabled);
- if(!enabled){suiteGeneration++;suiteSignature=null;suiteRequest?.abort();suiteRequest=null;return originalRefresh(options)}
+ if(!enabled){suiteGeneration++;suiteSignature=null;suiteRoute=null;suiteRequest?.abort();suiteRequest=null;return originalRefresh(options)}
+ if(suiteRoute!==hash){
+  suiteRoute=hash;suiteSignature=null;
+  const loading=node('p','suite-note','Loading suite…');loading.setAttribute('role','status');
+  suitePanel.replaceChildren(loading);
+ }
  if(options.background&&suiteRequest)return;
  suiteRequest?.abort();const request=new AbortController();suiteRequest=request;
  // Invalidate in-flight trace refreshes before they can render into suite mode.
@@ -96,10 +95,15 @@ refresh=async function(options={}){
   // Keep focused inputs and table scroll when only the timestamp advances.
   const content=({updated_at,...suite})=>suite;
   const signature=hash+JSON.stringify(hash==='suites'?data.map(content):content(data));
-  if(signature!==suiteSignature){suiteSignature=signature;hash==='suites'?renderSuiteIndex(data):renderSuiteDetail(data)}
+  if(signature!==suiteSignature){hash==='suites'?renderSuiteIndex(data):renderSuiteDetail(data);suiteSignature=signature}
   if(changed||options.navigate){document.querySelector('main').scrollTop=0;if(getComputedStyle(document.querySelector('main')).overflowY==='visible')window.scrollTo(0,0)}
   el('connection').textContent='Connected · suite status refreshed '+new Date().toLocaleTimeString();
- }catch(error){if(own===suiteGeneration)el('connection').textContent=error.message+' · existing view retained'}
+ }catch(error){if(own===suiteGeneration){
+  el('connection').textContent=error.message+(suiteSignature?' · existing view retained':'');
+  if(!suiteSignature&&suitePanel.querySelector('[role="alert"]')?.textContent!==error.message){
+   const notice=node('p','suite-note',error.message);notice.setAttribute('role','alert');suitePanel.replaceChildren(notice);
+  }
+ }}
  finally{if(suiteRequest===request)suiteRequest=null}
 };
 
