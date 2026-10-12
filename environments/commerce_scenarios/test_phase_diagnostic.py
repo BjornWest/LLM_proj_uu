@@ -4,8 +4,46 @@ from types import SimpleNamespace
 from unittest import TestCase, mock
 from tempfile import TemporaryDirectory
 import json
+import os
 
 from .runtime import ScenarioRuntime
+
+
+class RecorderSelection(TestCase):
+    def test_runner_recorder_and_invalid_environment_rejected_before_setup(self):
+        from . import phase_diagnostic as diagnostic
+        for value in ['1', 'true', '', '2']:
+            with self.subTest(value=value), TemporaryDirectory() as temp:
+                root = Path(temp).resolve()
+                with mock.patch.dict(os.environ, {'HARNESS_ENV_STEP_TELEMETRY': value}), \
+                        mock.patch.object(diagnostic.publication, '_json') as read, \
+                        mock.patch.object(diagnostic.publication, 'prepare_episode') as prepare:
+                    with self.assertRaisesRegex(ValueError, 'HARNESS_ENV_STEP_TELEMETRY'):
+                        diagnostic.run(root/'world', root/'missing-instance', root/'output')
+                read.assert_not_called()
+                prepare.assert_not_called()
+                self.assertFalse((root/'output').exists())
+
+    def test_disabled_runner_recorder_retains_direct_lifecycle(self):
+        from . import phase_diagnostic as diagnostic
+        for value in [None, '0']:
+            with self.subTest(value=value), TemporaryDirectory() as temp:
+                root = Path(temp).resolve()
+                instance = root/'instance.json'
+                instance.write_text(json.dumps({'family': 'pricing_promotions',
+                                                'mechanism': 'quantity_condition'}))
+                prepared, result = SimpleNamespace(close=mock.Mock()), object()
+                with mock.patch.dict(os.environ):
+                    os.environ.pop('HARNESS_ENV_STEP_TELEMETRY', None)
+                    if value is not None:
+                        os.environ['HARNESS_ENV_STEP_TELEMETRY'] = value
+                    with mock.patch.object(diagnostic.publication, 'prepare_episode', return_value=prepared) as prepare, \
+                            mock.patch.object(diagnostic, '_run_prepared', return_value=result) as run:
+                        self.assertIs(diagnostic.run(root/'world', instance, root/'output'), result)
+                prepare.assert_called_once_with(root/'world', instance, 'wrong',
+                    origin_diagnostics_path=root/'output/origin-phases.jsonl')
+                run.assert_called_once_with(prepared, root/'world', instance, root/'output')
+                prepared.close.assert_called_once_with()
 
 
 class OriginDiagnosticCaller(TestCase):
@@ -86,6 +124,11 @@ class OriginDiagnosticCaller(TestCase):
 
 
 class DiagnosticLifecycle(TestCase):
+    def setUp(self):
+        environment = mock.patch.dict(os.environ, {'HARNESS_ENV_STEP_TELEMETRY': '0'})
+        environment.start()
+        self.addCleanup(environment.stop)
+
     def prepared(self, root):
         native_step = mock.Mock(return_value='ordinary-effect')
         env = SimpleNamespace(step=native_step, unwrapped=object())
@@ -103,7 +146,7 @@ class DiagnosticLifecycle(TestCase):
         from contextlib import nullcontext
         from . import phase_diagnostic as diagnostic
         with TemporaryDirectory() as temp:
-            root = Path(temp)
+            root = Path(temp).resolve()
             instance = root/'instance.json'
             instance.write_text(json.dumps({'family': 'pricing_promotions', 'mechanism': 'quantity_condition'}))
             prepared, env, ordinary_step = self.prepared(root)
@@ -142,7 +185,7 @@ class DiagnosticLifecycle(TestCase):
     def test_wrong_family_and_existing_output_rejected_before_runtime(self):
         from . import phase_diagnostic as diagnostic
         with TemporaryDirectory() as temp, mock.patch.object(diagnostic.publication, 'prepare_episode') as prepare:
-            root = Path(temp)
+            root = Path(temp).resolve()
             instance = root/'instance.json'
             instance.write_text(json.dumps({'family': 'steering_recurrence', 'mechanism': 'quantity_condition'}))
             with self.assertRaisesRegex(ValueError, 'only quantity'):
@@ -157,7 +200,7 @@ class DiagnosticLifecycle(TestCase):
     def test_pre_dispatch_source_failure_closes_runtime_without_action_or_retry(self):
         from . import phase_diagnostic as diagnostic
         with TemporaryDirectory() as temp:
-            root = Path(temp)
+            root = Path(temp).resolve()
             instance = root/'instance.json'
             instance.write_text(json.dumps({'family': 'pricing_promotions', 'mechanism': 'quantity_condition'}))
             prepared, _, ordinary_step = self.prepared(root)
@@ -213,7 +256,7 @@ class DiagnosticLifecycle(TestCase):
         self.assertIs(env.unwrapped, env)
         try:
             with TemporaryDirectory() as temp:
-                root = Path(temp)
+                root = Path(temp).resolve()
                 instance = root/'instance.json'
                 instance.write_text(json.dumps({'family': 'pricing_promotions', 'mechanism': 'quantity_condition'}))
                 prepared, _, _ = self.prepared(root)

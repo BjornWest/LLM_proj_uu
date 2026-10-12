@@ -10,6 +10,10 @@ from . import matrix, publication
 
 
 def run(world, instance, output):
+    from intent_browser.step_telemetry import resolve_step_telemetry
+    if resolve_step_telemetry():
+        raise ValueError('Direct phase diagnostics require HARNESS_ENV_STEP_TELEMETRY unset or 0; '
+                         'the runner and direct recorders cannot be enabled together')
     output = Path(output).resolve()
     instance = Path(instance).resolve(strict=True)
     packet = publication._json(instance)
