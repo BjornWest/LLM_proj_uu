@@ -12,6 +12,7 @@ from hashlib import sha256
 import json
 from math import isfinite
 import pickle
+import sys
 
 
 class OutOfSupport(ValueError):
@@ -112,6 +113,69 @@ def steered(population, plan, opened=None):
         raise PlanMismatch(f"planned draws not made: {sorted(unused)[:3]}; partly used: {sorted(partial)[:3]}")
 
 
+# A plan key (REVIEW, product seed, stream key) names one stream of a pilot product's review sampler.
+REVIEW = "review"
+
+
+def review_seed(seed, product_seed):
+    """The seed a product's review stream opens under when a plan reseeds it.
+
+    The review sampler's stream keys do not name the product, so the product's
+    own seed stays part of it: two products reseeded alike still draw apart.
+    """
+    return f"{seed}/{product_seed}"
+
+
+@contextmanager
+def reviewed(footwear, plan):
+    """Within the block, planned review streams of pilot products open under another seed.
+
+    `plan` maps (product seed, stream key) to a `Reseeded` entry. The review
+    sampler looks its `stream` up at each call, so every draw of a review goes
+    through here; streams the plan does not name are the product's own.
+    """
+    if not all(isinstance(entry, Reseeded) for entry in plan.values()):
+        raise PlanMismatch("A product's review streams can be reseeded, not scripted")
+    natural = footwear.stream
+
+    def stream(seed, key):
+        entry = plan.get((seed, key))
+        return natural(seed, key) if entry is None else natural(review_seed(entry.seed, seed), key)
+
+    footwear.stream = stream
+    try:
+        yield
+    finally:
+        footwear.stream = natural
+
+
+# A plan key (CARRIER, stream key) names one stream of the carrier-evidence producer.
+CARRIER = "carrier"
+
+
+@contextmanager
+def carried(producer, plan):
+    """Within the block, planned streams of the carrier-evidence producer open under another seed.
+
+    `plan` maps stream keys to `Reseeded` entries. The producer looks its
+    `rng` up at each call; a shipment's review stream names the shipment, so
+    reseeded streams of different shipments draw apart.
+    """
+    if not all(isinstance(entry, Reseeded) for entry in plan.values()):
+        raise PlanMismatch("A carrier's review streams can be reseeded, not scripted")
+    natural = producer.rng
+
+    def rng(seed, key):
+        entry = plan.get(key)
+        return natural(seed, key) if entry is None else natural(entry.seed, key)
+
+    producer.rng = rng
+    try:
+        yield
+    finally:
+        producer.rng = natural
+
+
 def relabel(world, record, api):
     """Mark a world from a steered pass: its seed alone no longer reproduces it."""
     world["provenance"]["steered_generation"] = record
@@ -132,13 +196,19 @@ class Manufacture:
     arguments as when it was stored, so a plan that changes anything upstream
     of manufacture simply misses the cache from that point on. Results are
     stored pickled; each pass gets its own copy to mutate as the producer does.
+
+    A product whose seed is in `fresh` is manufactured again and not stored:
+    its plan changes draws inside its manufacture. Later products are still
+    reused, which holds as long as manufacture reads nothing of an earlier
+    product that such a plan changes; a pass's comparison with the natural
+    world outside the plan's resources would show a product that did.
     """
 
     def __init__(self):
         self.products = {}
 
     @contextmanager
-    def reused(self, package_export):
+    def reused(self, package_export, fresh=()):
         real = package_export.sample
         # `earlier` is the pass's running product list. Chaining the call
         # arguments stands in for hashing its growing contents.
@@ -152,7 +222,7 @@ class Manufacture:
                 state["chain"] = None
             state["calls"] += 1
             key = state["chain"]
-            if key is None:
+            if key is None or seed in fresh:
                 return real(seed, concept_id, brand, product_id, earlier=earlier, **options)
             if key not in self.products:
                 self.products[key] = pickle.dumps(
@@ -217,11 +287,21 @@ class Session:
     def generate(self, plan=None):
         """Returns the world and the stream keys the producer opened."""
         options = {k: v for k, v in self.inputs.items() if k != "seed"}
-        opened = []
+        opened, plan = [], plan or {}
+        reviews = {key[1:]: entry for key, entry in plan.items() if type(key) is tuple and key[0] == REVIEW}
+        carriers = {key[1]: entry for key, entry in plan.items()
+                    if type(key) is tuple and len(key) == 2 and key[0] == CARRIER}
+        commerce = {key: entry for key, entry in plan.items() if type(key) is str}
+        if len(reviews) + len(carriers) + len(commerce) != len(plan):
+            raise PlanMismatch("A plan names commerce streams, product review streams and carrier review streams")
         with ExitStack() as stack:
-            stack.enter_context(self.manufacture.reused(self.native.package_export))
+            stack.enter_context(self.manufacture.reused(self.native.package_export, {seed for seed, _ in reviews}))
+            if reviews:
+                stack.enter_context(reviewed(self.native.package_export.footwear, reviews))
+            if carriers:
+                stack.enter_context(carried(sys.modules[self.native.commerce.carrier_reviews.__module__], carriers))
             if self.defaults:
                 stack.enter_context(self.defaults.shared(self.native.population))
-            stack.enter_context(steered(self.native.population, plan or {}, opened))
+            stack.enter_context(steered(self.native.population, commerce, opened))
             world = self.native.commerce.generate(self.inputs["seed"], **options)
         return world, opened

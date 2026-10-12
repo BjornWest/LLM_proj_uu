@@ -5,7 +5,8 @@ request: its kind, concept, predicates and so on), `of` lists scenarios of
 that task as requirement files for the runner: the likeliest outcome, a hard
 variant (a better offer that does not count is listed ahead of the winner, a
 tie at a shortlist's cutoff, a relaxation that has to be used, a basket that
-just misses free shipping), and an unlikely outcome. For the memory and
+just misses free shipping), and an unlikely outcome; for a review summary,
+each verdict the count can come to. For the memory and
 clarification tasks the native module first resolves the remembered or hidden
 requirement into the predicates of the feature task that decides the answer. Each comes with the
 probability the block model gives it on this world, so that a caller can see
@@ -24,7 +25,7 @@ import json
 from math import log
 from pathlib import Path
 
-from . import cheapest, combined, listed, prices, shortlist, stock, streams, threshold
+from . import carriers, cheapest, combined, listed, prices, reviews, shortlist, stock, streams, threshold
 
 # Native task kinds read by the cheapest-available block, with the fields of the task that state the reading.
 # A comparison site goes with the surrounding-site controls the world is published with (`surrounding`).
@@ -35,7 +36,8 @@ WINNERS = {"cheapest_available": SITE,
            "recommend_matching_by_priorities": ("predicates", "availability", "priorities", *SITE),
            "cheapest_matching_unit_price": ("predicates", "availability", "unit_basis", *SITE),
            "cheapest_matching_with_permitted_relaxations": ("predicates", "availability", "relaxations", *SITE)}
-OTHERS = ("shortlist_matching_models", "comparison_cheapest_exact_sku_stock", "audit_free_shipping_claim")
+OTHERS = ("shortlist_matching_models", "comparison_cheapest_exact_sku_stock", "audit_free_shipping_claim",
+          "summarize_product_reviews", "summarize_carrier_reviews")
 # Kinds whose answer is a feature task's, once the native module has resolved what the shopper left unsaid.
 RESOLVED = {"cheapest_matching_with_memory": ".memory_offer_task",
             "cheapest_matching_after_clarification": ".hidden_offer_task"}
@@ -49,15 +51,23 @@ FIELDS = {**{kind: {"kind", "concept_id", *fields} for kind, fields in WINNERS.i
           "shortlist_matching_models": {"kind", "concept_id", "predicates", "availability", "limit", *SITE},
           "comparison_cheapest_exact_sku_stock": {"kind", "sku_id", *SITE},
           # The delivery methods change which options the native task counts, not the subtotal test steered here.
-          "audit_free_shipping_claim": {"kind", "retailer_index", "offer_index", "quantity", "delivery_types"}}
+          "audit_free_shipping_claim": {"kind", "retailer_index", "offer_index", "quantity", "delivery_types"},
+          "summarize_product_reviews": {"kind", "concept_id", "operation", "subject_scope", "product_index", "topic",
+                                        "min_assessed"},
+          "summarize_carrier_reviews": {"kind", "operation", "carrier_index", "shipping_class", "date_from", "date_to",
+                                        "aspect", "min_assessed"}}
 
 
-def ranked(world, needs, api, module=cheapest):
-    """The possible ones of some requirements, likeliest first, as (log probability, requirement)."""
+def ranked(world, needs, api, module=cheapest, shared=None):
+    """The possible ones of some requirements, likeliest first, as (log probability, requirement).
+
+    `shared` is a `cheapest.frame` for requirements of one reading, which are
+    then modelled without rebuilding what they have in common.
+    """
     found = []
     for need in needs:
         try:
-            block = module.model(world, need, api)
+            block = module.model(world, need, api, shared) if shared else module.model(world, need, api)
         except prices.ZeroMass:
             continue
         found.append((getattr(block, "log_probability", None) or log(block.probability), need))
@@ -74,17 +84,20 @@ def winners(world, task, api, extra=None):
     if task["kind"] == "cheapest_matching_local_branch_stock":
         stated["availability"] = cheapest.BRANCH
     base = {"schema": cheapest.VERSION, "concept_id": task["concept_id"], **stated, **(extra or {})}
-    scope = cheapest.scope(world, base, api)
+    shared = cheapest.frame(world, base, api)
+    scope = shared.scope
     offers = [(r["retailer_id"], o) for r in world["retailers"] for o in r["offers"] if o["sku_id"] in scope.skus and
               (scope.pairs is None or (r["retailer_id"], o["product_id"]) in scope.pairs)]
     pairs = sorted({(rid, o["product_id"]) for rid, o in offers})
-    alone = ranked(world, ({**base, "product_id": product, "retailer_ids": [rid]} for rid, product in pairs), api)
+    alone = ranked(world, ({**base, "product_id": product, "retailer_ids": [rid]} for rid, product in pairs), api,
+                   shared=shared)
     if not alone:
         return []
     found = [entry("likeliest_winner", "the retailer and product most likely to be the only best available offer", alone[0])]
     top = alone[0][1]
     behind = ranked(world, ({**top, "listed_below": [{"retailer_id": rid, "sku_id": o["sku_id"]}]} for rid, o in offers
-                            if (rid, o["product_id"]) != (top["retailer_ids"][0], top["product_id"])), api)
+                            if (rid, o["product_id"]) != (top["retailer_ids"][0], top["product_id"])), api,
+                    shared=shared)
     if behind:
         found.append(entry("better_offer_unavailable", "the same winner, with the likeliest single offer of another "
                            "retailer or product that would rank ahead of it listed and unavailable", behind[0]))
@@ -193,6 +206,47 @@ def free_shipping(world, task, api):
             for row in ranked(world, [{**base, **stated}], api, threshold)]
 
 
+def review_verdicts(world, task, api):
+    """The review-summary task's verdict on one product and topic: one candidate per verdict that can occur."""
+    if task.get("operation") != "topic_counts" or task.get("subject_scope", "product") != "product":
+        raise ValueError("Steering states topic counts over all of a product's reviews, not ratings or one option's")
+    products = sorted(p["public"]["product_id"] for p in world["products"]
+                      if p["public"]["concept_id"] == task["concept_id"])
+    index = task.get("product_index", 0)
+    if type(index) is not int or not 0 <= index < len(products):
+        raise ValueError("The task selects a product of its concept by an index within the world")
+    base = {"schema": reviews.VERSION, "product_id": products[index], "topic": task.get("topic"),
+            "min_assessed": task.get("min_assessed", 1)}
+    return verdicts(world, base, api, reviews)
+
+
+def verdicts(world, base, api, module):
+    words = {"more_positive": "more comments report the topic favourably than unfavourably",
+             "more_negative": "more comments report the topic unfavourably than favourably",
+             "tie": "as many comments report the topic favourably as unfavourably",
+             "insufficient_evidence": "fewer comments assess the topic than the task asks for"}
+    return [entry("verdict_" + row[1]["verdict"], words[row[1]["verdict"]], row)
+            for row in ranked(world, [{**base, "verdict": verdict} for verdict in reviews.VERDICTS], api, module)]
+
+
+def carrier_verdicts(world, task, api):
+    """The carrier-review task's verdict on one carrier and aspect: one candidate per verdict that can occur.
+
+    What happened to the carrier's shipments is not steered, so a verdict the
+    shipments' histories rule out is not among them.
+    """
+    if task.get("operation") != "topic_counts":
+        raise ValueError("Steering states topic counts over a carrier's reviews, not ratings")
+    names = sorted(c["carrier_id"] for c in world["carrier_evidence"]["public"]["carriers"])
+    index = task.get("carrier_index", 0)
+    if type(index) is not int or not 0 <= index < len(names):
+        raise ValueError("The task selects a carrier by an index within the world")
+    base = {"schema": carriers.VERSION, "carrier_id": names[index], "aspect": task.get("aspect"),
+            "min_assessed": task.get("min_assessed", 1),
+            **{key: task[key] for key in ("shipping_class", "date_from", "date_to") if key in task}}
+    return verdicts(world, base, api, carriers)
+
+
 def of(world, task, api):
     """Scenarios of a native task on a world, as requirement candidates.
 
@@ -202,7 +256,7 @@ def of(world, task, api):
     kind = task.get("kind") if type(task) is dict else None
     if kind in FIELDS and set(task) - FIELDS[kind]:
         raise ValueError("Steering cannot state this field of the task: " + ", ".join(sorted(set(task) - FIELDS[kind])))
-    needed = {OTHERS[1]: ("sku_id", "comparison_site_id"), OTHERS[2]: ()}.get(kind, ("concept_id",))
+    needed = {OTHERS[1]: ("sku_id", "comparison_site_id"), OTHERS[2]: (), OTHERS[4]: ("aspect",)}.get(kind, ("concept_id",))
     if kind in FIELDS and any(type(task.get(key)) is not str or not task[key] for key in needed):
         raise ValueError("The task must name its " + " and ".join(needed))
     if kind == "cheapest_matching_with_permitted_relaxations":
@@ -219,7 +273,8 @@ def of(world, task, api):
         return winners(world, task, api)
     if kind not in OTHERS:
         raise ValueError("Steering has no requirement for this kind of task: " + str(kind))
-    return {OTHERS[0]: shortlists, OTHERS[1]: comparison_stock, OTHERS[2]: free_shipping}[kind](world, task, api)
+    return {OTHERS[0]: shortlists, OTHERS[1]: comparison_stock, OTHERS[2]: free_shipping,
+            OTHERS[3]: review_verdicts, OTHERS[4]: carrier_verdicts}[kind](world, task, api)
 
 
 def main():

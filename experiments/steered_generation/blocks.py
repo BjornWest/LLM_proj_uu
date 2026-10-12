@@ -2,8 +2,10 @@
 
 A block is the set of draws one requirement resamples. It names the leaves it
 decides and the leaves its probability was computed from as resources:
-("stock", retailer, product), ("price", retailer, product) and, for a
-retailer's free-shipping threshold, ("threshold", retailer, ""). The producer
+("stock", retailer, product), ("price", retailer, product), for a
+retailer's free-shipping threshold ("threshold", retailer, ""), for a
+product's review corpus ("reviews", "", product) and for a carrier's
+("carrier_reviews", "", carrier). The producer
 gives every draw its own stream, so blocks whose resources do not meet are
 independent given everything upstream: each can be sampled on its own, all of
 them replayed in one pass, and the probability that every requirement holds is
@@ -154,9 +156,8 @@ def independent(steps):
             shared = step.writes & (other.writes | other.reads) if index != other_index else set()
             if shared:
                 kind, retailer, product = sorted(shared)[0]
-                raise Coupled(f"Requirements {index + 1} and {other_index + 1} both depend on the {kind} "
-                              f"of {product} at {retailer}" if product else
-                              f"Requirements {index + 1} and {other_index + 1} both depend on the {kind} of {retailer}")
+                raise Coupled(f"Requirements {index + 1} and {other_index + 1} both depend on the {kind} of " +
+                              (f"{product} at {retailer}" if product and retailer else product or retailer))
 
 
 def background(world, writes):
@@ -165,8 +166,12 @@ def background(world, writes):
     Stock of a retailer/product: the condition at each location, every SKU's
     quantities and supplier order, and the warehouse stock on its catalog
     pages. Price: every SKU's price and recorded draw. A retailer's threshold:
-    its free-shipping threshold. JSON text, unlike Python equality, keeps
-    true, 1 and 1.0 apart.
+    its free-shipping threshold. A product's reviews: the reviews and the
+    rating summary counted from them. A carrier's reviews: its reviews and the
+    summary counted from them, the corpus identity, and the wording of every
+    other carrier review, since the producer picks a phrase by how often each
+    was used before it. JSON text, unlike Python equality, keeps true, 1 and
+    1.0 apart.
     """
     def retailer(value):
         rid = value["retailer_id"]
@@ -197,6 +202,28 @@ def background(world, writes):
 
     view = {k: v for k, v in world.items() if k not in edits.META_FIELDS}
     view["retailers"] = [retailer(r) for r in world["retailers"]]
+    carriers = {carrier for kind, _, carrier in writes if kind == "carrier_reviews"}
+    if carriers:
+        def worded(row):
+            if row["carrier_id"] in carriers:
+                return {"review_id": row["review_id"]}
+            row = {k: v for k, v in row.items() if k != "text"}
+            return {**row, "statements": [{k: v for k, v in found.items() if k not in ("text", "template_id")}
+                                          for found in row["statements"]]} if "statements" in row else row
+
+        corpus = world["carrier_evidence"]
+        view["carrier_evidence"] = {
+            **{k: v for k, v in corpus.items() if k != "corpus_id"},
+            "public": {**{k: v for k, v in corpus["public"].items() if k != "corpus_id"},
+                       "carriers": [{k: v for k, v in row.items() if k != "summary"} if row["carrier_id"] in carriers
+                                    else row for row in corpus["public"]["carriers"]],
+                       "reviews": [worded(row) for row in corpus["public"]["reviews"]]},
+            "private": {**{k: v for k, v in corpus["private"].items() if k != "corpus_id"},
+                        "reviews": [worded(row) for row in corpus["private"]["reviews"]]}}
+    reviewed = {product for kind, _, product in writes if kind == "reviews"}
+    if reviewed:
+        view["products"] = [{k: v for k, v in item.items() if k not in ("reviews", "rating_summary")}
+                            if item["public"]["product_id"] in reviewed else item for item in world["products"]]
     return json.dumps(view, sort_keys=True, ensure_ascii=False, allow_nan=False)
 
 

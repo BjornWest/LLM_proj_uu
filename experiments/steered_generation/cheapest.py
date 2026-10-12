@@ -510,7 +510,28 @@ class Spread:
         return self.to_index[bisect_left(self.prices, rank)]
 
 
-def model(world, requirement, api):
+def reading_of(requirement):
+    """The part of a requirement that says who competes, what is available and how offers rank."""
+    return json.dumps({key: value for key, value in requirement.items()
+                       if key not in ("schema", "product_id", "retailer_ids", "listed_below")}, sort_keys=True)
+
+
+def frame(world, requirement, api):
+    """What every requirement with one reading shares on one world.
+
+    The scope, the block's pairs and, filled in as they are first needed, the
+    spread of each pair when none of its offers is named as listed below the
+    winner. Building these is most of a block model's cost, so a caller that
+    models many requirements of one reading (other winners, other named
+    offers) passes one frame to all of them.
+    """
+    stated(requirement)
+    found = scope(world, requirement, api)
+    return SimpleNamespace(world=world, reading=reading_of(requirement), scope=found,
+                           places=places(world, found, api), plain={})
+
+
+def model(world, requirement, api, shared=None):
     """The concept's stock-and-price block and the probability of the requirement in it.
 
     For a winning price w, the term is the probability that every designated
@@ -523,21 +544,33 @@ def model(world, requirement, api):
     distribution given the requirement, as floats for comparison; sampling
     works from the logarithms. `probability` is 0.0 when the probability is
     below the float range; `log_probability` always holds.
+
+    `shared` is a `frame` for this world and this requirement's reading; the
+    result is the same with and without it.
     """
-    found = sites(world, requirement, api)
-    requirement, places, block_scope = found.requirement, found.places, found.scope
+    if shared is not None and (shared.world is not world or shared.reading != reading_of(resolve(requirement))):
+        raise ValueError("A shared frame serves one world and one reading")
+    requirement, named_below, block_scope = named(world, requirement, api, shared and shared.scope)
+    shared = shared or SimpleNamespace(places=places(world, block_scope, api), plain={})
+    sited = shared.places
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
-    if not all(pair in places and places[pair].competing for pair in designated):
+    if not all(pair in sited and sited[pair].competing for pair in designated):
         raise ZeroMass("not_listed", "A designated retailer lists no competing offer of the product in this world")
     below = {}
-    for pair, sku_id in found.below:
-        offer = next((o for o in places[pair].offers if o["sku_id"] == sku_id), None) if pair in places else None
+    for pair, sku_id in named_below:
+        offer = next((o for o in sited[pair].offers if o["sku_id"] == sku_id), None) if pair in sited else None
         if offer is None:
             raise ZeroMass("not_listed", "The retailer does not list this SKU in this world")
         below.setdefault(pair, []).append(offer["offer_id"])
     config, native_round = world["config"]["retailer_price"], api.native.rounded_price
-    spread = {pair: Spread(outcomes(place, below.get(pair, ()), config, native_round))
-              for pair, place in places.items()}
+    spread = {}
+    for pair, place in sited.items():
+        if pair in below:
+            spread[pair] = Spread(outcomes(place, below[pair], config, native_round))
+        else:
+            if pair not in shared.plain:
+                shared.plain[pair] = Spread(outcomes(place, (), config, native_round))
+            spread[pair] = shared.plain[pair]
     log_terms = {}
     for price in sorted(set.intersection(*({o.rank for o in spread[pair].outcomes} for pair in designated)) - {None}):
         masses = []
@@ -551,7 +584,7 @@ def model(world, requirement, api):
         raise ZeroMass("no_outcome", "No stock and price outcome of the concept satisfies the requirement in this world")
     top = max(log_terms.values())
     log_probability = top + log(fsum(exp(value - top) for value in log_terms.values()))
-    return SimpleNamespace(requirement=requirement, places=places, designated=designated, spread=spread,
+    return SimpleNamespace(requirement=requirement, places=sited, designated=designated, spread=spread,
                            log_terms=log_terms, log_probability=log_probability, probability=exp(log_probability),
                            shares={price: exp(value - log_probability) for price, value in log_terms.items()},
                            below=below, config=config, native_round=native_round, scope=block_scope)
@@ -569,7 +602,7 @@ def pick_log(rng, options, logs):
         context.prec, context.Emin, context.Emax = 40, MIN_EMIN, MAX_EMAX
         weights = [Fraction(Decimal(value - top).exp()) for value in logs]
     if not all(weights):
-        raise NumericalLimit("Winning prices are too far apart in probability to choose among")
+        raise NumericalLimit("Outcomes are too far apart in probability to choose among")
     return pick(rng, options, weights)
 
 

@@ -145,6 +145,30 @@ class ModelTests(Cheapest):
         return [self.need(self.second, below=[(self.first, self.size(self.first, 0))]),
                 self.need(self.second, below=[(self.second, self.size(self.second, 0))])]
 
+    def test_a_shared_frame_changes_no_result(self):
+        for world in (self.natural, self.scarce):
+            shared = cheapest.frame(world, {"schema": cheapest.VERSION, "concept_id": SHOES}, self.api)
+            # In both orders, so that what one model leaves in the frame is what the next one finds there.
+            for requirement in self.requirements() + self.requirements()[::-1]:
+                with self.subTest(requirement=requirement, scarce=world is self.scarce):
+                    alone, together = (cheapest.model(world, requirement, self.api, *frame) for frame in ((), (shared,)))
+                    self.assertEqual((alone.log_terms, alone.log_probability, alone.shares, alone.below, alone.designated),
+                                     (together.log_terms, together.log_probability, together.shares, together.below,
+                                      together.designated))
+                    self.assertEqual(set(alone.spread), set(together.spread))
+                    for pair in alone.spread:
+                        self.assertEqual(alone.spread[pair].outcomes, together.spread[pair].outcomes)
+                    # The same random stream gives the same sample from either.
+                    self.assertEqual(*(cheapest.sample(block, Random(5)) for block in (alone, together)))
+            self.assertTrue(shared.plain)
+            # A frame serves its own world and reading only; an impossible requirement stays impossible with it.
+            sized = {**self.need(self.first), "predicates": [{"field": "sku.size_eu", "operator": "eq", "value": 40}]}
+            for other, need in ((self.scarce if world is self.natural else self.natural, self.need(self.first)), (world, sized)):
+                with self.assertRaises(ValueError):
+                    cheapest.model(other, need, self.api, shared)
+            with self.assertRaises(ValueError):
+                cheapest.model(world, {**self.need(self.first), "retailer_ids": []}, self.api, shared)
+
     def test_probability_and_winning_price_match_other_seeds(self):
         cases = [(self.natural, 2500, self.need(self.first), 500), (self.natural, 2500, self.need(self.first, self.second), 200),
                  (self.scarce, 4000, self.need(self.first), 500), (self.scarce, 4000, self.sold_out()[0], 200),

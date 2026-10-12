@@ -7,7 +7,8 @@ requested sample. A requirement file is a who-is-cheapest requirement (on
 prices alone, on stock and prices together with offers listed below the
 winner, or on a product's listed prices), a shortlist of models, a one-offer
 stock or price requirement, a basket's subtotal against a free-shipping
-threshold, or several of those to hold together.
+threshold, what a product's or a carrier's reviews say about a topic, or
+several of those to hold together.
 No browser, provider or sidecar publication.
 """
 import argparse
@@ -23,11 +24,12 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import blocks, cheapest, combined, listed, price_bounds, prices, shortlist, stock, streams, threshold
+from . import (blocks, carriers, cheapest, combined, listed, price_bounds, prices, reviews, shortlist, stock, streams,
+               threshold)
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
-              "listed.py", "shortlist.py", "threshold.py", "combined.py", "run.py"),
+              "listed.py", "shortlist.py", "threshold.py", "reviews.py", "carriers.py", "combined.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -395,6 +397,48 @@ def threshold_case(args, session, natural, opened, api, requirement, case, folde
         frequency_check(case, block.probability, sum(seen.values()), args.validate_trials)
 
 
+def reviews_case(args, session, natural, opened, api, requirement, case, folder):
+    """A product's reviews or a carrier's: the two modules answer to the same names."""
+    module = carriers if requirement["schema"] == carriers.VERSION else reviews
+    try:
+        block = module.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    place = block.site
+    signs = carriers.SIGNS if module is carriers else (reviews.POSITIVE, reviews.NEGATIVE)
+    case.update(status="sampled", probability_given_upstream=block.probability or None,
+                log_probability_given_upstream=block.log_probability,
+                natural=dict(zip(signs, module.counted(place, module.written(natural, place)))),
+                counts_modelled=len(block.log_terms),
+                **({"carrier_id": place.carrier_id,
+                    "shipments_that_could_mention": {sign: len(found) for sign, found in block.groups.items()}}
+                   if module is carriers else
+                   {"product_id": place.product_id, "reviews": place.count, "review_class_probabilities": block.shares}))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        try:
+            world, found, record = module.steer(session, natural, opened, requirement, api,
+                                                sample_rng(natural, case, index))
+        except blocks.NumericalLimit as error:
+            case.update(status="refused", reason=error.reason, detail=str(error))
+            return
+        seconds = time.monotonic() - clock
+        # The saved review records themselves, by the native rule written out in the module.
+        pinned.ensure(module.holds(place.requirement, *module.counted(place, module.written(world, place))),
+                      "Direct reading of the saved reviews disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+                                "counts": found["counts"], "verdict": found["verdict"],
+                                "review_redraws": record["review_redraws"],
+                                "streams_steered": record["streams_steered"], "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [module.trial(natural, requirement, api)], case)
+    if args.validate_trials:
+        seen = module.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        frequency_check(case, block.probability, sum(seen.values()), args.validate_trials)
+
+
 def held(row):
     """Whether an offer's recorded leaves make it available: stock anywhere or a supplier order."""
     return any(row["stock_by_source"].values()) or row["supplier_order"]
@@ -439,7 +483,8 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
 CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_case),
          price_bounds.VERSION: ("price", bound_case), cheapest.VERSION: ("stock_and_prices", cheapest_case),
          listed.VERSION: ("listed_prices", listed_case), shortlist.VERSION: ("shortlist", shortlist_case),
-         threshold.VERSION: ("threshold", threshold_case),
+         threshold.VERSION: ("threshold", threshold_case), reviews.VERSION: ("reviews", reviews_case),
+         carriers.VERSION: ("carrier_reviews", reviews_case),
          combined.VERSION: ("combined", combined_case)}
 
 

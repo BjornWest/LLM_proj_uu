@@ -527,6 +527,156 @@ costs. Which delivery options exist and what they charge is not steered; see
 `basket_quote.make_plan`, `prepared_quote.prepare` and
 `catalog_checkout_domain.make` and no route admission.
 
+## The eighth requirement: what a product's reviews say about a topic
+
+Requirement (`steered-review-topic-v1`): a product, a topic of the native
+review-summary task (an aspect and its context) and one or more of: the
+verdict of the task's count, the number of positive comments, the number of
+negative ones.
+
+```json
+{"schema": "steered-review-topic-v1",
+ "product_id": "footwear-brand-05/footwear.walking_shoes/00",
+ "topic": {"aspect": "wet_paving_grip",
+           "context": {"activity": "walking", "surface": "wet paving"}},
+ "verdict": "tie", "min_assessed": 2,
+ "positive": {"min": 3}}
+```
+
+`verdict` is `more_positive`, `more_negative`, `tie` or
+`insufficient_evidence`, by the native rule: fewer assessing comments than
+`min_assessed` (1 unless stated) is insufficient evidence, otherwise the
+larger of the two counts decides. `positive` and `negative` are bounds on
+the counts. The task counts written comments: a rating without a comment is
+not counted at all, and a comment that does not report on the topic is "not
+assessed".
+
+This is the first block upstream of the commerce producer: reviews are part
+of a product's manufacture. It covers the two pilot concepts (walking shoes
+and walking sandals), whose reviews `footwear_context_pilot.sample_reviews`
+draws with one named stream per draw under the product's own seed. For one
+review the producer draws a star rating (one more than a beta-binomial count
+of four, by the product's execution), a score for every aspect (a normal
+draw around a centre set by the stars, shifted for comfort on a cushioned
+shoe and for value by the price), the comment's length (zero three times out
+of four at the defaults) and the topics of the comment (value with its own
+probability, the others by weight without replacement). A review is positive
+or negative about a topic when it has a comment, the topic is among those
+chosen, and the score is at or above one half or below it.
+
+`reviews.py` models exactly those draws: per review the rating, the topic's
+score, the length and the topic choices are the block. The reviews of a
+product draw independently and alike in these, so the three numbers
+(positive, negative, neither) are multinomial with one review's class
+probabilities (`reviews.shares`), and the probability of a requirement is the
+sum over the counts that satisfy it, kept as logarithms.
+
+A sample picks the counts from that distribution, places them on reviews at
+random, and then redraws each review's block streams under fresh seeds until
+the review is of its class. The rejection is inside one review, where a class
+is as likely as `reviews.shares` says (a few percent for a topic's praise or
+complaint at the defaults) and does not get rarer with the requirement; what
+makes a requirement rare is the counts, and those are chosen exactly. The
+record states how many redraws a sample took. A review whose class had a
+probability below about one in a million would exhaust the limit of redraws
+and is refused as a numerical limit; no input so far is near that. None of
+the seed's own block draws is kept, also for reviews that say nothing. Every
+other draw of a review is the seed's own (the option bought, the sizing
+remarks, the other aspects' normal draws, the phrasing), and reads the
+block's draws where the producer makes it: another star rating moves the
+other aspects' scores, and other topics change which stock phrases later
+reviews use.
+
+How it meets the producer. A session reseeds the planned review streams of
+the product (`streams.reviewed`; plan keys are `("review", product seed,
+stream key)`) and manufactures that one product again instead of taking it
+from the session's store, which for a pilot product takes milliseconds. The
+block's resource is `("reviews", "", product)`: it is independent of every
+commerce block and of other products' reviews, and two requirements on one
+product's reviews are coupled. `blocks.background` leaves out that product's
+reviews and its rating summary and nothing else, so a pass fails if the
+commerce world, another product or anything else of this product moved. The
+check reads the steered world with the native
+`catalog_review_task.reference`, and compares its counts with the recorded
+draws read by the rule written out in `reviews.said`.
+
+Limits. Only the pilot concepts: the other concepts' reviews are drawn by a
+package program under one hashed seed per review, which this does not model.
+Not the topics whose score depends on the option bought or the wearer
+(`size_fit`, `forefoot_room`). Only the topic count over all of a product's
+reviews: not the star summary, not one option's reviews. The pilot's reviews
+are never neutral or mixed, so those counts are always zero. Probabilities
+use floating-point logarithms of gamma functions and the complementary error
+function; they are exact to that arithmetic. Which reviews a review site
+shows is built from the world downstream and is not part of this.
+
+## The ninth requirement: what a carrier's reviews say about an aspect
+
+Requirement (`steered-carrier-review-topic-v1`): a carrier, an aspect of the
+native carrier-review task, the scope the task counts in (a shipping class,
+a range of review dates) and one or more of: the verdict, the number of
+positive comments, the number of negative ones.
+
+```json
+{"schema": "steered-carrier-review-topic-v1",
+ "carrier_id": "carrier-01", "aspect": "handoff",
+ "shipping_class": "regular", "date_from": "2026-08-14",
+ "verdict": "more_negative", "min_assessed": 3}
+```
+
+The carrier corpus is drawn in two steps. Every shipment first gets a
+history on its own stream, which settles what happened to it: the day and
+the window it came in, how it was handed over, the parcel's condition,
+tracking and notices. Each is an observation with a sentiment. The review
+then comes from a second stream of the shipment: whether there is a comment
+(one time in four at the defaults), how many observations it mentions (one
+to four, with fixed weights), which (punctuality twice as likely as most,
+notices about a third as likely), the wording and the stars.
+
+`carriers.py` takes the histories as upstream and steers the reviews. Its
+block is the review stream of every shipment of the carrier in the task's
+scope whose history has an observation of the aspect: that review is
+positive, negative or neutral about the aspect, by what happened, exactly
+when it has a comment that mentions it. The chance of that is the
+shipment's own (it depends on what else there is to mention), so a count is
+a sum of independent yes/no draws with different probabilities, computed by
+a recursion over the shipments; the three counts come from different
+shipments and are independent.
+
+A sample picks the counts, then goes through the shipments and decides for
+each whether it mentions the aspect given how many of the remaining ones
+must, then redraws that shipment's review stream under fresh seeds until the
+review does or does not mention it. The whole review is on that stream, so
+its stars, its wording and the reviewer's name are redrawn with it.
+
+What it cannot do follows from the choice of block: **what happened to the
+shipments is not steered**. A carrier whose handovers all went well has no
+complaint about handover to write, and a requirement of one has probability
+zero given upstream; so does any count above the number of shipments with
+such an observation in scope. To steer that, the histories would have to
+join the block, and a history is one long stream of dependent draws (dates,
+collection or home, failures, each outcome by the carrier's quality level)
+for which this code has no closed form. The candidates tool leaves out
+verdicts the histories rule out.
+
+The resource is `("carrier_reviews", "", carrier)`: independent of commerce
+blocks, of product reviews and of other carriers' reviews, coupled with
+another requirement on the same carrier. One thing does reach across
+carriers: the producer picks each statement's phrase by how often every
+phrase was used before it, over the whole corpus, so redrawing one carrier's
+reviews can change the wording (not the aspect, the sentiment or the stars)
+of other carriers' reviews. `blocks.background` therefore leaves out, besides
+this carrier's reviews and summary and the corpus identity, the wording of
+every other carrier review, and compares everything else, including the
+histories. The numbers of mentions (0.4, 0.35, 0.2, 0.05) and the aspect
+weights are the producer's own constants, which it does not keep in its
+configuration; they are written out in `carriers.py` and checked by the
+readings against the producer.
+
+The check reads the steered world with the native
+`carrier_review_task.reference` in the task's scope and compares it with the
+recorded reviews.
+
 ## Requirement candidates for a native task
 
 `variants.of(world, task, api)` takes a native task specification (the
@@ -541,6 +691,8 @@ the block model gives each:
 | `shortlist_matching_models` with an integer `limit` | `natural_shortlist`; `tie_at_cutoff`; `another_shortlist`, the last two the likeliest among the first limit + 3 models of the natural ranking, not among all models |
 | `comparison_cheapest_exact_sku_stock` (with the bound `sku_id`) | the retailer shown cheapest holds the variant, has it only on supplier order, or has it unavailable |
 | `audit_free_shipping_claim` | no threshold; meets; below; just below; just meets |
+| `summarize_product_reviews` (topic counts over a pilot product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed` |
+| `summarize_carrier_reviews` (topic counts) | the same four verdicts in the task's scope, without those the shipments' histories rule out |
 
 A task is translated field by field, and a task with a field the tool does
 not carry into the requirement is refused with a `ValueError` that names the
@@ -551,9 +703,16 @@ in which no model matches gives no shortlist candidate. For the
 shipping-claim task `delivery_types` is accepted and not used: it changes
 which options the native task counts, not the subtotal test.
 
-The search runs the block model once per candidate requirement, so it costs
-about one model per retailer/product pair of the concept and one per
-competing offer. `python -m experiments.steered_generation.variants` writes
+The search models one requirement per retailer/product pair of the concept
+and one per competing offer. Requirements of one task differ only in who
+wins and which offer sits below the winner, so they share a
+`cheapest.frame`: the scope, the block's pairs and each pair's table when
+none of its offers is named. Only the pair of a named offer is rebuilt, and a
+model with a frame is the same as one without. On the medium world (21
+retailers, 90 products) that took the tool from 174 to 615 s per task down to
+158 to 162 s, which is the natural pass it starts with, and its candidates
+were unchanged (`medium/variants/`, `medium/variants-shared/`; B01, B05, B14
+and B20's task forms). `python -m experiments.steered_generation.variants` writes
 the files for a generation input after one natural pass; the runner then
 samples and checks whichever of them is wanted. A comparison site goes with
 the surrounding-site controls the world is published with, given as
@@ -570,7 +729,7 @@ only that matching offers exist, not which is cheapest.
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the seven kinds above, that must all hold.
+of the nine kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -590,6 +749,8 @@ price of one retailer/product:
 | Who lists a product cheapest | price of every compared pair of the product | nothing |
 | Which models make the shortlist | stock and price of every listed pair of the concept with an offer that competes | nothing |
 | A basket against the free-shipping threshold | the retailer's threshold, and the price of the retailer/product unless no threshold is required | nothing |
+| What a product's reviews say about a topic | the product's reviews | nothing |
+| What a carrier's reviews say about an aspect | the carrier's reviews (and the wording of other carriers' reviews, which nothing is judged on) | nothing |
 
 `blocks.independent` accepts a list of blocks when no block decides a
 resource that another decides or depends on. The producer draws separate
@@ -663,6 +824,8 @@ ever be cheapest. Receipts and worlds are under
 | `medium/readings/run-v1/` | `816f35f` | the readings on the medium world; 4,000 redraws |
 | `suite/B11/` .. `suite/B14/`, `suite/B11-seed73/`, `suite/B11-medium/` (`run-v1`) | `d0c3272` | rankings and shortlists on the suite's own inputs and on larger ones |
 | `suite/variants/CASE/run-v1/` for twelve suite tasks | `3d99dd0`, `19a2562` | every candidate the tool writes for the task, sampled and checked; 10,000 redraws |
+| `suite/variants/B09/`, `H10/` (`run-v1`) | `6040664` | the product-review tasks' candidates; 10,000 redraws |
+| `suite/variants/B09-rare/`, `B16/`, `B16-tracking/` (`run-v1`) | `51aefce` | rarer review requirements (200,000 redraws); the carrier-review task's candidates (10,000) |
 
 Requirement files are in `steering/`, `steering/stock/`, `steering/price/`,
 `steering/cheapest/` and `steering/combined/`. Commit `832238a6` moved the
@@ -1053,6 +1216,77 @@ and start state are not part of this.
 These are dev-producer worlds from the suite's inputs, not the suite's frozen
 worlds, and nothing here is published or bound to a task instance.
 
+### Reviews
+
+The suite's five product-review tasks are two task forms: B09, H05, H06 and
+H07 share one generation input and one task specification (the first walking
+shoe, grip on wet paving, 100 reviews per product), and H10 has its own (the
+sixth walking shoe, 2 reviews per product). For both, `variants` wrote the
+candidates from the task specification and the pinned runner sampled and
+checked each (`suite/variants/B09/`, `suite/variants/H10/`, launched by
+`launch-reviews.sh`; three samples, 10,000 redraws and 5 producer redraws per
+candidate; `summarize-reviews.py` prints the table). Steering commit
+`6040664`, dev's producer in the steering checkout.
+
+| Task | World (retailers / products; reviews) | Candidate | Probability given upstream | Natural counts | Samples (positive, negative; redraws; seconds) | Hits in redraws | Expected |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| B09 | 10 / 32; 100 reviews | `verdict_insufficient_evidence` | 0.0013 | 2 positive, 3 negative | 0, 0; 0, 0; 0, 0; 103–107 redraws; 1.66–1.70 s | 11 of 10,000 | 13 ± 4 |
+| B09 | 10 / 32; 100 reviews | `verdict_more_negative` | 0.51 | 2 positive, 3 negative | 3, 5; 2, 4; 2, 4; 176–334 redraws; 1.67–1.77 s | 5102 of 10,000 | 5098 ± 50 |
+| B09 | 10 / 32; 100 reviews | `verdict_more_positive` | 0.334 | 2 positive, 3 negative | 3, 2; 4, 2; 5, 3; 197–338 redraws; 1.69–1.79 s | 3385 of 10,000 | 3338 ± 47 |
+| B09 | 10 / 32; 100 reviews | `verdict_tie` | 0.155 | 2 positive, 3 negative | 4, 4; 2, 2; 1, 1; 157–249 redraws; 1.65–1.78 s | 1502 of 10,000 | 1550 ± 36 |
+| H10 | 8 / 23; 2 reviews | `verdict_insufficient_evidence` | 0.87 | 0 positive, 1 negative | 0, 0; 0, 0; 0, 0; 2 redraws; 0.41–0.42 s | 8716 of 10,000 | 8702 ± 34 |
+| H10 | 8 / 23; 2 reviews | `verdict_more_negative` | 0.0421 | 0 positive, 1 negative | 0, 1; 0, 1; 0, 1; 5–44 redraws; 0.40–0.42 s | 414 of 10,000 | 421 ± 20 |
+| H10 | 8 / 23; 2 reviews | `verdict_more_positive` | 0.0857 | 0 positive, 1 negative | 1, 0; 1, 0; 1, 0; 7–21 redraws; 0.41–0.46 s | 850 of 10,000 | 857 ± 28 |
+| H10 | 8 / 23; 2 reviews | `verdict_tie` | 0.002 | 0 positive, 1 negative | 1, 1; 1, 1; 1, 1; 14–100 redraws; 0.40–0.42 s | 20 of 10,000 | 20 ± 4 |
+
+All 24 samples satisfied their requirement by the native review task's
+reference and by the direct reading of the saved review records; every
+producer redraw equalled the block's reading. On B09's world a sample takes
+about 1.7 s, the natural pass 372 s (its other concepts' reviews dominate
+manufacture). H10's world has two reviews per product, so three of its four
+verdicts are the unusual ones.
+
+Rarer requirements on B09's world, written by hand
+(`suite/variants/B09-rare/candidates/`, launched by `launch-run.sh`;
+200,000 redraws each), at steering commit `51aefce`:
+
+| Task | World (retailers / products; reviews) | Candidate | Probability given upstream | Natural counts | Samples (positive, negative; redraws; seconds) | Hits in redraws | Expected |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| B09-rare | 10 / 32; 100 reviews | `even_and_many` | 8.79e-05 | 2 positive, 3 negative | 8, 8; 8, 8; 8, 8; 422–756 redraws; 1.66–1.70 s | 15 of 200,000 | 18 ± 4 |
+| B09-rare | 10 / 32; 100 reviews | `many_complaints` | 1.15e-06 | 2 positive, 3 negative | 2, 15; 1, 16; 2, 15; 393–532 redraws; 1.69–1.76 s | 0 of 200,000 | 0.2 ± 0.5 |
+| B09-rare | 10 / 32; 100 reviews | `nobody_mentions_it` | 0.0013 | 2 positive, 3 negative | 0, 0; 0, 0; 0, 0; 102–109 redraws; 1.63–1.72 s | 262 of 200,000 | 261 ± 16 |
+| B09-rare | 10 / 32; 100 reviews | `praise_only` | 0.00032 | 2 positive, 3 negative | 8, 0; 8, 0; 8, 0; 297–362 redraws; 1.61–1.77 s | 70 of 200,000 | 64 ± 8 |
+
+`many_complaints` (at least 15 complaints and at most 2 praises among 100
+reviews) is expected 0.2 times in 200,000 redraws, so its zero hits say
+nothing about its probability; the samples and their checks are its
+evidence, and the probability rests on the model that the other rows test.
+
+The carrier-review task (B16: the first carrier, handover, regular shipping
+class, reviews from 2026-08-14 on, at least three assessing comments), and
+the same task form on tracking with at least two (`suite/variants/B16/`,
+`B16-tracking/`, launched by `launch-carriers.sh`; 10,000 redraws), at
+`51aefce`:
+
+| Task | World (retailers / products; reviews) | Candidate | Probability given upstream | Natural counts | Samples (positive, negative; redraws; seconds) | Hits in redraws | Expected |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| B16 | 7 / 30; 8 shipments in the block | `verdict_insufficient_evidence` | 0.978 | 2 positive, 0 negative, 0 neutral | 1, 0; 0, 0; 0, 0; 8–22 redraws; 0.48–0.51 s | 9769 of 10,000 | 9777 ± 15 |
+| B16 | 7 / 30; 8 shipments in the block | `verdict_more_positive` | 0.0223 | 2 positive, 0 negative, 0 neutral | 3, 0; 3, 0; 3, 0; 24–55 redraws; 0.49–0.53 s | 231 of 10,000 | 223 ± 15 |
+| B16-tracking | 7 / 30; 10 shipments in the block | `verdict_insufficient_evidence` | 0.765 | 1 positive, 1 negative, 0 neutral | 1, 0; 0, 0; 0, 0; 10–19 redraws; 0.50–0.53 s | 7657 of 10,000 | 7647 ± 42 |
+| B16-tracking | 7 / 30; 10 shipments in the block | `verdict_more_positive` | 0.204 | 1 positive, 1 negative, 0 neutral | 2, 0; 5, 0; 2, 0; 38–70 redraws; 0.53–0.55 s | 2016 of 10,000 | 2038 ± 40 |
+| B16-tracking | 7 / 30; 10 shipments in the block | `verdict_tie` | 0.0315 | 1 positive, 1 negative, 0 neutral | 1, 1; 1, 1; 1, 1; 11–26 redraws; 0.50–0.52 s | 327 of 10,000 | 315 ± 17 |
+
+On B16's own input the carrier has eight shipments in scope with a handover
+observation and all eight went well, so only two verdicts can occur; "more
+negative" and "tie" have probability zero given the histories, and the tool
+does not offer them. Of that world's eight carriers one has any bad handover
+in scope. This is the limit stated under the ninth requirement, met on the
+suite's own task.
+
+All of these are dev-producer worlds from the suite's inputs, not the
+suite's frozen worlds, and nothing here is published or bound to a task
+instance.
+
 ### A medium world
 
 The world sizes asked for (Bjorn, 2026-10-11): a medium world has 4 to 8
@@ -1191,9 +1425,14 @@ carries review and description text that the checks also digest.
   are refused with a reason code, not repaired.
 - **The earlier Z3 pilot** (`experiments/constrained_world_pilot/`) is not
   connected.
-- **Only retail stock and prices.** Reviews and review sites are not steered,
-  and neither is which products a comparison site lists (that is the seed's,
-  and the requirement can only confine the comparison to it).
+- **Reviews, in part.** Steered: what the reviews of a pilot product
+  (walking shoes, walking sandals) say about a topic, and which of a
+  carrier's reviews mention an aspect. Not steered: reviews of the other
+  concepts, which a package program draws under one hashed seed per review;
+  the star summaries; one option's reviews; the topics that depend on the
+  option bought or the wearer; and what happened to a carrier's shipments,
+  which bounds what its reviews can be made to say. Which reviews a review
+  site shows, and which products a comparison site lists, are the seed's.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
   against a basket's subtotal. Carrier fees, which carriers and service tiers
   a retailer has, and so the delivered total (the single-item delivery and

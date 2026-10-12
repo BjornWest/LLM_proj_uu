@@ -13,12 +13,12 @@ from math import fsum, log, prod
 
 from experiments.world_requirement_construction import model as edits
 
-from . import blocks, cheapest, listed, price_bounds, prices, shortlist, stock, streams, threshold
+from . import blocks, carriers, cheapest, listed, price_bounds, prices, reviews, shortlist, stock, streams, threshold
 
 VERSION = "steered-requirements-v1"
 KINDS = {edits.VERSION: prices, stock.VERSION: stock, price_bounds.VERSION: price_bounds,
          cheapest.VERSION: cheapest, listed.VERSION: listed, shortlist.VERSION: shortlist,
-         threshold.VERSION: threshold}
+         threshold.VERSION: threshold, reviews.VERSION: reviews, carriers.VERSION: carriers}
 
 
 def resolve(requirement):
