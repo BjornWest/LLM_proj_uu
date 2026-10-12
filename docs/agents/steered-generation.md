@@ -409,9 +409,11 @@ barred SKUs are in the block.
 
 Which offers compete and what they are ranked by is not restated here for
 the priority and unit-price tasks. `cheapest.stocked` makes a copy of the
-world in which every listed offer holds one unit at every location, and the
-native oracle's candidates on that copy are the offers that can compete at
-all, each with the facts or the pack mass the oracle ranks it by. The record
+world in which every listed offer holds one unit at every location, and reads
+the native oracle's candidates on it, each with the facts or the pack mass
+the oracle ranks it by. The stocked copy identifies offers eligible apart
+from availability; whether an eligible offer can actually become available is
+determined by the block's stock and supplier distributions. The record
 gives `winning_price_minor` when the rank is a price and `winning_rank`
 otherwise.
 
@@ -485,10 +487,90 @@ in the fourth block. With a limit of one this must equal the fourth block
 summed over every set of the model's retailers, and a unit test checks that
 to twelve places. The check uses `catalog_shortlist_task.reference`.
 
+Shortlist probabilities and conditional samples use the documented
+finite-arithmetic and price-model approximations; model-level splits and the
+count table use guarded float products and may raise `NumericalLimit` before
+cutoff terms are assembled in logarithms.
+
+## The seventh requirement: a basket against the free-shipping threshold
+
+Requirement (`steered-free-shipping-v1`): a retailer, a SKU, a quantity and
+how the merchandise subtotal (listed price times quantity) stands to the
+retailer's advertised free-shipping threshold, in the native shipping-claim
+task's words; optionally a bound on the gap between the two.
+
+```json
+{"schema": "steered-free-shipping-v1",
+ "retailer_id": "apparel-06",
+ "sku_id": "footwear-brand-21/footwear.walking_shoes/00-black-standard-39",
+ "quantity": 2, "subtotal_test": "below_threshold",
+ "gap_minor": {"max": 10000}}
+```
+
+`subtotal_test` is `no_threshold`, `meets_threshold` or `below_threshold`.
+The producer draws per retailer whether a threshold is offered (with a
+probability by the retailer's scale) and, if so, its value from a short
+equally weighted list; `threshold.py` samples those two draws and the offer's
+price draw together. A retailer's threshold is a resource of its own,
+`("threshold", retailer, "")`, so the requirement combines with stock
+requirements and with anything on other retailers, and is coupled with
+another requirement on the same retailer's threshold or on the same price.
+For `no_threshold` the price is no part of the block. Threshold
+probabilities and conditional samples use the existing price-atom model and
+the documented finite-arithmetic approximations; repeated threshold values
+retain their multiplicity in the producer's choice list.
+
+This is the number the shipping-claim task asks about, not what delivery
+costs. Which delivery options exist and what they charge is not steered; see
+"What is not done". The unit tests read steered worlds with the native
+`catalog_shipping_claim_task.reference`, whose quote context is built with
+`basket_quote.make_plan`, `prepared_quote.prepare` and
+`catalog_checkout_domain.make` and no route admission.
+
+## Requirement candidates for a native task
+
+`variants.of(world, task, api)` takes a native task specification (the
+`task` of a generation request) and returns the scenarios of that task that
+steering can force on the world, as requirement files with the probability
+the block model gives each:
+
+| Task kind | Candidates |
+| --- | --- |
+| `cheapest_available`, `cheapest_matching_available`, `cheapest_matching_with_memory`, `cheapest_matching_after_clarification`, `cheapest_matching_local_branch_stock`, `recommend_matching_by_priorities`, `cheapest_matching_unit_price` | `likeliest_winner`; `better_offer_unavailable` (the likeliest single offer that would rank ahead of that winner, listed and unavailable); `unlikely_winner` (the pair at the middle of the ranking by probability) |
+| `cheapest_matching_with_permitted_relaxations` | `criteria_set_0`, `criteria_set_1`, ...: that set is the first with an available match |
+| `shortlist_matching_models` with an integer `limit` | `natural_shortlist`; `tie_at_cutoff`; `another_shortlist`, the last two the likeliest among the first limit + 3 models of the natural ranking, not among all models |
+| `comparison_cheapest_exact_sku_stock` (with the bound `sku_id`) | the retailer shown cheapest holds the variant, has it only on supplier order, or has it unavailable |
+| `audit_free_shipping_claim` | no threshold; meets; below; just below; just meets |
+
+A task is translated field by field, and a task with a field the tool does
+not carry into the requirement is refused with a `ValueError` that names the
+field, so that nothing that changes the native answer is dropped. That
+includes the native price cap (`max_price_minor`), which no block models
+yet, and a shortlist task without a limit, which lists every model. A world
+in which no model matches gives no shortlist candidate. For the
+shipping-claim task `delivery_types` is accepted and not used: it changes
+which options the native task counts, not the subtotal test.
+
+The search runs the block model once per candidate requirement, so it costs
+about one model per retailer/product pair of the concept and one per
+competing offer. `python -m experiments.steered_generation.variants` writes
+the files for a generation input after one natural pass; the runner then
+samples and checks whichever of them is wanted. A comparison site goes with
+the surrounding-site controls the world is published with, given as
+`surrounding` in the task.
+
+For the memory and clarification tasks (`cheapest_matching_with_memory`,
+`cheapest_matching_after_clarification`) the native module's own `resolve`
+joins the remembered or hidden requirement to the stated predicates, and the
+candidates are those of the resulting feature task, which is what their
+native references read. Cart-preparation tasks (`prepare_matching_carts`,
+`prepare_matching_checkout_details`) are not covered: their reference asks
+only that matching offers exist, not which is cheapest.
+
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the six kinds above, that must all hold.
+of the seven kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -507,6 +589,7 @@ price of one retailer/product:
 | Who is cheapest, on stock and prices | stock and price of every listed pair of the concept with an offer that competes | nothing |
 | Who lists a product cheapest | price of every compared pair of the product | nothing |
 | Which models make the shortlist | stock and price of every listed pair of the concept with an offer that competes | nothing |
+| A basket against the free-shipping threshold | the retailer's threshold, and the price of the retailer/product unless no threshold is required | nothing |
 
 `blocks.independent` accepts a list of blocks when no block decides a
 resource that another decides or depends on. The producer draws separate
@@ -577,6 +660,9 @@ ever be cheapest. Receipts and worlds are under
 | `run-v11-sold-out/`, `run-v11-shoe/`, `run-v11-regression/`, `medium/run-v11-shoes/`, `medium/run-v11-others/` | `311e8ff` (code `d9973a9`) | all five again after the eighth review's fix, with shorter redraw counts (50,000, 10,000, 20,000; 1,000 and 10,000 on the medium world) |
 | `readings/run-v1/` | `9cb2610` | the native tasks' readings of who competes and what is available, and who lists a product cheapest; 20,000 redraws |
 | `readings/run-v2/` | `cf07fdb` | the same after the rebase onto the approved candidate; 4,000 redraws |
+| `medium/readings/run-v1/` | `816f35f` | the readings on the medium world; 4,000 redraws |
+| `suite/B11/` .. `suite/B14/`, `suite/B11-seed73/`, `suite/B11-medium/` (`run-v1`) | `d0c3272` | rankings and shortlists on the suite's own inputs and on larger ones |
+| `suite/variants/CASE/run-v1/` for twelve suite tasks | `3d99dd0`, `19a2562` | every candidate the tool writes for the task, sampled and checked; 10,000 redraws |
 
 Requirement files are in `steering/`, `steering/stock/`, `steering/price/`,
 `steering/cheapest/` and `steering/combined/`. Commit `832238a6` moved the
@@ -898,6 +984,75 @@ identities are not, and nothing here has been published or bound to a task
 instance.
 
 
+### The suite's tasks, through the candidates tool
+
+For twelve tasks of the 34-task suite, `variants` was run on the task's own
+specification and generation input (`suite/variants/CASE/task.json`,
+`generation-input.private.json`), and the pinned runner then sampled and
+checked every candidate it wrote (`suite/variants/CASE/run-v1/`, launched by
+`suite/variants/launch.sh`; three samples, 10,000 redraws and 5 producer
+redraws per candidate; `summarize.py` prints these figures). Steering
+commits `3d99dd0` and, for B07 and B08, `19a2562`; the steering runtime files
+are the same at both. Dev's producer in the steering checkout.
+
+| Task | World (retailers / products / offers) | Candidate | Probability given upstream | Sample | Hits in 10,000 redraws | Expected |
+| --- | --- | --- | --- | --- | --- | --- |
+| B01: cheapest available on a comparison site | 12 / 25 / 411 | `likeliest_winner` | 0.393 | 0.70 to 0.87 s | 3,888 | 3,934 ± 49 |
+|  |  | `better_offer_unavailable` | 4.3e-11 | 0.77 to 0.84 s | 0 | 0 |
+|  |  | `unlikely_winner` | 4.8e-44 | 0.71 to 0.74 s | 0 | 0 |
+| H09: the same task as B01 | 12 / 25 / 411 | `likeliest_winner` | 0.393 | 0.69 to 0.82 s | 3,888 | 3,934 ± 49 |
+|  |  | `better_offer_unavailable` | 4.3e-11 | 0.73 to 0.82 s | 0 | 0 |
+|  |  | `unlikely_winner` | 4.8e-44 | 0.73 to 0.86 s | 0 | 0 |
+| B04: comparison site's cheapest retailer, exact variant's stock | 8 / 23 / 294 | `advertised_cheapest_in_stock` | 0.302 | 0.72 to 0.94 s | 2,979 | 3,022 ± 46 |
+|  |  | `advertised_cheapest_unavailable` | 0.087 | 0.74 to 0.85 s | 873 | 870 ± 28 |
+|  |  | `advertised_cheapest_on_supplier_order` | 0.0217 | 0.66 to 1.04 s | 259 | 217 ± 15 |
+| B05: cheapest in stock with size and two facts | 12 / 25 / 411 | `likeliest_winner` | 0.201 | 0.54 to 0.63 s | 2,046 | 2,006 ± 40 |
+|  |  | `unlikely_winner` | 0.2 | 0.57 to 0.63 s | 2,025 | 2,003 ± 40 |
+|  |  | `better_offer_unavailable` | 0.00319 | 0.54 to 0.57 s | 34 | 32 ± 6 |
+| B07: cheapest matching, requirements from memory | 9 / 16 / 206 | `likeliest_winner` | 0.253 | 0.45 to 0.47 s | 2,473 | 2,531 ± 43 |
+|  |  | `unlikely_winner` | 0.237 | 0.45 to 0.47 s | 2,360 | 2,369 ± 43 |
+|  |  | `better_offer_unavailable` | 0.00711 | 0.43 to 0.58 s | 63 | 71 ± 8 |
+| B08: cheapest matching after a clarification | 10 / 21 / 171 | `likeliest_winner` | 0.508 | 0.45 to 0.52 s | 5,094 | 5,079 ± 50 |
+|  |  | `better_offer_unavailable` | 0.0941 | 0.43 to 0.55 s | 1,009 | 941 ± 29 |
+|  |  | `unlikely_winner` | 0.00677 | 0.47 to 0.48 s | 82 | 68 ± 8 |
+| B11: shortlist of three models | 4 / 23 / 72 | `natural_shortlist` | 0.111 | 0.52 to 0.69 s | 1,101 | 1,114 ± 31 |
+| B12: permitted relaxations | 7 / 21 / 300 | `criteria_set_1` | 0.41 | 1.08 to 1.55 s | 4,129 | 4,102 ± 49 |
+|  |  | `criteria_set_2` | 1.7e-20 | 0.80 to 0.87 s | 0 | 0 |
+| B13: cheapest per kilogram | 2 / 14 / 15 | `likeliest_winner` | 0.995 | 0.84 to 0.92 s | 9,944 | 9,951 ± 7 |
+|  |  | `unlikely_winner` | 1 in 4,945 | 0.83 to 1.04 s | 1 | 2.0 ± 1.4 |
+| B14: lightest, then cheapest | 8 / 28 / 456 | `likeliest_winner` | 0.559 | 0.79 to 0.88 s | 5,596 | 5,591 ± 50 |
+|  |  | `better_offer_unavailable` | 0.106 | 0.80 to 0.93 s | 1,093 | 1,060 ± 31 |
+|  |  | `unlikely_winner` | 1.0e-47 | 0.76 to 0.81 s | 0 | 0 |
+| B18: free-shipping claim | 8 / 28 / 480 | `no_threshold` | 0.75 | 0.45 to 0.47 s | 7,483 | 7,500 ± 43 |
+|  |  | `below_threshold` | 0.214 | 0.44 to 0.46 s | 2,155 | 2,143 ± 41 |
+|  |  | `meets_threshold` | 0.0357 | 0.44 to 0.48 s | 362 | 357 ± 19 |
+|  |  | `just_meets_threshold` | 0.00261 | 0.45 to 0.51 s | 30 | 26 ± 5 |
+| B20: cheapest collectable at a branch in the city | 5 / 22 / 124 | `likeliest_winner` | 0.735 | 0.58 to 0.84 s | 7,403 | 7,354 ± 44 |
+|  |  | `unlikely_winner` | 0.0605 | 0.46 to 0.54 s | 572 | 605 ± 24 |
+
+All 96 samples satisfied their requirement by the direct reading of the saved
+leaves and by the native oracle of the task's reading (for B04 by its two
+parts' checks, and for B18 by the threshold rule; the native comparison-stock
+and shipping-claim oracles are applied in the unit tests). Every redraw count
+is within four standard errors. The largest deviation is B04's
+`advertised_cheapest_on_supplier_order`, 259 joint hits against 217 ± 15 (2.8
+standard errors); its two parts by themselves are 4,111 against 4,110 ± 49
+and 560 against 529 ± 22. Among some thirty comparisons in this table one
+that far out is not surprising, and nothing else points the same way, but it
+is the figure to look at first if a later run disagrees.
+
+For B11 the tool emits only `natural_shortlist`: there are two eligible
+models, so its search constructs neither a three-model alternative nor a
+four-model cutoff tie; smaller shortlists remain possible. B01's and H09's
+natural world has no listed offer that is
+likely to sit unavailable below the likeliest winner, hence 4.3e-11. B07 and
+B08 are read through the feature task their native modules resolve them to.
+What is steered is the world's stock and prices; a task's memories, prompts
+and start state are not part of this.
+
+These are dev-producer worlds from the suite's inputs, not the suite's frozen
+worlds, and nothing here is published or bound to a task instance.
+
 ### A medium world
 
 The world sizes asked for (Bjorn, 2026-10-11): a medium world has 4 to 8
@@ -1038,8 +1193,16 @@ carries review and description text that the checks also digest.
   connected.
 - **Only retail stock and prices.** Reviews and review sites are not steered,
   and neither is which products a comparison site lists (that is the seed's,
-  and the requirement can only confine the comparison to it). Delivery fees,
-  free-shipping thresholds and delivery options are not modelled.
+  and the requirement can only confine the comparison to it).
+- **Delivery cost.** A retailer's free-shipping threshold can be steered
+  against a basket's subtotal. Carrier fees, which carriers and service tiers
+  a retailer has, and so the delivered total (the single-item delivery and
+  order-set tasks) are not modelled. One obstacle is outside this code: with
+  delivery options enabled, which routes a retailer admits is decided by a
+  hash that includes the finished world's identity
+  (`delivery_admission.py`), so any steered change reshuffles the admitted
+  routes afterwards; an exact conditional sample of a delivered total needs
+  that keyed on something upstream of stock, prices and fees.
 - **No publication.** Steered worlds are native worlds only:
   `browser_runtime_ready` is false. `unified_generation.generate` accepts a
   `world_factory`, which is where a steered world would enter so that

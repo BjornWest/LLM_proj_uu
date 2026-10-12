@@ -6,7 +6,8 @@ One natural pass through the real producer, then one cheap steered pass per
 requested sample. A requirement file is a who-is-cheapest requirement (on
 prices alone, on stock and prices together with offers listed below the
 winner, or on a product's listed prices), a shortlist of models, a one-offer
-stock or price requirement, or several of those to hold together.
+stock or price requirement, a basket's subtotal against a free-shipping
+threshold, or several of those to hold together.
 No browser, provider or sidecar publication.
 """
 import argparse
@@ -22,11 +23,11 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import blocks, cheapest, combined, listed, price_bounds, prices, shortlist, stock, streams
+from . import blocks, cheapest, combined, listed, price_bounds, prices, shortlist, stock, streams, threshold
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
-              "listed.py", "shortlist.py", "combined.py", "run.py"),
+              "listed.py", "shortlist.py", "threshold.py", "combined.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -365,6 +366,35 @@ def shortlist_case(args, session, natural, opened, api, requirement, case, folde
         pinned.ensure(hits < 1000 or distance < 0.1, "Conditional cutoff distribution disagrees with the producer's draws")
 
 
+def threshold_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        block = threshold.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    place = block.site
+    case.update(status="sampled", probability_given_upstream=block.probability, offer_id=place.offer_id,
+                natural=dict(zip(("threshold_minor", "price_minor"), threshold.listed(natural, place))),
+                outcomes_modelled=len(block.outcomes))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        world, found, record = threshold.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        seconds = time.monotonic() - clock
+        # The saved leaves themselves, by the native rule written out in `threshold.holds`.
+        pinned.ensure(threshold.holds(place.requirement, *threshold.listed(world, place)),
+                      "Direct reading of the saved leaves disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+                                **{key: found[key] for key in ("unit_price_minor", "subtotal_minor",
+                                                               "advertised_threshold_minor", "subtotal_test")},
+                                "streams_steered": record["streams_steered"], "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [threshold.trial(natural, requirement, api)], case)
+    if args.validate_trials:
+        seen = threshold.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        frequency_check(case, block.probability, sum(seen.values()), args.validate_trials)
+
+
 def held(row):
     """Whether an offer's recorded leaves make it available: stock anywhere or a supplier order."""
     return any(row["stock_by_source"].values()) or row["supplier_order"]
@@ -409,6 +439,7 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
 CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_case),
          price_bounds.VERSION: ("price", bound_case), cheapest.VERSION: ("stock_and_prices", cheapest_case),
          listed.VERSION: ("listed_prices", listed_case), shortlist.VERSION: ("shortlist", shortlist_case),
+         threshold.VERSION: ("threshold", threshold_case),
          combined.VERSION: ("combined", combined_case)}
 
 

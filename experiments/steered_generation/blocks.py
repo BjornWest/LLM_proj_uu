@@ -2,7 +2,8 @@
 
 A block is the set of draws one requirement resamples. It names the leaves it
 decides and the leaves its probability was computed from as resources:
-("stock", retailer, product) and ("price", retailer, product). The producer
+("stock", retailer, product), ("price", retailer, product) and, for a
+retailer's free-shipping threshold, ("threshold", retailer, ""). The producer
 gives every draw its own stream, so blocks whose resources do not meet are
 independent given everything upstream: each can be sampled on its own, all of
 them replayed in one pass, and the probability that every requirement holds is
@@ -154,7 +155,8 @@ def independent(steps):
             if shared:
                 kind, retailer, product = sorted(shared)[0]
                 raise Coupled(f"Requirements {index + 1} and {other_index + 1} both depend on the {kind} "
-                              f"of {product} at {retailer}")
+                              f"of {product} at {retailer}" if product else
+                              f"Requirements {index + 1} and {other_index + 1} both depend on the {kind} of {retailer}")
 
 
 def background(world, writes):
@@ -162,13 +164,16 @@ def background(world, writes):
 
     Stock of a retailer/product: the condition at each location, every SKU's
     quantities and supplier order, and the warehouse stock on its catalog
-    pages. Price: every SKU's price and recorded draw. JSON text, unlike
-    Python equality, keeps true, 1 and 1.0 apart.
+    pages. Price: every SKU's price and recorded draw. A retailer's threshold:
+    its free-shipping threshold. JSON text, unlike Python equality, keeps
+    true, 1 and 1.0 apart.
     """
     def retailer(value):
         rid = value["retailer_id"]
         stock = {product for kind, retailer_id, product in writes if kind == "stock" and retailer_id == rid}
         price = {product for kind, retailer_id, product in writes if kind == "price" and retailer_id == rid}
+        if ("threshold", rid, "") in writes:
+            value = {k: v for k, v in value.items() if k != "free_shipping_threshold_minor"}
         if not stock and not price:
             return value
 

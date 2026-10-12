@@ -160,8 +160,9 @@ def stocked(world):
     """The world with every listed offer holding one unit at every location.
 
     A native oracle lists as candidates the offers that are available; on this
-    world those are all the offers that can compete at all, with whatever the
-    oracle ranks them by.
+    world those are the offers eligible apart from availability, with whatever
+    the oracle ranks them by. Whether an eligible offer can actually become
+    available is for the block's stock and supplier distributions to say.
     """
     return {**world, "retailers": [{**r, "offers": [{**o, "stock_by_source": dict.fromkeys(o["stock_by_source"], 1)}
                                                     for o in r["offers"]]} for r in world["retailers"]]}
