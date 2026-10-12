@@ -294,7 +294,7 @@ class CapacityParent:
             with self.lock:
                 requested = self.shutdown_requested.get(case)
                 cause = self.stop_cause
-                if requested in ('explicit_cancellation','cohort_abort','infrastructure_abort'):
+                if requested in ('explicit_cancellation','cohort_abort','infrastructure_abort','parent_close'):
                     reason = requested
                 elif case in self.cleanup_failures or (cause and case == cause['case'] and cause['infrastructure']):
                     reason = 'infrastructure_abort'
@@ -325,7 +325,7 @@ class CapacityParent:
                             self.errors[case] = dict(type='CapacityChannelError',
                                 message=('Parent stopped channel with an in-flight request' if requested
                                     else 'Child disconnected with an in-flight request'),
-                                reason=requested if requested in ('explicit_cancellation','cohort_abort')
+                                reason=requested if requested in ('explicit_cancellation','cohort_abort','parent_close')
                                     else 'cohort_abort' if requested else 'inflight_disconnect')
                     self._cancel_registered(case)
                 elif protected_root and not failed and row['request_id'] is not None:
@@ -420,13 +420,23 @@ class CapacityParent:
                     self.controller.finish_episode(case)
                 self.finished.add(case)
         except BaseException as exc:
-            row = self.controller.status()['episodes'].get(case, {})
+            # A diagnostic read must never replace the real verification failure
+            # or prevent recording its ledger/stop. Retain unknown request IDs.
+            request_id = None
+            try:
+                request_id = self.controller.status()['episodes'].get(case, {}).get('request_id')
+            except BaseException as diagnostic:
+                exc.add_note('Request ID diagnostic unavailable: '+type(diagnostic).__name__)
             with self.lock:
                 # Parent-observed final verification failures are authoritative
                 # for every actor, regardless of the first cohort stop cause.
                 self.cleanup_failures.setdefault(case, dict(type=type(exc).__name__,
-                    message=str(exc),stage=stage,request_id=row.get('request_id')))
-            self.abort_after_failure(case, exc, infrastructure=True)
+                    message=str(exc),stage=stage,request_id=request_id))
+            self.suite_stop_event.set()
+            try:
+                self.abort_after_failure(case, exc, infrastructure=True)
+            except BaseException as secondary:
+                exc.add_note('Abort cleanup also failed: '+type(secondary).__name__)
             raise
         finally:
             with self.lock:self.finishing.discard(case)
@@ -467,13 +477,22 @@ class CapacityParent:
         # release outstanding permits. The caller still owns verified cleanup.
         with self.lock:
             self.closed = True
+        errors=[]
+        def attempt(operation):
+            try:operation()
+            except BaseException as error:errors.append(error)
         for case in self.connections:
-            self.cancel(case, cohort_abort=True)
-            self.connections[case].close()
+            with self.lock:reason='cohort_abort' if self.stop_cause else 'parent_close'
+            attempt(lambda c=case,r=reason:self._shutdown(c,reason=r))
+            attempt(lambda c=case:self.cancel(c,cohort_abort=True))
+            attempt(self.connections[case].close)
         for thread in self.threads.values():
-            thread.join(5)
-            if thread.is_alive():
-                raise TimeoutError('Capacity RPC worker did not stop')
+            def join(t=thread):
+                t.join(5)
+                if t.is_alive():raise TimeoutError('Capacity RPC worker did not stop')
+            attempt(join)
+        if errors:raise RuntimeError('Capacity parent close failures: '+'; '.join(type(e).__name__+': '+str(e)for e in errors)) from errors[0]
+
 
 
 class CapacityClient:

@@ -1386,4 +1386,177 @@ class CapacityRPCTests(unittest.TestCase):
             server.shutdown();server.server_close();thread.join(3)
 
 
+class NativeFollowupTests(unittest.TestCase):
+    def test_cancel_decision_serializes_with_final_verification_entry(self):
+        with setup() as (controller,parent,_):
+            parent.activate('run:a')
+            entered=threading.Event();resume=threading.Event();verifying=threading.Event();errors=[]
+            original=controller.cancel_episode
+            def cancel(case):
+                entered.set();resume.wait(3);original(case)
+            controller.cancel_episode=cancel
+            def finish():
+                try:
+                    parent.finish_after_cleanup('run:a',verify_cleanup=lambda:(verifying.set() or True),record_terminal=lambda:True)
+                except BaseException as exc:errors.append(exc)
+            cancelling=threading.Thread(target=lambda:parent.cancel('run:a'));cancelling.start()
+            finishing=threading.Thread(target=finish)
+            try:
+                self.assertTrue(entered.wait(2));finishing.start()
+                self.assertFalse(verifying.wait(.05))
+            finally:
+                resume.set();cancelling.join(3);finishing.join(3)
+            self.assertFalse(cancelling.is_alive());self.assertFalse(finishing.is_alive())
+            self.assertEqual(errors,[]);self.assertIn('run:a',parent.finished)
+
+    def test_late_unjoinable_worker_keeps_infrastructure_root_and_sent_permit(self):
+        from unittest.mock import patch
+        controller=control.EpisodeCapacityController(control.ParkingConfig(max_active_episodes=1,max_generation_requests=1,fresh_seconds=60))
+        healthy(controller);a,b=socket.socketpair();entered=threading.Event();resume=threading.Event()
+        def blocked(*a,**k):entered.set();resume.wait(3);return None
+        with patch.object(rpc,'_receive',blocked):
+            parent=rpc.CapacityParent(controller,{'run:a':a},deadline=time.monotonic()+10).start()
+            try:
+                self.assertTrue(entered.wait(2));parent.activate('run:a')
+                controller.acquire_turn('run:a','sent-request',timeout=1)
+                with self.assertRaises(TimeoutError):
+                    parent.finish_after_cleanup('run:a',verify_cleanup=lambda:True,record_terminal=lambda:True,timeout=.02)
+                resume.set();wait_for(self,lambda:'run:a' in parent.ended)
+                row=controller.status()['episodes']['run:a']
+                self.assertFalse(row['cancelled']);self.assertFalse(row['done'])
+                self.assertEqual(row['request_id'],'sent-request')
+                self.assertEqual(parent.errors['run:a']['reason'],'infrastructure_abort')
+                self.assertEqual(parent.cleanup_failures['run:a']['stage'],'worker_cleanup')
+            finally:resume.set();b.close();parent.close();controller.close()
+
+    def test_diagnostic_failure_cannot_mask_final_failure_or_skip_stop(self):
+        for fault in (MemoryError('diagnostic'), KeyboardInterrupt('diagnostic')):
+            with self.subTest(fault=type(fault)), setup() as (controller,parent,_):
+                parent.activate('run:a')
+                original_status=controller.status
+                def unavailable():
+                    controller.status=original_status
+                    raise fault
+                def verify():
+                    controller.status=unavailable
+                    return False
+                with self.assertRaises(rpc.CapacityChannelError) as caught:
+                    parent.finish_after_cleanup('run:a',verify_cleanup=verify,record_terminal=lambda:True)
+                self.assertEqual(parent.stop_cause['message'],str(caught.exception))
+                self.assertTrue(parent.stop_cause['infrastructure'])
+                self.assertTrue(parent.suite_stop_event.is_set())
+                self.assertEqual(parent.cleanup_failures['run:a']['stage'],'verify_cleanup')
+                self.assertIsNone(parent.cleanup_failures['run:a']['request_id'])
+                self.assertFalse(controller.status()['episodes']['run:a']['done'])
+
+    def test_close_wakes_live_infrastructure_root_before_abort_shutdown(self):
+        with setup() as (controller,parent,clients):
+            parent.activate('run:a')
+            permit=clients['run:a']._exchange({'type':'acquire','phase':'policy','sequence':1})
+            entered=threading.Event();resume=threading.Event();errors=[]
+            original_shutdown=parent._shutdown
+            def shutdown(case,**kw):
+                if threading.current_thread().name=='paused-abort' and case=='run:a':
+                    entered.set();resume.wait(3)
+                return original_shutdown(case,**kw)
+            parent._shutdown=shutdown
+            def abort():
+                try:parent.abort_after_failure('run:a',RuntimeError('root'),infrastructure=True)
+                except BaseException as exc:errors.append(exc)
+            thread=threading.Thread(target=abort,name='paused-abort');thread.start()
+            try:
+                self.assertTrue(entered.wait(2));parent.close()
+                self.assertTrue(all(not t.is_alive() for t in parent.threads.values()))
+                row=controller.status()['episodes']['run:a']
+                self.assertFalse(row['cancelled']);self.assertFalse(row['done'])
+                self.assertEqual(row['request_id'],permit['request_id'])
+                self.assertEqual(parent.cleanup_failures,{})
+            finally:resume.set();thread.join(3)
+            self.assertFalse(thread.is_alive());self.assertEqual(errors,[])
+
+    def test_close_wakes_protected_final_verification_without_cancelling(self):
+        with setup() as (controller,parent,_):
+            parent.activate('run:a')
+            entered=threading.Event();resume=threading.Event();errors=[]
+            original_shutdown=parent._shutdown
+            def shutdown(case,**kw):
+                if threading.current_thread().name=='paused-finish':
+                    entered.set();resume.wait(3)
+                return original_shutdown(case,**kw)
+            parent._shutdown=shutdown
+            def finish():
+                try:parent.finish_after_cleanup('run:a',verify_cleanup=lambda:True,record_terminal=lambda:True)
+                except BaseException as exc:errors.append(exc)
+            thread=threading.Thread(target=finish,name='paused-finish');thread.start()
+            try:
+                self.assertTrue(entered.wait(2));parent.close()
+                self.assertTrue(all(not t.is_alive() for t in parent.threads.values()))
+                self.assertFalse(controller.status()['episodes']['run:a']['cancelled'])
+            finally:resume.set();thread.join(3)
+            self.assertEqual(errors,[]);self.assertIn('run:a',parent.finished)
+            self.assertEqual(parent.cleanup_failures,{})
+
+    def test_plain_close_has_explicit_reason_and_no_invented_cause(self):
+        with setup() as (controller,parent,clients):
+            parent.activate('run:a')
+            clients['run:a']._exchange({'type':'acquire','phase':'policy','sequence':1})
+            parent.close()
+            self.assertIsNone(parent.stop_cause)
+            self.assertFalse(parent.suite_stop_event.is_set())
+            self.assertEqual(parent.errors['run:a']['reason'],'parent_close')
+            self.assertNotIn('run:a',parent.finished)
+
+    def test_ledger_keeps_first_stage_even_after_successful_cleanup(self):
+        with setup() as (_,parent,_):
+            parent.activate('run:a')
+            with self.assertRaises(rpc.CapacityChannelError):
+                parent.finish_after_cleanup('run:a',verify_cleanup=lambda:True,record_terminal=lambda:False)
+            first=dict(parent.cleanup_failures['run:a'])
+            self.assertEqual(first['stage'],'record_terminal')
+            with self.assertRaises(rpc.CapacityChannelError):
+                parent.finish_after_cleanup('run:a',verify_cleanup=lambda:False,record_terminal=lambda:True)
+            self.assertEqual(parent.cleanup_failures['run:a'],first)
+            parent.finish_after_cleanup('run:a',verify_cleanup=lambda:True,record_terminal=lambda:True)
+            self.assertIn('run:a',parent.finished)
+            self.assertEqual(parent.cleanup_failures['run:a'],first)
+            self.assertTrue(parent.suite_stop_event.is_set())
+
+    def test_finish_failure_has_release_stage_and_no_clean_completion(self):
+        from unittest.mock import patch
+        with setup() as (controller,parent,_):
+            parent.activate('run:a')
+            original=RuntimeError('finish storage failed')
+            with patch.object(controller,'finish_episode',side_effect=original):
+                with self.assertRaises(RuntimeError) as caught:
+                    parent.finish_after_cleanup('run:a',verify_cleanup=lambda:True,record_terminal=lambda:True)
+            self.assertIs(caught.exception,original)
+            self.assertEqual(parent.cleanup_failures['run:a']['stage'],'release_and_finish')
+            self.assertNotIn('run:a',parent.finished)
+            self.assertTrue(parent.suite_stop_event.is_set())
+
+
+class FailureIsolatedParentCloseTests(unittest.TestCase):
+    def test_one_cancel_failure_does_not_skip_other_connections_or_joins(self):
+        from unittest.mock import Mock
+        parent=rpc.CapacityParent.__new__(rpc.CapacityParent)
+        parent.lock=threading.RLock();parent.stop_cause=None;parent.closed=False
+        a,b,t1,t2=(Mock() for _ in range(4));t1.is_alive.return_value=False;t2.is_alive.return_value=False
+        parent.connections={'a':a,'b':b};parent.threads={'a':t1,'b':t2}
+        parent._shutdown=Mock();parent.cancel=Mock(side_effect=[OSError('first cancel failed'),None])
+        with self.assertRaisesRegex(RuntimeError,'first cancel failed'):parent.close()
+        self.assertEqual(parent.cancel.call_count,2)
+        a.close.assert_called_once();b.close.assert_called_once();t1.join.assert_called_once();t2.join.assert_called_once()
+
+    def test_failed_abort_still_stops_queue_refill_and_retains_primary_failure(self):
+        from unittest.mock import patch
+        with setup() as (controller,parent,_):
+            parent.activate('run:a')
+            with patch.object(parent,'abort_after_failure',side_effect=RuntimeError('abort also failed')):
+                with self.assertRaises(rpc.CapacityChannelError) as caught:
+                    parent.finish_after_cleanup('run:a',verify_cleanup=lambda:False,record_terminal=lambda:True)
+            self.assertTrue(parent.suite_stop_event.is_set())
+            self.assertIn('run:a',parent.cleanup_failures)
+            self.assertNotIn('run:a',parent.finished)
+            self.assertIn('Abort cleanup also failed',str(caught.exception.__notes__))
+
 if __name__ == '__main__':unittest.main()

@@ -30,12 +30,15 @@ stopping the cohort, waking parked acquisitions and warm admissions, and
 rejecting active siblings' next dispatch guards. Retained rows keep their permits
 and lifecycle caps. `parent.stop_cause` retains the first case/type/message
 and explicit infrastructure classification. `cleanup_failures` independently
-records every actual failed final verification per case, with its stage and
+records the first actual failed final verification per case, with its stage and
 retained request ID, even after user cancellation or another first cause.
 Caller-classified aborts are not final-verification evidence. `secondary_exits`
 records later exits without overwriting the stop cause; it is bounded and is
 not an authoritative cleanup ledger. A pure ordinary cancellation leaves
-`cleanup_failures` empty, but any later failed final check populates it. The queue's `cancelled` boolean alone
+`cleanup_failures` empty, but any later failed final check populates it. An empty ledger is not completeness proof: require every activated case in
+`parent.finished`, actual child exit and HTTP cleanup evidence, and join this
+with the retained ledger. Later verified cleanup does not erase a prior failure.
+The queue's `cancelled` boolean alone
 does not express its cause. A differently bound queue stop event is unqualified.
 
 In each case create one `CapacityClient`, shared by policy and formatter.
@@ -113,7 +116,9 @@ grading/projection or explicit infrastructure-failure evidence persisted.
 The adapter then releases the exact retained permit and finishes the episode.
 Cleanup failure retains active ownership; the outer scheduler must stop refill
 and fail the suite instead of returning the lifecycle slot. Closing the parent
-alone never frees permits or finishes cases. No RPC/model retries are added.
+always shuts down its sockets, including protected rows, but never frees
+permits or finishes cases. Without a stop cause its reason is `parent_close`;
+it does not invent an infrastructure cause. No RPC/model retries are added.
 
 At channel EOF, cancellation and before cleanup verification, the parent
 calls `retire_dispatch`. It excludes the ended row from acquisitions, parking
@@ -194,3 +199,17 @@ calls. Actual frozen native-runner/browser/grade/viewer integration and actual
 vLLM cache/offload behaviour remain unqualified. The current MiMo cohort is
 unchanged; this is an additive future caller building block, not a production
 rollout or a new episode authorization.
+
+## Prospective native failure controls
+
+The model-free native probe supports explicit `fault=cancel_warm` and
+`fault=failed_close` controls. The first cancels the suite while a second actual
+browser is prewarmed; the second injects a native close error after real cleanup.
+Both stop refill and forbid requests from the warm actor. They distinguish
+ordinary cancellation from infrastructure failure and require actual child,
+identity-fenced browser-descendant, RPC, HTTP and tokenizer cleanup. They are
+scripted infrastructure controls, not model results or GPU/KV restoration proof.
+SIGTERM/SIGINT unwind native runner cleanup using a BaseException; bounded
+termination escalates only identity-fenced descendants. Native positive and
+failure evidence must bind the exact new probe/RPC files independently of old
+cohorts. `psutil` is an explicit installed dependency of this probe.
