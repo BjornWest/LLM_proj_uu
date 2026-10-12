@@ -218,6 +218,11 @@ complete-input ceiling and clip actual output allowance to
 no arbitrary episode time/turn cutoff. The finite rental and600-second request
 watchdogs remain.
 
+The separate read-only adapter and required fresh evidence fields are described
+in [fresh serving qualification](qwen-serving-qualification.md). It reuses an
+already qualified capability without generation diagnostics; the first actual
+capability/collector and combined worker remain required.
+
 Compose the pool and AX tokenizer with the exact accepted caller. Four active
 plus one warm environment normally needs ten task/chat leases; proposed pool
 caps16/per-server8. Shared AX tokenization does not replace the official vLLM
