@@ -277,13 +277,22 @@ class SharedBrowserEnv(BrowserEnv):
 
     def close(self):
         from .browser_shutdown import close_resources
-        failures = close_resources(self, lambda name, fn, **kwargs: fn())
+        failures = close_resources(self, lambda name, fn, **kwargs: fn(),
+            shared_close=SharedBrowserEnv.close.__get__(self))
         if failures: raise PoolError('Shared environment close failed: '+repr(failures))
         self.page = None
 
 
-def supported_shared(env):
-    if type(env) is not SharedBrowserEnv or getattr(env.close, '__func__', None) is not SharedBrowserEnv.close:
+def _supported_shared_close(env, close):
+    # The original method can be called by an instance-local recording wrapper.
+    # Qualify the bound original, never an arbitrary replacement on the instance.
+    if (type(env) is not SharedBrowserEnv
+            or getattr(close, '__self__', None) is not env
+            or getattr(close, '__func__', None) is not SharedBrowserEnv.close):
         return False
     qualify_browsergym()
     return isinstance(env.pool_episode, PoolEpisode)
+
+
+def supported_shared(env):
+    return _supported_shared_close(env, getattr(env, 'close', None))

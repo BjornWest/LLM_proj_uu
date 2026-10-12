@@ -154,3 +154,15 @@ disabled. Recording entries distinguish probes from episode pages, identify the
 local artifact name and retain real save/transfer failure messages. Failed remote
 artifacts and worker-death recordings remain until their browser member exits;
 clean successful transfers delete the remote copy.
+
+Fact-recording instrumentation may wrap an instance's `close()` and invoke the
+saved original pooled method after provider cleanup. The original method passes
+its own qualified bound close into resource shutdown; the exact environment
+type, receiver, method identity and BrowserGym source checks still apply. Generic
+shutdown checks continue to reject replacement close methods, so callers must
+invoke the recording wrapper rather than bypass it. Cleanup errors stay visible
+and do not certify a native grade. `tests/test_shared_recording_close.py` covers
+this boundary and recorded, zero-provider runner/after-close grading controls;
+set `HARNESS_TEST_TOKENIZER` to an existing qualified Qwen tokenizer if the
+repository-local test asset is absent. Recompose service and client from the same
+release: changing the adapter invalidates older pool source manifests.
