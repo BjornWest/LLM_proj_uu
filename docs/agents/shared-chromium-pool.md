@@ -33,13 +33,20 @@ launchServer defaults to a wildcard listener: the supervisor uses a source-pinne
 private in-memory launcher copy with one loopback-only bind. Installed dependency
 files and other processes are unchanged. Control uses a private Unix socket;
 worker WebSockets and internal browser servers bind only127.0.0.1. Descriptor and
-config files contain capability secrets and must remain private.
+config files contain capability secrets and must remain private. This is trusted
+same-user process sharing, not a sandbox against malicious workers. Browser-wide
+CDP can enumerate other contexts, and same-user processes can read the private
+config. The model action set exposes neither capability. Worker status omits the
+WebSocket bearer lease IDs.
 
 Each worker has its own Playwright-protocol connection, not a shared Python
 Browser object or a CDP-attached default context. Connection ownership lets the
 Playwright server close that worker's contexts after worker/driver death. Lease
 release requires the exact lease token/owner; old/foreign owners cannot close a
-new generation. Pending connections expire. Bounded in-memory ended-lease/member
+new generation. Clean releases have explicit acknowledgment events, including when the socket
+closed first. A signed release receipt remains valid after bounded history eviction
+without targeting any new lease. Pending connections expire. At capacity, an idle ready member may be retired before
+admitting a different profile; active or pending leases are never evicted. Bounded in-memory ended-lease/member
 histories and private append-only lifecycle events contain IDs, not page text.
 
 `SharedBrowserEnv` preserves native actions and observations. Reset/Chat constructor
@@ -53,7 +60,8 @@ before/after context-set inference is used. Optional background page creation
 uses that exact ID. With background mode an initial disposable blank identity
 probe is not an episode recording. Public `Video.path` is bound per-video to its
 future local artifact path, and `save_as` transfers videos before connection
-release. This is necessary because ordinary remote Video.path is unsupported.
+release. Transferred server artifacts are deleted; pages closed before any video
+frame are recorded as `no_video_frame` and do not invalidate other recordings. This is necessary because ordinary remote Video.path is unsupported.
 Task/chat recordings, popups and tracing stay isolated and are finalized normally.
 
 ## Caller API
@@ -132,3 +140,11 @@ composed acceptance before adoption. Historical releases remain unchanged.
 References: [Playwright server connection](https://playwright.dev/python/docs/api/class-browsertype#browser-type-connect),
 [context isolation](https://playwright.dev/python/docs/browser-contexts),
 [remote video paths](https://playwright.dev/python/docs/api/class-video#video-path).
+
+The CLI handles SIGTERM/SIGHUP/SIGINT with owned shutdown. The broker also checks
+its parent identity and drains if that controller disappears. A broker/storage
+failure still invalidates the pool as shared infrastructure; there is no replay.
+Qualification rehashes the installed executable and selected driver/source files
+for every client. This adds cold attachment work; it is not a startup speedup, nor
+a complete digest of every dependency module. A release must pin its complete
+execution dependency closure separately.

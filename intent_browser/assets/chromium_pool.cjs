@@ -5,6 +5,8 @@ const crypto = require('crypto'), path = require('path'), Module = require('modu
 const config = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const digest = value => crypto.createHash('sha256').update(value).digest('hex');
 const id = () => crypto.randomBytes(32).toString('hex');
+const releaseToken = (leaseId, owner) => crypto.createHmac('sha256', config.admin_secret)
+  .update(JSON.stringify([leaseId, owner])).digest('hex');
 const fail = message => { throw new Error(message); };
 if (digest(fs.readFileSync(__filename)) !== config.manifest.broker_asset_sha256)
   fail('Pool broker source changed');
@@ -83,7 +85,11 @@ async function acquire(body) {
       if (['closed', 'crashed'].includes(oldGroup.state)) groups.delete(oldId);
     }
     if ([...groups.values()].filter(x => !['closed', 'crashed'].includes(x.state)).length >= config.maxServers)
-      fail('Pool launch-profile/server capacity reached');
+      {
+        const idle = [...groups.values()].find(x => x.state === 'ready' && !x.leases.size);
+        if (!idle) fail('Pool launch-profile/server capacity reached');
+        await closeGroup(idle);
+      }
     group = { id: id(), generation: id(), key, state: 'starting', leases: new Set() };
     groups.set(group.id, group);
     try { group.server = await pw.chromium.launchServer(options); group.state = 'ready'; }
@@ -98,8 +104,8 @@ async function acquire(body) {
     });
   }
   if (closing) { await closeGroup(group); fail('Pool is shutting down'); }
-  const lease = { id: id(), releaseToken: id(), owner: body.owner, role: body.role,
-    group, connected: false };
+  const lease = { id: id(), owner: body.owner, role: body.role, group, connected: false };
+  lease.releaseToken = releaseToken(lease.id, lease.owner);
   leases.set(lease.id, lease); group.leases.add(lease.id);
   event('lease_acquired', { lease_id: lease.id, owner: lease.owner, role: lease.role,
     group: group.id, generation: group.generation });
@@ -140,14 +146,14 @@ async function shutdown() {
   // races that cleanup and turns a successful shutdown into an ENOENT failure.
   control.close(); proxy.close();
 }
-function status() {
+function status(admin) {
   return { version: 'shared-chromium-v1', manifest: config.manifest,
     groups: [...groups.values()].map(x => ({ id: x.id, generation: x.generation,
       profile_sha256: x.key, state: x.state, leases: x.leases.size,
       process_id: x.server ? x.server.process().pid : null })),
-    leases: [...leases.values()].map(x => ({ id: x.id, owner: x.owner, role: x.role,
+    leases: [...leases.values()].map(x => ({ ...(admin ? {id: x.id} : {}), owner: x.owner, role: x.role,
       group: x.group.id, generation: x.group.generation, connected: x.connected })),
-    ended: [...ended].map(([leaseId, x]) => ({ id: leaseId, owner: x.owner, reason: x.reason,
+    ended: [...ended].map(([leaseId, x]) => ({ ...(admin ? {id: leaseId} : {}), owner: x.owner, reason: x.reason,
       group: x.group, generation: x.generation })) };
 }
 const control = http.createServer((request, response) => {
@@ -169,12 +175,26 @@ const control = http.createServer((request, response) => {
         result = await operation; created = leases.get(result.lease_id);
       } else if (request.url === '/release') {
         const lease = leases.get(body.lease_id) || ended.get(body.lease_id);
-        if (!lease || lease.owner !== body.owner || lease.releaseToken !== body.release_token)
+        if (typeof body.lease_id !== 'string' || typeof body.owner !== 'string' ||
+            typeof body.release_token !== 'string' || !/^[a-f0-9]{64}$/.test(body.release_token) ||
+            !crypto.timingSafeEqual(Buffer.from(body.release_token), Buffer.from(releaseToken(body.lease_id, body.owner))))
+          fail('Foreign or unknown lease release');
+        if (lease && (lease.owner !== body.owner || lease.releaseToken !== body.release_token))
           fail('Foreign or unknown lease release');
         if (leases.has(body.lease_id)) remember(lease, 'released');
-        else if (lease.reason === 'connection_closed_without_release') lease.reason = 'released';
-        result = { released: true };
-      } else if (request.url === '/status') result = status();
+        const retained = ended.get(body.lease_id);
+        if (retained && !retained.acknowledged) {
+          const prior = retained.reason;
+          if (prior === 'connection_closed_without_release') retained.reason = 'released';
+          retained.acknowledged = true;
+          event('lease_release_acknowledged', {lease_id: body.lease_id, owner: body.owner,
+            reason: retained.reason, prior_reason: prior});
+        } else if (!retained) {
+          event('late_release_acknowledged', {lease_id: body.lease_id, owner: body.owner,
+            history_expired: true});
+        }
+        result = { released: true, history_expired: !retained };
+      } else if (request.url === '/status') result = status(admin);
       else if (request.url === '/drain') {
         const group = groups.get(body.group); if (!group || group.state !== 'ready') fail('Unknown/invalid group');
         group.state = 'draining'; if (!group.leases.size) await closeGroup(group); result = { draining: true };
@@ -209,3 +229,10 @@ proxy.listen(0, '127.0.0.1', () => control.listen(config.socket, () => {
   fs.renameSync(config.ready + '.tmp', config.ready);
 }));
 for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP']) process.on(sig, () => shutdown().catch(() => process.exit(1)));
+
+// A dead suite controller must not leave a new-admission service behind.
+const originalParent = process.ppid;
+const parentWatch = setInterval(() => {
+  if (process.ppid !== originalParent) shutdown().catch(() => process.exit(1));
+}, 250);
+parentWatch.unref();

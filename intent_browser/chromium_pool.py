@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import signal
 import socket
 import subprocess
 import time
@@ -172,7 +173,17 @@ class PoolSupervisor:
                 if self._admin is not None: self._admin.request('shutdown')
                 else: self.process.terminate()
                 self.process.wait(timeout=20)
-            except (PoolError, subprocess.TimeoutExpired) as error:
+            except PoolError as error:
+                # A simultaneous process-group stop can close the control socket
+                # before the parent's request. A clean broker exit still qualifies.
+                try: self.process.wait(timeout=20)
+                except subprocess.TimeoutExpired:
+                    failure = error
+                    self.process.terminate()
+                    try: self.process.wait(timeout=20)
+                    except subprocess.TimeoutExpired:
+                        self.process.kill(); self.process.wait(timeout=5)
+            except subprocess.TimeoutExpired as error:
                 failure = error
                 self.process.terminate()
                 try: self.process.wait(timeout=20)
@@ -214,11 +225,20 @@ def main():
     args = parser.parse_args()
     supervisor = PoolSupervisor(args.directory, max_servers=args.max_servers,
                                 max_leases=args.max_leases, per_server=args.per_server)
+    stopping = False
+    def stop(signum, frame):
+        nonlocal stopping
+        stopping = True
+    handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT)}
+    for sig in handlers: signal.signal(sig, stop)
     try:
         supervisor.start()
         print(str(supervisor.descriptor_path), flush=True)
-        supervisor.process.wait()
-    finally: supervisor.close()
+        while supervisor.process.poll() is None and not stopping: time.sleep(.1)
+    finally:
+        try: supervisor.close()
+        finally:
+            for sig, handler in handlers.items(): signal.signal(sig, handler)
 
 
 if __name__ == '__main__': main()

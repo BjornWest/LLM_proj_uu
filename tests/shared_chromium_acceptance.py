@@ -4,6 +4,11 @@ import json
 import multiprocessing as mp
 from pathlib import Path
 import tempfile
+import os
+import signal
+import subprocess
+import sys
+from unittest.mock import patch
 import time
 import unittest
 
@@ -102,6 +107,22 @@ class Lifecycle(unittest.TestCase):
                     finally:later.close();b.close()
                 finally:env.close();a.close()
 
+    def test_idle_profile_eviction_and_late_authenticated_release(self):
+        with tempfile.TemporaryDirectory() as tmp, PoolSupervisor(Path(tmp)/'pool',max_servers=1) as client:
+            first=client.request('acquire',{'owner':'first','role':'task','options':{'headless':True}})
+            client.request('release',{'lease_id':first['lease_id'],'owner':'first','release_token':first['release_token']})
+            for index in range(258):
+                owner='history-'+str(index)
+                record=client.request('acquire',{'owner':owner,'role':'task',
+                    'options':{'headless':True,'args':['--new-profile']}})
+                client.request('release',{'lease_id':record['lease_id'],'owner':owner,'release_token':record['release_token']})
+            self.assertTrue(client.request('release',{'lease_id':first['lease_id'],'owner':'first',
+                'release_token':first['release_token']})['history_expired'])
+            with self.assertRaises(PoolError):client.request('release',{'lease_id':first['lease_id'],
+                'owner':'foreign','release_token':first['release_token']})
+            self.assertLessEqual(sum(x['state']=='ready'for x in client.status()['groups']),1)
+
+
 
 class Recording(unittest.TestCase):
     def test_video_local_paths_finalize_and_background_direct_identity(self):
@@ -118,6 +139,35 @@ class Recording(unittest.TestCase):
             for p in paths:
                 self.assertTrue(p.is_file(),str(p));self.assertGreater(p.stat().st_size,100)
             self.assertEqual(client.status()['leases'],[])
+
+    def test_ephemeral_popup_download_and_artifact_cleanup(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            artifacts = Path(tmp)/'artifacts'; artifacts.mkdir()
+            supervisor = PoolSupervisor(Path(tmp)/'pool')
+            with patch.dict(os.environ, {'TMPDIR': str(artifacts)}), supervisor as client:
+                episode = client.episode('short-video', background=True)
+                env = episode.wrap(factory('red'))(str(Path(tmp)/'video'))
+                try:
+                    _, info = env.reset(seed=1)
+                    page = env.page
+                    env.context.new_page().close()
+                    page.evaluate("window.open('about:blank').close()")
+                    env.context.route('**/file', lambda route: route.fulfill(body='fixture', headers={
+                        'Content-Type': 'application/octet-stream',
+                        'Content-Disposition': 'attachment; filename=fixture.txt'}))
+                    with page.expect_download():
+                        page.evaluate("() => { const a=document.createElement('a'); a.href='/file'; a.target='_blank'; a.click(); }")
+                    page.screenshot()
+                finally: env.close(); episode.close()
+                self.assertTrue(Path(info['recording_file']).is_file())
+                self.assertTrue(Path(info['chat']['recording_file']).is_file())
+                self.assertFalse(list(artifacts.rglob('*.webm')))
+                self.assertTrue(all('id' not in row for row in client.status()['ended']))
+                events=[json.loads(line) for line in (Path(tmp)/'pool/events.jsonl').read_text().splitlines()]
+                for lease in episode.leases:
+                    ack=[x for x in events if x['kind']=='lease_release_acknowledged' and x['lease_id']==lease.record['lease_id']]
+                    self.assertEqual(len(ack),1); self.assertEqual(ack[0]['reason'],'released')
+
 
 
 class Failure(unittest.TestCase):
@@ -150,6 +200,51 @@ class Failure(unittest.TestCase):
                 for p in processes:
                     if p.is_alive():p.kill();p.join(10)
                 for p in pipes:p.close()
+
+
+    def test_cli_sigterm_closes_service_and_records_shutdown(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pool = Path(tmp)/'pool'
+            process = subprocess.Popen([sys.executable, '-m', 'intent_browser.chromium_pool',
+                                        '--directory', str(pool)], stdout=subprocess.DEVNULL)
+            try:
+                deadline=time.monotonic()+20
+                while not (pool/'descriptor.json').exists():
+                    self.assertIsNone(process.poll()); self.assertLess(time.monotonic(),deadline);time.sleep(.025)
+                client=PoolClient.from_file(pool/'descriptor.json')
+                record=client.request('acquire', {'owner':'cli-stop','role':'task',
+                    'options':{'headless':True}})
+                process.send_signal(signal.SIGTERM); process.wait(timeout=25)
+                self.assertEqual(process.returncode,0)
+                with self.assertRaises(PoolError):client.status()
+                events=[json.loads(line)for line in (pool/'events.jsonl').read_text().splitlines()]
+                self.assertTrue(any(x.get('reason')=='supervisor_shutdown'for x in events))
+            finally:
+                if process.poll() is None:process.kill();process.wait(timeout=5)
+
+
+    def test_controller_death_stops_broker_without_replay(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pool=Path(tmp)/'pool'
+            process=subprocess.Popen([sys.executable,'-m','intent_browser.chromium_pool',
+                '--directory',str(pool)],stdout=subprocess.DEVNULL)
+            try:
+                deadline=time.monotonic()+20
+                while not (pool/'descriptor.json').exists():
+                    self.assertIsNone(process.poll());self.assertLess(time.monotonic(),deadline);time.sleep(.025)
+                client=PoolClient.from_file(pool/'descriptor.json')
+                client.request('acquire',{'owner':'owner-died','role':'task','options':{'headless':True}})
+                socket_path=Path(client.descriptor['socket'])
+                process.kill();process.wait(timeout=5)
+                deadline=time.monotonic()+20
+                while socket_path.exists():
+                    self.assertLess(time.monotonic(),deadline);time.sleep(.025)
+                with self.assertRaises(PoolError):client.status()
+                events=[json.loads(line)for line in (pool/'events.jsonl').read_text().splitlines()]
+                self.assertTrue(any(x.get('reason')=='supervisor_shutdown'for x in events))
+                socket_path.parent.rmdir()  # abrupt parent death leaves its empty private directory
+            finally:
+                if process.poll() is None:process.kill();process.wait(timeout=5)
 
     def test_supervisor_loss_has_no_local_launch_fallback(self):
         with tempfile.TemporaryDirectory()as tmp:

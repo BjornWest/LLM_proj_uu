@@ -12,6 +12,8 @@ from importlib.metadata import version
 from pathlib import Path
 from types import FunctionType, SimpleNamespace
 
+from playwright.sync_api import Error as PlaywrightError
+
 from browsergym.core import _get_global_playwright
 from browsergym.core.env import BrowserEnv
 from browsergym.core.chat import Chat
@@ -80,6 +82,7 @@ class _BrowserLease:
         original = self.context.new_page
         video_directory = kwargs.get('record_video_dir')
         videos, saved_videos = {}, set()
+        self.recordings = []
         def register_video(page):
             if not video_directory or page in videos: return
             video = page.video
@@ -100,6 +103,7 @@ class _BrowserLease:
             probe = original()
             try: identify(probe)
             finally: probe.close()
+            if video_directory: videos[probe] = (probe.video, None)
             browser_session = self.browser.new_browser_cdp_session()
         # The disposable identity probe is infrastructure, not an episode page.
         # Closing it before a first video frame must not fail episode recording.
@@ -119,17 +123,32 @@ class _BrowserLease:
         original_close = self.context.close
         def close_context(*args, **kwargs):
             original_close(*args, **kwargs)
+            errors = []
             for page, (video, filename) in videos.items():
-                if page not in saved_videos:
-                    video.save_as(filename)
+                if page in saved_videos: continue
+                try:
+                    if filename is not None: video.save_as(filename)
+                    video.delete()
                     saved_videos.add(page)
+                    self.recordings.append({'status': 'saved' if filename is not None else 'probe_deleted'})
+                except PlaywrightError as error:
+                    # The pinned public API reports this exact failure when a
+                    # page closes before Playwright receives any video artifact.
+                    # No transfer/network/target errors are treated as empty video.
+                    if page.is_closed() and error.message in ('Page closed', 'Page did not produce any video frames'):
+                        saved_videos.add(page)
+                        self.recordings.append({'status': 'no_video_frame'})
+                    else: errors.append(error)
+                except Exception as error: errors.append(error)
+            if errors: raise PoolError('Video finalization failed') from errors[0]
         self.context.close = close_context
         return self.context
 
     def metadata(self):
         return {key: self.record[key] for key in ('owner', 'role', 'group', 'generation',
                 'profile_sha256', 'lease_id')} | {'context_id': getattr(self, 'context_id', None),
-                                               'released': self.closed}
+                                               'released': self.closed,
+                                               'recordings': getattr(self, 'recordings', [])}
 
     def close(self):
         if self.closed: return
