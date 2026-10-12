@@ -700,7 +700,8 @@ the order of the ids. Which comments at that level come first does not
 depend on what they say, so the page's comments are independent draws of
 their levels' kinds, and so are the reviews outside the page once the number
 of further comments at that level is summed over. That sum is an integral
-of a polynomial (the factor that depends on the number is a beta integral),
+of a polynomial (the factor that depends on the number is a beta integral
+over a factorial),
 which a Gauss-Legendre rule of enough points gives exactly up to rounding;
 the module's docstring has the formula. The probability of a requirement is
 the sum over the ways the page and the whole can both be as required, and a
@@ -712,10 +713,11 @@ the page off the saved reviews by the site's own sort and takes what each
 comment says from the native task's reference. A first page is not combined
 with a mean rating yet, and it is read for the pilot concepts only: for a
 review program, whether a review has a comment at all depends on every
-topic's statements, which the reading does not follow yet. The numbers are
-ordinary floats here, not logarithms: a requirement rarer than the smallest
-float (about 1e-308) is refused as a numerical limit where it is possible at
-all, and at most 400 reviews and a page of 100 are taken.
+topic's statements, which the reading does not follow yet. Everything is
+kept as logarithms, each term one exponent of a sum of logarithms: the
+integrand at a point is a product of hundreds of small powers and a large
+multinomial number, far outside the floats on its own while their product is
+an ordinary probability. At most 200 reviews and a page of 100 are taken.
 
 How it meets the producer. A session reseeds the planned review streams of
 the product and manufactures that one product again instead of taking it

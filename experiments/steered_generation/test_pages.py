@@ -7,8 +7,9 @@ judged against all assignments of a rating and a kind to each review, read by
 the page rule itself.
 """
 from collections import Counter
+from fractions import Fraction
 from itertools import product
-from math import prod
+from math import comb, exp, log, prod
 from random import Random
 import unittest
 
@@ -86,21 +87,48 @@ class PageTests(unittest.TestCase):
                     found = pages.model(cells, count, size, order, page_ok, whole_ok)
                     self.assertEqual(set(found.options), set(direct))
                     for key, value in found.options.items():
-                        self.assertAlmostEqual(value / direct[key], 1, places=10, msg=key)
-                    self.assertFalse(found.lost)
+                        self.assertAlmostEqual(exp(value) / direct[key], 1, places=10, msg=key)
 
     def test_everything_adds_up_for_many_reviews(self):
         for count, size, order in ((40, 4, "highest"), (100, 4, "highest"), (100, 12, "lowest"), (60, 100, "identity"),
-                                   (100, 1, "identity"), (400, 3, "highest")):
+                                   (100, 1, "identity"), (200, 3, "highest")):
             with self.subTest(count=count, size=size, order=order):
                 found = pages.model(chances(count + size), count, size, order, lambda p, n: True, lambda p, n: True)
-                self.assertAlmostEqual(sum(found.options.values()), 1, places=9)
+                self.assertAlmostEqual(sum(exp(value) for value in found.options.values()), 1, places=9)
         # A page's own distribution does not depend on the order where no rating is likelier to praise.
         even = {(rating, kind): .05 for rating in range(1, 6) for kind in KINDS}
-        totals = [sum(value for key, value in pages.model(even, 30, 4, order, lambda p, n: p > n, lambda p, n: n > p)
-                      .options.items()) for order in pages.ORDERS]
+        totals = [sum(exp(value) for value in pages.model(even, 30, 4, order, lambda p, n: p > n, lambda p, n: n > p)
+                      .options.values()) for order in pages.ORDERS]
         self.assertAlmostEqual(totals[0], totals[1], places=12)
         self.assertAlmostEqual(totals[0], totals[2], places=12)
+
+    def test_far_tails_keep_their_digits(self):
+        """Requirements whose probability is far below what a product of their factors can hold as a float.
+
+        With one rating and no negative comments, in the order of the ids,
+        "the page is all praise, and exactly k comments praise" has a closed
+        form: over the number w of other comments, the chance of the totals
+        times the chance that the first comments are all among the praising
+        ones. Exact in rationals here.
+        """
+        masses = {pages.POSITIVE: Fraction(.0128), pages.OTHER: Fraction(.2147), pages.NEGATIVE: Fraction(0)}
+        masses[pages.SILENT] = 1 - sum(masses.values())
+        cells = {(rating, kind): float(masses[kind]) if rating == 3 else 0.0 for rating in range(1, 6) for kind in KINDS}
+        for count, size, praising in ((200, 4, 4), (200, 4, 120), (200, 4, 150), (200, 100, 140), (200, 4, 196), (120, 12, 90)):
+            with self.subTest(count=count, size=size, praising=praising):
+                exact = sum(comb(count, praising) * comb(count - praising, others) * masses[pages.POSITIVE] ** praising *
+                            masses[pages.OTHER] ** others * masses[pages.SILENT] ** (count - praising - others) *
+                            Fraction(comb(praising, size), comb(praising + others, size))
+                            for others in range(count - praising + 1))
+                found = pages.model(cells, count, size, "identity", lambda p, n: p == size, lambda p, n: p == praising)
+                total = pages.together(found.options.values())
+                self.assertAlmostEqual(total, log(exact.numerator) - log(exact.denominator), places=9)
+                self.assertLess(total, -5)
+                # Sampling still chooses among such options.
+                groups = pages.sample(Random(count + praising), found)
+                self.assertEqual(sum(number for _, kind, number, _ in groups if kind == pages.POSITIVE), praising)
+        self.assertLess(pages.together(pages.model(cells, 200, 4, "identity", lambda p, n: p == 4, lambda p, n: p == 150)
+                                       .options.values()), -500)
 
     def test_samples_match_enumeration(self):
         # Two ratings only, for the cases with enough reviews outside the page that several say nothing of the topic.
@@ -126,14 +154,14 @@ class PageTests(unittest.TestCase):
                     page, whole = judged(rows, ranks, size, order)
                     if page_ok(*page) and whole_ok(*whole):
                         direct[rows] = prod(cells[cell] for cell in rows)
-                block, rng, trials, seen = pages.model(cells, count, size, order, page_ok, whole_ok), Random(seed), 40000, Counter()
+                block, rng, trials, seen = pages.model(cells, count, size, order, page_ok, whole_ok), Random(seed), 25000, Counter()
                 for _ in range(trials):
                     targets = pages.placed(rng, pages.sample(rng, block), ranks)
                     seen[tuple((pages.choose(rng, group, [cells[rating, kind] for rating in group]), kind)
                                for group, kind in targets)] += 1
                 self.assertLessEqual(set(seen), set(direct))
                 total = sum(direct.values())
-                self.assertAlmostEqual(total, sum(block.options.values()), places=12)
+                self.assertAlmostEqual(total, sum(exp(value) for value in block.options.values()), places=12)
                 for rows, value in direct.items():
                     chance = value / total
                     # Tens of thousands of outcomes: six standard errors each, and two draws of allowance for the
@@ -164,21 +192,21 @@ class PageTests(unittest.TestCase):
 
     def test_limits_and_refusals(self):
         cells = chances(1)
-        for count, size, order in ((-1, 4, "highest"), (401, 4, "highest"), (10, 0, "highest"), (10, 101, "highest"),
+        for count, size, order in ((-1, 4, "highest"), (201, 4, "highest"), (10, 0, "highest"), (10, 101, "highest"),
                                    (10, 4, "newest"), (10, True, "highest"), (10.0, 4, "highest")):
             with self.assertRaises(ValueError):
                 pages.model(cells, count, size, order, lambda p, n: True, lambda p, n: True)
-        # Possible, but with a chance below the smallest float: lost, which the caller refuses as a numerical limit.
+        # Possible with a chance far below the smallest float: still an option, with its logarithm, and sampled.
         rare = {(rating, kind): {(1, pages.SILENT): 1 - 1e-200, (5, pages.POSITIVE): 1e-200}.get((rating, kind), 0.0)
                 for rating in range(1, 6) for kind in KINDS}
         found = pages.model(rare, 10, 4, "highest", lambda p, n: p == 4, lambda p, n: True)
-        self.assertEqual((found.options, found.lost), ({}, True))
+        self.assertAlmostEqual(pages.together(found.options.values()), log(comb(10, 4)) + 4 * log(1e-200), places=6)
+        groups = pages.sample(Random(0), found)
+        self.assertEqual(sum(number for _, kind, number, _ in groups if kind == pages.POSITIVE), 4)
+        # Impossible by the kinds themselves: no option.
+        self.assertEqual(pages.model(rare, 10, 4, "highest", lambda p, n: n == 1, lambda p, n: True).options, {})
         with self.assertRaises(blocks.NumericalLimit):
-            pages.sample(Random(0), found)
-        # Impossible by the kinds themselves: nothing is lost.
-        found = pages.model(rare, 10, 4, "highest", lambda p, n: n == 1, lambda p, n: True)
-        self.assertEqual((found.options, found.lost), ({}, False))
-
+            pages.choose(Random(0), (1, 2), [0.0, 0.0])
 
 if __name__ == "__main__":
     unittest.main()

@@ -18,8 +18,9 @@ size. Which comments at the cut come first does not depend on what they say,
 so the page's comments and the others at the cut are independent draws of
 that level's kinds. Summing the reviews outside the page over how many, `e`,
 are further comments at the cut leaves one factor that depends on `e`,
-`e! / (e + j)!`, which is an integral of `x ** e * (1 - x) ** (j - 1)` over
-0..1; under the integral the reviews outside the page are independent again,
+`e! / (e + j)!`, which is the integral of `x ** e * (1 - x) ** (j - 1)` over
+0..1 divided by `(j - 1)!`; under the integral the reviews outside the page
+are independent again,
 each a comment at the cut with its probability times `x`, a comment below
 the cut, or silent. So, with `n` reviews, of which `m = n - u - j` are
 outside the page, and for totals `X`, `Y` of positive and negative comments
@@ -33,19 +34,25 @@ comments above and at the cut, and `T_m` is the trinomial weight of `m`
 reviews being positive, negative or neither with the probabilities just
 named. The integrand is a polynomial of degree below `n`, which a
 Gauss-Legendre rule of enough points integrates exactly up to rounding.
+
+Everything is kept as logarithms: the integrand at a point is a product of
+hundreds of small powers and a large multinomial number, far outside the
+floats on its own while their product is an ordinary probability, so each
+term is one exponent of a sum of logarithms and sums of terms are taken
+relative to their largest. Sampling chooses among logarithms likewise.
 """
 from functools import lru_cache
-from math import comb, cos, exp, fsum, lgamma, perm, pi
+from math import cos, exp, fsum, inf, lgamma, log, pi
 from types import SimpleNamespace
 
 from .blocks import NumericalLimit, pick
+from .cheapest import pick_log
 
 ORDERS = ("highest", "lowest", "identity")
 POSITIVE, NEGATIVE, OTHER, SILENT = "positive", "negative", "other", "silent"
 WRITTEN = (POSITIVE, NEGATIVE, OTHER)
-# The sizes this arithmetic is written for: binomial and multinomial numbers of this many reviews stay far inside
-# the floats, and so do the rule's points.
-REVIEWS, SIZES = 400, 100
+# The sizes this is written for: a rule of up to a hundred points, and a few seconds of sums for the most reviews.
+REVIEWS, SIZES = 200, 100
 
 
 def levels(order):
@@ -75,6 +82,28 @@ def rule(count):
     return found
 
 
+def ln(mass):
+    """The logarithm of a probability, with minus infinity for none."""
+    return log(mass) if mass > 0 else -inf
+
+
+def times(number, logarithm):
+    """So many factors of one logarithm; none of them is no factor, whatever it is."""
+    return number * logarithm if number else 0.0
+
+
+def together(logarithms):
+    """The logarithm of a sum of numbers given by their logarithms, taken relative to the largest."""
+    logarithms = list(logarithms)
+    top = max(logarithms, default=-inf)
+    return top if top == -inf else top + log(fsum(exp(value - top) for value in logarithms))
+
+
+def ways(*numbers):
+    """The logarithm of the number of ways to split a total into parts of these sizes."""
+    return lgamma(sum(numbers) + 1) - fsum(lgamma(number + 1) for number in numbers)
+
+
 def parts(number):
     """The ways a number of comments split into positive, negative and other."""
     return [(positive, negative, number - positive - negative)
@@ -82,39 +111,31 @@ def parts(number):
 
 
 def weight(numbers, masses):
-    """The multinomial weight of so many comments of each kind, and whether it can occur at all."""
-    total = sum(numbers)
-    value = comb(total, numbers[0]) * comb(total - numbers[0], numbers[1])
-    for number, mass in zip(numbers, masses):
-        value *= mass ** number
-    return value, all(mass > 0 or not number for number, mass in zip(numbers, masses))
+    """The logarithm of the multinomial weight of so many comments of each kind; minus infinity where it cannot occur."""
+    return ways(*numbers) + fsum(times(number, ln(mass)) for number, mass in zip(numbers, masses))
 
 
 def model(cells, count, size, order, page_ok, whole_ok):
-    """The ways the first page and the whole can both be as required, each with its probability.
+    """The ways the first page and the whole can both be as required, each with the logarithm of its probability.
 
     `cells` gives one review's probability of each (star rating, kind);
     `page_ok` and `whole_ok` judge numbers of positive and negative comments
-    on the page and in all. Returns the options with a positive probability
-    (a short list of comments that all fit on the page, or a cut with the
-    page's positive and negative comments), what sampling needs, and whether
-    any option that the kinds allow at all was lost to the floats.
+    on the page and in all. Returns the options that can occur (a short list
+    of comments that all fit on the page, or a cut with the page's positive
+    and negative comments) and what sampling needs.
     """
     if not (type(count) is int and 0 <= count <= REVIEWS and type(size) is int and 1 <= size <= SIZES and order in ORDERS):
-        raise ValueError("A first page has a size of 1 to 100 and an order, over at most 400 reviews")
+        raise ValueError(f"A first page has a size of 1 to {SIZES} and an order, over at most {REVIEWS} reviews")
     mass = lambda group, kind: fsum(cells[rating, kind] for rating in group)
     silent, all_stars = mass(range(1, 6), SILENT), tuple(range(1, 6))
     written = [mass(all_stars, kind) for kind in WRITTEN]
-    options, tables, possible = {}, {}, False
+    options, tables = {}, {}
     # Fewer comments than the page holds: the page is the whole.
     for number in range(min(size, count + 1)):
         for split in parts(number):
             if page_ok(*split[:2]) and whole_ok(*split[:2]):
-                value, can = weight(split, written)
-                can = can and (silent > 0 or number == count)
-                possible = possible or can
-                value *= comb(count, number) * silent ** (count - number)
-                if value > 0:
+                value = ways(number, count - number) + times(count - number, ln(silent)) + weight(split, written)
+                if value > -inf:
                     options["short", split] = value
     outside = count - size
     for index, group in enumerate(levels(order) if outside >= 0 else []):
@@ -126,53 +147,48 @@ def model(cells, count, size, order, page_ok, whole_ok):
             low = size - high
             if not fsum(cut) > 0:
                 continue
-            # The integral, for every number of positive and negative comments outside the page.
-            table = [[0.0] * (outside + 1 - positive) for positive in range(outside + 1)]
-            for x, share in rule((outside + low - 1) // 2 + 1):
-                powers = [[1.0] for _ in range(3)]
-                for row, base in zip(powers, (x * cut[0] + below[0], x * cut[1] + below[1], x * cut[2] + rest)):
-                    for _ in range(outside):
-                        row.append(row[-1] * base)
-                scale = share * (1 - x) ** (low - 1)
-                for positive in range(outside + 1):
-                    for negative in range(outside + 1 - positive):
-                        table[positive][negative] += (scale * powers[0][positive] * powers[1][negative] *
-                                                      powers[2][outside - positive - negative])
-            many = lgamma(outside + 1)
-            for positive in range(outside + 1):
-                for negative in range(outside + 1 - positive):
-                    table[positive][negative] *= exp(many - lgamma(positive + 1) - lgamma(negative + 1) -
-                                                     lgamma(outside - positive - negative + 1))
-            can_outside = lambda positive, negative: (
-                (cut[0] + below[0] > 0 or not positive) and (cut[1] + below[1] > 0 or not negative) and
-                (cut[2] + rest > 0 or outside == positive + negative))
-            constant = perm(count, size) / (perm(high, high) * perm(low - 1, low - 1))
+            # The integral, for every number of positive and negative comments outside the page: at each point of the
+            # rule, the logarithm of every power that can enter.
+            points = rule((outside + low - 1) // 2 + 1)
+            scale = [ln(share) + times(low - 1, ln(1 - x)) for x, share in points]
+            powers = [[[times(number, ln(x * here + there)) for x, _ in points] for number in range(outside + 1)]
+                      for here, there in ((cut[0], below[0]), (cut[1], below[1]), (cut[2], rest))]
+            table = [[ways(positive, negative, outside - positive - negative) + together(
+                one + two + three + four for one, two, three, four in zip(
+                    scale, powers[0][positive], powers[1][negative], powers[2][outside - positive - negative]))
+                for negative in range(outside + 1 - positive)] for positive in range(outside + 1)]
+            constant = lgamma(count + 1) - lgamma(outside + 1) - lgamma(high + 1) - lgamma(low)
             pages = {}
             for first in parts(high):
                 for second in parts(low):
                     found = (first[0] + second[0], first[1] + second[1])
-                    if page_ok(*found):
-                        (one, can_one), (two, can_two) = weight(first, above), weight(second, cut)
-                        pages.setdefault(found, []).append((one * two, first, second, can_one and can_two))
+                    value = weight(first, above) + weight(second, cut)
+                    if page_ok(*found) and value > -inf:
+                        pages.setdefault(found, []).append((value, first, second))
             tables[index, high] = SimpleNamespace(table=table, pages=pages, above=above, cut=cut, below=below, rest=rest,
                                                   silent=silent, group=group)
             for found, rows in pages.items():
-                fits = [(positive, negative) for positive in range(outside + 1) for negative in range(outside + 1 - positive)
-                        if whole_ok(found[0] + positive, found[1] + negative)]
-                possible = possible or any(row[3] for row in rows) and any(can_outside(*pair) for pair in fits)
-                value = constant * fsum(row[0] for row in rows) * fsum(table[positive][negative] for positive, negative in fits)
-                if value > 0:
+                value = constant + together(row[0] for row in rows) + together(
+                    table[positive][negative] for positive in range(outside + 1) for negative in range(outside + 1 - positive)
+                    if whole_ok(found[0] + positive, found[1] + negative))
+                if value > -inf:
                     options["cut", index, high, found] = value
-    return SimpleNamespace(options=options, tables=tables, lost=possible and not options, count=count, size=size,
-                           order=order, page_ok=page_ok, whole_ok=whole_ok, cells=cells, written=written, silent=silent)
+    return SimpleNamespace(options=options, tables=tables, count=count, size=size, order=order, page_ok=page_ok,
+                           whole_ok=whole_ok, cells=cells, written=written, silent=silent)
 
 
 def choose(rng, options, weights):
     """One of some options in proportion to its weight; a numerical limit where none has any."""
     kept = [(option, value) for option, value in zip(options, weights) if value > 0]
     if not kept:
-        raise NumericalLimit("The kinds of review under the first page's requirement are too unlikely to choose among")
+        raise NumericalLimit("The star ratings under the first page's requirement are too unlikely to choose among")
     return pick(rng, [option for option, _ in kept], [value for _, value in kept])
+
+
+def chosen(rng, options, logarithms):
+    """One of some options in proportion to the number its logarithm gives; those that cannot occur are left out."""
+    kept = [(option, value) for option, value in zip(options, logarithms) if value > -inf]
+    return pick_log(rng, [option for option, _ in kept], [value for _, value in kept])
 
 
 def sample(rng, block):
@@ -182,7 +198,7 @@ def sample(rng, block):
     number, and where they stand: "page" and "after" for the comments at the
     cut that the page takes first and the others there, None elsewhere.
     """
-    option = choose(rng, list(block.options), list(block.options.values()))
+    option = chosen(rng, list(block.options), list(block.options.values()))
     stars, count, size = tuple(range(1, 6)), block.count, block.size
     if option[0] == "short":
         split = option[1]
@@ -195,20 +211,20 @@ def sample(rng, block):
     after = tuple(rating for group in order[index + 1:] for rating in group)
     pairs = [(positive, negative) for positive in range(outside + 1) for negative in range(outside + 1 - positive)
              if block.whole_ok(found[0] + positive, found[1] + negative)]
-    positive, negative = choose(rng, pairs, [place.table[a][b] for a, b in pairs])
+    positive, negative = chosen(rng, pairs, [place.table[a][b] for a, b in pairs])
     neither = outside - positive - negative
-    _, first, second, _ = choose(rng, place.pages[found], [row[0] for row in place.pages[found]])
+    _, first, second = chosen(rng, place.pages[found], [row[0] for row in place.pages[found]])
     # Of the reviews outside the page: which are further comments at the cut, by kind.
     further = [(a, b, c) for a in range(positive + 1) for b in range(negative + 1) for c in range(neither + 1)]
     chance = lambda a, b, c: (
-        comb(positive, a) * place.cut[0] ** a * place.below[0] ** (positive - a) *
-        comb(negative, b) * place.cut[1] ** b * place.below[1] ** (negative - b) *
-        comb(neither, c) * place.cut[2] ** c * place.rest ** (neither - c) /
-        perm(a + b + c + low, low))
-    at = choose(rng, further, [chance(*row) for row in further])
+        ways(a, positive - a) + times(a, ln(place.cut[0])) + times(positive - a, ln(place.below[0])) +
+        ways(b, negative - b) + times(b, ln(place.cut[1])) + times(negative - b, ln(place.below[1])) +
+        ways(c, neither - c) + times(c, ln(place.cut[2])) + times(neither - c, ln(place.rest)) +
+        lgamma(a + b + c + 1) - lgamma(a + b + c + low + 1))
+    at = chosen(rng, further, [chance(*row) for row in further])
     left = neither - at[2]
-    quiet = choose(rng, range(left + 1), [comb(left, number) * place.below[2] ** (left - number) * place.silent ** number
-                                         for number in range(left + 1)])
+    quiet = chosen(rng, range(left + 1), [ways(number, left - number) + times(left - number, ln(place.below[2])) +
+                                         times(number, ln(place.silent)) for number in range(left + 1)])
     groups = [(before, kind, number, None) for kind, number in zip(WRITTEN, first)]
     groups += [(place.group, kind, number, "page") for kind, number in zip(WRITTEN, second)]
     groups += [(place.group, kind, number, "after") for kind, number in zip(WRITTEN, at)]

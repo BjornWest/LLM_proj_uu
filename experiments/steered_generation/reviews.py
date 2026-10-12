@@ -487,13 +487,10 @@ def paged(place):
     found = pages.model(place.reader.kinds(place), place.count, page["size"], page["order"],
                         lambda positive, negative: agreed(page, positive, negative),
                         lambda positive, negative: agreed(place.requirement, positive, negative))
-    if found.lost:
-        raise NumericalLimit("The first page's requirement is too unlikely in every way to weigh")
     if not found.options:
         raise ZeroMass("no_outcome", "No first page and counts of this product's reviews satisfy the requirement in this world")
-    terms = {option: log(value) for option, value in found.options.items()}
-    top = max(terms.values())
-    total = min(0.0, top + log(fsum(exp(value - top) for value in terms.values())))
+    terms = dict(found.options)
+    total = min(0.0, pages.together(terms.values()))
     return SimpleNamespace(site=place, page=found, cells=None, shares=marginal(place.reader.cells(place)),
                            log_terms=terms, log_probability=total, probability=exp(total))
 
