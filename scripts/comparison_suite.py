@@ -2,13 +2,13 @@
 from contextlib import contextmanager
 from hashlib import sha256
 from pathlib import Path
-import json,math,os,runpy,signal,socket,sqlite3,subprocess,sys,tempfile,threading,time,types
+import json,math,os,runpy,signal,socket,sqlite3,subprocess,sys,tempfile,threading,time,types,importlib.util
 
 class EpisodeDeadline(BaseException):
  """Termination must bypass optional recording's ordinary error fallback."""
 
 class CaseDeadline(RuntimeError):
- """A failed case must not cancel independent paid cases in the queue."""
+ """Legacy independent watchdog error; Qwen retains cohort stop on unverified capacity cleanup."""
 
 
 def signal_deadline(*_):
@@ -33,8 +33,60 @@ def checked(r):
  if p.is_symlink() or pin(p)!=r:raise ValueError('Pinned input changed: '+str(p))
  return p
 
+def qwen_mode(s):return s.get('runtime_mode')=='qwen-private-v1'
+
+def qwen_modules(s):
+ for value in s['qwen_sources'].values():checked(value)
+ runtime=runpy.run_path(str(checked(s['qwen_sources']['runtime'])))
+ observer=runpy.run_path(str(checked(s['qwen_sources']['observer'])))
+ return runtime,observer
+
+def capacity_modules(s):
+ # One isolated controller namespace; telemetry uses that exact class copy.
+ name='_qwen_suite_capacity_frozen'
+ if name in sys.modules:raise RuntimeError('Capacity namespace already loaded')
+ package=types.ModuleType(name);package.__path__=[];sys.modules[name]=package
+ result={}
+ try:
+  for key,relative in (('control','capacity_control'),('telemetry','serving_telemetry')):
+   location=checked(s['qwen_sources'][key])
+   spec=importlib.util.spec_from_file_location(name+'.'+relative,location)
+   module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module);result[key]=module
+  result['rpc']=types.SimpleNamespace(**runpy.run_path(str(checked(s['qwen_sources']['rpc']))))
+  return result
+ except BaseException:
+  for key in (name,name+'.capacity_control',name+'.serving_telemetry'):sys.modules.pop(key,None)
+  raise
+
+def validate_qwen_limits(s):
+ if (s.get('max_steps') is not None or s.get('episode_timeout') is not None
+     or s.get('max_input_tokens')!=250000 or s.get('server_context_tokens')!=262144
+     or type(s.get('max_tokens')) is not int or not 0<s['max_tokens']<=16384
+     or type(s.get('request_timeout')) is not int or not 0<s['request_timeout']<=600
+     or type(s.get('startup_timeout')) is not int or not 0<s['startup_timeout']<=900):
+  raise ValueError('Explicit Qwen native context/input/headroom and request/startup limits required')
+ if any(c.get('policy_model')!='Qwen/Qwen3.8-27B-FP8' or c.get('max_input_tokens')!=250000
+        or c.get('id')!='qwen-'+c.get('task_id','') for c in s['cases']):
+  raise ValueError('One exact Qwen model and task identity per finite case required')
+ if not s.get('shared_tokenizer') or not s.get('shared_chromium'):
+  raise ValueError('This prospective Qwen composition requires the qualified pooled runtime')
+ canaries=s.get('canary_task_ids')
+ if canaries!=['B02','B14','H03','H05'] or s.get('start_order',[])[:4]!=['qwen-'+i for i in canaries]:raise ValueError('Four declared canaries must lead the queue')
+ for case in s['cases']:checked(case['recipe_manifest'])
+ for row in s['qwen_sources'].values():checked(row)
+
+def qwen_live(s):
+ runtime,_=qwen_modules(s);admission=runtime['ServingAdmission'](s['serving_live'])
+ if admission.fingerprint!=s['serving_compatibility_fingerprint']:
+  raise ValueError('Expected reviewed serving compatibility differs from current instance')
+ return runtime,admission
+
+
 def helper(s):return runpy.run_path(str(checked(s['helpers'])))
-def config_hash(s):return sha256(json.dumps({k:v for k,v in s.items() if k not in ('review','sockets','tokenizer_socket')},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+def config_hash(s):
+ excluded={'review','sockets','tokenizer_socket'}
+ if qwen_mode(s):excluded|={'serving_live','rental_deadline_utc','capacity_bindings','chromium_descriptor'}
+ return sha256(json.dumps({k:v for k,v in s.items() if k not in excluded},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
 
 def case_binding(c):
  # Scripted answers/journeys are control inputs, not real-case identity.
@@ -42,6 +94,7 @@ def case_binding(c):
 
 def execution_binding(s,c):
  excluded={'review','ready','cases','start_order','output','completion_db','suite_id','spec_path','sockets','tokenizer_socket','chromium_descriptor','scripted_hold_seconds','case_dependencies'}
+ if qwen_mode(s):excluded|={'serving_live','rental_deadline_utc','capacity_bindings','chromium_descriptor'}
  fields={k:v for k,v in s.items() if k not in excluded}
  fields['case_dependencies']=s.get('case_dependencies',{}).get(c['id'],[])
  return sha256(json.dumps(fields,sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
@@ -65,22 +118,25 @@ class CaseWatchdog:
  activation starts the agreed episode budget. Expiry stops the owned bounded
  launcher and closes its control socket. Containment is not native cleanup.
  """
- def __init__(self,process,connection_holder,*,startup_seconds,episode_seconds,cleanup_grace_seconds=30,stop_event=None,clock=time.monotonic):
-  for value in (startup_seconds,episode_seconds,cleanup_grace_seconds):
+ def __init__(self,process,connection_holder,*,startup_seconds,episode_seconds,cleanup_grace_seconds=30,stop_event=None,clock=time.monotonic,rental_deadline=None):
+  for value in (startup_seconds,cleanup_grace_seconds)+(() if episode_seconds is None else (episode_seconds,)):
    if type(value) not in (int,float) or not math.isfinite(value) or value<=0:raise ValueError('Positive finite case watchdog limits required')
+  if episode_seconds is None and (type(rental_deadline) not in (int,float) or not math.isfinite(rental_deadline) or rental_deadline<=clock()):raise ValueError('No episode ceiling requires a future finite rental deadline')
+  self.rental_deadline=rental_deadline
   self.process,self.connections,self.clock=process,connection_holder,clock
   self.episode_seconds=episode_seconds;self.grace=cleanup_grace_seconds;self.suite_stop=stop_event
   self.deadline=clock()+startup_seconds+cleanup_grace_seconds
+  if rental_deadline is not None:self.deadline=min(self.deadline,rental_deadline+cleanup_grace_seconds)
   self.phase='startup';self.failure=None;self.lock=threading.Lock();self.stop=threading.Event()
   self.thread=threading.Thread(target=self._run,daemon=True);self.thread.start()
  def ready(self):
   with self.lock:
    if self.failure is not None:raise CaseDeadline(str(self.failure))
-   self.phase='parked';self.deadline=None
+   self.phase='parked';self.deadline=None if self.rental_deadline is None else self.rental_deadline+self.grace
  def activate(self):
   with self.lock:
    if self.failure is not None:raise CaseDeadline(str(self.failure))
-   self.phase='active';self.deadline=self.clock()+self.episode_seconds+self.grace
+   self.phase='active';self.deadline=(self.rental_deadline if self.episode_seconds is None else self.clock()+self.episode_seconds)+self.grace
  def _run(self):
   while not self.stop.wait(.05):
    with self.lock:
@@ -105,6 +161,25 @@ class CaseWatchdog:
   self.stop.set();self.thread.join(2)
   if self.thread.is_alive():raise RuntimeError('Case watchdog did not stop')
 
+class CanaryBarrier:
+ def __init__(self,case_ids,stop_event):
+  self.ids=set(case_ids);self.stop=stop_event;self.completed=set();self.event=threading.Event();self.lock=threading.Lock()
+  if not self.ids:raise ValueError('Explicit nonempty canary cohort required')
+ def wait(self,ident):
+  if ident in self.ids:return
+  while not self.event.wait(.05):
+   if self.stop.is_set():raise RuntimeError('Canary qualification aborted; remainder not dispatched')
+  if self.stop.is_set():raise RuntimeError('Suite stopped before remainder activation')
+ def fail(self,ident):
+  if ident in self.ids:self.stop.set();self.event.set()
+ def complete(self,ident):
+  if ident not in self.ids:return
+  with self.lock:
+   if ident in self.completed:raise RuntimeError('Duplicate canary completion')
+   self.completed.add(ident)
+   if self.completed==self.ids:self.event.set()
+
+
 class WatchedAdmission:
  def __init__(self,admission,watchdog):self.admission,self.watchdog=admission,watchdog
  def __getattr__(self,name):return getattr(self.admission,name)
@@ -112,15 +187,29 @@ class WatchedAdmission:
   self.watchdog.ready();self.admission.environment_ready(ready);self.watchdog.activate()
 def source_guard(s,c=None):
  checked(s['driver']);checked(s['helpers']);checked(s['events_helper'])
- if c is not None:checked(c['recipe_manifest'])
+ if c is not None:
+  checked(c['recipe_manifest'])
+  if 'source_export' in c:
+   if not qwen_mode(s):raise ValueError('Exported cases require explicit Qwen mode')
+   helper(s)['verify_source_export'](c['root'],c['commit'],c['source_export'],{})
+ if qwen_mode(s):
+  for row in s['qwen_sources'].values():checked(row)
  if 'authorization' in s:checked(s['authorization'])
  if 'transport' in s:
   for row in s['transport']['files']:checked(row)
   for name in ('node','bridge_worker','pi'):checked(s[name])
- if not Path(s['driver']['path']).read_bytes()==subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':scripts/comparison_suite.py']):raise ValueError('Caller differs from committed source')
+ if 'source_export' in s:
+  if not qwen_mode(s):raise ValueError('Exported sources require explicit Qwen mode')
+  required={'scripts/comparison_suite.py':s['driver']['sha256'],'scripts/comparison_suite_helpers.py':s['helpers']['sha256']}
+  for row in s['qwen_sources'].values():
+   location=Path(row['path']).resolve()
+   if location.is_relative_to(Path(s['caller_root']).resolve()):required[str(location.relative_to(Path(s['caller_root']).resolve()))]=row['sha256']
+  helper(s)['verify_source_export'](s['caller_root'],s['caller_commit'],s['source_export'],required)
+ elif not Path(s['driver']['path']).read_bytes()==subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':scripts/comparison_suite.py']):raise ValueError('Caller differs from committed source')
 
 def check_release(s):
  source_guard(s)
+ if qwen_mode(s):return check_qwen_release(s)
  authorized=load(checked(s['authorization']))
  if ([c['id'] for c in s['cases']]!=s['start_order'] or s['start_order']!=[i for i in authorized['case_ids'] if i in {c['id'] for c in s['cases']}]
      or len(set(s['start_order']))!=len(s['cases']) or s['max_concurrent_episodes']!=authorized['max_active_combined'] or s['prewarm_count']!=authorized['prewarm_count']
@@ -137,6 +226,31 @@ def check_release(s):
  for v in a['cases']:verify_ready_case(s,by_id[v['case']],v)
 
 
+def check_qwen_release(s):
+ validate_qwen_limits(s)
+ authorized=load(checked(s['authorization']))
+ ids=[c['id'] for c in s['cases']]
+ if (len(set(ids))!=len(ids) or ids!=s['start_order'] or ids!=authorized['case_ids']
+     or authorized.get('dispatch_authorized') is not True
+     or authorized.get('allocation_authorized') is not True
+     or authorized['max_active_combined']!=s['max_concurrent_episodes']
+     or authorized['prewarm_count']!=s['prewarm_count']
+     or authorized.get('max_input_tokens')!=250000):
+  raise ValueError('Actual finite Qwen episode/rental authorization required')
+ review=load(checked(s['review']));ready=load(checked(s['ready']))
+ if (review.get('status')!='approved' or review.get('configuration_sha256')!=config_hash(s)
+     or ready.get('status')!='passed' or ready.get('driver')!=s['driver']
+     or len(ready['cases'])!=len(ids) or {v['case'] for v in ready['cases']}!=set(ids)):
+  raise ValueError('Exact reviewed Qwen configuration and actual scripted case acceptance required')
+ for row in ready['cases']:verify_ready_case(s,next(c for c in s['cases'] if c['id']==row['case']),row)
+ _,live=qwen_live(s)
+ if live.live.get('dispatch_authorized') is not True:raise ValueError('Current live contract cannot dispatch')
+ if authorized['approved_rental_seconds']!=live.deployment['approved_rental_seconds']:
+  raise ValueError('Actual allocation rental differs from finite approval')
+ live.readiness()
+
+
+
 def address_projection_result(trace, result):
  """Adapt the scoped address publisher's verified result, retaining its scope."""
  canonical=load(Path(trace)/'evaluation.json')
@@ -147,9 +261,48 @@ def address_projection_result(trace, result):
  return {**result,'task_completed':canonical['task_completed'],
   'automatic':pin(Path(trace)/'automatic-grading.json'),'canonical':pin(Path(trace)/'evaluation.json')}
 
+def flush_completions(s,events,api):
+ if not qwen_mode(s):return api['flush'](events)
+ # Remote VM has no Codex daemon or subscription credentials. Preserve notices
+ # pending; workstation delivery uses the existing Events helper on this snapshot.
+ out=Path(s['output']);folder=out/'completion-snapshots';folder.mkdir(exist_ok=True)
+ destination=folder/(str(time.time_ns())+'.sqlite');destination.touch(exist_ok=False)
+ source=sqlite3.connect('file:'+str(Path(s['completion_db']).resolve())+'?mode=ro',uri=True)
+ target=sqlite3.connect(destination)
+ try:source.backup(target)
+ finally:target.close();source.close()
+ with (out/'completion-return.jsonl').open('a') as stream:
+  stream.write(json.dumps({'schema':'qwen-completion-return-v1','snapshot':pin(destination),
+   'notices':events.notices(),'delivery_owner':'workstation existing Events helper',
+   'remote_delivery_attempts':0})+'\n')
+
+def file_digest(path):
+ result=sha256()
+ with Path(path).open('rb') as stream:
+  for chunk in iter(lambda:stream.read(1024*1024),b''):result.update(chunk)
+ return result.hexdigest()
+
+def terminal_inventory(s):
+ out=Path(s['output'])
+ if not out.is_dir():return
+ rows=[];rejected=[]
+ for path in sorted(out.rglob('*')):
+  if path.is_symlink():rejected.append(str(path.relative_to(out)));continue
+  if path.is_file() and path.name!='terminal-artifacts.json':
+   rows.append({'relative_path':str(path.relative_to(out)),'bytes':path.stat().st_size,
+                'sha256':file_digest(path)})
+ save(out/'terminal-artifacts.json',{'schema':'qwen-suite-terminal-artifacts-v1','private':True,
+  'suite_id':s['suite_id'],'source_driver':s['driver'],'files':rows,'rejected_symlinks':rejected,
+  'qualification':'Transport inventory only; individual infrastructure/task outcomes remain in Events and canonical grades.'})
+
+
+def record_capacity(out,row):
+ with (out/'capacity-events.jsonl').open('a') as stream:stream.write(json.dumps(row)+'\n')
+
+
 def execute(s,c,scripted=False):
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
- if s.get('shared_chromium') and not scripted:raise ValueError('Pooled comparison caller is model-free qualification only')
+ if s.get('shared_chromium') and not scripted and not qwen_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
  if not scripted:
   check_release(s)
   with sqlite3.connect('file:'+str(Path(s.get('completion_db',str(Path(s['output'])/'completion.sqlite'))))+'?mode=ro',uri=True) as db:
@@ -183,7 +336,8 @@ def execute(s,c,scripted=False):
   if recording is not None:recording.release_package();recording=None
   save(inspection_out/'setup-failure.json',{'status':'disabled','reason':str(error),'error_type':type(error).__name__,'native_grade_unchanged':True})
  counts={'policy_requests':0,'formatter_requests':0,'reported_cost_usd':0.0,'responses_without_cost':0}
- profile=None;lease=None;pooled=None
+ profile=None;lease=None;pooled=None;capacity_client=None;factories=None;environment_holder={};pending_snapshot={}
+ qwen=None;serving=None
  model=c['policy_model']
  if model=='gpt-6-luna' and not scripted:
   ExternalAgentBackend,BridgeServer,EpisodeConcurrency,SuiteEpisode,SubscriptionQuotaGuard,read_quota,normalize=h['load_transport'](s)
@@ -203,6 +357,7 @@ def execute(s,c,scripted=False):
   counts[phase+'_requests']+=1
   if phase=='formatter' and counts['formatter_requests']>1:raise RuntimeError('One formatter maximum')
  def record(value):
+  if qwen_mode(s) and value.get('event')=='response':counts['responses_without_cost']+=1
   with (out/'http-attempts.jsonl').open('a') as f:f.write(json.dumps({'epoch':time.time(),**value})+'\n')
  def backend(phase,consumer_before_dispatch=None):
   def dispatched_guard():
@@ -255,6 +410,9 @@ def execute(s,c,scripted=False):
      return httpx.Response(200,json=response)
     return httpx.Response(200,json={'choices':[{'finish_reason':'tool_calls','message':{'role':'assistant','content':None,'tool_calls':[{'id':'positive','type':'function','function':{'name':'send_msg_to_user','arguments':json.dumps({'text':answer})}}]}}],'usage':{}})
    b.client=httpx.Client(transport=httpx.MockTransport(dispatched))
+  elif qwen_mode(s):
+   with factories.policy_session(before_dispatch=before_dispatch) as b:yield b
+   return
   else:b=backend('policy',before_dispatch)
   try:yield b
   finally:b.close()
@@ -270,7 +428,7 @@ def execute(s,c,scripted=False):
   timings['environment_ready_monotonic']=time.monotonic();timings['ready_episode_id']=ready.episode_id;timings['ready_trace']=str(ready.directory)
   save(out/'warm-ready.json',dict(timings));signal.alarm(0)
   admission.environment_admission(ready)
-  timings['activated_monotonic']=time.monotonic();save(out/'activated.json',dict(timings));signal.alarm(180 if scripted else s['episode_timeout'])
+  timings['activated_monotonic']=time.monotonic();save(out/'activated.json',dict(timings));signal.alarm(180 if scripted else max(1,math.ceil(serving.deadline-time.time())) if qwen_mode(s) else s['episode_timeout'])
   if lease is not None:
    proof=lease.begin_episode(c['id']);save(out/'subscription-admission.json',proof)
  def runner(factory,b,metadata,**kw):
@@ -284,14 +442,16 @@ def execute(s,c,scripted=False):
   p=h['policy_profile'](kw['harness_profile'],discovery=False)
   shared=SharedTokenizerConfig(s['tokenizer_socket'])
   kw['harness_profile']=replace(p,ax_config=replace(p.ax_config,shared_tokenizer=shared))
-  if model=='gpt-6-luna':
+  if qwen_mode(s):
+   kw['input_counter']=QwenInputCounter(checked(s['tokenizer']),shared_tokenizer=shared) if scripted else serving.runner_count
+  elif model=='gpt-6-luna':
    kw['input_counter']=OpaqueReasoningInputCounter(QwenInputCounter(checked(s['tokenizer']),shared_tokenizer=shared))
   else:
    sizing=types.SimpleNamespace(model=model,base_url='https://openrouter.ai/api/v1',request_options={'reasoning':{'enabled':True}}) if scripted else b
    kw['input_counter']=model_matched_input_counter(sizing,assets_root=s['counter_assets_root'],shared_tokenizer=shared)
   kw['environment_admission']=environment_ready;kw['retry_policy']=None
   def make_env(video=None):
-   timings['environment_creation_monotonic']=time.monotonic();env=factory(video)
+   timings['environment_creation_monotonic']=time.monotonic();env=factory(video);environment_holder['env']=env
    # Count actual reset on this one instance without altering native class/type guards.
    original=env.reset
    def reset(*a,**k):timings['reset_calls']+=1;return original(*a,**k)
@@ -303,8 +463,34 @@ def execute(s,c,scripted=False):
   result=h['project'](s,out,{**c,'id':c['task_id']},trace=trace,grade=grade)
   if c['task_id'] in ('H01','H02'):result=address_projection_result(trace,result)
   save(out/'grade-viewer.json',result);return result
+ def browser_snapshot():
+  env=environment_holder['env'];page=env.unwrapped.page
+  if page.is_closed():raise RuntimeError('Browser closed before native dispatch')
+  old_alarm=signal.alarm(max(1,math.ceil(min(5,serving.deadline-time.time()))));started=time.monotonic()
+  try:value=page.evaluate("() => ({url:location.href,text:document.body.innerText,fields:Array.from(document.querySelectorAll('input,select,textarea')).map(e=>[e.tagName,e.name,e.type,e.value,e.checked])})")
+  finally:signal.alarm(max(1,math.ceil(min(serving.deadline-time.time(),max(1,old_alarm-(time.monotonic()-started))))))
+  return sha256(json.dumps(value,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+ @contextmanager
+ def qwen_turn(phase):
+  if phase=='policy':pending_snapshot['before']=browser_snapshot()
+  with capacity_client.turn(phase):yield
+ def fresh(phase):
+  # Final source/admission guards run once in before(), after count.
+  if phase=='policy':
+   current=browser_snapshot()
+   if current!=pending_snapshot['before']:raise RuntimeError('Browser state changed while parked; stale policy request not dispatched')
+   record({'event':'fresh_after_capacity_wait','phase':phase,'browser_semantic_sha256':current})
  try:
-  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda _:Formatter() if scripted else backend('formatter')))
+  if qwen_mode(s) and not scripted:
+   qwen,serving=qwen_live(s)
+   _,observer_module=qwen_modules(s)
+   rpc=types.SimpleNamespace(**runpy.run_path(str(checked(s['qwen_sources']['rpc']))))
+   capacity_client=observer_module['connect_client'](rpc,s['capacity_bindings'][c['id']],deadline=time.monotonic()+serving.deadline-time.time(),on_event=lambda row:record_capacity(out,row))
+  if qwen_mode(s) and not scripted:
+   factories=qwen['QwenFactories'](backend_class=ChatCompletionsBackend,admission=serving,
+    before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
+    max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],turn=qwen_turn)
+  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda path:Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter')))
   if result.get('status')!='graded_and_projected':raise ValueError('Missing automatic grading/HTTP projection: '+str(result))
   if scripted and result['viewer_projection']['task_completed'] is not True:raise ValueError('Scripted positive native grade did not pass')
   if timings['reset_calls']!=1:raise ValueError('Warm activation reset or duplicated environment')
@@ -320,7 +506,11 @@ def execute(s,c,scripted=False):
    try:
     if recording is not None:recording.release_package()
    finally:
-    if pooled is not None:pooled.close()
+    try:
+     if pooled is not None:pooled.close()
+    finally:
+     if capacity_client is not None:capacity_client.close()
+  save(out/'cleanup.json',{'status':'passed','case':c['id'],'wrapper_finalizers_returned':True,'recording_released':True,'pool_lease_released':pooled is not None,'capacity_channel_closed':capacity_client is not None,'capacity_infrastructure_error':None if capacity_client is None else capacity_client.infrastructure_error})
 
 
 def timing_record(ident,t,start,initially_warming):
@@ -359,7 +549,7 @@ def stop_pool_service(spec, root, output, process):
 
 def supervise(s,scripted=False):
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
- if s.get('shared_chromium') and not scripted:raise ValueError('Pooled comparison caller is model-free qualification only')
+ if s.get('shared_chromium') and not scripted and not qwen_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
  stop=threading.Event();previous={kind:signal.getsignal(kind) for kind in (signal.SIGTERM,signal.SIGINT,signal.SIGALRM)}
  def terminate_suite(*args):stop.set();signal_deadline(*args)
  try:
@@ -370,8 +560,9 @@ def supervise(s,scripted=False):
 
 def _supervise(s,scripted=False,stop=None):
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
- if s.get('shared_chromium') and not scripted:raise ValueError('Pooled comparison caller is model-free qualification only')
- for name in ('startup_timeout','episode_timeout','suite_timeout'):
+ if s.get('shared_chromium') and not scripted and not qwen_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
+ if qwen_mode(s):validate_qwen_limits(s)
+ for name in (('startup_timeout','suite_timeout') if qwen_mode(s) else ('startup_timeout','episode_timeout','suite_timeout')):
   if type(s.get(name)) is not int or not 0<s[name]<2**31:raise ValueError('Positive integer '+name+' required before any case claim')
  grace=s.get('shutdown_grace_seconds',30)
  if type(grace) is not int or not 1<=grace<=120:raise ValueError('Explicit cleanup grace must be1..120 seconds')
@@ -387,10 +578,10 @@ def _supervise(s,scripted=False,stop=None):
   for ident in members:events.subscribe(s['suite_id']+'-'+ident,s['suite_id'],'codex:'+s['thread_id'],episode=ident,final=False)
   events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[10,20,30,35,40,50],final=True)
  h['register_roots'](s)
- stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock()
+ stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop) if qwen_mode(s) else None
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
   os.chmod(tmp,0o700);s=dict(s);s['tokenizer_socket']=str(Path(tmp)/'tokenizer.sock');s['sockets']={}
-  assets=[Path(s['counter_assets_root'])/'mimo-v2.6-pro-73875d00/tokenizer.json',checked(s['tokenizer'])]
+  assets=[checked(s['tokenizer'])] if qwen_mode(s) else [Path(s['counter_assets_root'])/'mimo-v2.6-pro-73875d00/tokenizer.json',checked(s['tokenizer'])]
   manifest=Path(tmp)/'assets.json';save(manifest,[{'path':str(a),'sha256':pin(a)['sha256'],'normalization':'raw'} for a in assets])
   root=s['cases'][0]['root']
   service=subprocess.Popen([s['python'],'-I','-B','-c',"import sys;sys.path.insert(0,sys.argv[1]);from intent_browser.tokenizer_service import main;sys.argv=sys.argv[1:];sys.argv[0]='tokenizer_service';main()",root,'--socket',s['tokenizer_socket'],'--manifest',str(manifest),'--max-clients',str(s['max_concurrent_episodes']+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=(out/'tokenizer-stderr.log').open('x'),text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
@@ -401,7 +592,8 @@ def _supervise(s,scripted=False,stop=None):
     pool_log=(out/'chromium-pool-stderr.log').open('x')
     pool_directory=(Path(tmp)/'chromium-pool').resolve()
     service_driver=checked(s['pool_service_driver'])
-    if service_driver.read_bytes()!=subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':scripts/shared_chromium_service.py']):raise ValueError('Pool service driver differs from committed source')
+    if 'source_export' in s:h['verify_source_export'](s['caller_root'],s['caller_commit'],s['source_export'],{'scripts/shared_chromium_service.py':s['pool_service_driver']['sha256']})
+    elif service_driver.read_bytes()!=subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':scripts/shared_chromium_service.py']):raise ValueError('Pool service driver differs from committed source')
     checked(s['launcher'])
     for case in s['cases']:
      manifest=h['recipe_check'](case)
@@ -414,36 +606,60 @@ def _supervise(s,scripted=False,stop=None):
     descriptor=pool_service.stdout.readline().strip()
     if descriptor!=str(pool_directory/'descriptor.json') or not Path(descriptor).is_file():raise RuntimeError('Chromium pool descriptor differs')
     s['chromium_descriptor']=descriptor
+   if qwen_mode(s) and not scripted:
+    _,serving=qwen_live(s);modules=capacity_modules(s);_,observer_module=qwen_modules(s)
+    capacity_host=observer_module['CapacityHost'](rpc=modules['rpc'],control=modules['control'],telemetry=modules['telemetry'],source=s,output=out,case_ids=s['start_order'],cap=s['max_concurrent_episodes'],deadline=time.monotonic()+serving.deadline-time.time(),stop_event=stop,directory=tmp,qualification=serving)
+    s['capacity_bindings']={ident:capacity_host.child_binding(ident) for ident in s['start_order']}
+    save(out/'observer-transport.json',{'socket':str(capacity_host.observer_rpc.path),'epoch':capacity_host.journal.epoch,'observer_id':capacity_host.observer.observer_id,'session_id':serving.session,'journal':str(out/'serving-telemetry.jsonl'),'maximum_batch_rows':120,'WandB_owner':'workstation controller; no credentials here'})
    for c in s['cases']:
     listener=socket.socket(socket.AF_UNIX);path=str(Path(tmp)/(c['id']+'.sock'));listener.bind(path);listener.listen(1);listener.settimeout(s['startup_timeout']);listeners[c['id']]=listener;s['sockets'][c['id']]=path
-   runtime=out/'runtime-spec.json';save(runtime,s)
+   # Capability-bearing child spec lives in the private temporary transport tree.
+   runtime=Path(tmp)/'runtime-spec.json';save(runtime,s)
+   save(out/'runtime-spec.redacted.json',{k:v for k,v in s.items() if k not in {'capacity_bindings','sockets','tokenizer_socket','chromium_descriptor'}})
    def one(c,admission):
-    ident=c['id'];events.start(s['suite_id'],ident);started=time.monotonic();process=None;connection=None;watchdog=None;connections={}
+    ident=c['id'];events.start(s['suite_id'],ident);started=time.monotonic();process=None;connection=None;watchdog=None;connections={};stdout=None;stderr=None
     with lock:clocks[ident]={'process_launch_monotonic':started}
     try:
      stdout=(out/(ident+'-stdout.log')).open('x');stderr=(out/(ident+'-stderr.log')).open('x')
+     if capacity_host is not None:capacity_host.begin_relay(ident)
      process=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','2048','--tasks','256','--receipt',str(out/(ident+'-bounded')),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',s['driver']['path'],'scripted-case' if scripted else 'case',str(runtime),ident],stdout=stdout,stderr=stderr,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
-     watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop)
+     watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop,rental_deadline=None if serving is None else time.monotonic()+serving.deadline-time.time())
      connection,_=listeners[ident].accept();connection.settimeout(s['suite_timeout'])
      connections['connection']=connection
      # Ready receipt precedes gate; activation reply is emitted only under queue's cap.
-     proof=channel['serve_admission'](connection,WatchedAdmission(admission,watchdog),expected_run_root=out/ident/'live/runs')
+     watched=WatchedAdmission(admission,watchdog)
+     if capacity_host is not None or canary_barrier is not None:
+      original=watched.environment_ready
+      def ready(value=None):
+       original(value)
+       if canary_barrier is not None:canary_barrier.wait(ident)
+       if capacity_host is not None:capacity_host.activate(ident,priority=s['start_order'].index(ident))
+      watched.environment_ready=ready
+     proof=channel['serve_admission'](connection,watched,expected_run_root=out/ident/'live/runs')
      code=process.wait(timeout=60);stdout.close();stderr.close()
      if watchdog.failure is not None:raise CaseDeadline(str(watchdog.failure))
      if code!=0:raise RuntimeError('Child lifecycle exited '+str(code))
      result=load(out/ident/'result.json');grade=load(out/ident/'grade-viewer.json')
      if result['status']!='graded_and_projected' or grade['status']!='verified':raise ValueError('Child grading/viewer unavailable')
      task=result['result']['viewer_projection']['task_completed'];payload={'result':pin(out/ident/'result.json'),'viewer':grade,'usage':result['usage'],'task_verdict':'pass' if task is True else 'fail' if task is False else 'inconclusive'}
+     if capacity_host is not None:
+      def cleanup():
+       marker=load(out/ident/'cleanup.json')
+       return process.poll()==0 and marker.get('status')=='passed' and marker.get('case')==ident and marker.get('capacity_channel_closed') is True and marker.get('capacity_infrastructure_error') is None
+      capacity_host.finish(ident,verify_cleanup=cleanup,record_terminal=lambda:result['status']=='graded_and_projected' and grade['status']=='verified')
      events.finish(s['suite_id'],ident,'succeeded',payload)
      if not scripted:
-      with delivery_lock:api['flush'](events)
+      with delivery_lock:flush_completions(s,events,api)
+     if canary_barrier is not None:canary_barrier.complete(ident)
      return {'case':ident,'state':'succeeded','payload':payload,'admission':proof}
     except BaseException as e:
+     if canary_barrier is not None:canary_barrier.fail(ident)
      if watchdog is not None and watchdog.failure is not None:
       deadline_error=CaseDeadline(str(watchdog.failure));deadline_error.__cause__=e;e=deadline_error
+     if capacity_host is not None:capacity_host.failed(ident,e,infrastructure=not isinstance(e,queue['QueueCancelled']))
      events.finish(s['suite_id'],ident,'failed',{'system_failure':{'type':type(e).__name__,'message':str(e)},'task_verdict':None})
      if not scripted:
-      with delivery_lock:api['flush'](events)
+      with delivery_lock:flush_completions(s,events,api)
      raise e
     finally:
      try:
@@ -457,6 +673,8 @@ def _supervise(s,scripted=False,stop=None):
         process.terminate()
         try:process.wait(timeout=35)
         except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10)
+       if stdout is not None:stdout.close()
+       if stderr is not None:stderr.close()
        with lock:clocks[ident]['lifecycle_finished_monotonic']=time.monotonic()
    result=queue['run_ordered_suite']({c['id']:c for c in s['cases']},one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop)
    result['max_observed_active']=max(e['active'] for e in result['events']);result['max_observed_warming']=max(e['warming_or_ready'] for e in result['events']);result['clocks']=clocks
@@ -473,32 +691,53 @@ def _supervise(s,scripted=False,stop=None):
     'max_warming_or_parked':result['max_observed_warming'],'cases':measurements,
     'qualification':'Setup and activation timing within one cohort of different tasks; not a paired causal speedup experiment.'})
    if any(r['status']!='completed' for r in result['cases'].values()):raise RuntimeError('One or more case infrastructure failures')
-   if not scripted:api['flush'](events)
+   if not scripted:flush_completions(s,events,api)
   finally:
    stop.set()
    for listener in listeners.values():listener.close()
    try:
-    if service and service.poll() is None:service.terminate();service.wait(timeout=10)
+    if capacity_host is not None:
+     try:save(out/'capacity-terminal.json',{'status':capacity_host.controller.status(),'parent_errors':capacity_host.parent.errors,'cleanup_failures':capacity_host.parent.cleanup_failures,'finished':sorted(capacity_host.parent.finished),'stop_cause':capacity_host.parent.stop_cause})
+     finally:capacity_host.close()
    finally:
     try:
-     if pool_service is not None:
-      try:
-       stop_pool_service(s,root,out,pool_service)
-       save(out/'chromium-pool-shutdown.json',{'status':'passed','returncode':pool_service.returncode,'private_transport_cleanup':'verified_by_service_zero_exit'})
-      except BaseException as error:
-       save(out/'chromium-pool-shutdown.json',{'status':'failed','returncode':pool_service.poll(),'type':type(error).__name__,'message':str(error),'forced_containment_may_leave_private_transport':True})
-       raise
-      finally:
-       import shutil
-       if (pool_directory/'events.jsonl').is_file():shutil.copyfile(pool_directory/'events.jsonl',out/'chromium-pool-events.jsonl')
+     if service and service.poll() is None:service.terminate();service.wait(timeout=10)
     finally:
-     if pool_log is not None:pool_log.close()
+     try:
+      if pool_service is not None:
+       try:
+        stop_pool_service(s,root,out,pool_service)
+        save(out/'chromium-pool-shutdown.json',{'status':'passed','returncode':pool_service.returncode,'private_transport_cleanup':'verified_by_service_zero_exit'})
+       except BaseException as error:
+        save(out/'chromium-pool-shutdown.json',{'status':'failed','returncode':pool_service.poll(),'type':type(error).__name__,'message':str(error),'forced_containment_may_leave_private_transport':True})
+        raise
+       finally:
+        import shutil
+        if (pool_directory/'events.jsonl').is_file():shutil.copyfile(pool_directory/'events.jsonl',out/'chromium-pool-events.jsonl')
+     finally:
+      if pool_log is not None:pool_log.close()
 
 
 
 def main():
  mode,path,*rest=sys.argv[1:];s=load(path)
  if mode in ('case','scripted-case'):execute(s,next(c for c in s['cases'] if c['id']==rest[0]),mode=='scripted-case')
- elif mode in ('supervise','scripted'):supervise(s,mode=='scripted')
+ elif mode in ('supervise','scripted'):
+  prior_output=Path(s['output']).exists()
+  try:supervise(s,mode=='scripted')
+  finally:
+   owner_path=Path(s['output'])/'supervisor-start.json'
+   primary=sys.exception()
+   try:
+    if qwen_mode(s) and not prior_output and owner_path.is_file() and load(owner_path).get('pid')==os.getpid():terminal_inventory(s)
+   except BaseException as inventory_error:
+    if primary is None:raise
+    primary.add_note('Terminal inventory also failed: '+repr(inventory_error))
+ elif mode=='prepare-qwen':
+  if not qwen_mode(s):raise ValueError('Explicit Qwen runtime mode required')
+  validate_qwen_limits(s);source_guard(s)
+  h=helper(s)
+  for c in s['cases']:h['recipe_check'](c)
+  print(json.dumps({'status':'source_prepared_NOT_runtime_ready','cases':[c['id'] for c in s['cases']],'models':0,'provider_requests':0,'caller':s['driver']}))
  else:raise ValueError('Unknown mode')
 if __name__=='__main__':main()

@@ -252,7 +252,7 @@ while time.monotonic()<end:admission.before_dispatch();time.sleep(.1)
                     sock=caller.socket.socket(caller.socket.AF_UNIX);path=str(Path(temp)/(ident+'.sock'));sock.bind(path);sock.listen(1);sock.settimeout(15);listeners[ident]=sock;sockets[ident]=path
                 spec={'suite_id':'CPU-only','output':str(out),'sockets':sockets,'startup_timeout':15,'episode_timeout':3,'suite_timeout':60,'python':sys.executable,'driver':{'path':str(child)},'channel_path':str(ROOT/'scripts/episode_queue_channel.py'),'library_path':os.environ.get('LD_LIBRARY_PATH',''),'launcher':{'path':'/home/bjorn/code/LLM_proj_uu/scripts/run_bounded_job.py'},'work':{'A':30,'B':1,'C':2,'D':2,'E':1}}
                 runtime=Path(temp)/'runtime.json';runtime.write_text(json.dumps(spec))
-                namespace=dict(vars(caller));namespace.update(s=spec,scripted=False,out=out,runtime=runtime,listeners=listeners,stop=stop,grace=1,lock=threading.Lock(),clocks={},channel=channel,events=SimpleNamespace(start=lambda *a:None,finish=lambda *a:records.append(a)),delivery_lock=threading.Lock(),api={'flush':lambda _:None})
+                namespace=dict(vars(caller));namespace.update(canary_barrier=None,capacity_host=None,serving=None,s=spec,scripted=False,out=out,runtime=runtime,listeners=listeners,stop=stop,grace=1,lock=threading.Lock(),clocks={},channel=channel,events=SimpleNamespace(start=lambda *a:None,finish=lambda *a:records.append(a)),delivery_lock=threading.Lock(),api={'flush':lambda _:None})
                 exec(one,namespace)
                 result=queue['run_ordered_suite']({i:{'id':i}for i in 'ABCDE'},namespace['one'],max_concurrent_episodes=2,prewarm_count=1,start_order=list('ABCDE'),stop_event=stop)
                 self.assertFalse(result['cancelled']);self.assertEqual(result['cases']['A']['status'],'failed')
@@ -262,4 +262,155 @@ while time.monotonic()<end:admission.before_dispatch();time.sleep(.1)
             finally:
                 for listener in listeners.values():listener.close()
 
+class QwenWatchdogTests(unittest.TestCase):
+    def test_rental_deadline_replaces_active_episode_ceiling_and_bounds_warm_wait(self):
+        from types import SimpleNamespace
+        clock=[10.];process=SimpleNamespace(poll=lambda:None,terminate=lambda:None)
+        watchdog=caller.CaseWatchdog(process,{},startup_seconds=5,episode_seconds=None,
+            cleanup_grace_seconds=2,rental_deadline=40,clock=lambda:clock[0])
+        try:
+            watchdog.ready();self.assertEqual(watchdog.deadline,42)
+            clock[0]=30;watchdog.activate();self.assertEqual(watchdog.deadline,42)
+        finally:watchdog.close()
+        with self.assertRaises(ValueError):caller.CaseWatchdog(process,{},startup_seconds=5,episode_seconds=None)
+
+    def test_qwen_prepare_rejects_wrong_context_and_model_before_target_imports(self):
+        valid=dict(max_steps=None,episode_timeout=None,max_input_tokens=250000,server_context_tokens=262144,
+            max_tokens=16384,request_timeout=600,startup_timeout=900,shared_tokenizer=True,shared_chromium=True,
+            cases=[dict(policy_model='Qwen/Qwen3.8-27B-FP8',max_input_tokens=250000,id='qwen-B01',task_id='B01',recipe_manifest={})],qwen_sources={})
+        for key,value in [('max_steps',200),('episode_timeout',1080),('max_input_tokens',100000),('server_context_tokens',131072)]:
+            with self.subTest(key=key),patch.object(caller,'checked',side_effect=AssertionError('no target reads')):
+                with self.assertRaises(ValueError):caller.validate_qwen_limits({**valid,key:value})
+
+class QwenCanaryBarrierTests(unittest.TestCase):
+    def test_remainder_waits_for_all_canaries_and_failed_task_can_still_be_infrastructure_complete(self):
+        stop=threading.Event();barrier=caller.CanaryBarrier(['a','b','c','d'],stop);released=threading.Event()
+        thread=threading.Thread(target=lambda:(barrier.wait('e'),released.set()))
+        thread.start()
+        try:
+            for ident in ['a','b','c']:barrier.complete(ident)
+            self.assertFalse(released.wait(.1))
+            barrier.complete('d');self.assertTrue(released.wait(1))
+            with self.assertRaises(RuntimeError):barrier.complete('d')
+        finally:stop.set();thread.join(1)
+
+    def test_canary_failure_wakes_remainder_without_dispatch(self):
+        stop=threading.Event();barrier=caller.CanaryBarrier(['a'],stop);errors=[]
+        def wait():
+            try:barrier.wait('b')
+            except RuntimeError as e:errors.append(str(e))
+        thread=threading.Thread(target=wait);thread.start();stop.set();thread.join(1)
+        self.assertFalse(thread.is_alive());self.assertTrue(errors)
+
+    def test_initial_startup_watchdog_cannot_outlive_rental_budget(self):
+        from types import SimpleNamespace
+        process=SimpleNamespace(poll=lambda:None,terminate=lambda:None)
+        watchdog=caller.CaseWatchdog(process,{},startup_seconds=900,episode_seconds=None,
+            cleanup_grace_seconds=30,rental_deadline=20,clock=lambda:10)
+        try:self.assertEqual(watchdog.deadline,50)
+        finally:watchdog.close()
+
 if __name__=='__main__':unittest.main()
+
+class QwenReviewRegressionTests(unittest.TestCase):
+    def test_child_release_hash_ignores_only_private_chromium_transport(self):
+        # Supervisor and child verify the same reviewed configuration, after
+        # the supervisor has inserted private transport paths and capabilities.
+        spec={'runtime_mode':'qwen-private-v1','shared_chromium':True,'caller_commit':'frozen',
+              'max_concurrent_episodes':4,'canary_task_ids':['B02','B14','H03','H05']}
+        runtime={**spec,'chromium_descriptor':'/tmp/unique/descriptor.json',
+                 'capacity_bindings':{'qwen-B02':{'token':'private'}},'sockets':{'qwen-B02':'/tmp/control'}}
+        self.assertEqual(caller.config_hash(spec),caller.config_hash(runtime))
+        self.assertNotEqual(caller.config_hash(spec),caller.config_hash({**runtime,'max_concurrent_episodes':5}))
+
+    def test_scripted_canary_failure_terminates_real_queue(self):
+        import runpy
+        queue=runpy.run_path(str(ROOT/'scripts/episode_queue.py'))
+        stop=threading.Event();barrier=caller.CanaryBarrier(['a'],stop);result=[]
+        def execute(case,admission):
+            ident=case['id']
+            try:
+                admission.environment_ready()
+                if ident=='a':raise RuntimeError('actual canary setup failure')
+                barrier.wait(ident)
+                raise AssertionError('remainder must not dispatch')
+            except BaseException:
+                barrier.fail(ident);raise
+        def run():result.append(queue['run_ordered_suite']({'a':{'id':'a'},'b':{'id':'b'}},execute,
+            max_concurrent_episodes=2,prewarm_count=0,start_order=['a','b'],stop_event=stop))
+        thread=threading.Thread(target=run);thread.start();thread.join(3)
+        try:self.assertFalse(thread.is_alive());self.assertTrue(stop.is_set());self.assertEqual(len(result),1)
+        finally:stop.set();thread.join(2)
+
+    def test_terminal_inventory_streams_and_preserves_symlink_as_rejection(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp);(out/'trace.bin').write_bytes(b'x'*2000001);(out/'foreign').symlink_to('/etc/passwd')
+            spec={'output':str(out),'suite_id':'cpu','driver':{'path':'source','sha256':'a'*64}}
+            with patch.object(Path,'read_bytes',side_effect=AssertionError('must stream artifacts')):
+                caller.terminal_inventory(spec)
+            result=caller.load(out/'terminal-artifacts.json')
+            self.assertEqual(result['files'][0]['bytes'],2000001)
+            self.assertEqual(result['rejected_symlinks'],['foreign'])
+
+class ExplicitSourceExportTests(unittest.TestCase):
+    def setUp(self):
+        import runpy
+        self.api=runpy.run_path(str(ROOT/'scripts/comparison_suite_helpers.py'))
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+        self.root=Path(self.tmp.name)/'root';self.root.mkdir()
+        self.source=self.root/'module.py';self.source.write_text('VALUE=1\n');self.source.chmod(0o644)
+        self.digest=caller.pin(self.source)['sha256'];self.index=Path(self.tmp.name)/'source-index.json'
+        self.row={'commit':'f'*40,'files':{'module.py':{'sha256':self.digest,'bytes':8,'mode':'100644'}}}
+        self.index.write_text(json.dumps({'format':'private-frozen-source-capsule-v1','roots':{'frozen':self.row}}))
+        self.descriptor={'index':caller.pin(self.index),'root_id':'frozen'}
+
+    def verify(self):return self.api['verify_source_export'](self.root,'f'*40,self.descriptor,{'module.py':self.digest})
+
+    def test_explicit_index_verifies_flat_root_without_git(self):
+        with patch.object(caller.subprocess,'check_output',side_effect=AssertionError('no git fallback')):
+            self.assertEqual(self.verify()['commit'],'f'*40)
+        self.source.write_text('VALUE=2\n')
+        with self.assertRaises(ValueError):self.verify()
+
+    def test_identity_index_mode_ancestor_and_traversal_fail_closed(self):
+        with self.assertRaises(ValueError):self.api['verify_source_export'](self.root,'a'*40,self.descriptor,{'module.py':self.digest})
+        self.source.chmod(0o755)
+        with self.assertRaises(ValueError):self.verify()
+        self.source.chmod(0o644)
+        with self.assertRaises(ValueError):self.api['verify_source_export'](self.root,'f'*40,self.descriptor,{'../module.py':self.digest})
+        self.index.write_text('{}')
+        with self.assertRaises(ValueError):self.verify()
+
+    def test_recipe_check_uses_explicit_source_export_and_keeps_default_git_guard(self):
+        recipe=Path(self.tmp.name)/'recipe';recipe.mkdir();(recipe/'episode.json').write_text(json.dumps({'manual_task':{'user_message':'natural'}}))
+        manifest=recipe/'manifest.json';manifest.write_text(json.dumps({'files':{'episode.json':caller.pin(recipe/'episode.json')['sha256']},
+            'source_sha256':{'module.py':self.digest},'automatic_grader_supported':True}))
+        case={'id':'qwen-B01','task_id':'B01','root':str(self.root),'commit':'f'*40,'recipe':str(recipe),
+            'recipe_manifest':caller.pin(manifest),'public_request':'natural','source_export':self.descriptor}
+        self.api['recipe_check'](case)
+        del case['source_export']
+        with patch.object(caller.subprocess,'check_output',side_effect=RuntimeError('Git is mandatory')):
+            with self.assertRaisesRegex(RuntimeError,'Git is mandatory'):self.api['recipe_check'](case)
+
+class QwenChildReleaseRegressionTests(unittest.TestCase):
+    def test_real_child_passes_reviewed_config_after_dynamic_pool_insertion(self):
+        from types import SimpleNamespace
+        import sqlite3
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp);ident='qwen-B02';case={'id':ident,'task_id':'B02','policy_model':'Qwen/Qwen3.8-27B-FP8'}
+            spec={'runtime_mode':'qwen-private-v1','shared_chromium':True,'cases':[case],'start_order':[ident],
+                'max_concurrent_episodes':4,'prewarm_count':1,'authorization':{'path':'authorization'},'review':{'path':'review'},
+                'ready':{'path':'ready'},'driver':{'path':'driver'},'caller_commit':'frozen','suite_id':'cpu','output':str(out)}
+            authorized={'case_ids':[ident],'dispatch_authorized':True,'allocation_authorized':True,'max_active_combined':4,
+                        'prewarm_count':1,'max_input_tokens':250000,'approved_rental_seconds':7200}
+            review={'status':'approved','configuration_sha256':caller.config_hash(spec)}
+            ready={'status':'passed','driver':spec['driver'],'cases':[{'case':ident}]}
+            records={'authorization':authorized,'review':review,'ready':ready}
+            with sqlite3.connect(out/'completion.sqlite') as db:
+                db.execute('CREATE TABLE episodes(suite TEXT,id TEXT,state TEXT)');db.execute('INSERT INTO episodes VALUES(?,?,?)',('cpu',ident,'running'))
+            runtime={**spec,'chromium_descriptor':'/tmp/fresh/descriptor.json','capacity_bindings':{ident:{'token':'one-shot'}}}
+            live=SimpleNamespace(live={'dispatch_authorized':True},deployment={'approved_rental_seconds':7200},readiness=lambda:None)
+            with patch.object(caller,'source_guard'),patch.object(caller,'validate_qwen_limits'),patch.object(caller,'verify_ready_case'),\
+                 patch.object(caller,'checked',side_effect=lambda row:row['path']),patch.object(caller,'load',side_effect=lambda p:records[p]),\
+                 patch.object(caller,'qwen_live',return_value=({},live)),patch.object(caller,'helper',side_effect=RuntimeError('passed release before target setup')):
+                with self.assertRaisesRegex(RuntimeError,'passed release before target setup'):caller.execute(runtime,case,scripted=False)

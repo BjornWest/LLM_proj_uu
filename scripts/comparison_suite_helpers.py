@@ -82,6 +82,36 @@ def validate_cases(spec):
         raise ValueError('Launch cases differ from exact accepted recipe/callable bindings')
 
 
+def verify_source_export(root, commit, descriptor, required):
+    """Explicit reviewed capsule provenance, never an absent-Git fallback."""
+    root = Path(root)
+    if root.is_symlink() or not root.is_dir():
+        raise ValueError('Export root must be an ordinary directory')
+    root = root.resolve()
+    index = load(checked(descriptor['index']))
+    if index.get('format') != 'private-frozen-source-capsule-v1':
+        raise ValueError('Exact frozen source capsule index required')
+    row = index['roots'][descriptor['root_id']]
+    if row['commit'] != commit:
+        raise ValueError('Export committed identity changed')
+    for name, digest in required.items():
+        relative = Path(name)
+        if relative.is_absolute() or '..' in relative.parts:
+            raise ValueError('Export file escaped indexed root')
+        path = root/relative
+        if not path.resolve().is_relative_to(root) or any(parent.is_symlink() for parent in [path,*path.parents] if parent.is_relative_to(root)):
+            raise ValueError('Export path or ancestor is a symlink')
+        record = row['files'][name]
+        if record['sha256'] != digest or record['mode'] not in ('100644','100755'):
+            raise ValueError('Export pin differs from approved indexed source')
+        checked({'path':str(path),'sha256':digest})
+        mode = path.stat().st_mode & 0o777
+        expected = 0o755 if record['mode']=='100755' else 0o644
+        if mode != expected or path.stat().st_size != record['bytes']:
+            raise ValueError('Export bytes/mode differ from approved index')
+    return row
+
+
 def recipe_check(case):
     recipe = Path(case['recipe']).resolve()
     manifest = load(checked(case['recipe_manifest']))
@@ -91,8 +121,10 @@ def recipe_check(case):
             raise ValueError('Recipe path escaped its root')
         checked({'path': str(path), 'sha256': digest})
     root = Path(case['root']).resolve()
-    if subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'],
-                               text=True).strip() != case['commit']:
+    if 'source_export' in case:
+        verify_source_export(root, case['commit'], case['source_export'], manifest['source_sha256'])
+    elif subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'],
+                                 text=True).strip() != case['commit']:
         raise ValueError('Accepted per-case commit changed')
     for name, digest in manifest['source_sha256'].items():
         path = root/name
