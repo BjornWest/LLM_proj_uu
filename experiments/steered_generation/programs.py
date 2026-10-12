@@ -40,14 +40,15 @@ from . import reviews, streams
 
 # What is read is the distribution each draw is written as. The program realises a draw from 53-bit uniform
 # numbers in floating point, which follows that distribution closely for numbers of ordinary size and departs from
-# it at extremes; those are refused, not approximated:
+# it at extremes. The limits below are conservative margins that keep rounding and underflow negligible at the
+# scale this experiment samples at, not the points at which the sampler fails; outside them a program is refused:
 # - a normal draw's range, mean, spread, grid and thresholds beyond SMALL..LARGE in size (a midpoint, quotient or
-#   product here would overflow), or a spread below FINE times the mean's size (mean + z * spread would then move
-#   in float steps as coarse as the spread itself);
-# - a rating whose beta distribution has a shape parameter outside SHAPES (below about 0.03 Python's gamma sampler
-#   underflows to zero with a chance that shows; far above, the products here would overflow);
+#   product here could overflow), or a spread below FINE times the mean's size (the float steps of
+#   mean + z * spread stay below about 1e-10 of the spread where a threshold carries appreciable probability);
+# - a rating whose beta distribution has a shape parameter outside SHAPES (Python's gamma sampler underflows to
+#   zero with a chance of about 1e-13 at 0.04, rising quickly below; far above, the products here could overflow);
 # - a weight outside WEIGHTS, or an outcome with a share of its draw below RARE (subnormal weights round in the
-#   program's own selection as well as here, and one uniform number cannot realise a much rarer outcome).
+#   program's own selection as well as here; a share of 1e-9 still spans millions of the uniform number's steps).
 SMALL, LARGE, FINE, SHAPES, WEIGHTS, RARE = 1e-150, 1e150, 1e-6, (.04, 1e6), (1e-100, 1e100), 1e-9
 # Review programs rebuilt from a world, by the producer module, the world's seed and the product.
 BUILT = {}
