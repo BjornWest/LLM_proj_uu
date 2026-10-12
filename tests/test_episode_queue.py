@@ -206,5 +206,214 @@ class QueueTests(unittest.TestCase):
         self.assertEqual(value['cases']['B']['status'], 'not_started')
 
 
+class DynamicQueueTests(unittest.TestCase):
+    launch = QueueTests.launch
+    finish = QueueTests.finish
+
+    def change(self, handle, target):
+        with handle.condition:
+            handle.validate_target(target)
+            handle.set_target(target)
+
+    def test_invalid_dynamic_options_precede_construction(self):
+        called = []
+        for value in (False, 0, -1, 1.5, '4', 1):
+            with self.subTest(ceiling=value), self.assertRaises(ValueError):
+                q.run_ordered_suite({'A': 'A'}, lambda *args: called.append(args),
+                    max_concurrent_episodes=2, max_concurrent_ceiling=value,
+                    on_queue_ready=lambda handle: None)
+        with self.assertRaises(ValueError):
+            q.run_ordered_suite({'A': 'A'}, lambda *args: called.append(args),
+                max_concurrent_episodes=1, max_concurrent_ceiling=2)
+        with self.assertRaises(TypeError):
+            q.run_ordered_suite({'A': 'A'}, lambda *args: called.append(args),
+                max_concurrent_episodes=1, on_queue_ready=42)
+        self.assertEqual(called, [])
+
+    def test_callback_precedes_setup_and_can_choose_initial_target(self):
+        starts, handles = [], []
+        def ready(handle):
+            handles.append(handle)
+            self.assertEqual(starts, [])
+            self.assertEqual(handle.snapshot()['active'], 0)
+            self.change(handle, 2)
+            self.assertEqual(starts, [])
+            self.assertEqual(handle.snapshot()['target'], 2)
+        def run(case, admission):
+            starts.append(case)
+            admission.environment_ready()
+            admission.check_active()
+            return case
+        result = q.run_ordered_suite({'A': 'A', 'B': 'B'}, run,
+            max_concurrent_episodes=1, prewarm_count=0,
+            max_concurrent_ceiling=2, on_queue_ready=ready)
+        self.assertEqual(len(handles), 1)
+        self.assertEqual(sorted(starts), ['A', 'B'])
+        self.assertEqual(result['admission_target'], 2)
+        self.assertTrue(handles[0].snapshot()['finished'])
+        with handles[0].condition, self.assertRaises(q.QueueCancelled):
+            handles[0].validate_target(1)
+
+    def test_callback_failure_starts_nothing_and_closes_handle(self):
+        starts, handles = [], []
+        def ready(handle):
+            handles.append(handle)
+            self.change(handle, 2)
+            raise RuntimeError('parent registration failed')
+        with self.assertRaisesRegex(RuntimeError, 'registration failed'):
+            q.run_ordered_suite({'A': 'A'}, lambda *args: starts.append(args),
+                max_concurrent_episodes=1, max_concurrent_ceiling=2,
+                on_queue_ready=ready)
+        self.assertEqual(starts, [])
+        self.assertTrue(handles[0].snapshot()['finished'])
+        self.assertTrue(handles[0].snapshot()['stopped'])
+
+    def controlled(self, target=1, warm=1, ceiling=3):
+        created = {i: threading.Event() for i in 'ABCD'}
+        active = {i: threading.Event() for i in 'ABCD'}
+        release = {i: threading.Event() for i in 'ABCD'}
+        cleanup = {i: threading.Event() for i in 'ABCD'}
+        handles, closed = [], []
+        def run(case, admission):
+            created[case].set()
+            try:
+                admission.environment_ready()
+                admission.check_active()
+                active[case].set()
+                if not release[case].wait(5) or not cleanup[case].wait(5):
+                    raise TimeoutError('finite fake lifecycle gate')
+                return case
+            finally:
+                closed.append(case)
+        thread, results, errors = self.launch(run, max_concurrent_episodes=target,
+            prewarm_count=warm, max_concurrent_ceiling=ceiling,
+            on_queue_ready=handles.append)
+        self._controlled_thread, self._controlled_errors = thread, errors
+        self.addCleanup(self.finish, thread, errors)
+        def release_all():
+            for event in [*release.values(), *cleanup.values()]:
+                event.set()
+        self.addCleanup(release_all)
+        return handles, created, active, release, cleanup, results, closed
+
+    def test_raise_admits_warm_and_cold_once_in_fifo_order(self):
+        handles, created, active, release, cleanup, results, closed = self.controlled()
+        self.assertTrue(active['A'].wait(5))
+        self.assertTrue(created['B'].wait(5))
+        self.assertFalse(active['B'].is_set())
+        self.change(handles[0], 3)
+        self.assertTrue(active['B'].wait(5))
+        self.assertTrue(active['C'].wait(5))
+        self.assertTrue(created['D'].wait(5))
+        self.assertFalse(active['D'].is_set())
+        self.assertEqual(handles[0].snapshot()['active'], 3)
+        self.assertEqual(handles[0].snapshot()['warming_or_ready'], 1)
+        # Complete cleanups so the final FIFO/once-only trace can be inspected.
+        for event in [*release.values(), *cleanup.values()]: event.set()
+        # addCleanup still joins and verifies the outer runner errors.
+        self.finish(self._controlled_thread, self._controlled_errors)
+        value = results[0]
+        self.assertEqual([e['case'] for e in value['events'] if e['event'] == 'admitted'], list('ABCD'))
+        self.assertEqual(sorted(closed), list('ABCD'))
+        self.assertTrue(all(e['active'] <= 3 and e['active'] + e['warming_or_ready'] <= 4 for e in value['events']))
+
+    def test_lower_drains_and_cleanup_retains_permits(self):
+        handles, created, active, release, cleanup, results, closed = self.controlled(target=2, warm=1)
+        self.assertTrue(active['A'].wait(5)); self.assertTrue(active['B'].wait(5))
+        self.assertTrue(created['C'].wait(5))
+        self.change(handles[0], 1)
+        self.assertEqual(handles[0].snapshot()['active'], 2)
+        self.assertFalse(active['C'].is_set()); self.assertFalse(created['D'].is_set())
+        # A has returned its fake policy, but remains active through cleanup.
+        release['A'].set()
+        self.assertFalse(active['C'].is_set())
+        cleanup['A'].set()
+        with handles[0].condition:
+            self.assertTrue(handles[0].condition.wait_for(lambda: handles[0].snapshot()['active'] == 1, 5))
+        self.assertFalse(active['C'].is_set())
+        self.assertFalse(created['D'].is_set())  # The existing warm actor is retained.
+        self.assertEqual(handles[0].snapshot()['warming_or_ready'], 1)
+        release['B'].set(); cleanup['B'].set()
+        self.assertTrue(active['C'].wait(5))
+        self.assertTrue(created['D'].wait(5))
+        self.assertFalse(active['D'].is_set())
+
+    def test_invalid_updates_and_stale_controller_leave_queue_unchanged(self):
+        handles, created, active, release, cleanup, results, closed = self.controlled()
+        self.assertTrue(active['A'].wait(5))
+        handle = handles[0]
+        self.assertTrue(created['B'].wait(5))
+        with self.assertRaises(q.AdmissionError): handle.validate_target(2)
+        with self.assertRaises(q.AdmissionError): handle.set_target(2)
+        with handle.condition:
+            before = handle.snapshot()
+            for value in [False, 0, -1, 1.5, '2', None, 4]:
+                with self.subTest(target=value), self.assertRaises(ValueError): handle.validate_target(value)
+                self.assertEqual(handle.snapshot(), before)
+            with self.assertRaises(q.AdmissionError): handle.set_target(2)
+            handle.validate_target(2)
+            # Parent controller CAS rejects the stale revision; setter is not called.
+            controller = dict(revision=2, target=1)
+            with self.assertRaisesRegex(RuntimeError, 'stale'):
+                if controller['revision'] != 1: raise RuntimeError('stale revision')
+            self.assertEqual(handle.snapshot(), before)
+            self.assertEqual(controller, dict(revision=2, target=1))
+
+    def test_stop_between_validation_and_controller_commit_starts_nothing(self):
+        stop = threading.Event(); handles = []; created = []
+        def ready(handle):
+            handles.append(handle)
+            with handle.condition:
+                handle.validate_target(2)
+                controller = dict(target=2)  # Successful parent CAS.
+                stop.set()  # External cancellation races after validation.
+                handle.set_target(2)
+                self.assertEqual(handle.snapshot()['target'], controller['target'])
+                self.assertTrue(handle.snapshot()['stopped'])
+        result = q.run_ordered_suite({'A': 'A', 'B': 'B'}, lambda *args: created.append(args),
+            max_concurrent_episodes=1, prewarm_count=1, max_concurrent_ceiling=2,
+            stop_event=stop, on_queue_ready=ready)
+        self.assertEqual(created, [])
+        self.assertTrue(result['cancelled'])
+        with handles[0].condition, self.assertRaises(q.QueueCancelled): handles[0].validate_target(1)
+
+    def test_concurrent_updates_and_terminals_never_duplicate_admission(self):
+        handles = []; ready = threading.Event(); starts = []; controllers = []
+        release = threading.Event()
+        def run(case, admission):
+            starts.append(case)
+            admission.environment_ready(); admission.check_active()
+            ready.set()
+            if not release.wait(5): raise TimeoutError('finite fake gate')
+            return case
+        thread, result, errors = self.launch(run, max_concurrent_episodes=1,
+            prewarm_count=1, max_concurrent_ceiling=3, on_queue_ready=handles.append)
+        self.addCleanup(self.finish, thread, errors)
+        self.addCleanup(release.set)
+        self.assertTrue(ready.wait(5))
+        barrier = threading.Barrier(3)
+        update_errors = []
+        def update():
+            try:
+                barrier.wait(5)
+                for target in (3, 1, 2, 3):
+                    with handles[0].condition:
+                        try: handles[0].validate_target(target)
+                        except q.QueueCancelled: break
+                        controllers.append(target)
+                        handles[0].set_target(target)
+            except BaseException as error: update_errors.append(error)
+        writers = [threading.Thread(target=update) for _ in range(2)]
+        for writer in writers: writer.start()
+        barrier.wait(5); release.set()
+        for writer in writers: writer.join(5)
+        self.assertTrue(all(not writer.is_alive() for writer in writers))
+        self.assertEqual(update_errors, [])
+        self.finish(thread, errors)
+        self.assertEqual(sorted(starts), list('ABCD'))
+        self.assertEqual([e['case'] for e in result[0]['events'] if e['event'] == 'admitted'], list('ABCD'))
+        self.assertTrue(all(e['active'] <= 3 and e['active'] + e['warming_or_ready'] <= 4 for e in result[0]['events']))
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

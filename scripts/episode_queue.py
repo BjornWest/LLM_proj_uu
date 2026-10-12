@@ -6,7 +6,7 @@ before every provider dispatch. Neither method creates or resets environments.
 """
 from dataclasses import dataclass
 from math import isfinite
-from threading import Condition, Event, Thread
+from threading import Condition, Event, RLock, Thread, get_ident
 
 
 class QueueCancelled(RuntimeError):
@@ -95,13 +95,92 @@ class EpisodeAdmission:
         return callback
 
 
+class EpisodeQueueHandle:
+    """Trusted parent control for an explicitly mutable admission target.
+
+    Hold condition continuously across validate_target(), the controller CAS,
+    and set_target(). set_target() applies that already validated transaction;
+    it deliberately does not recheck an external stop Event after the CAS.
+    A concurrent stop still prevents the pump from starting another actor.
+    Neither method cancels or deactivates existing active or warmed episodes.
+    """
+    def __init__(self, queue):
+        self._queue = queue
+        self._validated_target = None
+
+    @property
+    def condition(self):
+        return self._queue.condition
+
+    def _require_lock(self):
+        if not self.condition._is_owned():
+            raise AdmissionError('Hold queue.condition throughout target validation and update')
+
+    def validate_target(self, max_active_episodes):
+        self._require_lock()
+        self._validated_target = None
+        q = self._queue
+        if type(max_active_episodes) is not int or not 1 <= max_active_episodes <= q.ceiling:
+            raise ValueError('Admission target must be a positive integer within the fixed ceiling')
+        if q.stopped() or q.finished:
+            raise QueueCancelled('Cannot update a stopped or finished queue')
+        self._validated_target = (get_ident(), max_active_episodes)
+
+    def set_target(self, max_active_episodes):
+        """Apply a validated target while the parent's transaction lock is held.
+
+        The caller must have called validate_target for this same value without
+        releasing condition. Lifecycle completion cannot race that lock; an
+        external stop may race the controller CAS, but never starts new actors.
+        """
+        self._require_lock()
+        q = self._queue
+        if self._validated_target != (get_ident(), max_active_episodes):
+            raise AdmissionError('Validate this target in the same locked parent transaction first')
+        # Structural preconditions do not change between validation and CAS.
+        if type(max_active_episodes) is not int or not 1 <= max_active_episodes <= q.ceiling:
+            raise ValueError('Admission target must be a positive integer within the fixed ceiling')
+        if q.finished:
+            raise QueueCancelled('Cannot update a finished queue')
+        self._validated_target = None
+        previous = q.target
+        q.target = max_active_episodes
+        if previous != q.target:
+            q.emit('admission_target_changed', None)
+        if q.running:
+            q.pump()
+        q.condition.notify_all()
+
+    def snapshot(self):
+        with self.condition:
+            q = self._queue
+            active, warm = q.counts()
+            return dict(target=q.target, ceiling=q.ceiling, active=active,
+                        warming_or_ready=warm, prewarm_count=q.settings.prewarm_count,
+                        construction_ceiling=q.ceiling + q.settings.prewarm_count,
+                        stopped=q.stopped(), finished=q.finished)
+
+
 class _Queue:
-    def __init__(self, cases, run_case, settings, stop_event):
+    def __init__(self, cases, run_case, settings, stop_event, on_queue_ready=None,
+                 max_concurrent_ceiling=None):
         self.order = settings.validate(cases)
         if not callable(run_case):
             raise TypeError('run_case must be callable')
+        if on_queue_ready is not None and not callable(on_queue_ready):
+            raise TypeError('on_queue_ready must be callable')
+        if max_concurrent_ceiling is not None:
+            if on_queue_ready is None:
+                raise ValueError('A mutable ceiling requires the opt-in queue-ready callback')
+            if (type(max_concurrent_ceiling) is not int
+                    or max_concurrent_ceiling < settings.max_concurrent_episodes):
+                raise ValueError('Fixed ceiling must be an integer at least the initial target')
         self.cases, self.run_case, self.settings = cases, run_case, settings
-        self.condition = Condition()
+        self.condition = Condition(RLock())
+        self.on_queue_ready = on_queue_ready
+        self.target = settings.max_concurrent_episodes
+        self.ceiling = self.target if max_concurrent_ceiling is None else max_concurrent_ceiling
+        self.running, self.finished = False, False
         self.stop_event = stop_event if stop_event is not None else Event()
         self.rows = {i: dict(started=False, active=False, ready=False, done=False,
                             status='queued', result=None, error=None) for i in self.order}
@@ -118,6 +197,8 @@ class _Queue:
         active, warm = self.counts()
         self.events.append(dict(sequence=len(self.events), event=event, case=ident,
                                 active=active, warming_or_ready=warm))
+        if self.on_queue_ready is not None:
+            self.events[-1].update(target=self.target, ceiling=self.ceiling)
 
     def start(self, ident, active):
         row = self.rows[ident]
@@ -145,7 +226,7 @@ class _Queue:
         for ident in self.order:
             if self.stopped():
                 break
-            if self.counts()[0] >= self.settings.max_concurrent_episodes:
+            if self.counts()[0] >= self.target:
                 break
             row = self.rows[ident]
             if row['done'] or row['active']:
@@ -156,6 +237,10 @@ class _Queue:
                 self.condition.notify_all()
             else:
                 self.start(ident, True)
+        # Lowering drains preexisting actors. Do not construct another cold
+        # environment until actual active admission is back within the target.
+        if self.counts()[0] > self.target:
+            return
         for ident in self.order:
             if self.stopped():
                 break
@@ -197,7 +282,12 @@ class _Queue:
 
     def run(self):
         try:
+            if self.on_queue_ready is not None:
+                # Expose the handle before initial admission. A callback may
+                # adjust its initial target, but no actor starts before return.
+                self.on_queue_ready(EpisodeQueueHandle(self))
             with self.condition:
+                self.running = True
                 self.pump()
                 while any(r['started'] and not r['done'] for r in self.rows.values()):
                     self.condition.wait(.1)
@@ -213,26 +303,39 @@ class _Queue:
             # not allow us to kill or finalize an independently owned process.
             for thread in self.threads:
                 thread.join()
+            with self.condition:
+                self.running, self.finished = False, True
+                for ident, row in self.rows.items():
+                    if not row['started']:
+                        row.update(done=True, status='not_started')
+                        self.emit('not_started', ident)
+                self.condition.notify_all()
         with self.condition:
-            for ident, row in self.rows.items():
-                if not row['started']:
-                    row.update(done=True, status='not_started')
-                    self.emit('not_started', ident)
-            return dict(cases={i: dict(r) for i, r in self.rows.items()}, events=list(self.events),
-                        start_order=list(self.order),
-                        max_concurrent_episodes=self.settings.max_concurrent_episodes,
-                        prewarm_count=self.settings.prewarm_count,
-                        cancelled=self.stopped())
+            result = dict(cases={i: dict(r) for i, r in self.rows.items()}, events=list(self.events),
+                          start_order=list(self.order),
+                          max_concurrent_episodes=self.settings.max_concurrent_episodes,
+                          prewarm_count=self.settings.prewarm_count,
+                          cancelled=self.stopped())
+            if self.on_queue_ready is not None:
+                result.update(admission_target=self.target, max_concurrent_ceiling=self.ceiling)
+            return result
 
 
 def run_ordered_suite(cases, run_case, *, max_concurrent_episodes, prewarm_count=1,
-                      start_order=None, stop_event=None):
+                      start_order=None, stop_event=None, on_queue_ready=None,
+                      max_concurrent_ceiling=None):
     """Execute each selected case once; cold entries do not call run_case.
 
     cases maps IDs to opaque frozen caller inputs. run_case(value, admission)
     owns setup, native execution, grading, publication and cleanup, returning
     only after that lifecycle has ended. Admission order is deterministic;
     actual ready times, first requests and completion times may differ.
+    on_queue_ready(handle) opts into mutable target control before any actor
+    starts; max_concurrent_ceiling is immutable and defaults to the initial
+    target. The fixed total construction ceiling is that ceiling + prewarm_count.
+    Updates must hold handle.condition across validate_target, controller CAS,
+    and set_target. A reduction drains; it never cancels existing actors.
     """
     settings = QueueSettings(max_concurrent_episodes, prewarm_count, start_order)
-    return _Queue(dict(cases), run_case, settings, stop_event).run()
+    return _Queue(dict(cases), run_case, settings, stop_event,
+                  on_queue_ready, max_concurrent_ceiling).run()
