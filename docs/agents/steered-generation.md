@@ -718,6 +718,9 @@ kept as logarithms, each term one exponent of a sum of logarithms: the
 integrand at a point is a product of hundreds of small powers and a large
 multinomial number, far outside the floats on its own while their product is
 an ordinary probability. At most 200 reviews and a page of 100 are taken.
+One review's own probabilities are taken as ordinary floats, as the pilot's
+reader gives them; a table with subnormal entries could still lose an
+outcome where two of its entries are mixed before a logarithm is taken.
 
 How it meets the producer. A session reseeds the planned review streams of
 the product and manufactures that one product again instead of taking it
@@ -918,6 +921,166 @@ modelled at this level: tracking and notices have longer chains, and
 handling and collection are observed for collected parcels, whose receipt
 date depends on opening hours.
 
+## The eleventh requirement: a retailer's shipping policy
+
+Requirement (`steered-retailer-shipping-v1`): a retailer and one or more of
+the carriers it must or must not have a contract with, how many carriers it
+has, whether any of its contracts offers express or economy delivery, the
+lowest standard collection fee among its contracts, the lowest standard
+home-delivery fee (a contract's collection fee plus its home difference),
+and the days its warehouse takes to dispatch.
+
+```json
+{"schema": "steered-retailer-shipping-v1", "retailer_id": "footwear-04",
+ "carriers": {"include": ["carrier-03"], "exclude": ["carrier-07"]},
+ "carrier_count": {"max": 2}, "express": false,
+ "collection_fee_minor": {"min": 5900}, "dispatch_days": {"min": 2}}
+```
+
+The producer draws, per retailer, how many carriers (uniformly in a range
+set by the retailer's scale: one to three, two to four, three to five), which
+ones (an ordered sample of the world's eight carriers without replacement),
+per contract whether it has an economy and an express tier (a coin each),
+per contract a collection fee and a home difference (each a weighted choice
+from a five-row table) and the warehouse's dispatch days (a weighted choice
+of none, one or two). All are named streams, and nothing else in the world
+reads them: the contracts are recorded on the retailer and used afterwards
+by quotes and pages. So they are the block, `policies.py`: the contract
+draws when the requirement is about contracts, the dispatch draw when it is
+about dispatch, as two resources, `("contracts", retailer, "")` and
+`("dispatch", retailer, "")`.
+
+Contracts draw independently and alike whichever carrier they are with. The
+probability is a sum over the number of carriers of the chance that the set
+of carriers is as required (a ratio of binomial numbers) times the chance
+that so many contracts are as required; the latter folds the contracts in
+one at a time, keeping only what a requirement reads of them (a tier seen,
+the lowest fees so far). A sample chooses the number and that summary, the
+contracts back from the last to the first, and the carriers, and replays
+all of it through the producer; a plan can now script an ordered sample. The
+check reads the recorded contracts and dispatch days. The tables are read
+again when a requirement is modelled; a world whose recorded digests of the
+sampling defaults and the delivery plan are not the files' is refused.
+
+Limits. Fees are the contract's own standard numbers: what a shopper is
+quoted adds the tier's difference, distance and the free-shipping threshold
+(`basket_quote`), and which options a site shows is decided after the world
+is finished (see "What is not done"). A branch's dispatch days and whether a
+carrier takes bulky parcels are the seed's.
+
+## The twelfth requirement: who is cheapest, with that retailer's policy
+
+Requirement (`steered-cheapest-seller-policy-v1`): a ranking in the fourth
+block's words but without a winner, and a policy in the eleventh's words but
+without a retailer. It holds when one retailer's product alone is the
+cheapest available offer of the ranking and that retailer's policy is as
+stated.
+
+```json
+{"schema": "steered-cheapest-seller-policy-v1",
+ "cheapest": {"concept_id": "footwear.walking_shoes"},
+ "policy": {"express": false, "carrier_count": {"max": 1}}}
+```
+
+This is the case "the best offer is at a shop whose delivery the customer
+does not like". Without it one would look for a seed in which some retailer
+that can win happens to have such a policy, and steer the ranking to it; the
+policies the seed drew would then never have been asked anything.
+`sellers.py` states it as what it is: one of several things that exclude one
+another, "this retailer's product alone is cheapest, and this retailer's
+policy is as stated", one for every retailer and product of the ranking.
+Stock and prices are drawn apart from policies, so each alternative's
+probability is the product of the fourth block's and the eleventh's, the
+requirement's is their sum, and a sample picks an alternative in proportion
+and samples its two blocks. The winner's policy is drawn as required; every
+other retailer's is the seed's own, which is its distribution given the
+requirement. The check finds the winner in the saved leaves, then asks the
+native oracle and the recorded contracts. As a part of several requirements
+it declares everything it could decide: the ranking's stock and prices and
+the policy of every retailer in it.
+
+## The thirteenth requirement: a carrier's stars and how well it serves
+
+Requirement (`steered-carrier-stars-v1`): a carrier and a bound on the
+average stars its summary publishes, the level of one or more aspects of its
+service (strong, mixed or weak punctuality, handling, handoff,
+communication), or both.
+
+```json
+{"schema": "steered-carrier-stars-v1", "carrier_id": "carrier-03",
+ "average_stars": {"max": 3.7}, "levels": {"punctuality": "weak"}}
+```
+
+The producer draws a carrier's four levels, each on its own stream; then
+every shipment's history on the shipment's stream, where a level is the
+chance that the aspect goes well; then every shipment's review on one more
+stream: the comment, and the stars, which are likelier high the more of the
+history went well and are held to the comment's tone. The block,
+`ratings.py`, is the four level streams and every review stream of the
+carrier. The history streams stay the seed's own, so for each of the 81
+choices of levels the histories are known (the producer's own `history`,
+called with those levels) and with them each review's distribution of stars:
+a beta-binomial for the stars as drawn, and the chance that the comment has
+praise, complaints or both for the hold. Reviews draw independently, so the
+total is a sum of independent numbers. The probability is a sum over the
+level choices the requirement allows of the chance of the levels times the
+chance of the required average under them. A sample picks the levels in
+proportion, then the total, then each review's stars given the total, and
+redraws each stream until it gives what was picked.
+
+A low rating therefore comes with worse service, to the extent the producer
+ties the two. On the pilot world (32 shipments a carrier, a tenth of a
+second to model) a carrier naturally rated 4.38:
+
+| Average at most | Probability | Weak aspects expected, of four |
+|---|---|---|
+| any | 1 | 0.6 |
+| 3.8 | 0.16 | 1.4 |
+| 3.6 | 0.063 | 1.7 |
+| 3.2 | 0.0036 | 2.4 |
+| 3.0 | 0.0006 | 2.7 |
+| 2.0 | 2e-11 | 3.7 |
+
+Carriers' natural averages on the pilot and medium worlds lie between 3.8
+and 4.6, so "a carrier with really low ratings" in this producer's terms is
+one at 3.5 or so; lower is reachable at the same cost but is a carrier whose
+reviews are harsher than anything its service explains.
+
+It combines with the twelfth requirement: "the cheapest available offer is at
+a retailer that ships with this carrier only, and this carrier is rated at
+most 3.9" is two independent blocks. It does not combine with the ninth or
+the tenth requirement on the same carrier, whose reviews it redraws.
+
+Limits. The history streams are not redrawn for the stars: given the levels,
+what happened to each shipment is the seed's. The levels are private
+parameters; a task sees them through the metrics and the reviews.
+
+### The three together on the medium world
+
+Scripts and outputs under
+`.local/coordination/world-requirement-construction-20261010/steering/walkthrough/`
+(`case-seller`, `case-carrier`, `case-stars`; not pinned runs), on the medium
+world of "A medium world" (21 retailers, 90 products), four seconds a sample:
+
+- "The cheapest available walking shoe is at a retailer with no express
+  delivery whose warehouse takes two days to dispatch": probability 0.060;
+  under 1,500 other seeds of the same streams it held in 7.0%. In the seed's
+  own world two retailers have such a policy and one of them never has the
+  cheapest shoe. Over 200 samples seven retailers win, each about as often
+  as its chance of winning times its chance of such a policy says (0.10 to
+  0.21), and the winner's contracts and dispatch days are redrawn; the other
+  twenty retailers' are the seed's.
+- "... at a retailer that ships with one named carrier only, and that
+  carrier's punctuality comments are more negative than positive": 0.0093
+  times 0.17, as two independent blocks. Only a small retailer can have one
+  carrier, so the two small retailers that can win share the samples.
+- "... ships with one named carrier only, and that carrier is rated at most
+  3.6", for the carrier the seed rates highest (4.59, one weak-free set of
+  levels): 0.0093 times 0.012. In 20 samples the average is 3.34 to 3.59;
+  the carrier has one weak aspect in 5, two in 12 and three in 3, and its
+  delivery metrics follow (attempts on the promised day 84% to 66% where
+  punctuality turns weak).
+
 ## Requirement candidates for a native task
 
 `variants.of(world, task, api)` takes a native task specification (the
@@ -990,7 +1153,7 @@ only that matching offers exist, not which is cheapest.
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the ten kinds above, that must all hold.
+of the thirteen kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -1826,9 +1989,11 @@ carries review and description text that the checks also digest.
   services are the seed's. Which reviews a review
   site shows, and which products a comparison site lists, are the seed's.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
-  against a basket's subtotal. Carrier fees, which carriers and service tiers
-  a retailer has, and so the delivered total (the single-item delivery and
-  order-set tasks) are not modelled. One obstacle is outside this code: with
+  against a basket's subtotal, and so can its contracts: which carriers and
+  tiers it has and their standard fees. The delivered total of an order (the
+  single-item delivery and order-set tasks) is not modelled: it adds tier
+  differences, distance and the threshold to those fees, over every retailer
+  that lists the product. One obstacle is outside this code: with
   delivery options enabled, which routes a retailer admits is decided by a
   hash that includes the finished world's identity
   (`delivery_admission.py`), so any steered change reshuffles the admitted

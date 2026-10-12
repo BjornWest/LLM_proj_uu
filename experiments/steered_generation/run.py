@@ -27,14 +27,13 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import (blocks, carriers, cheapest, combined, listed, price_bounds, prices, reviews, shipments, shortlist, stock,
-               streams, threshold, variants)
+from . import (blocks, carriers, cheapest, combined, listed, policies, price_bounds, prices, ratings, reviews, sellers,
+               shipments, shortlist, stock, streams, threshold, variants)
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
               "listed.py", "shortlist.py", "threshold.py", "reviews.py", "programs.py", "pages.py", "carriers.py", "shipments.py",
-              "combined.py",
-              "variants.py", "run.py"),
+              "policies.py", "sellers.py", "ratings.py", "combined.py", "variants.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -402,6 +401,94 @@ def threshold_case(args, session, natural, opened, api, requirement, case, folde
         frequency_check(case, block.probability, sum(seen.values()), args.validate_trials)
 
 
+def policy_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        block = policies.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    place = block.site
+    before = policies.listed(natural, place)
+    case.update(status="sampled", probability_given_upstream=block.probability, retailer_id=place.retailer_id,
+                natural={"contracts": before[0], "warehouse_dispatch_days": before[1]},
+                outcomes_modelled=len(block.outcomes or ()) + len(block.days or ()))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        world, found, record = policies.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        seconds = time.monotonic() - clock
+        # The saved leaves themselves, by the rule written out in `policies.holds`.
+        pinned.ensure(policies.holds(place.requirement, *policies.listed(world, place)),
+                      "Direct reading of the saved leaves disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+                                "contracts": found["contracts"], "warehouse_dispatch_days": found["warehouse_dispatch_days"],
+                                "streams_steered": record["streams_steered"], "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [policies.trial(natural, requirement, api)], case)
+    if args.validate_trials:
+        hits = policies.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        frequency_check(case, block.probability, hits, args.validate_trials)
+
+
+def stars_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        block = ratings.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    place = block.site
+    levels, stars = ratings.written(natural, place)
+    case.update(status="sampled", probability_given_upstream=block.probability,
+                log_probability_given_upstream=block.log_probability, carrier_id=place.carrier_id,
+                natural={"aspect_levels": levels, "average_stars": ratings.average(sum(stars), len(stars))},
+                level_choices_modelled=len(block.alternatives))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        world, found, record = ratings.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        seconds = time.monotonic() - clock
+        # The saved leaves themselves, by the rule written out in `ratings.holds`.
+        pinned.ensure(ratings.holds(place.requirement, *ratings.written(world, place)),
+                      "Direct reading of the saved leaves disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+                                "aspect_levels": found["aspect_levels"], "average_stars": found["average_stars"],
+                                "streams_steered": record["streams_steered"], "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [ratings.trial(natural, requirement, api)], case)
+    if args.validate_trials:
+        hits = ratings.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        frequency_check(case, block.probability, hits, args.validate_trials)
+
+
+def seller_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        block = sellers.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    case.update(status="sampled", probability_given_upstream=block.probability or None,
+                log_probability_given_upstream=block.log_probability, alternatives_modelled=len(block.alternatives))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        world, found, record = sellers.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        seconds = time.monotonic() - clock
+        # The saved leaves themselves: the winner's recorded contracts and dispatch days by `policies.holds`.
+        retailer = next(row for row in world["retailers"] if row["retailer_id"] == found["retailer_id"])
+        pinned.ensure(policies.holds(policies.resolve(sellers.policy(block.requirement, found["retailer_id"])),
+                                     retailer["contracts"], retailer["source_locations"][0]["dispatch_days"]),
+                      "Direct reading of the saved leaves disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+                                "retailer_id": found["retailer_id"], "product_id": found["product_id"],
+                                "contracts": found["policy"]["contracts"],
+                                "streams_steered": record["streams_steered"], "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [sellers.trial(natural, requirement, api)], case)
+    if args.validate_trials:
+        seen = sellers.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        frequency_check(case, block.probability, sum(seen.values()), args.validate_trials)
+
+
 def reviews_case(args, session, natural, opened, api, requirement, case, folder):
     """A product's reviews, a carrier's, or a carrier's shipments with them: the modules answer to the same names."""
     module = {carriers.VERSION: carriers, shipments.VERSION: shipments}.get(requirement["schema"], reviews)
@@ -493,6 +580,9 @@ CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_c
          threshold.VERSION: ("threshold", threshold_case), reviews.VERSION: ("reviews", reviews_case),
          carriers.VERSION: ("carrier_reviews", reviews_case),
          shipments.VERSION: ("carrier_shipments", reviews_case),
+         policies.VERSION: ("shipping_policy", policy_case),
+         sellers.VERSION: ("cheapest_seller_policy", seller_case),
+         ratings.VERSION: ("carrier_stars", stars_case),
          combined.VERSION: ("combined", combined_case)}
 
 

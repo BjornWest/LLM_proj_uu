@@ -3,10 +3,12 @@
 A block is the set of draws one requirement resamples. It names the leaves it
 decides and the leaves its probability was computed from as resources:
 ("stock", retailer, product), ("price", retailer, product), for a
-retailer's free-shipping threshold ("threshold", retailer, ""), for a
-product's review corpus ("reviews", "", product), for a carrier's
+retailer's free-shipping threshold ("threshold", retailer, ""), for its
+carrier contracts ("contracts", retailer, "") and its warehouse's dispatch
+days ("dispatch", retailer, ""), for a product's review corpus ("reviews", "", product), for a carrier's
 ("carrier_reviews", "", carrier) and for its shipments' histories
-("carrier_shipments", "", carrier). The producer
+("carrier_shipments", "", carrier) and for its quality levels
+("carrier_quality", "", carrier). The producer
 gives every draw its own stream, so blocks whose resources do not meet are
 independent given everything upstream: each can be sampled on its own, all of
 them replayed in one pass, and the probability that every requirement holds is
@@ -167,12 +169,13 @@ def background(world, writes):
     Stock of a retailer/product: the condition at each location, every SKU's
     quantities and supplier order, and the warehouse stock on its catalog
     pages. Price: every SKU's price and recorded draw. A retailer's threshold:
-    its free-shipping threshold. A product's reviews: the reviews and the
+    its free-shipping threshold. A retailer's contracts: its carrier contracts.
+    Its dispatch: the days its warehouse takes. A product's reviews: the reviews and the
     rating summary counted from them. A carrier's reviews: its reviews and the
     summary counted from them, the corpus identity, and the wording of every
     other carrier review, since the producer picks a phrase by how often each
     was used before it. A carrier's shipments: their histories and the
-    metrics counted from them. JSON text, unlike Python equality, keeps true,
+    metrics counted from them. A carrier's quality: its four levels. JSON text, unlike Python equality, keeps true,
     1 and 1.0 apart.
     """
     def retailer(value):
@@ -181,6 +184,12 @@ def background(world, writes):
         price = {product for kind, retailer_id, product in writes if kind == "price" and retailer_id == rid}
         if ("threshold", rid, "") in writes:
             value = {k: v for k, v in value.items() if k != "free_shipping_threshold_minor"}
+        if ("contracts", rid, "") in writes:
+            value = {k: v for k, v in value.items() if k != "contracts"}
+        if ("dispatch", rid, "") in writes:
+            value = {**value, "source_locations": [
+                {k: v for k, v in row.items() if k != "dispatch_days"} if row["kind"] == "warehouse" else row
+                for row in value["source_locations"]]}
         if not stock and not price:
             return value
 
@@ -233,6 +242,13 @@ def background(world, writes):
                           for row in private["shipments"]],
             "carrier_parameters": [{k: v for k, v in row.items() if k != "observed_history_metrics"}
                                    if row["carrier_id"] in shipped else row for row in private["carrier_parameters"]]}
+    levelled = {carrier for kind, _, carrier in writes if kind == "carrier_quality"}
+    if levelled:
+        if not levelled <= shipped:
+            raise AssertionError("A block that redraws a carrier's quality levels redraws its shipments")
+        private = view["carrier_evidence"]["private"]
+        private["carrier_parameters"] = [{k: v for k, v in row.items() if k != "aspect_levels"}
+                                         if row["carrier_id"] in levelled else row for row in private["carrier_parameters"]]
     reviewed = {product for kind, _, product in writes if kind == "reviews"}
     if reviewed:
         view["products"] = [{k: v for k, v in item.items() if k not in ("reviews", "rating_summary")}
