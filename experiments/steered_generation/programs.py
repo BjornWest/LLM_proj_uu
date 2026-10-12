@@ -38,10 +38,17 @@ from types import SimpleNamespace
 
 from . import reviews, streams
 
-# The sizes of number the arithmetic here is written for. A normal draw's range, mean, spread, grid and thresholds
-# within these never overflow a product, quotient or midpoint below, and neither do the products of four factors
-# that a rating's concentration within its own enters. Anything outside is refused, not approximated.
-SMALL, LARGE, CONCENTRATIONS = 1e-150, 1e150, (1e-60, 1e60)
+# What is read is the distribution each draw is written as. The program realises a draw from 53-bit uniform
+# numbers in floating point, which follows that distribution closely for numbers of ordinary size and departs from
+# it at extremes; those are refused, not approximated:
+# - a normal draw's range, mean, spread, grid and thresholds beyond SMALL..LARGE in size (a midpoint, quotient or
+#   product here would overflow), or a spread below FINE times the mean's size (mean + z * spread would then move
+#   in float steps as coarse as the spread itself);
+# - a rating whose beta distribution has a shape parameter outside SHAPES (below about 0.03 Python's gamma sampler
+#   underflows to zero with a chance that shows; far above, the products here would overflow);
+# - a weight outside WEIGHTS, or an outcome with a share of its draw below RARE (subnormal weights round in the
+#   program's own selection as well as here, and one uniform number cannot realise a much rarer outcome).
+SMALL, LARGE, FINE, SHAPES, WEIGHTS, RARE = 1e-150, 1e150, 1e-6, (.04, 1e6), (1e-100, 1e100), 1e-9
 # Review programs rebuilt from a world, by the producer module, the world's seed and the product.
 BUILT = {}
 
@@ -247,15 +254,25 @@ def rating_key(place, index):
 
 def stars(execution, concentration):
     """The probability of each star rating: one more than a beta-binomial count of four."""
-    if not (type(concentration) in (int, float) and CONCENTRATIONS[0] <= concentration <= CONCENTRATIONS[1] and
-            type(execution) in (int, float) and 0 <= execution <= 1):
-        raise unmodelled("a rating whose concentration or execution is beyond ordinary size")
+    if not (type(concentration) in (int, float) and type(execution) in (int, float) and 0 <= execution <= 1 and
+            concentration > 0):
+        raise unmodelled("a rating without a positive concentration and an execution from zero to one")
     mean = .05 + .9 * execution
     a, b = mean * concentration, (1 - mean) * concentration
+    if not (SHAPES[0] <= a <= SHAPES[1] and SHAPES[0] <= b <= SHAPES[1]):
+        raise unmodelled("a rating whose beta distribution the program's sampler does not follow closely")
     # Ratios of beta functions as rising products: no difference of large logarithms.
     rising = lambda start, count: prod(start + more for more in range(count))
     return {1 + hits: (1, 4, 6, 4, 1)[hits] * rising(a, hits) * rising(b, 4 - hits) / rising(a + b, 4)
             for hits in range(5)}
+
+
+def weighed(weights):
+    """Weights of a size, and of shares, that the program's weighted selection follows closely; else refused."""
+    positive = [weight for weight in weights if weight > 0]
+    if (not positive or not all(type(weight) in (int, float) and WEIGHTS[0] <= weight <= WEIGHTS[1] for weight in positive) or
+            min(positive) < RARE * fsum(positive) or any(not weight >= 0 for weight in weights)):
+        raise unmodelled("a weighted draw with weights beyond ordinary size or an outcome rarer than one in a billion")
 
 
 def topic_sets(policy, eligible, lengths):
@@ -267,6 +284,12 @@ def topic_sets(policy, eligible, lengths):
     """
     others = {name: weight for name, weight in policy["effective_weights"].items() if name != "value"}
     value = min(1.0, max(0.0, policy["value_probability_given_comment"])) if "value" in eligible else 0.0
+    weighed(lengths.values())
+    if any(int(slots) for slots, weight in lengths.items() if weight > 0):
+        if 0 < value < RARE or 0 < 1 - value < RARE:
+            raise unmodelled("a chance of mentioning value within a billionth of never or always")
+        if value < 1 or any(int(slots) > 1 for slots, weight in lengths.items() if weight > 0):
+            weighed(others.values())
     total, found = fsum(lengths.values()), defaultdict(list)
 
     def fill(chosen, left, slots, mass):
@@ -323,6 +346,8 @@ def tails(params, bound):
     if (not all(type(size) in (int, float) and abs(size) <= LARGE for size in sizes) or params["sd"] < SMALL or
             step is not None and not step >= SMALL):
         raise unmodelled("a normal draw with a range, mean, spread, grid or threshold beyond ordinary size")
+    if params["sd"] < FINE * abs(params["mean"]):
+        raise unmodelled("a normal draw whose spread is too fine for floats at its mean")
     ended = (lambda x: round(x / step) * step) if step is not None else (lambda x: x)
     if ended(low) >= bound:
         return 1.0, 0.0
@@ -342,6 +367,7 @@ def outcomes(place, step, context):
     twin = place.program.twin
     params = twin.resolve(step, context)
     if step["sample"] == "weighted_choice":
+        weighed(params["effective_weights"].values())
         for name, share in params["probabilities"].items():
             if share > 0:
                 yield (twin._eval(params["values_expr"][name], context) if "values_expr" in params

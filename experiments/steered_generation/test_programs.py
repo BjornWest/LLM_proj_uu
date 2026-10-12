@@ -181,6 +181,19 @@ class ModelTests(Programs):
             for topics, mass in found.items():
                 self.assertAlmostEqual(mass, direct[topics], places=12, msg=topics)
             self.assertAlmostEqual(sum(found.values()), 1, places=12)
+        # Weights and shares the program's selection does not follow closely are refused.
+        tiny = {"effective_weights": {"value": 1.0, "a": 5e-324, "b": 1.5e-323}, "value_probability_given_comment": .5}
+        for bad, eligible, weights in ((tiny, ["value", "a", "b"], {"1": 1}), (policy, ["value", "a"], {"0": 1, "1": 1e-12}),
+                                       (policy, ["value", "a"], {"0": 1e200, "1": 1e200}),
+                                       ({**policy, "value_probability_given_comment": 1e-12}, ["value", "a"], {"1": 1}),
+                                       ({**policy, "value_probability_given_comment": 1 - 1e-12}, ["value", "a"], {"1": 1}),
+                                       ({**policy, "effective_weights": {"value": 1.0, "a": 1.0, "b": 1e-12}}, ["value", "a", "b"], {"1": 1})):
+            with self.assertRaises(ValueError):
+                programs.topic_sets(bad, eligible, weights)
+        for weights in ([5e-324, 1.5e-323], [1, 1e-12], [1e200, 1], [0, 0], [1, float("nan")], [1, -1]):
+            with self.assertRaises(ValueError):
+                programs.weighed(weights)
+        programs.weighed([0, 1, 1e-8, 3])
         # A value probability outside zero to one acts as certainty either way, as the producer's comparison does.
         for chance, has in ((1.5, True), (-.2, False)):
             found = programs.topic_sets({**policy, "value_probability_given_comment": chance}, ["value", "a", "b"], {"1": 1})
@@ -239,7 +252,10 @@ class ModelTests(Programs):
                     # Sizes at which a midpoint, a quotient or a product here would overflow or lose its digits.
                     {**params, "min": 1e308, "max": 1.5e308, "mean": 1.25e308, "sd": 1e307},
                     {**params, "mean": 1e308, "sd": 1.5e308}, {**params, "sd": 1e-200}, {**params, "round_to": 1e-200},
-                    {**params, "mean": float("nan")}, {**params, "max": float("inf")}, {**params, "mean": 10 ** 400}):
+                    {**params, "mean": float("nan")}, {**params, "max": float("inf")}, {**params, "mean": 10 ** 400},
+                    # A spread too fine for floats at the mean: the program's draw then lands on the mean itself.
+                    {**params, "mean": .495, "sd": 1e-150, "round_to": .01}, {**params, "mean": .495, "sd": 1e-18},
+                    {**params, "mean": 1000, "sd": 1e-4}):
             with self.assertRaises(ValueError):
                 programs.tails(bad, .5)
         with self.assertRaises(ValueError):
@@ -250,17 +266,26 @@ class ModelTests(Programs):
             above, below = programs.tails(edge, edge["max"] / 2)
             self.assertAlmostEqual(above + below, 1, places=12)
         # A rating's concentration: within its sizes the five chances add up; outside it is refused.
-        for concentration in (1e-60, 1e-6, 1.5, 1e6, 1e60):
+        for concentration in (1, 1.5, 1e3, 1e6):
             for execution in (0, .37, 1):
                 found = programs.stars(execution, concentration)
                 self.assertAlmostEqual(sum(found.values()), 1, places=14)
                 self.assertTrue(all(0 <= chance <= 1 for chance in found.values()))
+        # The producer's own rating draw at the low end of what is read: its beta sampler still follows.
+        from environments.product_world.review_rating_sampling import sample_rating
+        seen, trials, model = Counter(), 20000, programs.stars(0, 1)
+        for seed in range(trials):
+            seen[sample_rating(Random(seed), 0, 1)["rating"]] += 1
+        for rating, chance in model.items():
+            self.assertLess(abs(seen[rating] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 1e-9, rating)
         # The same numbers as the difference of log-gammas gives where that is accurate.
         beta = lambda x, y: lgamma(x) + lgamma(y) - lgamma(x + y)
         for hits, chance in enumerate(programs.stars(.37, 1.5).values()):
             a, b = (.05 + .9 * .37) * 1.5, (1 - .05 - .9 * .37) * 1.5
             self.assertAlmostEqual(chance, (1, 4, 6, 4, 1)[hits] * exp(beta(a + hits, b + 4 - hits) - beta(a, b)), places=13)
-        for execution, concentration in ((.5, 1e70), (.5, 1e-70), (.5, float("nan")), (1.5, 1.5), (.5, True)):
+        # Shapes below which Python's gamma sampler underflows often enough to show, and the other refusals.
+        for execution, concentration in ((.5, 1e70), (.5, 1e-60), (.5, 1e-6), (.5, .001), (0, .7), (1, .7), (.5, 1e7),
+                                         (.5, 0), (.5, float("nan")), (1.5, 1.5), (.5, True)):
             with self.assertRaises(ValueError):
                 programs.stars(execution, concentration)
         self.assertEqual(reviews.whole({1: .25, 2: .75}), {1: .25, 2: .75})
@@ -604,6 +629,15 @@ class RefusalTests(Programs):
         def sharp(document):
             step(document, "rating")["concentration"] = 1e70
 
+        def loose(document):
+            step(document, "rating")["concentration"] = .001
+
+        def fine(document):
+            step(document, "value_favourability").update(mean=.495, sd=1e-18, round_to=.01)
+
+        def faint(document):
+            step(document, "sentiment_everyday_comfort").update(weights={"positive": 5e-324, "negative": 1.5e-323}, cases=[])
+
         def unknown(document):
             # A value the field counts as unknown reads differently from its neighbours within one band.
             document["fields"]["review.value_favourability"]["unknown_values"] = [.5]
@@ -623,7 +657,8 @@ class RefusalTests(Programs):
 
         for change, topic in ((neutral, "everyday_comfort"), (both, "everyday_comfort"), (strict, "value"), (scaled, "value"),
                               (doubled, "value"), (chained, "value"), (whole, "value"), (unknown, "value"),
-                              (vast, "value"), (spread, "value"), (sharp, "everyday_comfort"),
+                              (vast, "value"), (spread, "value"), (sharp, "everyday_comfort"), (loose, "everyday_comfort"),
+                              (fine, "value"), (faint, "everyday_comfort"),
                               (unclipped, "value"), (wide, "everyday_comfort"), (guarded, "everyday_comfort")):
             with self.subTest(change=change.__name__):
                 self.altered(change)

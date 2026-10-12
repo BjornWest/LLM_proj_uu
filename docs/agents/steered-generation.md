@@ -604,11 +604,20 @@ included; a mention of the draw that is not the draw alone, `>=`, and a
 number written out refuses the program, and so does a field that marks some
 value of the draw as unknown, since one value could then not stand for its
 neighbours. A threshold is kept as the number the program has, whole or
-not. The arithmetic is written for numbers of ordinary size and refuses
-others instead of approximating: a normal draw's range, mean, spread, grid
-and thresholds up to 1e150 in size (spread and grid from 1e-150), a rating's
-concentration from 1e-60 to 1e60; and one review's probabilities must come out
-adding up to one. Because the order of the steps is written here a
+not. What is read is the distribution each draw is written as; the program
+realises a draw from 53-bit uniform numbers in floating point, which follows
+that distribution closely for numbers of ordinary size and departs from it at
+extremes. Those are refused instead of approximated: a normal draw whose
+range, mean, spread, grid or thresholds are beyond 1e150 in size, or whose
+spread is below a millionth of its mean's size (the draw would then land on
+the mean); a rating whose beta distribution has a shape parameter below 0.04
+or above a million (below about 0.03 Python's gamma sampler underflows often
+enough to show; the programs in git have 0.075 at the least); a weight
+outside 1e-100 to 1e100, or an outcome of a weighted draw rarer than one in
+a billion of its draw. One review's probabilities must also come out as
+probabilities adding up to one. Inside those limits the model is still of
+the written distributions: a normal tail beyond about eight spreads, for
+one, is in the model and not in what the program's sampler can draw. Because the order of the steps is written here a
 second time, every recorded review of a natural world is also followed from
 its recorded draws alone, and the world is refused if that gives another
 rating or says another thing than the review does.
