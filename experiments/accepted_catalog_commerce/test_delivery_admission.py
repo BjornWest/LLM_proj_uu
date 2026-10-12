@@ -210,3 +210,193 @@ def test_native_coupon_recalculates_cost_without_changing_menu(world):
     legacy = native.quote(world, rid, lines(world), plan=plan, coupon_plan=cp, coupon_code='SAVE')
     expected = {o['option_id']: o for o in legacy['options']}
     assert all(expected[o['option_id']] == o for o in discounted['options'])
+
+
+# Plan version 2: draws keyed on the seed, the retailer and its real route universe, not the finished world.
+V1_ROWS_SEEDS_0_TO_11 = '693514e681a7f05716b80d78cca4ac8fbfd91cd65924ad67d977a1cdfbf3fe0b'
+V2 = admission.STRUCTURAL_PLAN_VERSION
+
+
+def rebound(w):
+    """A world after an edit of a leaf: a new identity, as generation gives every changed world."""
+    w['world_id'] = 'fixture/' + native.model.digest({k: v for k, v in w.items() if k != 'world_id'})
+    return w
+
+
+def leaf_edits(w):
+    """Each a change that leaves the retailer's routes and home-anchor capability as they were."""
+    retailer = w['retailers'][0]
+    def price(): retailer['offers'][0]['price_minor'] += 700
+    def stock():
+        for offer in retailer['offers']:
+            offer['stock_by_source'] = {source: 0 for source in offer['stock_by_source']}
+    def wait(): retailer['offers'][1]['supplier_order'] = {'enabled': True, 'wait_days': 9, 'disclosure': 'shown'}
+    def fee():
+        retailer['contracts'][0]['collection_fee_minor'] += 1000; retailer['contracts'][0]['home_delta_minor'] += 1000
+    def threshold(): retailer['free_shipping_threshold_minor'] = 50000
+    def dispatch():
+        for source in retailer['source_locations']: source['dispatch_days'] = 2
+    return {'price': price, 'stock': stock, 'supplier_wait': wait, 'fee': fee, 'threshold': threshold, 'dispatch': dispatch}
+
+
+def test_v1_rows_and_formula_are_unchanged(commerce):
+    w, _, plan, rid = commerce
+    plans = [admission.make_plan(w, plan, seed=seed) for seed in range(12)]
+    assert native.model.digest([p['retailers'] for p in plans]) == V1_ROWS_SEEDS_0_TO_11
+    assert all(p['schema_version'] == admission.PLAN_VERSION == 'retailer-delivery-admission-plan-v1' for p in plans)
+    # The formula written out: every draw is a digest of the seed, the finished world's id, the retailer, a stage and a key.
+    rank = lambda seed, stage, key: native.model.digest(
+        {'seed': seed, 'world_id': w['world_id'], 'retailer_id': rid, 'stage': stage, 'key': key})
+    homes = {r['route_key'] for r in admission.enumerate_routes(w, plan, rid) if r['destination_type'] == 'home'}
+    for seed, p in enumerate(plans):
+        row = p['retailers'][0]
+        anchor = min(homes, key=lambda key: rank(seed, 'home', key))
+        ordered = [anchor] + sorted((key for key in row['initial_route_keys'] if key != anchor),
+                                    key=lambda key: rank(seed, 'membership', key))
+        assert row['home_anchor_key'] == anchor and row['admitted_route_keys'] == sorted(ordered[:row['sampled_count']])
+        assert admission.make_plan(w, plan, seed=seed, plan_version=admission.PLAN_VERSION) == p
+
+
+@pytest.mark.parametrize('edit', ['price', 'stock', 'supplier_wait', 'fee', 'threshold', 'dispatch', 'all'])
+def test_v2_menus_do_not_move_with_leaves_and_v1_menus_do(commerce, edit):
+    w, backend, plan, rid = commerce
+    before = {version: [admission.make_plan(w, plan, seed=seed, plan_version=version) for seed in range(12)]
+              for version in admission.PLAN_VERSIONS}
+    changed = deepcopy(w)
+    for name, change in leaf_edits(changed).items():
+        if edit in (name, 'all'):
+            change()
+    rebound(changed)
+    assert changed['world_id'] != w['world_id']
+    new_plan = backend.make_plan(changed)
+    after = {version: [admission.make_plan(changed, new_plan, seed=seed, plan_version=version) for seed in range(12)]
+             for version in admission.PLAN_VERSIONS}
+    rows = lambda plans: [p['retailers'] for p in plans]
+    assert rows(after[V2]) == rows(before[V2])
+    assert rows(after[admission.PLAN_VERSION]) != rows(before[admission.PLAN_VERSION])
+    for old, new in zip(before[V2], after[V2]):
+        # The plan itself is new and bound to the changed world; the old one is stale for it.
+        assert admission.validate_plan(changed, new_plan, new)['valid']
+        assert (new['world_id'], new['world_sha256']) != (old['world_id'], old['world_sha256'])
+        with pytest.raises(ValueError, match='Stale delivery'):
+            admission.validate_plan(changed, new_plan, old)
+        with pytest.raises(ValueError, match='Stale delivery'):
+            admission.Oracle(changed, new_plan, old)
+    menu = lambda world, base, sidecar: [admission.route_key(c) for c in admission.quote(
+        world, rid, lines(world), plan=base, admission_plan=sidecar)['delivery_choices']]
+    if edit not in ('stock', 'all'):
+        assert menu(changed, new_plan, after[V2][5]) == menu(w, plan, before[V2][5])
+
+
+def test_v2_count_pmf_replay_override_and_roundtrip(commerce):
+    w, _, plan, rid = commerce
+    bound = len(admission.enumerate_routes(w, plan, rid))
+    make = lambda seed, **kw: admission.make_plan(w, plan, seed=seed, plan_version=V2, **kw)
+    draws = [make(seed, count_weights={1: 1, 2: 1, bound + 1: 100}) for seed in range(30)]
+    assert {p['retailers'][0]['sampled_count'] for p in draws} == {1, 2}
+    assert draws[7] == make(7, count_weights={1: 1, 2: 1, bound + 1: 100})
+    counts = [make(seed)['retailers'][0]['sampled_count'] for seed in range(300)]
+    assert len(set(counts)) > 5 and max(counts) <= bound
+    homes = {make(seed)['retailers'][0]['home_anchor_key'] for seed in range(60)}
+    assert len(homes) > 1
+    for p in (make(7), make(7, retailer_counts={rid: 1}), make(7, count_weights={bound + 1: 1}, retailer_counts={rid: bound})):
+        assert p['schema_version'] == V2
+        row = p['retailers'][0]
+        assert set(row['admitted_route_keys']) <= set(row['initial_route_keys']) and row['home_anchor_key'] in row['admitted_route_keys']
+        assert len(row['admitted_route_keys']) == row['sampled_count']
+        assert admission.validate_plan(w, plan, json.loads(json.dumps(p)))['valid']
+    with pytest.raises(ValueError, match='mass within'):
+        make(7, count_weights={bound + 1: 1})
+
+
+def test_v2_structural_change_draws_afresh_and_stays_real(world):
+    rid = world['retailers'][0]['retailer_id']; plan = native.make_plan(world)
+    before = [admission.make_plan(world, plan, seed=seed, plan_version=V2)['retailers'][0] for seed in range(20)]
+    changes = {}
+    tiers = deepcopy(world); tiers['retailers'][0]['contracts'][0]['tiers'] = ['standard']; changes['a tier dropped'] = tiers
+    point = deepcopy(world); carrier = point['address_context']['carriers'][0]
+    carrier['collection_point_ids'] = carrier['collection_point_ids'][1:]; changes['a collection point dropped'] = point
+    branch = deepcopy(world); branch['retailers'][0]['geography']['branches'][0]['pickup_enabled'] = False
+    changes['a pickup branch closed'] = branch
+    for name, changed in changes.items():
+        rebound(changed); new_plan = native.make_plan(changed)
+        universe = {r['route_key'] for r in admission.enumerate_routes(changed, new_plan, rid)}
+        assert universe < set(before[0]['initial_route_keys']), name
+        after = [admission.make_plan(changed, new_plan, seed=seed, plan_version=V2) for seed in range(20)]
+        for p in after:
+            row = p['retailers'][0]
+            assert set(row['admitted_route_keys']) <= universe == set(row['initial_route_keys']), name
+            assert row['home_anchor_key'] in row['admitted_route_keys'] and len(row['admitted_route_keys']) == row['sampled_count']
+            assert admission.validate_plan(changed, new_plan, p)['valid']
+        # Not the old draws restricted to the routes that remain: the count draw itself is new.
+        assert [p['retailers'][0]['sampled_count'] for p in after] != [
+            min(row['sampled_count'], len(universe)) for row in before], name
+    # A change of home-anchor capability alone, with the routes as they were, is structural too; this fixture's one
+    # carrier cannot lose it and stay a valid basket plan, so the draw's identity is read directly.
+    keys = before[0]['initial_route_keys']
+    homes = [r['route_key'] for r in admission.enumerate_routes(world, plan, rid) if r['destination_type'] == 'home']
+    draw = lambda *identity: [admission._ranker(V2, *identity)(stage, key) for stage, key in
+                              (('count', None), ('home', keys[0]), ('membership', keys[0]), ('membership', keys[1]))]
+    same = draw(3, 'one-world', rid, keys, homes)
+    assert len(set(same)) == 4 and len(homes) > 1
+    assert same == draw(3, 'another-world', rid, list(reversed(keys)), list(reversed(homes)))
+    for other in ((4, 'one-world', rid, keys, homes), (3, 'one-world', 'other-retailer', keys, homes),
+                  (3, 'one-world', rid, keys[1:], homes), (3, 'one-world', rid, keys, homes[1:]),
+                  (3, 'one-world', rid, keys, [])):
+        assert not set(same) & set(draw(*other))
+    # Version 1 reads the world's id and nothing of the routes.
+    v1 = lambda *identity: admission._ranker(admission.PLAN_VERSION, *identity)('membership', keys[0])
+    assert v1(3, 'one-world', rid, keys, homes) == v1(3, 'one-world', rid, keys[1:], []) != v1(3, 'another-world', rid, keys, homes)
+
+
+def test_v2_one_retailers_menu_does_not_depend_on_other_retailers(world):
+    rid = world['retailers'][0]['retailer_id']
+    alone = [admission.make_plan(world, native.make_plan(world), seed=seed, plan_version=V2)['retailers'][0] for seed in range(12)]
+    extra = deepcopy(world['retailers'][0]); extra['retailer_id'] = 'second-retailer'
+    extra['contracts'][0]['tiers'] = ['standard']
+    world['retailers'].append(extra); rebound(world)
+    plan = native.make_plan(world)
+    both = [admission.make_plan(world, plan, seed=seed, plan_version=V2) for seed in range(12)]
+    assert [next(r for r in p['retailers'] if r['retailer_id'] == rid) for p in both] == alone
+    assert any(len({json.dumps({k: v for k, v in r.items() if k != 'retailer_id'}, sort_keys=True) for r in p['retailers']}) == 2
+               for p in both)
+    world['retailers'].reverse()
+    assert admission.make_plan(world, native.make_plan(world), seed=3, plan_version=V2)['retailers'] == both[3]['retailers']
+
+
+def test_plan_versions_are_explicit_and_not_interchangeable(commerce):
+    w, _, plan, rid = commerce
+    for bad in ('retailer-delivery-admission-plan-v3', None, 2, ['retailer-delivery-admission-plan-v2'], ''):
+        with pytest.raises(ValueError, match='plan version'):
+            admission.make_plan(w, plan, seed=1, plan_version=bad)
+    swapped = 0
+    for seed in range(12):
+        plans = {version: admission.make_plan(w, plan, seed=seed, plan_version=version) for version in admission.PLAN_VERSIONS}
+        for version, other in zip(admission.PLAN_VERSIONS, reversed(admission.PLAN_VERSIONS)):
+            forged = {**deepcopy(plans[version]), 'schema_version': other}
+            if plans[version]['retailers'] != plans[other]['retailers']:
+                swapped += 1
+                with pytest.raises(ValueError, match='Invalid admitted'):
+                    admission.validate_plan(w, plan, forged)
+        for bad in ('retailer-delivery-admission-plan-v3', None, ['retailer-delivery-admission-plan-v1']):
+            with pytest.raises(ValueError, match='Stale delivery'):
+                admission.validate_plan(w, plan, {**deepcopy(plans[V2]), 'schema_version': bad})
+    assert swapped >= 12
+
+
+def test_oracle_reports_the_plans_version_and_quotes_alike(commerce):
+    w, backend, plan, rid = commerce
+    bound = len(admission.enumerate_routes(w, plan, rid))
+    for version in admission.PLAN_VERSIONS:
+        sidecar = admission.make_plan(w, plan, seed=7, plan_version=version, retailer_counts={rid: bound})
+        oracle = admission.Oracle(w, plan, sidecar)
+        policy = oracle.public_policy(plan, rid)['delivery_admission']
+        assert policy['schema_version'] == version and policy['plan_sha256'] == native.model.digest(sidecar)
+        full = oracle.quote(w, rid, lines(w), plan=plan)
+        assert full['schema_version'] == admission.VERSION and full['admission_plan_sha256'] == native.model.digest(sidecar)
+        old = backend.quote(w, rid, lines(w), plan=plan)
+        for key in ('lines', 'delivery_choices', 'options', 'group_delivery_offers', 'line_availability'):
+            assert full[key] == old[key]
+        one = admission.make_plan(w, plan, seed=7, plan_version=version, retailer_counts={rid: 1})
+        shown = admission.quote(w, rid, lines(w), plan=plan, admission_plan=one)['delivery_choices']
+        assert [admission.route_key(c) for c in shown] == one['retailers'][0]['admitted_route_keys']

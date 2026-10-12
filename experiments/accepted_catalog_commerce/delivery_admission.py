@@ -2,6 +2,15 @@
 
 Admission precedes stock, price and basket feasibility. No global rebinding,
 renderer-side truncation, stock repair or changes to the historical basket plans.
+
+Two plan versions sample the menus. V1 draws on the seed, the retailer and the
+finished world's id, so any change of a leaf (one price, one stock quantity)
+redraws every retailer's count, home anchor and membership. V2 is opt-in and
+draws on the seed, the retailer and that retailer's real route universe with
+its eligible home anchors: a menu moves only when that retailer's routes do.
+Both bind the plan to the current world and basket plan, so a plan made for
+another world is stale under either. A plan is validated and replayed by the
+version it states; V1 plans and their values are unchanged.
 """
 from copy import deepcopy
 import math
@@ -12,6 +21,8 @@ from . import basket_quote as catalog
 
 VERSION = 'retailer-delivery-admission-quote-v1'
 PLAN_VERSION = 'retailer-delivery-admission-plan-v1'
+STRUCTURAL_PLAN_VERSION = 'retailer-delivery-admission-plan-v2'
+PLAN_VERSIONS = (PLAN_VERSION, STRUCTURAL_PLAN_VERSION)
 DEFAULT_COUNT_WEIGHTS = {
     1: 50, 2: 180, 3: 220, 4: 200, 5: 130, 6: 100, 7: 40,
     8: 25, 9: 20, 10: 15, 11: 4, 12: 4, 13: 3, 14: 3, 15: 3, 16: 3,
@@ -96,12 +107,27 @@ def _rank(seed, world_id, retailer_id, stage, key):
                          'stage': stage, 'key': key})
 
 
-def _count(weights, bound, seed, world_id, rid):
+def _ranker(version, seed, world_id, retailer_id, keys, homes):
+    """The draw of one retailer's stage and route key, by the plan version's identity.
+
+    V2 leaves out the finished world: stock, waits, prices, thresholds and
+    tariffs cannot move a menu. It takes in the sorted route universe and the
+    sorted eligible home anchors, so a real change of routes or of anchor
+    capability draws afresh instead of keeping a menu made for other routes.
+    """
+    if version == PLAN_VERSION:
+        return lambda stage, key: _rank(seed, world_id, retailer_id, stage, key)
+    identity = model.digest({'schema_version': STRUCTURAL_PLAN_VERSION, 'seed': seed, 'retailer_id': retailer_id,
+                             'initial_route_keys': sorted(keys), 'eligible_home_anchor_keys': sorted(homes)})
+    return lambda stage, key: model.digest({'identity': identity, 'stage': stage, 'key': key})
+
+
+def _count(weights, bound, rank):
     if bound == 0:
         return 0
     rows = [r for r in weights if r['count'] <= bound and r['weight'] > 0]
     _require(bool(rows), 'No positive count mass within the real route bound')
-    draw = int(_rank(seed, world_id, rid, 'count', None), 16) / 2**256
+    draw = int(rank('count', None), 16) / 2**256
     target = draw * sum(r['weight'] for r in rows)
     for row in rows:
         target -= row['weight']
@@ -110,7 +136,7 @@ def _count(weights, bound, seed, world_id, rid):
     return rows[-1]['count']
 
 
-def _rows(backend, world, basket_plan, seed, weights, counts, destination):
+def _rows(backend, world, basket_plan, seed, weights, counts, destination, version=PLAN_VERSION):
     retailers, products = backend._world(world)
     _require(type(counts) is dict and set(counts) <= set(retailers),
              'Count overrides must name known retailers')
@@ -118,18 +144,18 @@ def _rows(backend, world, basket_plan, seed, weights, counts, destination):
     for policy in sorted(basket_plan['retailer_policies'], key=lambda p: p['retailer_id']):
         rid = policy['retailer_id']; retailer = retailers[rid]
         choices = _potential(backend, world, retailer, policy, destination)
-        count = (counts[rid] if rid in counts else
-                 _count(weights, len(choices), seed, world['world_id'], rid))
-        _require(type(count) is int and (1 <= count <= len(choices) if choices else count == 0),
-                 'Retailer count must fit the real initial route universe')
         keys = sorted(route_key(c) for c in choices)
         bulky = any(products[o['product_id']]['facts']['shipping_class'] == 'bulky'
                     for o in retailer['offers'])
         terms = {t['carrier_id']: t for t in policy['carrier_terms']}
         homes = [route_key(c) for c in choices if c['destination_type'] == 'home' and
                  (not bulky or terms[c['carrier_id']]['bulky_supported'])]
-        anchor = min(homes, key=lambda k: _rank(seed, world['world_id'], rid, 'home', k)) if homes else None
-        ordered = sorted(keys, key=lambda k: _rank(seed, world['world_id'], rid, 'membership', k))
+        rank = _ranker(version, seed, world['world_id'], rid, keys, homes)
+        count = counts[rid] if rid in counts else _count(weights, len(choices), rank)
+        _require(type(count) is int and (1 <= count <= len(choices) if choices else count == 0),
+                 'Retailer count must fit the real initial route universe')
+        anchor = min(homes, key=lambda k: rank('home', k)) if homes else None
+        ordered = sorted(keys, key=lambda k: rank('membership', k))
         selected = ([anchor] if anchor else []) + [k for k in ordered if k != anchor]
         rows.append({'retailer_id': rid, 'initial_route_keys': keys,
                      'sampled_count': count, 'admitted_route_keys': sorted(selected[:count]),
@@ -138,20 +164,25 @@ def _rows(backend, world, basket_plan, seed, weights, counts, destination):
 
 
 def make_plan(world, basket_plan, *, seed, count_weights=None, retailer_counts=None,
-              destination=None):
-    """Sample once per retailer; optional exact count fixtures never force stock."""
+              destination=None, plan_version=PLAN_VERSION):
+    """Sample once per retailer; optional exact count fixtures never force stock.
+
+    `plan_version` chooses what the draws are keyed on (see the module's
+    docstring); V2 is used only where a caller asks for it.
+    """
     backend = _backend(world)
     backend.validate_plan(world, basket_plan)
+    _require(type(plan_version) is str and plan_version in PLAN_VERSIONS, 'Unknown delivery admission plan version')
     _require(type(seed) is int and seed >= 0, 'Delivery seed must be a nonnegative integer')
     weights = _weights(DEFAULT_COUNT_WEIGHTS if count_weights is None else count_weights)
     counts = {} if retailer_counts is None else deepcopy(retailer_counts)
     location = deepcopy(world['user_location'] if destination is None else backend._location(destination))
     _require(backend._within_region(world, location), 'Unsupported initial address region')
-    return {'schema_version': PLAN_VERSION, 'world_id': world['world_id'],
+    return {'schema_version': plan_version, 'world_id': world['world_id'],
             'world_sha256': model.digest(world), 'basket_plan_sha256': model.digest(basket_plan),
             'seed': seed, 'initial_destination': location, 'count_weights': weights,
             'retailer_counts': counts,
-            'retailers': _rows(backend, world, basket_plan, seed, weights, counts, location)}
+            'retailers': _rows(backend, world, basket_plan, seed, weights, counts, location, plan_version)}
 
 
 def validate_plan(world, basket_plan, admission_plan):
@@ -161,7 +192,8 @@ def validate_plan(world, basket_plan, admission_plan):
         'schema_version', 'world_id', 'world_sha256', 'basket_plan_sha256', 'seed',
         'initial_destination', 'count_weights', 'retailer_counts', 'retailers'},
         'Invalid delivery admission plan shape')
-    _require(admission_plan['schema_version'] == PLAN_VERSION and
+    _require(type(admission_plan['schema_version']) is str and
+             admission_plan['schema_version'] in PLAN_VERSIONS and
              admission_plan['world_id'] == world['world_id'] and
              admission_plan['world_sha256'] == model.digest(world) and
              admission_plan['basket_plan_sha256'] == model.digest(basket_plan),
@@ -176,7 +208,7 @@ def validate_plan(world, basket_plan, admission_plan):
     location = backend._location(admission_plan['initial_destination'])
     _require(backend._within_region(world, location), 'Unsupported initial address region')
     expected = _rows(backend, world, basket_plan, admission_plan['seed'], normalized,
-                     admission_plan['retailer_counts'], location)
+                     admission_plan['retailer_counts'], location, admission_plan['schema_version'])
     _require(type(admission_plan['retailers']) is list and all(
         type(r) is dict and type(r.get('sampled_count')) is int
         for r in admission_plan['retailers']), 'Invalid retailer count rows')
@@ -209,7 +241,7 @@ class Oracle:
         row = next((r for r in self._admission['retailers'] if r['retailer_id'] == retailer_id), None)
         _require(row is not None, 'Unknown delivery retailer')
         return {**policy, 'natural_choice_count_sampling': retailer_id not in self._admission['retailer_counts'],
-                'delivery_admission': {'schema_version': PLAN_VERSION,
+                'delivery_admission': {'schema_version': self._admission['schema_version'],
                     'plan_sha256': self._digest, 'sampled_count': row['sampled_count'],
                     'initial_route_count': len(row['initial_route_keys']),
                     'fixed_menu': True, 'home_coverage': row['home_anchor_key'] is not None}}
