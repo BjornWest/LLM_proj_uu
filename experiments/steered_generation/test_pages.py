@@ -103,16 +103,26 @@ class PageTests(unittest.TestCase):
         self.assertAlmostEqual(totals[0], totals[2], places=12)
 
     def test_samples_match_enumeration(self):
-        for count, size, order, seed, name in ((4, 1, "highest", 11, "page praises, whole complains"),
-                                               (3, 2, "lowest", 12, "one complaint on the page"),
-                                               (3, 1, "identity", 13, "two praising in all"),
-                                               (4, 2, "highest", 14, "page silent on it, whole tied"),
-                                               (2, 5, "highest", 15, "one complaint on the page")):
+        # Two ratings only, for the cases with enough reviews outside the page that several say nothing of the topic.
+        low = tuple((rating, kind) for rating in (1, 2, 3) for kind in KINDS)
+        for count, size, order, seed, name, absent in ((4, 1, "highest", 11, "page praises, whole complains", ()),
+                                                       (3, 2, "lowest", 12, "one complaint on the page", ()),
+                                                       (3, 1, "identity", 13, "two praising in all", ()),
+                                                       (4, 2, "highest", 14, "page silent on it, whole tied", ()),
+                                                       (2, 5, "highest", 15, "one complaint on the page", ()),
+                                                       (5, 1, "highest", 16, "anything", low),
+                                                       (5, 2, "lowest", 17, "one complaint on the page", low),
+                                                       (5, 2, "identity", 18, "anything", low),
+                                                       # Every review a comment for or against: several of each outside.
+                                                       (5, 1, "highest", 19, "anything", low + tuple(
+                                                           (rating, kind) for rating in (4, 5) for kind in (pages.OTHER, pages.SILENT))),
+                                                       (6, 2, "lowest", 20, "one complaint on the page", low + tuple(
+                                                           (rating, kind) for rating in (4, 5) for kind in (pages.OTHER, pages.SILENT)))):
             with self.subTest(count=count, size=size, order=order, condition=name):
-                cells, (page_ok, whole_ok) = chances(seed), CONDITIONS[name]
+                cells, (page_ok, whole_ok) = chances(seed, absent), CONDITIONS[name]
                 ranks = Random(seed).sample(range(count), count)
                 direct = {}
-                for rows in product(cells, repeat=count):
+                for rows in product([cell for cell, mass in cells.items() if mass], repeat=count):
                     page, whole = judged(rows, ranks, size, order)
                     if page_ok(*page) and whole_ok(*whole):
                         direct[rows] = prod(cells[cell] for cell in rows)
@@ -126,9 +136,23 @@ class PageTests(unittest.TestCase):
                 self.assertAlmostEqual(total, sum(block.options.values()), places=12)
                 for rows, value in direct.items():
                     chance = value / total
-                    # Two draws of allowance for the outcomes too rare to expect even one of.
-                    self.assertLess(abs(seen[rows] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 2 / trials, rows)
-                self.assertGreater(len(seen), 20)
+                    # Tens of thousands of outcomes: six standard errors each, and two draws of allowance for the
+                    # ones too rare to expect even once.
+                    self.assertLess(abs(seen[rows] / trials - chance), 6 * (chance * (1 - chance) / trials) ** .5 + 2 / trials, rows)
+                self.assertGreater(len(seen), 10)
+                # Single outcomes are too many to tell much each; so also what they add up to, against its exact mean.
+                features = {"stars": lambda rows: sum(rating for rating, _ in rows),
+                            "first_stars": lambda rows: rows[0][0], "last_kind_silent": lambda rows: rows[-1][1] == pages.SILENT,
+                            **{kind: (lambda rows, kind=kind: sum(own == kind for _, own in rows)) for kind in KINDS},
+                            **{f"{kind}_stars": (lambda rows, kind=kind: sum(rating for rating, own in rows if own == kind))
+                               for kind in KINDS},
+                            "page_stars": lambda rows: sum(rows[index][0] for index in pages.first(rows, ranks, size, order)),
+                            "page_places": lambda rows: sum(pages.first(rows, ranks, size, order))}
+                for label, feature in features.items():
+                    mean = sum(feature(rows) * value for rows, value in direct.items()) / total
+                    spread = (sum((feature(rows) - mean) ** 2 * value for rows, value in direct.items()) / total) ** .5
+                    mine = sum(feature(rows) * times for rows, times in seen.items()) / trials
+                    self.assertLess(abs(mine - mean), 4.5 * spread / trials ** .5 + 1e-9, label)
 
     def test_reading_a_page(self):
         rows = [(3, pages.SILENT), (5, pages.OTHER), (4, pages.POSITIVE), (5, pages.NEGATIVE), (1, pages.OTHER), (4, pages.SILENT)]

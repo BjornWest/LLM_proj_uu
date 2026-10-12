@@ -1647,6 +1647,26 @@ harnesses) the check was stopped after 25 minutes without a result, which is
 the cost named under "Limits". The eight concepts the first pass did not
 reach are unchecked.
 
+The first page (`steering/pages-r11/shoe-grip`, steering commit `a11fe02`,
+one runner command with `--task`): the suite's review task on the same input
+again (the walking shoe Vallheden Strand, 100 reviews, grip on wet paving),
+now with eight candidates. The six earlier ones have their earlier
+probabilities. With four comments to a page and the highest ratings first,
+"the first page is more positive and all the comments together are more
+negative" has probability 0.286 for this shoe: the page takes the
+best-rated comments, which are the likeliest to praise, so this is the usual
+way for a product with more complaints than praise to look, and the suite's
+instance of it is no rare find. The reverse, a first page of complaints over
+a whole that praises, is 7.0e-4. Three samples of each were checked against
+the page read off the saved reviews in the site's order and the native
+task's classes (one comment of praise and none against on the page, under
+four to six complaints in all; one complaint and no praise on the page,
+under three or four comments of praise in all); a sample takes 2.2 to 2.4 s
+after a natural pass of 385 s. Over 2,000 redraws the first held 608 times
+against 572 expected (1.8 standard errors) and the second never against 1.4
+expected. Redraws through the producer equalled the reading's in all six
+passes.
+
 All of these are dev-producer worlds from the suite's inputs, not the
 suite's frozen worlds, and nothing here is published or bound to a task
 instance.
