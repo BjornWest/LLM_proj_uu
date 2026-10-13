@@ -15,7 +15,7 @@ from experiments.accepted_catalog_commerce import basket_quote, delivery_admissi
 from experiments.footwear_world_pilot import model as native
 from experiments.world_sampling_defaults import model as population
 
-from experiments.steered_generation import blocks, combined, menus, policies, prices, ratings, sellers, streams
+from experiments.steered_generation import blocks, cheapest, combined, menus, policies, prices, ratings, sellers, streams
 
 SHOES, SANDALS = "footwear.walking_shoes", "footwear.walking_sandals"
 INPUTS = {"seed": 5, "concept_ids": [SHOES, SANDALS], "tasks": [SHOES], "controls": None,
@@ -385,6 +385,58 @@ class SteeringTests(Menus):
         block.site = place
         rng = Random(714601)
         self.assertTrue(any(policies.displayed(place, policies.draw(block, rng)[1]) for _ in range(6000)))
+
+    def test_the_seller_requirement_reads_what_its_parts_read(self):
+        """Astra v27: a block around other blocks must declare their reads, in its footprint and in its step."""
+        plan = basket_quote.make_plan(self.natural)
+        routes = {r["retailer_id"]: len(delivery_admission.enumerate_routes(self.natural, plan, r["retailer_id"]))
+                  for r in self.natural["retailers"]}
+        fewest = min(count for count in routes.values() if count)
+        self.assertGreater(fewest, 1)
+        clause = {"cheapest_carrier": self.carriers[3], "delivery_options": {"count_weights": {str(fewest): 1}}}
+        seller = {"schema": sellers.VERSION, "cheapest": {"concept_id": SANDALS}, "policy": {"shown": clause}}
+        ranked = {pair[0] for pair in cheapest.frame(self.natural, sellers.ranking(seller), self.api).places}
+        outside = sorted(set(routes) - ranked)
+        self.assertTrue(outside)
+        declared = sellers.footprint(self.natural, seller, self.api)
+        self.assertLessEqual({("contracts", rid, "") for rid in outside}, declared.reads)
+        self.assertFalse(declared.reads & declared.writes)
+        other = {"schema": policies.VERSION, "retailer_id": outside[0], "express": True}
+        with self.assertRaises(blocks.Coupled):
+            combined.prepare(self.natural, {"schema": combined.VERSION, "all": [seller, other]}, self.api, Random(0))
+        step = sellers.prepare(self.natural, seller, self.api, Random(0))
+        self.assertLessEqual({("contracts", rid, "") for rid in outside}, step.reads)
+        self.assertLessEqual(declared.writes - step.writes, step.reads)
+        self.assertTrue(step.estimated)
+        self.assertEqual(sellers.trial(self.natural, seller, self.api).reads, declared.reads)
+        # With counts from one route nothing outside the ranking is read, and such a redraw is fine beside it.
+        plain = {**seller, "policy": {"shown": {"cheapest_carrier": self.carriers[3]}}}
+        self.assertEqual(sellers.footprint(self.natural, plain, self.api).reads, set())
+        combined.prepare(self.natural, {"schema": combined.VERSION, "all": [plain, other]}, self.api, Random(0))
+
+    def test_an_estimate_with_no_error_is_still_an_estimate(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from experiments.steered_generation import run, threshold
+        carrier, retailer = self.carriers[1], self.retailers["small"]
+        sure = self.need("small", carriers={"include": [carrier]}, carrier_count={"max": 1},
+                         shown={"carriers": {"include": [carrier]}})
+        block = policies.model(self.natural, sure, self.api)
+        self.assertEqual((block.accepted, block.error), (policies.PROPOSALS, 0.0))
+        self.assertTrue(policies.prepare(self.natural, sure, self.api, Random(0)).estimated)
+        other = self.retailers["large"]
+        exact = {"schema": threshold.VERSION, "retailer_id": other["retailer_id"], "sku_id": other["offers"][0]["sku_id"],
+                 "quantity": 1, "subtotal_test": threshold.TESTS[0]}
+        together = {"schema": combined.VERSION, "all": [sure, exact]}
+        record = combined.steer(self.session, self.natural, self.opened, together, self.api, Random(1))[2]
+        self.assertEqual((record["probability_is_estimated"], record["probability_standard_error"]), (True, 0.0))
+        args = SimpleNamespace(samples=1, producer_redraws=0, validate_trials=0)
+        for runner, requirement in ((run.policy_case, sure), (run.combined_case, together)):
+            case = {"samples": [], "requirement_sha256": "x"}
+            with TemporaryDirectory() as folder:
+                runner(args, self.session, self.natural, self.opened, self.api, requirement, case, lambda index: Path(folder) / str(index))
+            self.assertEqual((case["status"], case["probability_is_estimated"], case["probability_standard_error"]),
+                             ("sampled", True, 0.0))
 
     def unwaived(self, seller, rated, plain):
         """The same with no free shipping at the winner: what the menu costs is what every one of its offers is quoted."""

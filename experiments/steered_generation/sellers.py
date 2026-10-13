@@ -83,8 +83,13 @@ def footprint(world, requirement, api):
              if fields & set(requirement["policy"])}
     if "free_shipping" in requirement:
         about.add("threshold")
-    return SimpleNamespace(writes={(kind, *pair) for pair in shared.places for kind in ("stock", "price")} |
-                           {(name, retailer, "") for retailer, _ in shared.places for name in about}, reads=set())
+    writes = {(kind, *pair) for pair in shared.places for kind in ("stock", "price")} | {
+        (name, retailer, "") for retailer, _ in shared.places for name in about}
+    # What the ranking reads, and what the policy of any retailer that may win reads: none of it may be redrawn
+    # beside this block, whichever alternative is picked.
+    reads = set(shared.scope.reads).union(*(policies.footprint(world, policy(requirement, retailer), api).reads
+                                            for retailer in sorted({retailer for retailer, _ in shared.places})))
+    return SimpleNamespace(writes=writes, reads=reads - writes)
 
 
 def model(world, requirement, api):
@@ -163,7 +168,7 @@ def prepare(natural, requirement, api, rng):
     if "free_shipping" in block.requirement:
         steps.append(threshold.prepare(natural, unwaived(natural, block.requirement, pair), api, rng))
     blocks.independent(steps)
-    writes = set().union(*(step.writes for step in steps))
+    writes, declared = set().union(*(step.writes for step in steps)), footprint(natural, requirement, api)
 
     def record(world):
         rows = [step.record(world) for step in steps]
@@ -195,8 +200,11 @@ def prepare(natural, requirement, api, rng):
         return found
 
     return Step(script={key: entry for step in steps for key, entry in step.script.items()}, probability=block.probability,
-                log_probability=block.log_probability, error=block.error, writes=writes,
-                reads=footprint(natural, requirement, api).writes - writes, record=record, check=checked)
+                log_probability=block.log_probability, error=block.error,
+                estimated=bool(block.estimates or block.not_found), writes=writes,
+                # The alternatives not picked stay as the seed made them, and so must all that any alternative reads.
+                reads=(declared.writes | declared.reads).union(*(step.reads for step in steps)) - writes,
+                record=record, check=checked)
 
 
 def steer(session, natural, natural_opened, requirement, api, rng):

@@ -149,11 +149,14 @@ def listed(world, requirement, package):
     return LISTED[key], sidecar
 
 
-def reading(skus, pairs, sources, supplier, reference, key=None, barred=(), settled=None, delivered=None, reads=()):
+def reading(skus, pairs, sources, supplier, reference, key=None, barred=(), settled=None, delivered=None, reads=(),
+            stranded=()):
     """One native task's reading of a requirement; see `scope`."""
     return SimpleNamespace(
         skus=set(skus) - set(barred), pairs=pairs, sources=sources, supplier=supplier, reference=reference,
         key=key or (lambda sku_id, price: price), barred=frozenset(barred), delivered=delivered, reads=set(reads),
+        # Retailers a recipe's delivery counts cannot serve: no site is built from such a world (see `model`).
+        stranded=list(stranded),
         settled=settled or (lambda found: found if found["status"] == "match" else None))
 
 
@@ -201,9 +204,6 @@ def delivering(world, requirement, api, skus, declared, feature):
     options = requirement["delivered"].get("delivery_options", {})
     listing = {r["retailer_id"] for r in world["retailers"] for o in r["offers"] if o["sku_id"] in skus}
     places = {rid: menus.oracle(world, rid, options, api) for rid in sorted(listing)}
-    if places and menus.stranded(next(iter(places.values()))):
-        raise ZeroMass("no_outcome", "The recipe's delivery counts have no support for a retailer of this world, so no "
-                                     "site is built from it")
     charges = {rid: menus.delivery(place) for rid, place in places.items()}
     delivered = {rid: charge for rid, charge in charges.items() if charge is not None}
     spec = {"kind": native.KIND, "concept_id": requirement["concept_id"], "predicates": requirement["predicates"]}
@@ -211,8 +211,13 @@ def delivering(world, requirement, api, skus, declared, feature):
     def reference(found):
         settings = next(iter(places.values())).settings if places else website.options({"enabled": True})
         plan = baskets.make_plan(found)
-        sidecar = admission.make_plan(found, plan, seed=found["seed"], count_weights=website.producer_weights(settings),
-                                      plan_version=menus.VERSION)
+        try:
+            sidecar = admission.make_plan(found, plan, seed=found["seed"], plan_version=menus.VERSION,
+                                          count_weights=website.producer_weights(settings))
+        except ValueError as error:
+            if str(error) != menus.UNSUPPORTED:
+                raise
+            raise Unmet("The recipe's delivery counts have no support for a retailer of this world") from error
         context = quotes.prepare(found, plan=plan, admission_plan=sidecar)
         task = native.make(found, spec, inventory=declared, quote_context=context)
         return task, native.reference(found, task, inventory=declared, quote_context=context)
@@ -223,6 +228,7 @@ def delivering(world, requirement, api, skus, declared, feature):
                for o in r["offers"] if o["sku_id"] in skus},
         {r["retailer_id"]: {s["source_id"] for s in r["source_locations"] if s["shipping_enabled"]} for r in world["retailers"]},
         True, reference, delivered=delivered,
+        stranded=menus.stranded(next(iter(places.values()))) if places else [],
         # With counts that start above one route, every retailer's contracts decide whether a site is built at all.
         reads={(kind, rid, "") for rid in listing for kind in ("contracts", "threshold")} | {
             ("contracts", r["retailer_id"], "") for r in world["retailers"]
@@ -645,6 +651,9 @@ def model(world, requirement, api, shared=None):
     if shared is not None and (shared.world is not world or shared.reading != reading_of(resolve(requirement))):
         raise ValueError("A shared frame serves one world and one reading")
     requirement, named_below, block_scope = named(world, requirement, api, shared and shared.scope)
+    if block_scope.stranded:
+        raise ZeroMass("no_outcome", "The recipe's delivery counts have no support for a retailer of this world, so no "
+                                     "site is built from it: " + ", ".join(block_scope.stranded))
     shared = shared or SimpleNamespace(places=places(world, block_scope, api), plain={})
     sited = shared.places
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
@@ -948,7 +957,7 @@ def prepare(natural, requirement, api, rng):
                                       "weight across seeds."}
 
     return Step(script=scripts(block, draws), probability=block.probability, log_probability=block.log_probability,
-                error=block.error,
+                error=block.error, estimated=block.bounded,
                 writes={(kind, *pair) for pair in block.places for kind in ("stock", "price")},
                 reads=set(block.scope.reads),
                 record=record, check=lambda world: check(world, requirement, api, block.scope))

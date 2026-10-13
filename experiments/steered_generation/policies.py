@@ -373,7 +373,7 @@ def prepare(natural, requirement, api, rng):
                                       "is the seed's own; the requirement depends on no other draw. Use the "
                                       "probability as the importance weight across seeds."}
 
-    return Step(script=script, probability=block.probability, error=block.error,
+    return Step(script=script, probability=block.probability, error=block.error, estimated=place.menu is not None,
                 **vars(footprint(natural, requirement, api)), record=record,
                 check=lambda world: check(world, requirement, api))
 

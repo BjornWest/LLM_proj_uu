@@ -113,7 +113,8 @@ class Step:
     describes the block; `check(world)` reads the requirement off the finished
     world. A block whose probability can fall below the float range gives its
     logarithm as well; `probability` is then 0.0. A block whose probability
-    is an estimate gives its standard error in `error`; zero says it is exact.
+    is an estimate says so in `estimated` and gives its standard error in
+    `error`, which can be zero for an estimate too.
     """
     script: dict
     probability: float
@@ -123,6 +124,7 @@ class Step:
     check: Callable
     log_probability: float = None
     error: float = 0.0
+    estimated: bool = False
 
 
 def bound(value):

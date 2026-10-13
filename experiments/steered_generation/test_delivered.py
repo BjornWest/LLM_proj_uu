@@ -258,6 +258,32 @@ class SteeringTests(Delivered):
                        "subtotal_test": threshold.TESTS[0]}):
             with self.subTest(other=other), self.assertRaises(blocks.Coupled):
                 combined.prepare(self.natural, {"schema": combined.VERSION, "all": [need, other]}, self.api, Random(0))
+        # The same through the seller requirement, which reads what its ranking reads (Astra v27).
+        ranking = {key: value for key, value in self.base.items() if key != "schema"}
+        seller = {"schema": sellers.VERSION, "cheapest": ranking, "policy": {"dispatch_days": {"min": 1}}}
+        declared = sellers.footprint(self.natural, seller, self.api)
+        self.assertEqual(declared.reads, self.frame.scope.reads)
+        threshold_elsewhere = {"schema": threshold.VERSION, "retailer_id": ranked[1], "quantity": 1, "subtotal_test": threshold.TESTS[0],
+                               "sku_id": next(r for r in self.natural["retailers"] if r["retailer_id"] == ranked[1])["offers"][0]["sku_id"]}
+        for other in (threshold_elsewhere, {"schema": policies.VERSION, "retailer_id": ranked[1], "express": True}):
+            with self.subTest(seller_with=other), self.assertRaises(blocks.Coupled):
+                combined.prepare(self.natural, {"schema": combined.VERSION, "all": [seller, other]}, self.api, Random(0))
+        self.assertLessEqual(self.frame.scope.reads, sellers.prepare(self.natural, seller, self.api, Random(0)).reads)
+        world, found, record = sellers.steer(self.session, self.natural, self.opened, seller, self.api, Random(2))
+        self.assertGreaterEqual(found["policy"]["warehouse_dispatch_days"], 1)
+        self.assertEqual(found["cheapest"]["reference"]["objective"], "cheapest_total")
+        # A recipe that strands a retailer: the combination reports the part, and its runner does not fall over.
+        from experiments.steered_generation import run
+        stranding = {**self.need(pair), "delivered": {"delivery_options": {"count_weights": {"10000": 1}}}}
+        dispatch = {"schema": policies.VERSION, "retailer_id": ranked[0], "dispatch_days": {"min": 1}}
+        with self.assertRaises(prices.ZeroMass) as caught:
+            combined.prepare(self.natural, {"schema": combined.VERSION, "all": [dispatch, stranding]}, self.api, Random(0))
+        self.assertEqual((caught.exception.reason, caught.exception.part), ("no_outcome", 1))
+        case = {"samples": [], "requirement_sha256": "x"}
+        run.combined_case(SimpleNamespace(samples=1, producer_redraws=0, validate_trials=0), self.session, self.natural,
+                          self.opened, self.api, {"schema": combined.VERSION, "all": [dispatch, stranding]}, case, None)
+        self.assertEqual((case["status"], case["part"]), ("zero_probability_given_upstream", 1))
+        self.assertFalse(cheapest.satisfied(self.natural, stranding, self.api))
         # Dispatch days and a carrier's stars are read by no total.
         together = {"schema": combined.VERSION, "all": [
             need, {"schema": policies.VERSION, "retailer_id": ranked[0], "dispatch_days": {"min": 1}},

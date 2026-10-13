@@ -90,7 +90,7 @@ def price_case(args, session, natural, opened, api, requirement, case, folder):
         try:
             world, task, reference, record = prices.steer(session, natural, requirement, api, sample_rng(natural, case, index))
         except prices.ZeroMass as error:
-            case.update(status="zero_probability_given_upstream", reason=error.reason)
+            case.update(status=absent(error), reason=error.reason)
             return
         seconds = time.monotonic() - clock
         minimum, scanned = pinned.direct_scan(world, requirement)
@@ -136,7 +136,7 @@ def stock_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = stock.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     except blocks.NumericalLimit as error:
         case.update(status="refused", reason=error.reason, detail=str(error))
@@ -163,7 +163,7 @@ def stock_case(args, session, natural, opened, api, requirement, case, folder):
     if args.validate_trials:
         ends = stock.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
         hits = sum(ends.values())
-        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        validation = frequency_check(case, block.probability, hits, args.validate_trials, getattr(block, "error", 0.0))
         # How the block ends given the requirement: model against the reading's redraws.
         distance = sum(abs(block.outcomes.get(e, 0) / block.probability - ends.get(e, 0) / hits)
                        for e in set(block.outcomes) | set(ends)) / 2 if hits else None
@@ -176,7 +176,7 @@ def bound_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = price_bounds.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     place, limits = block.site, requirement["price_minor"]
     listed = lambda world: next(o["price_minor"] for r in world["retailers"] for o in r["offers"]
@@ -202,7 +202,7 @@ def bound_case(args, session, natural, opened, api, requirement, case, folder):
     if args.validate_trials:
         seen = price_bounds.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
         hits = sum(seen.values())
-        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        validation = frequency_check(case, block.probability, hits, args.validate_trials, getattr(block, "error", 0.0))
         # The offer's price given the requirement: model against the real pricing function.
         distance = sum(abs(fsum(a[0] for a in block.by_price.get(p, ())) / block.probability - seen.get(p, 0) / hits)
                        for p in set(block.by_price) | set(seen)) / 2 if hits else None
@@ -216,7 +216,7 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
         clock = time.monotonic()
         block = cheapest.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     except cheapest.NumericalLimit as error:
         case.update(status="refused", reason=error.reason, detail=str(error))
@@ -227,6 +227,8 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
                 log_probability_given_upstream=block.log_probability, model_seconds=time.monotonic() - clock,
                 retailer_products=len(block.places), offers=len(before["offers"]),
                 winning_prices_modelled=len(block.shares),
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "proposals": cheapest.PROPOSALS, "proposals_accepted": block.accepted} if block.bounded else {}),
                 natural_unavailable_offers=sum(not held(row) for row in before["offers"].values()))
     for index in range(args.samples):
         clock = time.monotonic()
@@ -273,7 +275,7 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
         winning = Counter(reading.winning(seed) for seed in range(10 ** 6, 10 ** 6 + args.validate_trials))
         del winning[None]
         hits = sum(winning.values())
-        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        validation = frequency_check(case, block.probability, hits, args.validate_trials, getattr(block, "error", 0.0))
         # Winning-price distribution given the requirement: model against the reading's redraws.
         distance = sum(abs(block.shares.get(p, 0) - winning.get(p, 0) / hits)
                        for p in set(block.shares) | set(winning)) / 2 if hits else None
@@ -286,7 +288,7 @@ def listed_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = listed.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     pairs = set(block.groups)
     case.update(status="sampled", probability_given_upstream=block.probability or None,
@@ -321,7 +323,7 @@ def listed_case(args, session, natural, opened, api, requirement, case, folder):
         winning = Counter(reading.winning(seed) for seed in range(10 ** 6, 10 ** 6 + args.validate_trials))
         del winning[None]
         hits = sum(winning.values())
-        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        validation = frequency_check(case, block.probability, hits, args.validate_trials, getattr(block, "error", 0.0))
         distance = sum(abs(block.shares.get(p, 0) - winning.get(p, 0) / hits)
                        for p in set(block.shares) | set(winning)) / 2 if hits else None
         validation.update(winning_price_total_variation=distance)
@@ -334,7 +336,7 @@ def shortlist_case(args, session, natural, opened, api, requirement, case, folde
         clock = time.monotonic()
         block = shortlist.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     except blocks.NumericalLimit as error:
         case.update(status="refused", reason=error.reason, detail=str(error))
@@ -371,7 +373,7 @@ def shortlist_case(args, session, natural, opened, api, requirement, case, folde
         seen = Counter(reading.winning(seed) for seed in range(10 ** 6, 10 ** 6 + args.validate_trials))
         del seen[None]
         hits = sum(seen.values())
-        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        validation = frequency_check(case, block.probability, hits, args.validate_trials, getattr(block, "error", 0.0))
         distance = sum(abs(block.shares.get(c, 0) - seen.get(c, 0) / hits)
                        for c in set(block.shares) | set(seen)) / 2 if hits else None
         validation.update(cutoff_total_variation=distance)
@@ -382,7 +384,7 @@ def threshold_case(args, session, natural, opened, api, requirement, case, folde
     try:
         block = threshold.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     place = block.site
     case.update(status="sampled", probability_given_upstream=block.probability, offer_id=place.offer_id,
@@ -417,7 +419,8 @@ def policy_case(args, session, natural, opened, api, requirement, case, folder):
     before = policies.listed(natural, place)
     case.update(status="sampled", probability_given_upstream=block.probability, retailer_id=place.retailer_id,
                 **({"probability_is_estimated": True, "probability_standard_error": block.error,
-                    "proposals": policies.PROPOSALS, "proposals_accepted": block.accepted} if block.error else {}),
+                    "proposals": policies.PROPOSALS, "proposals_accepted": block.accepted}
+                   if block.accepted is not None else {}),
                 natural={"contracts": before[0], "warehouse_dispatch_days": before[1]},
                 outcomes_modelled=len(block.outcomes or ()) + len(block.days or ()))
     for index in range(args.samples):
@@ -443,7 +446,7 @@ def stars_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = ratings.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     place = block.site
     levels, stars = ratings.written(natural, place)
@@ -466,7 +469,7 @@ def stars_case(args, session, natural, opened, api, requirement, case, folder):
         producer_redraws(args, session, natural, [ratings.trial(natural, requirement, api)], case)
     if args.validate_trials:
         hits = ratings.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
-        frequency_check(case, block.probability, hits, args.validate_trials)
+        frequency_check(case, block.probability, hits, args.validate_trials, getattr(block, "error", 0.0))
 
 
 def seller_case(args, session, natural, opened, api, requirement, case, folder):
@@ -507,7 +510,7 @@ def reviews_case(args, session, natural, opened, api, requirement, case, folder)
     try:
         block = module.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason)
         return
     place = block.site
     signs = carriers.SIGNS if module is carriers else (reviews.POSITIVE, reviews.NEGATIVE)
@@ -556,7 +559,7 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
         try:
             world, found, record = combined.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
         except prices.ZeroMass as error:
-            case.update(status=absent(error), reason=error.reason, part=error.part)
+            case.update(status=absent(error), reason=error.reason, part=getattr(error, "part", None))
             return
         except (blocks.Coupled, cheapest.NumericalLimit) as error:
             case.update(status="refused", reason=error.reason, detail=str(error))
@@ -568,7 +571,8 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
         case.update(status="sampled", probability_given_upstream=record["probability_given_upstream"],
                     part_probabilities=parts, methods=[part["method"] for part in record["blocks"]],
                     **({"probability_is_estimated": True, "part_probability_standard_errors": errors,
-                        "probability_standard_error": record["probability_standard_error"]} if any(errors) else {}))
+                        "probability_standard_error": record["probability_standard_error"]}
+                       if record.get("probability_is_estimated") else {}))
         case["samples"].append({
             "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
             "streams_steered": record["streams_steered"],
