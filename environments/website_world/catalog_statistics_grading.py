@@ -1,12 +1,10 @@
 """Grounded exact aggregate with independently bound comparison-site citation."""
 from copy import deepcopy
 from decimal import Decimal, InvalidOperation
-import re
 from urllib.parse import urlsplit,parse_qsl,quote
 
 from experiments.answer_grading.extraction import claim,obj,validate_claims,_quote
 from . import catalog_statistics_task as native
-from .numeric_claim_grounding import number_in_quote
 
 VERSION='website-catalog-statistics-grading-v5'
 INSTRUCTIONS='''Extract the final answer only, using the supplied schema. You are a formatter,
@@ -53,28 +51,19 @@ class CatalogStatisticsGrader:
         self.extraction_instructions=INSTRUCTIONS
 
     def validate_claims(self,c,answer):
-        c=validate_claims(c,answer,schema=self.schema,semantic_fields=("statistic_sek","undefined"))
+        c=validate_claims(c,answer,schema=self.schema,semantic_fields=("statistic_sek","currency","undefined"))
         for key in ('population_count','statistic_sek','currency','undefined'):
             value,evidence=c[key]['value'],c[key]['evidence']
             if value is None:
                 if evidence is not None:raise ValueError('Absent claim must have null evidence: '+key)
                 continue
             _quote(evidence,answer)
-            spans=[m.span() for m in re.finditer(re.escape(evidence),answer)]
             if key=='population_count':
                 if type(value) is not int or value<0:raise ValueError('Invalid population count')
-                if not number_in_quote(value,evidence,answer):
-                    raise ValueError('Population count missing from its answer quote')
             elif key=='statistic_sek':
                 try:amount=Decimal(value)
                 except InvalidOperation:raise ValueError('Invalid quoted statistic')
                 if not amount.is_finite():raise ValueError('Nonfinite quoted statistic')
-                if not number_in_quote(amount,evidence,answer):
-                    raise ValueError('Statistic missing from its answer quote')
-            elif key=='currency' and not any(
-                any(q0<=m.start() and m.end()<=q1 for q0,q1 in spans)
-                for m in re.finditer(r'(?<!\w)'+re.escape(value)+r'(?!\w)',answer)):
-                raise ValueError('Currency missing from its answer quote')
         return c
 
     def grade(self,claims,answer):

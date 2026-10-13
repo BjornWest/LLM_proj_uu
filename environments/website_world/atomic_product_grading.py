@@ -3,27 +3,12 @@
 Read-task claims come from a separately adopted extractor; expected values must
 never be inserted to repair missing claims. Provenance is consumer-owned.
 """
-import re
 
 from . import atomic_product_task as native, catalog_cart_grading as capture
 from . import catalog_cart_task as carts
 from .adapter import digest
 
 VERSION = 'website-atomic-product-grade-v2'
-
-
-def _fact_claims(value):
-    """Ignore a presentation label without altering the qualifier's contents.
-
-    Extraction still grounds the original claim in the actual answer. This does
-    not drop a qualification or fill it from the private expected value.
-    """
-    if type(value) is not dict or type(value.get('qualifier')) is not str:
-        return value
-    qualifier = value['qualifier']
-    match = re.match(r'^\s*reference configuration\s*:\s*(\S.*)$', qualifier,
-                     flags=re.IGNORECASE | re.DOTALL)
-    return {**value, 'qualifier': match.group(1)} if match else value
 
 
 def selected_tuple(state, page_id, variants):
@@ -154,9 +139,7 @@ def grade(world, task, reference, *, catalog, bindings, checkout_domain,
                     'status': 'pass' if selected == task['selection'] else 'fail', 'actual': selected}
         elif kind.startswith('read_'):
             correct = (type(claims) is dict and set(claims) == set(reference['expected_claims'])
-                       and digest(_fact_claims(claims) if kind == 'read_public_fact' else claims)
-                       == digest(_fact_claims(reference['expected_claims']) if kind == 'read_public_fact'
-                                 else reference['expected_claims']))
+                       and digest(claims) == digest(reference['expected_claims']))
             report['components']['answer'] = {'status': 'fail' if answer_present is False else 'inconclusive' if claims is None else 'pass' if correct else 'fail'}
         if limited:
             report['components']['task_retailer_actions'] = _task_actions(

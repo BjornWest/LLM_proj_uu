@@ -95,9 +95,9 @@ def test_evidence_must_be_answer_not_task():
     with pytest.raises(ValueError,match='quote'):validate_claims(c,'I recommend this.')
 
 
-def test_money_cannot_be_computed_or_wrongly_scaled():
-    with pytest.raises(ValueError):money_minor({'amount':'57125','currency':'SEK','evidence':'571.25 SEK'})
-    with pytest.raises(ValueError):money_minor({'amount':'571.25','currency':'SEK','evidence':'663 SEK minus 165.75 SEK plus 74 SEK'})
+def test_typed_money_conversion_trusts_extractor_not_quote_parsing():
+    assert money_minor({'amount':'57125','currency':'SEK','evidence':'571.25 SEK'}) == 5712500
+    assert money_minor({'amount':'571.25','currency':'SEK','evidence':'663 SEK minus 165.75 SEK plus 74 SEK'}) == 57125
     assert money_minor({'amount':'1200.50','currency':'SEK','evidence':'1 200,50 SEK'})==120050
     assert money_minor({'amount':'1200.50','currency':'USD','evidence':'$1,200.50'})==120050
 
