@@ -8,6 +8,29 @@ callers keep their original limits. This hosted cap does not apply to private
 vLLM serving: parked requests need capacity-aware waiting and the separately
 agreed rental deadline.
 
+Private Qwen callers may explicitly set `private_read_wait_policy` to
+`rental_bounded`. This is separate from the hosted 180-second cap. Unsent local
+capacity waits already use the rental deadline. The opt-in extends buffered HTTP
+reads after submission to the remaining rental time, since queued work, prefill
+and generation cannot be distinguished before the reply arrives. Connection,
+write and connection-pool waits stay bounded by the smaller of 30 seconds, the
+configured request timeout and remaining rental time. The deadline is measured
+again immediately before submission, after parking and count/source checks.
+
+The default `bounded_request` policy retains the previous maximum 600-second
+HTTPX timeout and request payload. Both policies now emit a
+`private_http_wait_policy` meter row; expiry before submission fails without
+installing a request hook or sending bytes. Neither policy measures active decode or guarantees cache
+retention. HTTPX read timeouts apply between reads; the parent's existing rental
+watchdog remains the total-wall bound and the host-deletion watchdog remains
+independent. A local timeout/close does not prove remote cancellation or justify
+early permit release. New policies need fresh source/config/native acceptance;
+under `rental_bounded`, a connected server that stops progressing can consume
+the rest of the rental unless an operator or the host watchdog intervenes.
+Historical releases and their receipts remain unchanged. Private callers declare
+four distinct member canaries at the front of their finite queue; the old four
+remain valid, while a new reviewed configuration can select a narrower set.
+
 This additive mode extends `scripts/comparison_suite.py`; it reuses the ordered
 queue, prewarming channel, source-isolated saved consumers, recording hook,
 automatic native grading and viewer projection. It does not allocate a host,

@@ -322,7 +322,8 @@ def projection_sha256():
 class QwenFactories:
     """Reviewed-B06 session lifecycle, generalized for the finite saved suite."""
     def __init__(self, *, backend_class, admission, before_policy, before_formatter,
-                 meter, freshness_guard, max_output_tokens=16384, request_timeout=600, turn=lambda phase: nullcontext()):
+                 meter, freshness_guard, max_output_tokens=16384, request_timeout=600,
+                 read_wait_policy='bounded_request', turn=lambda phase: nullcontext()):
         for f in (backend_class, before_policy, before_formatter, meter, turn, freshness_guard):
             if not callable(f):
                 raise ValueError('Explicit factory, guards, turn and meter required')
@@ -330,14 +331,30 @@ class QwenFactories:
             raise ValueError('Positive finite configured output cap required')
         if type(request_timeout) is not int or not 0 < request_timeout <= 600:
             raise ValueError('Request watchdog must be 1..600 seconds')
+        if type(read_wait_policy) is not str or read_wait_policy not in ('bounded_request', 'rental_bounded'):
+            raise ValueError('Explicit private buffered read policy required')
         self.backend_class, self.admission = backend_class, admission
         self.policy_guard, self.formatter_guard, self.meter, self.turn = before_policy, before_formatter, meter, turn
         self.freshness_guard = freshness_guard
         self.maximum, self.timeout = max_output_tokens, request_timeout
+        self.read_wait_policy = read_wait_policy
         self.owner = get_ident()
         self.policy_active = self.policy_finished = self.formatter_active = False
         self.formatter_calls = 0
         self.poisoned = False
+
+    def http_timeout(self):
+        remaining = self.admission.deadline-self.admission.clock()
+        if remaining <= 0:
+            raise TimeoutError('Rental deadline expired before HTTP submission')
+        if self.read_wait_policy == 'bounded_request':
+            return min(self.timeout, remaining)
+        import httpx
+        control = min(30, self.timeout, remaining)
+        # Buffered reads cannot attribute queue/prefill/decode progress. The
+        # parent rental watchdog supplies the total-wall bound, even if bytes
+        # arrive gradually and renew HTTPX's per-read timer.
+        return httpx.Timeout(connect=control, write=control, pool=control, read=remaining)
 
     def check(self):
         if get_ident() != self.owner or self.poisoned:
@@ -346,13 +363,12 @@ class QwenFactories:
 
     def backend(self, phase, directory=None):
         self.check()
-        remaining = self.admission.deadline-self.admission.clock()
         import httpx
         probe={'model':'å','tools':[{'z':1,'a':2}]}
         if httpx.Request('POST','http://127.0.0.1/',json=probe).content != encoded(probe):
             raise ValueError('Installed httpx JSON encoder differs from ordered counter wire')
         raw = self.backend_class(self.admission.base, MODEL, None,
-            timeout=min(self.timeout, remaining), max_tokens=self.maximum,
+            timeout=self.http_timeout(), max_tokens=self.maximum,
             supports_images=True, session_routing=False, request_options={})
         return QwenBackend(self, raw, phase, directory)
 
@@ -458,6 +474,15 @@ class QwenBackend:
             (f.policy_guard if self.phase == 'policy' else f.formatter_guard)()
             if self.phase == 'formatter':
                 f.formatter_calls += 1  # A failed paid call cannot be replayed.
+            timeout = f.http_timeout()
+            if hasattr(self.raw,'client'):self.raw.client.timeout=timeout
+            f.meter({'event':'private_http_wait_policy', 'phase':self.phase,
+                'policy':f.read_wait_policy, 'rental_deadline_utc':f.admission.deadline,
+                'read_timeout_seconds':getattr(timeout,'read',timeout),
+                'connect_timeout_seconds':getattr(timeout,'connect',timeout),
+                'write_timeout_seconds':getattr(timeout,'write',timeout),
+                'pool_timeout_seconds':getattr(timeout,'pool',timeout),
+                'scope':'Buffered server waiting/prefill/generation; no request-specific progress attribution. Parent rental watchdog bounds total wall time.'})
             if hasattr(self.raw,'client'):
                 hooks=self.raw.client.event_hooks
                 originals=list(hooks.get('request',[]))
@@ -465,7 +490,6 @@ class QwenBackend:
                     if http_request.content!=encoded(request):raise ValueError('Actual HTTP bytes differ from ordered counted wire; no dispatch')
                     for callback in originals:callback(http_request)
                 hooks['request']=[counted_wire]
-            if hasattr(self.raw,'client'):self.raw.client.timeout=min(f.timeout,f.admission.deadline-f.admission.clock())
             try:result = self.raw.complete(selected)
             finally:
                 if hasattr(self.raw,'client'):hooks['request']=originals

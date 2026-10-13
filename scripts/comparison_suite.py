@@ -105,7 +105,15 @@ def runtime_limits(s):
   raise ValueError('Explicit fixed episode/generation ceilings and initial targets required')
  return value['max_active_ceiling']
 
+def private_read_wait_policy(s):
+ value=s.get('private_read_wait_policy','bounded_request')
+ if (type(value)is not str or value not in ('bounded_request','rental_bounded')
+     or ('private_read_wait_policy'in s and not qwen_mode(s))):
+  raise ValueError('Private-only explicit buffered read policy required')
+ return value
+
 def validate_qwen_limits(s):
+ private_read_wait_policy(s)
  if (s.get('max_steps') is not None or s.get('episode_timeout') is not None
      or s.get('max_input_tokens')!=250000 or s.get('server_context_tokens')!=262144
      or type(s.get('max_tokens')) is not int or not 0<s['max_tokens']<=16384
@@ -119,7 +127,11 @@ def validate_qwen_limits(s):
  if not s.get('shared_tokenizer') or not s.get('shared_chromium'):
   raise ValueError('This prospective Qwen composition requires the qualified pooled runtime')
  canaries=s.get('canary_task_ids')
- if canaries!=['B02','B14','H03','H05'] or s.get('start_order',[])[:4]!=['qwen-'+i for i in canaries]:raise ValueError('Four declared canaries must lead the queue')
+ if (type(canaries)is not list or len(canaries)!=4
+     or any(type(i)is not str or not i for i in canaries) or len(set(canaries))!=4
+     or not set(canaries)<={c['task_id']for c in s['cases']}
+     or s.get('start_order',[])[:4]!=['qwen-'+i for i in canaries]):
+  raise ValueError('Four distinct declared member canaries must lead the queue')
  for case in s['cases']:checked(case['recipe_manifest'])
  for row in s['qwen_sources'].values():checked(row)
 
@@ -316,6 +328,7 @@ def source_guard(s,c=None):
  elif not Path(s['driver']['path']).read_bytes()==subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':scripts/comparison_suite.py']):raise ValueError('Caller differs from committed source')
 
 def check_release(s):
+ private_read_wait_policy(s)
  browser_step_options(s)
  pool_resource_options(s)
  source_guard(s)
@@ -810,7 +823,8 @@ def execute(s,c,scripted=False):
   if qwen_mode(s) and not scripted:
    factories=qwen['QwenFactories'](backend_class=ChatCompletionsBackend,admission=serving,
     before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
-    max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],turn=qwen_turn)
+    max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],
+    read_wait_policy=private_read_wait_policy(s),turn=qwen_turn)
   result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda path:Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter',directory=path)))
   if result.get('status')!='graded_and_projected':raise ValueError('Missing automatic grading/HTTP projection: '+str(result))
   if scripted and result['viewer_projection']['task_completed'] is not True:raise ValueError('Scripted positive native grade did not pass')
