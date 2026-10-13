@@ -45,9 +45,9 @@ class FiniteTaskTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp);prepared=p/'prepared';(prepared/'recipe').mkdir(parents=True)
    for f in [prepared/'recipe/manifest.json',prepared/'prepared-instance.json']:f.write_text('{}')
-   s=self.spec();c=s['cases'][0];c.update(family='catalog_statistics',public_request='Count',recipe_manifest=caller.pin(prepared/'recipe/manifest.json'),prepared_receipt=caller.pin(prepared/'prepared-instance.json'))
-   s.update(start_order=[c['id']],max_concurrent_episodes=1,prewarm_count=0,canary_task_ids=['B02'],hosted_readiness={'path':str(p/'readiness'),'sha256':'not-used'})
-   request={'cases':[{'id':'B02','family':c['family'],'public_request':'Count','prepared':str(prepared),'manifest_sha256':c['recipe_manifest']['sha256'],'prepared_receipt_sha256':c['prepared_receipt']['sha256'],'maximum_complete_input_tokens':64000,'max_steps':30,'max_output_tokens':16384}], 'policy_and_formatter_model':hosted.MODEL,'concurrency':1,'request_timeout_seconds':180}
+   s=self.spec();c=s['cases'][0];c.update(family='catalog_statistics',root=str(prepared),argument=str(prepared),callable={'module':'environments.website_world.task_instances','symbol':'run'},public_request='Count',recipe_manifest=caller.pin(prepared/'recipe/manifest.json'),prepared_receipt=caller.pin(prepared/'prepared-instance.json'))
+   s.update(output=str(p/'model'),suite_id='test',start_order=[c['id']],max_concurrent_episodes=1,prewarm_count=0,canary_task_ids=['B02'],hosted_readiness={'path':str(p/'readiness'),'sha256':'not-used'})
+   request={'cases':[{'id':'B02','family':c['family'],'public_request':'Count','prepared':str(prepared),'manifest_sha256':c['recipe_manifest']['sha256'],'prepared_receipt_sha256':c['prepared_receipt']['sha256'],'maximum_complete_input_tokens':64000,'max_steps':30,'max_output_tokens':16384}], 'source_root':str(prepared),'policy_and_formatter_model':hosted.MODEL,'concurrency':1,'request_timeout_seconds':180}
    (p/'request.json').write_text(json.dumps(request))
    auth={'schema':'hosted-finite-task-authorization-v1','request':caller.pin(p/'request.json'),'case_ids':[c['id']],'dispatch_authorized':True,'automatic_retries':False,'policy_model':hosted.MODEL,'formatter_model':hosted.MODEL,'max_active_combined':1,'prewarm_count':0}
    s['authorization']=caller.pin(p/'request.json')
@@ -60,25 +60,27 @@ class FiniteTaskTests(unittest.TestCase):
     for key,value in [('max_steps',31),('max_input_tokens',64001),('public_request','other'),('family','feature_offer')]:
      bad=deepcopy(s);bad['cases'][0][key]=value
      with self.subTest(key=key),self.assertRaises(ValueError):caller.check_hosted_release(bad)
-    with patch.object(caller,'hosted_prior_specs',return_value={'previous':{}}):
-     with self.assertRaisesRegex(ValueError,'automatic repeat'):caller.check_hosted_release(s)
+    claim=caller.finite_dispatch_claim_path(auth);claim.write_text('{}')
+    with self.assertRaisesRegex(ValueError,'automatic repeat'):caller.check_hosted_release(s)
+    claim.unlink()
     auth['automatic_retries']=True
     with self.assertRaisesRegex(ValueError,'once-only'):caller.check_hosted_release(s)
 
  def test_independent_native_acceptance_preserves_producer_and_rejects_cross_case(self):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp);trace=p/'runs/trace';trace.mkdir(parents=True);prepared=p/'prepared';prepared.mkdir()
-   c={'id':'qwen-new','argument':str(prepared),'root':'/frozen-native','public_request':'Count','recipe_manifest':{'path':'recipe','sha256':'hash'},'prepared_receipt':{'path':'receipt','sha256':'hash'}}
+   c={'id':'qwen-new','task_id':'new','max_input_tokens':64000,'argument':str(prepared),'root':'/frozen-native','public_request':'Count','recipe_manifest':{'path':'recipe','sha256':'hash'},'prepared_receipt':{'path':'receipt','sha256':'hash'}}
    def write(name,value):
     path=p/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value));return caller.pin(path)
    row={'case':c['id'],'recipe_manifest':c['recipe_manifest'],'prepared_receipt':c['prepared_receipt'],'native_source_root':c['root'],
-    'control':write('control.json',{'status':'passed','expected_verdict':True,'external_provider_requests':0,'instance':{'prepared':str(prepared)},'trace':str(trace)}),
+    'control':write('control.json',{'status':'passed','expected_verdict':True,'external_provider_requests':0,'instance':{'prepared':str(prepared),'case_id':'new','max_input_tokens':64000},'trace':str(trace)}),
     'result':write('result.json',{'status':'graded_and_projected','trace':str(trace),'native_grade':{'structured_claims_correct':True}}),
     'canonical':write('runs/trace/evaluation.json',{'task_completed':True,'technical_error':None}),
     'metadata':write('runs/trace/metadata.json',{'tags':['scripted']}),
     'public_task':write('runs/trace/policy-task.json',{'user_message':'Count'}),
-    'HTTP':write('HTTP.json',{'derived_evaluation':{'binding_status':'verified','structured_claims_correct':True}}),
+    'HTTP':write('HTTP.json',{'recording_id':trace.name,'derived_evaluation':{'episode_id':trace.name,'binding_status':'verified','structured_claims_correct':True}}),
     'producer':write('producer.json',{'actual_source':'independent-native-runner'})}
+   row['producer_acceptance']=write('producer-acceptance.json',{'passed':1,'inputs':[row['producer']],'cases':[{'case_id':'new','trace':str(trace),'evidence':[row[k]for k in ('result','canonical','HTTP','recipe_manifest','prepared_receipt')]}]})
    caller.verify_finite_ready_case({},c,row)
    for key,value in [('case','other'),('native_source_root','/different'),('recipe_manifest',{'path':'other','sha256':'different'})]:
     with self.subTest(key=key),self.assertRaises(ValueError):caller.verify_finite_ready_case({},c,{**row,key:value})

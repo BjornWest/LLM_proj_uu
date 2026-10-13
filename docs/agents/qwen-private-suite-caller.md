@@ -401,3 +401,12 @@ recipes and source root. These controls retain their original producer, result,
 canonical grade, public task, metadata and actual HTTP evidence; they are never
 relabelled as executions of the hosted caller. Source, counter, hosted transport,
 recording and configuration qualification remain separate requirements.
+
+Finite mode additionally requires the first up-to-four cases to pass actual
+caller-path scripted acceptance through its queue, pool, recording and shared
+viewer. Independent native HTTP evidence binds both recording and episode IDs
+to the same trace. An atomic request-hash dispatch claim prevents a different
+authorization/spec filename from issuing a second attempt. Correctly graded
+no-answer or limit outcomes do not hold later finite cases; infrastructure
+failures can still stop admission. Per-case turn limits apply only in this
+explicit profile, preserving legacy/private no-turn behavior.
