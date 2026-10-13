@@ -53,3 +53,32 @@ def test_bad_bounds_reject(limit):
 
 def test_factor_tokens_keep_type_and_structured_scope():
     assert interactions({'value':True,'scope':{'kind':'sku'}},1)!=interactions({'value':1,'scope':{'kind':'sku'}},1)
+
+
+def test_compaction_preserves_bytes_modes_and_independent_paths(tmp_path):
+    import os
+    from .task_compatibility_sweep import compact_prepared
+    folders=[]
+    for label in ['one','two']:
+        directory=tmp_path/label;directory.mkdir();folders.append(directory)
+        (directory/'prepared-instance.json').write_text('{}')
+        (directory/'same').write_bytes(b'immutable')
+        (directory/'executable').write_bytes(b'immutable');os.chmod(directory/'executable',0o755)
+    compact_prepared(folders[0],tmp_path/'store')
+    result=compact_prepared(folders[1],tmp_path/'store')
+    assert result['reused_duplicate_bytes']>0
+    assert (folders[0]/'same').stat().st_ino==(folders[1]/'same').stat().st_ino
+    assert (folders[0]/'same').stat().st_ino!=(folders[0]/'executable').stat().st_ino
+    for directory in folders:
+        assert (directory/'same').read_bytes()==b'immutable'
+        assert (directory/'executable').stat().st_mode&0o777==0o755
+
+
+def test_compaction_rejects_unfinished_preparation_and_corrupted_store(tmp_path):
+    from .task_compatibility_sweep import compact_prepared
+    from hashlib import sha256
+    directory=tmp_path/'prepared';directory.mkdir();store=tmp_path/'store';store.mkdir()
+    with pytest.raises(ValueError,match='completed'):compact_prepared(directory,store)
+    (directory/'prepared-instance.json').write_text('{}')
+    target=store/(sha256(b'{}').hexdigest()+'-644');target.write_text('changed')
+    with pytest.raises(ValueError,match='changed'):compact_prepared(directory,store)

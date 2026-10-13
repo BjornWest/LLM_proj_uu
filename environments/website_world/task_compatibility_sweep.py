@@ -11,6 +11,8 @@ import json
 import os
 from pathlib import Path
 from random import Random
+import stat
+import shutil
 import time
 
 VERSION = 'website-task-compatibility-sweep-v1'
@@ -109,10 +111,13 @@ def compact_prepared(directory, store):
         if path.is_symlink():
             raise ValueError('Prepared compaction does not admit symbolic links')
         if not path.is_file():continue
-        payload=path.read_bytes();digest=sha256(payload).hexdigest();target=store/digest
+        payload=path.read_bytes();digest=sha256(payload).hexdigest()
+        mode=stat.S_IMODE(path.stat().st_mode);target=store/(digest+'-'+format(mode,'o'))
         try:os.link(path,target)
         except FileExistsError:
-            if target.is_symlink() or not target.is_file() or sha256(target.read_bytes()).hexdigest()!=digest:
+            if (target.is_symlink() or not target.is_file()
+                    or stat.S_IMODE(target.stat().st_mode)!=mode
+                    or sha256(target.read_bytes()).hexdigest()!=digest):
                 raise ValueError('Immutable content store entry changed')
         if path.stat().st_ino!=target.stat().st_ino:
             # Unique same-directory temporary name; atomic replacement never
@@ -158,6 +163,8 @@ def run_native(selection, output, *, workers=2, prepare=False, share_assets=Fals
                 (directory/(name+'.json')).write_text(json.dumps(native[name],indent=2,ensure_ascii=False,allow_nan=False)+'\n')
             if prepare:
                 stage='unmocked_preparation'
+                if shutil.disk_usage(output).free < 1024*1024*1024:
+                    raise OSError('Less than1GiB free: ordinary preparation held to protect retained evidence')
                 receipt=task_instances.prepare(row['instance'],directory/'prepared')
                 result['stages'][stage]={'status':'passed','receipt':receipt}
                 if share_assets:
