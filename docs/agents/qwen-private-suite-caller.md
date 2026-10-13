@@ -1,5 +1,13 @@
 # Private Qwen suite caller
 
+Future OpenRouter Qwen releases cap each policy and formatter request at 180
+seconds, including the total-duration watchdog and the HTTP timeout. A timed-out
+request is an infrastructure failure with unknown remote cancellation; it does
+not establish task failure or authorize an automatic replay. Historical frozen
+callers keep their original limits. This hosted cap does not apply to private
+vLLM serving: parked requests need capacity-aware waiting and the separately
+agreed rental deadline.
+
 This additive mode extends `scripts/comparison_suite.py`; it reuses the ordered
 queue, prewarming channel, source-isolated saved consumers, recording hook,
 automatic native grading and viewer projection. It does not allocate a host,

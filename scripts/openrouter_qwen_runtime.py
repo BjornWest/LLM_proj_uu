@@ -11,6 +11,7 @@ import time
 MODEL = 'qwen/qwen3.8-27b'
 CONTEXT = 262144
 INPUT_LIMIT = 150000
+HOSTED_REQUEST_MAX_SECONDS = 180
 
 
 def validate_limits(spec):
@@ -21,7 +22,7 @@ def validate_limits(spec):
             or spec.get('max_input_tokens') != INPUT_LIMIT
             or spec.get('server_context_tokens') != CONTEXT):
         raise ValueError('Hosted Qwen requires explicit native context and no turn/episode ceiling')
-    for key, maximum in (('max_tokens', 65536), ('request_timeout', 1800),
+    for key, maximum in (('max_tokens', 65536), ('request_timeout', HOSTED_REQUEST_MAX_SECONDS),
                          ('startup_timeout', 900), ('suite_timeout', 2**31-1)):
         value = spec.get(key)
         if type(value) is not int or not 0 < value <= maximum:
@@ -175,7 +176,7 @@ class HostedQwenBackend:
         if type(quote_pair_schema) is not bool or (quote_pair_schema and phase != 'formatter'):
             raise ValueError('Quote-pair schema is a boolean formatter-only option')
         if (type(maximum) is not int or not 0 < maximum <= 65536
-                or type(timeout) is not int or not 0 < timeout <= 1800
+                or type(timeout) is not int or not 0 < timeout <= HOSTED_REQUEST_MAX_SECONDS
                 or type(deadline) not in (int, float) or not math.isfinite(deadline)
                 or deadline <= clock()):
             raise ValueError('Bounded output/request and future suite deadline required')

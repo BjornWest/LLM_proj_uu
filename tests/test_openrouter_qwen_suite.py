@@ -43,7 +43,7 @@ class HostedAdmissionTests(unittest.TestCase):
             return {'input_tokens':tokens if len(measurements)==1 else 50,'scope':'local estimate'}
         count.observe_completion=lambda request,result:observed.append((request,result))
         wrapped = hosted.HostedQwenBackend(raw,count,phase=phase,maximum=16384,
-            deadline=deadline,timeout=600,directory=directory,clock=lambda:1)
+            deadline=deadline,timeout=180,directory=directory,clock=lambda:1)
         wrapped.begin_episode('test/session')
         self.addCleanup(wrapped.close)
         return wrapped,seen,measurements,observed
@@ -64,7 +64,7 @@ class HostedAdmissionTests(unittest.TestCase):
 
     def test_larger_output_budget_keeps_actual_context_headroom(self):
         backend,seen,_,_=self.backend(150000)
-        backend.maximum=65536;backend.timeout=1800
+        backend.maximum=65536
         backend.complete([])
         self.assertEqual(seen[0]['max_tokens'],65536)
         self.assertLessEqual(seen[0]['max_tokens']+150000,hosted.CONTEXT)
@@ -279,13 +279,13 @@ class HostedSourceAdmissionTests(unittest.TestCase):
     def spec(self):
         return {'runtime_mode':'qwen-openrouter-v1','max_steps':None,'episode_timeout':None,
             'max_input_tokens':150000,'server_context_tokens':262144,'max_tokens':16384,
-            'request_timeout':600,'startup_timeout':180,'suite_timeout':36000,
+            'request_timeout':180,'startup_timeout':180,'suite_timeout':36000,
             'shared_tokenizer':True,'shared_chromium':True,
             'cases':[{'id':'qwen-B02','task_id':'B02','policy_model':hosted.MODEL,'max_input_tokens':150000}]}
 
     def test_explicit_hosted_mode_admits_pool_without_private_serving(self):
         spec=self.spec();hosted.validate_limits(spec)
-        hosted.validate_limits({**spec,'max_tokens':65536,'request_timeout':1800})
+        hosted.validate_limits({**spec,'max_tokens':65536,'request_timeout':180})
         self.assertTrue(caller.pooled_model_mode(spec));self.assertFalse(caller.qwen_mode(spec))
         with patch.object(caller,'check_release',side_effect=RuntimeError('review gate reached')):
             with self.assertRaisesRegex(RuntimeError,'review gate'):caller.execute(spec,{},scripted=False)
@@ -310,10 +310,23 @@ class HostedSourceAdmissionTests(unittest.TestCase):
         for key in ('max_steps','episode_timeout'):
             missing=deepcopy(spec);del missing[key]
             with self.subTest(missing=key),self.assertRaises(ValueError):hosted.validate_limits(missing)
-        for value in [True,0,1801]:
+        for value in [True,0,181,600,1800]:
             with self.subTest(timeout=value),self.assertRaises(ValueError):hosted.validate_limits({**spec,'request_timeout':value})
         case={**spec['cases'][0],'policy_model':'xiaomi/mimo-v2.6-pro'}
         with self.assertRaises(ValueError):hosted.validate_limits({**spec,'cases':[case]})
+
+    def test_backend_enforces_hosted_deadline_for_policy_and_formatter(self):
+        from intent_browser.backend import ChatCompletionsBackend
+        raw=ChatCompletionsBackend('https://openrouter.ai/api/v1',hosted.MODEL)
+        self.addCleanup(raw.close)
+        for phase in ('policy','formatter'):
+            wrapped=hosted.HostedQwenBackend(raw,lambda *_:{'input_tokens':1},
+                phase=phase,maximum=65536,deadline=1000,timeout=180,clock=lambda:1)
+            self.assertEqual(wrapped.timeout,180)
+            for timeout in (181,600,1800):
+                with self.subTest(phase=phase,timeout=timeout),self.assertRaises(ValueError):
+                    hosted.HostedQwenBackend(raw,lambda *_:{'input_tokens':1},
+                        phase=phase,maximum=65536,deadline=1000,timeout=timeout,clock=lambda:1)
 
     def test_resume_retains_every_native_result_even_if_cleanup_failed(self):
         import runpy
