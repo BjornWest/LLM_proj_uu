@@ -235,10 +235,10 @@ def generate(request, *, world_factory=None):
         if config['delivery_options'] is not None:
             from experiments.accepted_catalog_commerce import delivery_admission
             from functools import partial
-            from .delivery_options import producer_weights
+            from .delivery_options import producer_plan_version, producer_weights
             from .unified_generation import initial_home_delivery_available
             basket_plan=basket_quote.make_plan(world)
-            try:delivery_plan=delivery_admission.make_plan(world,basket_plan,seed=world['seed'],count_weights=producer_weights(config['delivery_options']))
+            try:delivery_plan=delivery_admission.make_plan(world,basket_plan,seed=world['seed'],count_weights=producer_weights(config['delivery_options']),plan_version=producer_plan_version(config['delivery_options']))
             except ValueError as error:
                 if str(error)!='No positive count mass within the real route bound':raise
                 delivery_supported=False

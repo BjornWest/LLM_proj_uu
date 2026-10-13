@@ -161,3 +161,70 @@ def test_unsupported_count_pmf_rejects_proposals_without_clipping_or_fallback(sa
     assert len(audit['proposals']) == 3
     assert all(r['reason']=='delivery_count_support' and r['completion_mass']==0 and not r['accepted']
                for r in audit['proposals'])
+
+
+def test_admission_plan_version_is_opt_in_and_leaves_default_settings_as_they_were():
+    from experiments.accepted_catalog_commerce import delivery_admission
+    from environments.website_world.delivery_options import (ADMISSION_PLANS, VERSION, producer_plan_version,
+                                                             validate_settings)
+    assert ADMISSION_PLANS == delivery_admission.PLAN_VERSIONS
+    v1, v2 = ADMISSION_PLANS
+    default = options({'enabled': True})
+    assert set(default) == {'schema', 'count_weights', 'order_weights'} and default['schema'] == VERSION
+    assert options({'enabled': True, 'admission_plan': v1}) == default
+    assert producer_plan_version(default) == v1
+    asked = options({'enabled': True, 'admission_plan': v2})
+    assert asked == {**default, 'admission_plan': v2} and validate_settings(asked) == asked
+    assert producer_plan_version(asked) == v2 and producer_weights(asked) == producer_weights(default)
+    for bad in ('retailer-delivery-admission-plan-v3', '', None, 2, [v2]):
+        with pytest.raises(ValueError):
+            options({'enabled': True, 'admission_plan': bad})
+        with pytest.raises(ValueError):
+            validate_settings({**default, 'admission_plan': bad})
+    # Normalized settings name a version only when it is not the default, so one request has one normal form.
+    with pytest.raises(ValueError):
+        validate_settings({**default, 'admission_plan': v1})
+    with pytest.raises(ValueError):
+        options({'enabled': False, 'admission_plan': v2})
+
+
+@pytest.mark.parametrize('asked', [None, 'retailer-delivery-admission-plan-v1', 'retailer-delivery-admission-plan-v2'])
+def test_the_catalog_generator_asks_the_oracle_for_the_settings_plan_version(saved_world, monkeypatch, asked):
+    from experiments.accepted_catalog_commerce import delivery_admission
+    from environments.website_world import unified_generation, generation
+    made, real = [], delivery_admission.make_plan
+
+    def recording(*args, **kwargs):
+        made.append(kwargs.get('plan_version', 'not passed'))
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(delivery_admission, 'make_plan', recording)
+    settings = {'enabled': True, 'count_weights': {'10000': 1}, **({} if asked is None else {'admission_plan': asked})}
+    # The native generator's call is exercised with an order-set task in test_order_set_delivery.py.
+    with pytest.raises(generation.SamplingBudgetExceeded):
+        unified_generation.generate({'schema': unified_generation.VERSION, 'seed': 1,
+                                     'realism': {'delivery_options': settings},
+                                     'budget': {'max_proposals': 2, 'max_seconds': 10}},
+                                    world_factory=lambda *args, **kwargs: deepcopy(saved_world))
+    assert made == [asked or 'retailer-delivery-admission-plan-v1'] * 2
+
+
+def test_a_generated_plan_has_the_asked_version_and_the_same_weights(saved_world):
+    from experiments.accepted_catalog_commerce import basket_quote, delivery_admission
+    from environments.website_world.delivery_options import producer_plan_version
+    base = basket_quote.make_plan(saved_world)
+    plans = {}
+    for version in delivery_admission.PLAN_VERSIONS:
+        settings = options({'enabled': True, 'admission_plan': version})
+        plans[version] = delivery_admission.make_plan(saved_world, base, seed=saved_world['seed'],
+                                                      count_weights=producer_weights(settings),
+                                                      plan_version=producer_plan_version(settings))
+        assert plans[version]['schema_version'] == version
+        assert delivery_admission.validate_plan(saved_world, base, plans[version])['valid']
+        oracle = delivery_admission.Oracle(saved_world, base, plans[version])
+        rid = saved_world['retailers'][0]['retailer_id']
+        assert oracle.public_policy(base, rid)['delivery_admission']['schema_version'] == version
+    first, second = plans.values()
+    assert first['count_weights'] == second['count_weights']
+    assert [r['initial_route_keys'] for r in first['retailers']] == [r['initial_route_keys'] for r in second['retailers']]
+    assert first['retailers'] != second['retailers']

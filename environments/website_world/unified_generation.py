@@ -115,11 +115,12 @@ def generate(request,*,world_factory=None):
         if config['delivery_options'] is not None:
             from experiments.accepted_catalog_commerce import delivery_admission
             from functools import partial
-            from .delivery_options import producer_weights
+            from .delivery_options import producer_plan_version, producer_weights
             basket_plan = basket_quote.make_plan(world)
             try:
                 delivery_plan = delivery_admission.make_plan(world, basket_plan, seed=world['seed'],
-                    count_weights=producer_weights(config['delivery_options']))
+                    count_weights=producer_weights(config['delivery_options']),
+                    plan_version=producer_plan_version(config['delivery_options']))
             except ValueError as error:
                 # The finite PMF can have no support below this world's actual
                 # capacity. Reject only this declared zero-completion case;

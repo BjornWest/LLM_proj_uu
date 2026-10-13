@@ -15,10 +15,13 @@ COUNT_WEIGHTS = {
     '13': .4, '14': .4, '15': .4, '16': .6,
 }
 ORDER_WEIGHTS = {'arrival': 1, 'cost': 1}
+# Product's admission plan versions, by what their draws are keyed on. The first is the default and is never
+# written into normalized settings, so settings that do not ask for another version are byte-for-byte as before.
+ADMISSION_PLANS = ('retailer-delivery-admission-plan-v1', 'retailer-delivery-admission-plan-v2')
 
 
 def options(value):
-    if (not isinstance(value, dict) or set(value) - {'enabled', 'count_weights', 'order_weights'}
+    if (not isinstance(value, dict) or set(value) - {'enabled', 'count_weights', 'order_weights', 'admission_plan'}
             or type(value.get('enabled')) is not bool):
         raise ValueError('Delivery alternatives require an explicit enabled flag')
     if not value['enabled']:
@@ -35,18 +38,26 @@ def options(value):
     if not isinstance(order, dict) or set(order) != set(ORDER_WEIGHTS):
         raise ValueError('Declare both arrival and cost ordering weights')
     probabilities(order)
+    admission = value.get('admission_plan', ADMISSION_PLANS[0])
+    if type(admission) is not str or admission not in ADMISSION_PLANS:
+        raise ValueError('Unknown delivery admission plan version')
     return {'schema': VERSION,
             'count_weights': {k: counts[k] for k in sorted(counts, key=int)},
-            'order_weights': {k: order[k] for k in ORDER_WEIGHTS}}
+            'order_weights': {k: order[k] for k in ORDER_WEIGHTS},
+            **({} if admission == ADMISSION_PLANS[0] else {'admission_plan': admission})}
 
 
 def validate_settings(settings):
     if not isinstance(settings, dict) or settings.get('schema') != VERSION:
         raise ValueError('Invalid normalized delivery settings')
-    if set(settings) != {'schema', 'count_weights', 'order_weights'}:
+    if set(settings) - {'admission_plan'} != {'schema', 'count_weights', 'order_weights'}:
+        raise ValueError('Invalid normalized delivery settings')
+    # Normalized settings name a plan version only when it is not the default.
+    if settings.get('admission_plan', ADMISSION_PLANS[1]) not in ADMISSION_PLANS[1:]:
         raise ValueError('Invalid normalized delivery settings')
     settings = options({'enabled': True, 'count_weights': settings['count_weights'],
-                        'order_weights': settings['order_weights']})
+                        'order_weights': settings['order_weights'],
+                        **({'admission_plan': settings['admission_plan']} if 'admission_plan' in settings else {})})
     return settings
 
 
@@ -54,6 +65,11 @@ def producer_weights(settings):
     """Convert canonical JSON count keys for Product's integer-keyed API."""
     validated = validate_settings(settings)
     return {int(k): value for k, value in validated['count_weights'].items()}
+
+
+def producer_plan_version(settings):
+    """The admission plan version these settings ask Product's oracle for."""
+    return validate_settings(settings).get('admission_plan', ADMISSION_PLANS[0])
 
 
 def _arrival(value):

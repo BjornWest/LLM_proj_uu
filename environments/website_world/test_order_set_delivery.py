@@ -47,3 +47,21 @@ def test_single_offer_reference_still_rejects_menus_before_sampling():
     with pytest.raises(ValueError,match='native reference'):
         g.generate({'schema':g.VERSION,'seed':1,'realism':{'delivery_options':{'enabled':True}}},
             world_factory=lambda *a,**kw:pytest.fail('Unsupported reference must fail before generation'))
+
+
+@pytest.mark.parametrize('asked', [None, delivery_admission.STRUCTURAL_PLAN_VERSION])
+def test_fresh_native_menu_uses_the_admission_plan_version_the_recipe_asks_for(tmp_path, asked):
+    spec=request();spec['realism']={'delivery_options':{'enabled':True,'count_weights':{'1':1,'2':1,'3':1},
+        **({} if asked is None else {'admission_plan':asked})},'page_variations':{'enabled':True}}
+    spec['requirements']=[]
+    out=tmp_path/'fresh';g.prepare(spec,out)
+    admission=json.loads((out/'delivery-plan.private.json').read_text());ref=json.loads((out/'order-set-reference.private.json').read_text())
+    assert admission['schema_version']==(asked or delivery_admission.PLAN_VERSION)
+    assert ref['result']['admission_plan_sha256']==model.digest(admission)
+    with g.GeneratedEpisode(out) as episode:
+        runtime=episode.runtime
+        assert runtime.delivery_plan==admission and type(runtime.delivery_oracle) is delivery_admission.Oracle
+        world=runtime.world
+        assert delivery_admission.validate_plan(world,runtime.delivery_oracle._backend.make_plan(world),admission)['valid']
+        for row in admission['retailers']:
+            assert set(row['admitted_route_keys'])<=set(row['initial_route_keys']) and len(row['admitted_route_keys'])==row['sampled_count']
