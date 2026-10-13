@@ -50,6 +50,30 @@ class WireTests(unittest.TestCase):
     def setUp(self):
         self.calls = []; self.records = []
 
+    def test_reviewed_runtime_loads_through_measurement_source_gate(self):
+        runtime = ROOT / 'scripts/qwen_suite_runtime.py'
+        loaded = Q.source_runtime(Q.pin(runtime))
+        self.assertEqual(loaded['MODEL'], Q.MODEL)
+        self.assertEqual(loaded['CONTEXT'], Q.CONTEXT)
+        self.assertEqual(loaded['projection_sha256'](),
+                         'e818865d35a1a4cd9c6d3abc1c3fa02786cad1cb8eb89bd57b870f2ae6b8c27e')
+        self.assertTrue(callable(loaded['QwenFactories'].http_timeout))
+
+    def test_old_runtime_pin_rejected_before_source_read(self):
+        runtime = ROOT / 'scripts/qwen_suite_runtime.py'
+        row = dict(path=str(runtime),
+                   sha256='4491d896a025b728ea1ab6eca4640b2efc030cc7a33769d4d538f5056c32c7dd')
+        with patch.object(Q, 'read_pin', side_effect=AssertionError('Unexpected source read')):
+            with self.assertRaisesRegex(ValueError, 'independently reviewed exact runtime'):
+                Q.source_runtime(row)
+
+    def test_changed_runtime_bytes_rejected_before_execution(self):
+        with tempfile.TemporaryDirectory() as temp:
+            runtime = Path(temp) / 'qwen_suite_runtime.py'
+            runtime.write_text("raise AssertionError('Unreviewed code executed')\n")
+            with self.assertRaises(ValueError):
+                Q.source_runtime(dict(path=str(runtime), sha256=Q.RUNTIME_SHA256))
+
     def exchange(self, path, body):
         self.calls.append((path, deepcopy(body)))
         ids = reference(project(body))

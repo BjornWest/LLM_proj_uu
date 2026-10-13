@@ -34,7 +34,7 @@ CONTEXT = 262144
 BOUNDARY = 250000
 GEOMETRY = dict(min_pixels=65536, max_pixels=16777216, patch_size=16,
                 merge_size=2, temporal_patch_size=2)
-RUNTIME_SHA256 = '4491d896a025b728ea1ab6eca4640b2efc030cc7a33769d4d538f5056c32c7dd'
+RUNTIME_SHA256 = 'c0684c3ff0923a5054d5804c85b61d231caf774837963ed94641046351419ff3'
 
 
 def wire(value):
