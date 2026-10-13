@@ -1,8 +1,9 @@
 # Native answer validation boundary
 
-Prospective contract for the affected Website task families. Frozen
-recipes, source trees, outputs and grades keep their original implementation.
-Actual source-bound lifecycle acceptance is separate from these local controls.
+Contract implemented in the composed development source for the affected Website
+task families. Existing frozen recipes, source trees, outputs and grades keep
+their pinned implementations. Actual source-bound lifecycle acceptance remains
+separate from the source and CPU controls.
 
 The extractor interprets the final answer: negation, conditions, ambiguity,
 absence and categorical meaning. It returns schema-valid semantic values with
@@ -47,14 +48,13 @@ rewrites raw claims or repairs wrong native targets.
 new callers do not use it. It proves a quote exists, not an absence assertion.
 Categorical product-option schema expansion remains deferred.
 
-The atomic consumer and variant-reset paragraphs below state the prospective
-contract after separately owned Website dependencies are composed. Their source
-cleanup is not included in this native/shared commit; until then those consumers
-may retain the old answer parser. Neither this document nor source review claims
-runtime adoption.
+The atomic consumer and variant-reset cleanup is composed into dev at
+`259ddb21`. Source review and CPU controls establish the boundary described
+below. Evaluation owns prospective source-bound lifecycle, automatic grading
+and viewer acceptance; this document does not claim runtime or prod adoption.
 
-Atomic public facts will use extractor-supplied typed scalar/array values and
-qualifiers. The consumer will check schema, null consistency and authentic
+Atomic public facts use extractor-supplied typed scalar/array values and
+qualifiers. The consumer checks schema, null consistency and authentic
 nonempty quotes. Canonical qualifier menus remain supported; without a menu,
 the extractor interprets the stated configuration/scope rather than retaining a
 presentation heading as part of the qualifier value. The modern native grader

@@ -119,8 +119,7 @@ class VariantResetEpisode:
             raise ValueError('Not a native reset capture-container extension')
         read = lambda name: json.loads((self.output / name).read_bytes())
         frozen_task = read('variant-reset-task.private.json')
-        scope_file = self.output/'variant-reset-scoring-scope.private.json'
-        self.scoring_scope = publication.checked_scope(read(scope_file.name) if scope_file.exists() else 'whole_run')
+        self.scoring_scope = publication.recipe_scope(self.output, self.manifest)
         runtime_options = read('variant-reset-runtime-options.private.json')
         # Attach/check the read contract before Runtime or provider startup.
         # The actual capsule is supplied only after the browser returns.
@@ -221,9 +220,13 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     if extraction_backend_factory is not None and not callable(extraction_backend_factory):
         raise ValueError('Configured answer extractor must be callable')
     output, destination = Path(output).resolve(), Path(run_directory).resolve()
-    shared.load(output)
     scope_file = output/'variant-reset-scoring-scope.private.json'
-    scoring_scope = publication.checked_scope(json.loads(scope_file.read_bytes()) if scope_file.exists() else 'whole_run')
+    # Legacy recipes have whole-run scope. Reject absent authority before
+    # loading them; an opt-in sidecar still requires full recipe validation.
+    if not scope_file.exists() and authority_approval is None:
+        raise ValueError('Whole-run reset requires exact new-source authority approval')
+    manifest = shared.load(output)
+    scoring_scope = publication.recipe_scope(output, manifest)
     if scoring_scope == 'whole_run' and authority_approval is None:
         raise ValueError('Whole-run reset requires exact new-source authority approval')
     if scoring_scope != 'whole_run' and authority_approval is not None:
@@ -248,6 +251,8 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
         'scoring_scope':scoring_scope,'extractor_requests_max':1,'prospective_external_grading':True,'viewer_projection_required':True})
     try:
         with VariantResetEpisode(output,authority_approval=authority_approval) as episode:
+            if episode.scoring_scope != scoring_scope:
+                raise ValueError('Reset scoring scope changed during episode construction')
             expected_public = deepcopy(episode.public)
             inputs = {name:output/filename for name,filename in {
                 'world':'pin/world.private.json','task':'variant-reset-task.private.json',

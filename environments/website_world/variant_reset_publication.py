@@ -24,6 +24,24 @@ def checked_scope(value):
     return value
 
 
+def recipe_scope(output, manifest):
+    """Read only a manifest-bound scope; absence retains legacy whole-run."""
+    output = Path(output).resolve()
+    name = 'variant-reset-scoring-scope.private.json'
+    path = output/name
+    files = manifest.get('files', {})
+    if path.exists() or path.is_symlink():
+        if not path.resolve().is_relative_to(output):
+            raise ValueError('Reset scoring scope escapes the recipe')
+        payload = path.read_bytes()
+        if files.get(name) != sha256(payload).hexdigest():
+            raise ValueError('Reset scoring scope is not manifest-bound')
+        return checked_scope(json.loads(payload))
+    if name in files:
+        raise ValueError('Manifest-bound reset scoring scope is missing')
+    return 'whole_run'
+
+
 def recipe_marker():
     return {'recipe': CAPTURE_CONTAINER, 'variant_reset_recipe': VERSION}
 

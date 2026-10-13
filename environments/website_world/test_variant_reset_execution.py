@@ -30,6 +30,7 @@ class ResetLifecycleControls(unittest.TestCase):
             (self.recipe/name).write_text('{}')
         self.events=[];self.cleanup_error=False;self.corrupt_public=False
         self.missing=False;self.authority={'authored':True};self.factory=execution.ResetAnswerGrader
+        self.scoring_scope='whole_run'
         self.omit_returned_completeness=False
         self.projection=True;self.grade=True;self.summary_error=None
         self.viewer_module=ModuleType('agent_trace.adapters.browsergym');self.viewer_module.__file__=__file__
@@ -38,6 +39,7 @@ class ResetLifecycleControls(unittest.TestCase):
         owner=self
         class Episode:
             def __init__(self,output,*,authority_approval):
+                self.scoring_scope=owner.scoring_scope
                 self.public=deepcopy(owner.public)
                 path=Path(execution.__file__).resolve()
                 self.task=SimpleNamespace(files={str(path):sha256(path.read_bytes()).hexdigest(),**{str(p):sha256(p.read_bytes()).hexdigest() for p in owner.recipe.rglob('*') if p.is_file()}},make_env=lambda:None)
@@ -113,7 +115,8 @@ class ResetLifecycleControls(unittest.TestCase):
 
     def execute(self, *, max_steps=1):
         with patch.dict('sys.modules',{'agent_trace.adapters.browsergym':self.viewer_module}), \
-             patch.object(execution.shared,'load',return_value={}), \
+             patch.object(execution.shared,'load',return_value={'files':{
+                 p.name:sha256(p.read_bytes()).hexdigest() for p in self.recipe.iterdir() if p.is_file()}}), \
              patch.object(execution,'VariantResetEpisode',self.Episode), \
              patch.object(finalization,'extract_saved_deferred',side_effect=self.deferred), \
              patch.object(finalization,'publish_finalized_answer',side_effect=self.publish):
@@ -166,6 +169,7 @@ class ScopedResetLifecycleControls(ResetLifecycleControls):
     def setUp(self):
         super().setUp()
         self.authority=None
+        self.scoring_scope='observed_variant_cart_state'
         (self.recipe/'variant-reset-scoring-scope.private.json').write_text(json.dumps('observed_variant_cart_state'))
 
     def test_unlimited_turns_reach_runner_and_keep_once_only_grading(self):
@@ -217,6 +221,14 @@ class ScopedResetLifecycleControls(ResetLifecycleControls):
         with self.assertRaisesRegex(ValueError,'null whole-run'):
             self.execute()
         self.assertNotIn('policy-open',self.events)
+
+    def test_changed_episode_scope_blocks_policy_and_grading(self):
+        self.scoring_scope='whole_run'
+        result=self.execute()
+        self.assertEqual(result['status'],'system_failure')
+        self.assertNotIn('policy-open',self.events)
+        self.assertNotIn('grade',self.events)
+        self.assertEqual(self.events,['runtime-close'])
 
 
 class ScopedResetNativeAdapterControls(unittest.TestCase):
