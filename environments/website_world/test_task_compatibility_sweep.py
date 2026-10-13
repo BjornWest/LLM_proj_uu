@@ -127,7 +127,7 @@ def test_mixed_outcome_pairs_and_invalid_input_are_visible(tmp_path,monkeypatch)
     monkeypatch.setattr(task_instances,'inspect',inspect)
     report=sweep.run_native(_selection('good','bad'),tmp_path/'out')
     coverage=report['observed_stage_pair_coverage']['native_inspection'];assert coverage['passed_pairs']==coverage['mixed_outcome_pairs']==coverage['pairs_with_failure']==1
-    with pytest.raises(ValueError,match='Malformed'):sweep.run_native({'schema':sweep.VERSION,'selected':[{'id':'bad'}]},tmp_path/'invalid')
+    with pytest.raises(ValueError,match='Malformed'):sweep.run_native({'schema':sweep.VERSION,'coverage':{},'selected':[{'id':'bad'}]},tmp_path/'invalid')
     assert not (tmp_path/'invalid').exists()
 
 

@@ -176,7 +176,7 @@ def audit_schema(schema, *, expectations=()):
                     finding(path, 'claim_pair_not_required', 'Value/evidence pair is not required by schema.')
                 # Pairing may be checked by the mechanical validator; record the
                 # wire-schema gap separately rather than claiming it is absent.
-                if 'null' in _types(props['value'],schema):
+                if 'null' in _types(props['value'],schema) and (node.get('type')=='object' or {'value','evidence'}<=set(node.get('required',[]))):
                     gap=_pair_wire_gap(schema,node)
                     if gap:finding(path,gap,'Nullable pairing requires post-validation or further schema-rule inspection.')
     for expected in expectations:
