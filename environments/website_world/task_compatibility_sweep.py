@@ -8,6 +8,7 @@ from copy import deepcopy
 from hashlib import sha256
 from itertools import combinations
 import json
+import os
 from pathlib import Path
 from random import Random
 import time
@@ -90,14 +91,52 @@ def select_cases(candidates, *, limit=200, seed=0, triples=()):
                         'uncovered_triples':encode(all_triples-covered_triples)}}
 
 
-def run_native(selection, output, *, workers=2, prepare=False):
+def compact_prepared(directory, store):
+    """Share exact finished immutable preparation bytes, without mocking freeze.
+
+    Hardlinks preserve every file/path/byte. They do not enforce immutability;
+    ordinary manifest/source hash checks remain mandatory before consumption.
+    Only a completed fresh preparation may be supplied, never a run directory.
+    """
+    directory,store=Path(directory).resolve(),Path(store).resolve()
+    if not (directory/'prepared-instance.json').is_file():
+        raise ValueError('Only completed task-instance preparations can be compacted')
+    if directory==store or store.is_relative_to(directory) or directory.is_relative_to(store):
+        raise ValueError('Keep the immutable store separate from the prepared recipe')
+    store.mkdir(parents=True,exist_ok=True)
+    reused=0;shared=0
+    for path in directory.rglob('*'):
+        if path.is_symlink():
+            raise ValueError('Prepared compaction does not admit symbolic links')
+        if not path.is_file():continue
+        payload=path.read_bytes();digest=sha256(payload).hexdigest();target=store/digest
+        try:os.link(path,target)
+        except FileExistsError:
+            if target.is_symlink() or not target.is_file() or sha256(target.read_bytes()).hexdigest()!=digest:
+                raise ValueError('Immutable content store entry changed')
+        if path.stat().st_ino!=target.stat().st_ino:
+            # Unique same-directory temporary name; atomic replacement never
+            # overwrites another case's path or changes the linked bytes.
+            temporary=path.with_name(path.name+'.share-'+str(os.getpid()))
+            os.link(target,temporary)
+            try:os.replace(temporary,path)
+            finally:
+                if temporary.exists():temporary.unlink()
+            reused+=len(payload)
+        shared+=1
+    return {'files':shared,'reused_duplicate_bytes':reused,
+            'source_freeze_was_mocked':False,'hardlinks_enforce_immutability':False}
+
+
+def run_native(selection, output, *, workers=2, prepare=False, share_assets=False):
     """Use actual constructors/readers and optional real freezer; retain failures.
 
     No monkeypatched source collection, producer or reference is used here.
     This stage runs no browsers/models. Parallel cases have separate outputs.
     """
     from . import task_instances
-    if type(workers) is not int or not 1<=workers<=4 or type(prepare) is not bool:
+    if (type(workers) is not int or not 1<=workers<=4 or type(prepare) is not bool
+            or type(share_assets) is not bool or share_assets and not prepare):
         raise ValueError('Use1-4 workers and explicit preparation Boolean')
     if selection.get('schema')!=VERSION or not isinstance(selection.get('selected'),list):
         raise ValueError('Use a selected compatibility case set')
@@ -121,6 +160,8 @@ def run_native(selection, output, *, workers=2, prepare=False):
                 stage='unmocked_preparation'
                 receipt=task_instances.prepare(row['instance'],directory/'prepared')
                 result['stages'][stage]={'status':'passed','receipt':receipt}
+                if share_assets:
+                    result['shared_immutable_assets']=compact_prepared(directory/'prepared',output/'immutable-files')
             result['status']='passed'
         except Exception as error:
             # A ValueError may be unsupported notation, no saved witness, or
@@ -138,8 +179,16 @@ def run_native(selection, output, *, workers=2, prepare=False):
     report={'schema':VERSION,'selection_sha256':sha256(_json(selection).encode()).hexdigest(),
             'configuration_count':len(results),'passed':sum(x['status']=='passed' for x in results),
             'requires_triage':sum(x['status']=='requires_triage' for x in results),
-            'results':results,'coverage':selection['coverage'],'browsers':0,'models':0,
+            'results':results,'design_coverage':selection['coverage'],'browsers':0,'models':0,
             'limitations':['Native/preparation acceptance does not establish browser/automatic-grade/HTTP acceptance.',
                            'Coverage is measured against the finite declared candidate pool only.']}
+    attempted=set().union(*(interactions(row['factors']) for row in results))
+    native_passed=set().union(*(interactions(row['factors']) for row in results
+                               if row['stages'].get('native_inspection',{}).get('status')=='passed'))
+    prepared=set().union(*(interactions(row['factors']) for row in results
+                          if row['stages'].get('unmocked_preparation',{}).get('status')=='passed'))
+    report['observed_stage_pair_coverage']={
+        'native_inspection':{'attempted_pairs':len(attempted),'passed_pairs':len(native_passed)},
+        'unmocked_preparation':{'attempted_pairs':len(attempted) if prepare else 0,'passed_pairs':len(prepared)}}
     (output/'report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False,allow_nan=False)+'\n')
     return report
