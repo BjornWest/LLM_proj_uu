@@ -64,7 +64,7 @@ def test_process_ownership_uses_ancestry_and_excludes_sibling():
 def test_pidfd_signal_failure_is_evidence_not_numeric_pid_fallback():
     s = guard.Supervisor(SimpleNamespace(), time.monotonic())
     s.known[(123, 456)] = 99
-    with patch.object(signal, "pidfd_send_signal", side_effect=PermissionError(1, "denied")) as send:
+    with patch.object(guard, "pidfd_send_signal", side_effect=PermissionError(1, "denied")) as send:
         s.send(signal.SIGTERM)
     send.assert_called_once_with(99, signal.SIGTERM)
     assert s.errors == [{"pid": 123, "start_ticks": 456, "phase": "signal", "errno": 1}]
@@ -74,7 +74,7 @@ def test_process_reuse_during_pidfd_open_is_excluded():
     s = guard.Supervisor(SimpleNamespace(), time.monotonic())
     row = dict(pid=123, start_ticks=456, ppid=os.getpid(), state="S")
     with patch.object(guard, "process_table", return_value={123: row}), \
-         patch.object(os, "pidfd_open", return_value=99), \
+         patch.object(guard, "pidfd_open", return_value=99), \
          patch.object(guard, "proc_stat", return_value={**row, "start_ticks": 789}), \
          patch.object(os, "close") as close:
         assert s.discover() == []
@@ -285,7 +285,7 @@ def boot_run(tmp_path, code, setup):
 
 def test_cleanup_failure_retains_command_cause_and_overrides_exit(tmp_path):
     proc = boot_run(tmp_path, "raise SystemExit(7)",
-                    "g.Supervisor.cleanup=lambda self:{'complete':False,'remaining_unknown':True}")
+                    "g.Supervisor.cleanup=lambda self,**kw:{'complete':False,'remaining_unknown':True}")
     assert proc.returncode == 125
     result = json.loads((tmp_path / "receipt/result.json").read_text())
     assert result["command_returncode"] == 7 and result["first_stop_reason"] == "command_exit"
@@ -332,3 +332,171 @@ def test_command_signal_receipt_matches_actual_launcher_exit(tmp_path):
     proc, _, result = launch(tmp_path, "import os,signal; os.kill(os.getpid(),signal.SIGKILL)")
     assert proc.returncode == result["returncode"] == 137
     assert result["command_returncode"] == -signal.SIGKILL and result["cleanup_verified"]
+
+
+def test_missing_python_pidfd_bindings_use_real_libc(monkeypatch):
+    monkeypatch.delattr(os, "pidfd_open", raising=False)
+    monkeypatch.delattr(signal, "pidfd_send_signal", raising=False)
+    verified = guard.verify_pidfds()
+    assert verified["self_signal_zero_verified"]
+    assert set(verified["bindings"].values()) <= {"libc", "linux_syscall_x86_64", "linux_syscall_aarch64"}
+    fd = guard.pidfd_open(os.getpid())
+    assert not os.get_inheritable(fd)
+    os.close(fd)
+    with pytest.raises(OSError) as caught:
+        guard.pidfd_send_signal(fd, 0)
+    assert caught.value.errno == 9
+
+
+def test_missing_python_and_libc_symbols_use_verified_kernel_syscalls(monkeypatch):
+    import ctypes
+    libc = ctypes.CDLL(None, use_errno=True)
+    monkeypatch.delattr(os, "pidfd_open", raising=False)
+    monkeypatch.delattr(signal, "pidfd_send_signal", raising=False)
+    monkeypatch.setattr(guard.ctypes, "CDLL", lambda *a, **kw: SimpleNamespace(syscall=libc.syscall))
+    verified = guard.verify_pidfds()
+    assert verified["self_signal_zero_verified"]
+    assert all(route.startswith("linux_syscall_") for route in verified["bindings"].values())
+
+
+def test_unsupported_binding_architecture_refuses_without_pid_signal(monkeypatch):
+    monkeypatch.delattr(os, "pidfd_open", raising=False)
+    monkeypatch.delattr(signal, "pidfd_send_signal", raising=False)
+    monkeypatch.setattr(guard.ctypes, "CDLL", lambda *a, **kw: SimpleNamespace())
+    monkeypatch.setattr(guard.platform, "machine", lambda: "not-qualified")
+    with pytest.raises(RuntimeError):
+        guard.verify_pidfds()
+
+
+def test_real_cleanup_without_either_python_pidfd_api(tmp_path):
+    proc = boot_run(tmp_path, "import time; time.sleep(60)",
+                    "g.os.pidfd_open=None; g.signal.pidfd_send_signal=None")
+    assert proc.returncode == 124, proc.stderr
+    result = json.loads((tmp_path / "receipt/result.json").read_text())
+    entry = json.loads((tmp_path / "receipt/entry.json").read_text())
+    assert result["cleanup_verified"] and result["first_stop_reason"] == "wall_deadline"
+    assert set(entry["pidfd_bindings"].values()) <= {"libc", "linux_syscall_x86_64", "linux_syscall_aarch64"}
+
+
+def test_pidfd_cache_and_reaped_history_stay_bounded_under_churn(tmp_path):
+    # A separate process owns/reaps its children. Constrain its FD table to
+    # reproduce the previous leak rather than relying on the workstation limit.
+    boot = """import importlib.util,sys,resource,os,time
+s=importlib.util.spec_from_file_location('g',sys.argv[1]); g=importlib.util.module_from_spec(s); s.loader.exec_module(g)
+resource.setrlimit(resource.RLIMIT_NOFILE,(64,64))
+supervisor=g.Supervisor(None,time.monotonic())
+maximum=0
+for index in range(180):
+ p=os.fork()
+ if p==0:
+  time.sleep(.002); os._exit(0)
+ supervisor.discover()
+ while True:
+  supervisor.reap()
+  if supervisor.no_children: break
+  time.sleep(.001)
+ maximum=max(maximum,len(supervisor.known))
+assert maximum == 0 and supervisor.reaped_total == 180
+assert len(supervisor.reaped) == 64
+supervisor.close()
+"""
+    proc = subprocess.run([sys.executable, "-I", "-B", "-c", boot, str(LAUNCHER)], capture_output=True, timeout=10)
+    assert proc.returncode == 0, proc.stderr
+
+
+def test_sigterm_does_not_interrupt_payload_finally_twice(tmp_path):
+    marker = tmp_path / "cleanup-finished"
+    code = f"""import signal,time
+signal.signal(signal.SIGTERM,lambda *a:(_ for _ in ()).throw(SystemExit(0)))
+try: time.sleep(60)
+finally:
+ time.sleep(.25)
+ open({str(marker)!r},'w').write('done')
+"""
+    command = argv(tmp_path / "receipt", code, wall=.2)
+    command[command.index("--grace-seconds")+1] = "1"
+    proc = subprocess.run(command, capture_output=True, timeout=5)
+    result = json.loads((tmp_path / "receipt/result.json").read_text())
+    assert proc.returncode == 124 and marker.read_text() == "done"
+    assert result["cleanup_verified"] and result["cleanup"]["signals"]["TERM"] == 1
+
+
+def test_leading_timeout_preserves_its_kill_after_grace(tmp_path):
+    marker = tmp_path / "cleanup-finished"
+    code = f"""import signal,time
+signal.signal(signal.SIGTERM,lambda *a:(_ for _ in ()).throw(SystemExit(0)))
+try: time.sleep(60)
+finally:
+ time.sleep(.4)
+ open({str(marker)!r},'w').write('done')
+"""
+    receipt = tmp_path / "receipt"
+    command = [sys.executable, "-I", "-B", str(LAUNCHER), "--memory-mib", "96", "--tasks", "16",
+               "--receipt", str(receipt), "--sample-seconds", ".02", "--",
+               "timeout", "--kill-after=2s", "0.2s", sys.executable, "-I", "-B", "-c", code]
+    proc = subprocess.run(command, capture_output=True, timeout=8)
+    result = json.loads((receipt / "result.json").read_text())
+    entry = json.loads((receipt / "entry.json").read_text())
+    assert proc.returncode == 124 and marker.read_text() == "done", proc.stderr
+    assert result["cleanup_verified"] and result["first_stop_reason"] == "command_exit"
+    assert result["cleanup"]["signals"]["TERM"] == 0
+    assert entry["deadline_source"] == "leading_timeout_backstop" and entry["wall_seconds"] > 2.2
+
+
+def test_resource_log_budget_does_not_stop_monitoring(tmp_path):
+    receipt = tmp_path / "receipt"
+    command = argv(receipt, "import time; time.sleep(.3)")
+    command[command.index("--"):command.index("--")] = ["--resource-log-bytes", "1024"]
+    proc = subprocess.run(command, capture_output=True, timeout=5)
+    result = json.loads((receipt / "result.json").read_text())
+    assert proc.returncode == 0 and result["cleanup_verified"]
+    assert result["resource_log_truncated"] and result["sample_count"] > result["logged_samples"]
+    assert (receipt / "resources.jsonl").stat().st_size == result["logged_bytes"] <= 1024
+
+
+def test_malformed_json_registry_is_recorded_and_cleaned(tmp_path):
+    code = "import os,pathlib,time; pathlib.Path(os.environ['CONTAINER_JOB_REGISTRY'],'bad.json').write_text('[]'); time.sleep(60)"
+    proc, receipt, result = launch(tmp_path, code)
+    assert proc.returncode == 125 and result["first_stop_reason"] == "supervisor_error"
+    assert result["cleanup_verified"]
+    assert json.loads((receipt / "error.json").read_text())["error_class"] == "RuntimeError"
+
+
+def test_reaped_root_exit_code_is_not_overwritten_by_reused_numeric_pid():
+    supervisor = guard.Supervisor(None, time.monotonic())
+    supervisor.root, supervisor.root_status = (123, 456), 7
+    with patch.object(os, "waitpid", side_effect=[(123, 9 << 8), ChildProcessError()]):
+        supervisor.reap()
+    assert supervisor.root_status == 7
+
+
+def test_nofile_capacity_is_qualified_before_exec(tmp_path):
+    proc = boot_run(tmp_path, "pass", "g.resource.setrlimit(g.resource.RLIMIT_NOFILE,(64,64))")
+    result = json.loads((tmp_path / "receipt/result.json").read_text())
+    assert proc.returncode == 125 and not result["payload_forked"]
+    assert result["first_stop_reason"] == "preflight_failed"
+
+
+def test_probe_qualifies_pidfds_when_python_bindings_are_missing(tmp_path):
+    receipt = tmp_path / "receipt"
+    boot = ("import importlib.util,sys; s=importlib.util.spec_from_file_location('g',sys.argv[1]); "
+            "g=importlib.util.module_from_spec(s); s.loader.exec_module(g); "
+            "g.os.pidfd_open=None; g.signal.pidfd_send_signal=None; sys.argv=sys.argv[1:]; raise SystemExit(g.main())")
+    proc = subprocess.run([sys.executable, "-I", "-B", "-c", boot, str(LAUNCHER),
+                           "--probe", "--receipt", str(receipt)], capture_output=True, timeout=5)
+    observed = json.loads((receipt / "probe.json").read_text())["observed"]
+    assert proc.returncode == 0 and observed["pidfd"]["self_signal_zero_verified"]
+    assert observed["rlimit_nofile"][1] > 0
+
+
+def test_native_exec_restores_signal_defaults_and_blocked_mask(tmp_path):
+    receipt = tmp_path / "receipt"
+    command = argv(receipt, "pass")
+    command = command[:command.index("--")+1] + ["/bin/cat", "/proc/self/status"]
+    # Python ordinarily ignores SIGPIPE and inherits blocked masks across exec.
+    boot = "import os,signal,sys; signal.pthread_sigmask(signal.SIG_BLOCK,{signal.SIGUSR1}); os.execv(sys.argv[1],sys.argv[1:])"
+    proc = subprocess.run([sys.executable, "-I", "-B", "-c", boot, *command], capture_output=True, text=True, timeout=5)
+    assert proc.returncode == 0, proc.stderr
+    status = dict(line.split(':',1) for line in proc.stdout.splitlines() if ':' in line)
+    assert int(status["SigBlk"].strip(),16) == 0
+    assert not int(status["SigIgn"].strip(),16) & (1 << (signal.SIGPIPE-1))

@@ -5,13 +5,16 @@ Requires visible finite outer cgroup-v2 memory/pids limits, Linux pidfds and a
 standalone single-threaded supervisor. See docs/agents/container-jobs.md.
 """
 import argparse
+from collections import deque
 import ctypes
 import datetime as dt
 import json
 import math
 import os
+import platform
 from pathlib import Path
 import re
+import resource
 import signal
 import stat
 import sys
@@ -22,6 +25,74 @@ import hashlib
 SCHEMA = "container-job-v1"
 MIB = 1024 ** 2
 STOP_SIGNALS = (signal.SIGTERM, signal.SIGINT, signal.SIGHUP)
+
+
+def pidfd_backend():
+    libc = ctypes.CDLL(None, use_errno=True)
+    arch = platform.machine()
+    routes = {}
+    for operation, python_module in (("pidfd_open", os), ("pidfd_send_signal", signal)):
+        if callable(getattr(python_module, operation, None)):
+            routes[operation] = "python"
+        elif hasattr(libc, operation):
+            routes[operation] = "libc"
+        elif arch in ("x86_64", "aarch64"):
+            routes[operation] = "linux_syscall_" + arch
+        else:
+            raise RuntimeError("No supported pidfd binding for this architecture")
+    return routes
+
+
+def pidfd_open(pid):
+    native = getattr(os, "pidfd_open", None)
+    if callable(native):
+        return native(pid)
+    libc = ctypes.CDLL(None, use_errno=True)
+    if hasattr(libc, "pidfd_open"):
+        function = libc.pidfd_open
+        function.argtypes = [ctypes.c_int, ctypes.c_uint]
+        function.restype = ctypes.c_int
+        fd = function(pid, 0)
+    elif platform.machine() in ("x86_64", "aarch64"):
+        libc.syscall.restype = ctypes.c_long
+        fd = libc.syscall(ctypes.c_long(434), ctypes.c_int(pid), ctypes.c_uint(0))
+    else:
+        raise RuntimeError("Unsupported pidfd syscall architecture")
+    if fd < 0:
+        code = ctypes.get_errno()
+        raise OSError(code, os.strerror(code))
+    os.set_inheritable(fd, False)
+    return fd
+
+
+def pidfd_send_signal(fd, sig):
+    native = getattr(signal, "pidfd_send_signal", None)
+    if callable(native):
+        return native(fd, sig)
+    libc = ctypes.CDLL(None, use_errno=True)
+    if hasattr(libc, "pidfd_send_signal"):
+        function = libc.pidfd_send_signal
+        function.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_uint]
+        function.restype = ctypes.c_int
+        result = function(fd, sig, None, 0)
+    elif platform.machine() in ("x86_64", "aarch64"):
+        libc.syscall.restype = ctypes.c_long
+        result = libc.syscall(ctypes.c_long(424), ctypes.c_int(fd), ctypes.c_int(sig), ctypes.c_void_p(), ctypes.c_uint(0))
+    else:
+        raise RuntimeError("Unsupported pidfd syscall architecture")
+    if result < 0:
+        code = ctypes.get_errno()
+        raise OSError(code, os.strerror(code))
+
+
+def verify_pidfds():
+    routes = pidfd_backend()
+    fd = pidfd_open(os.getpid())
+    try:
+        pidfd_send_signal(fd, 0)
+    finally:
+        os.close(fd)
+    return dict(bindings=routes, self_signal_zero_verified=True)
 
 
 def write_json(path, value):
@@ -107,6 +178,8 @@ def probe():
                 cgroup_directory_writable=os.access(group, os.W_OK),
                 shm_total_bytes=shm.f_blocks * shm.f_frsize,
                 shm_available_bytes=shm.f_bavail * shm.f_frsize,
+                rlimit_nofile=list(resource.getrlimit(resource.RLIMIT_NOFILE)),
+                pidfd=verify_pidfds(),
                 namespace_scope="Visible hierarchy only; hidden provider ancestors not inferred")
 
 
@@ -120,38 +193,71 @@ def duration(value):
     return result
 
 
-def timeout_wall(command):
+def timeout_details(command):
     if not command or Path(command[0]).name != "timeout":
         return None
     index = 1
+    kill_after = None
     while index < len(command) and command[index].startswith("-"):
         value = command[index]
         if value == "--":
             index += 1
             break
         if value in ("--signal", "--kill-after", "-s", "-k"):
+            if value in ("--kill-after", "-k"):
+                kill_after = duration(command[index + 1])
             index += 2
         elif value.startswith(("--signal=", "--kill-after=")) or value in ("--foreground", "--preserve-status", "-v", "--verbose"):
+            if value.startswith("--kill-after="):
+                kill_after = duration(value.split("=", 1)[1])
             index += 1
         else:
             raise ValueError("Unknown leading timeout option; pass explicit --wall-seconds")
     if index >= len(command) - 1:
         raise ValueError("Leading timeout must have a duration and command")
-    return duration(command[index])
+    return dict(duration=duration(command[index]), kill_after=kill_after)
+
+
+def timeout_wall(command):
+    details = timeout_details(command)
+    return details["duration"] if details else None
 
 
 def validate(args):
     if args.memory_mib <= 0 or args.tasks <= 0:
         raise ValueError("memory-mib and tasks must be positive")
+    if not math.isfinite(args.sample_seconds) or not .02 <= args.sample_seconds <= 2:
+        raise ValueError("Sample must be .02-2s")
+    configured = os.environ.get("CONTAINER_JOB_WALL_SECONDS")
+    try:
+        parsed = timeout_details(args.command)
+    except (ValueError, IndexError):
+        if args.wall_seconds is None and configured is None:
+            raise ValueError("Unsupported leading timeout; pass explicit --wall-seconds")
+        parsed = None
+    args.deadline_source = "explicit_wall"
+    if args.wall_seconds is None:
+        if configured is not None:
+            args.wall_seconds = duration(configured)
+            args.deadline_source = "environment_wall"
+        elif parsed is not None:
+            # Let GNU timeout deliver its own first signal and complete its
+            # declared kill-after grace. Our deadline is a later backstop.
+            grace = parsed["kill_after"] if parsed["kill_after"] is not None else 2
+            args.wall_seconds = parsed["duration"] + grace + 1 + 2 * args.sample_seconds
+            args.deadline_source = "leading_timeout_backstop"
+    if args.grace_seconds is None:
+        args.grace_seconds = parsed["kill_after"] if parsed and parsed["kill_after"] is not None else 2
+    if args.cleanup_seconds is None:
+        args.cleanup_seconds = max(8, args.grace_seconds + 2)
     for name in ("sample_seconds", "grace_seconds", "cleanup_seconds"):
         value = getattr(args, name)
         if not math.isfinite(value) or value <= 0:
             raise ValueError(name + " must be finite and positive")
     if not .02 <= args.sample_seconds <= 2 or not args.grace_seconds < args.cleanup_seconds <= 60:
         raise ValueError("Sample must be .02-2s; cleanup must exceed grace and be <=60s")
-    if args.wall_seconds is None:
-        configured = os.environ.get("CONTAINER_JOB_WALL_SECONDS")
-        args.wall_seconds = duration(configured) if configured is not None else timeout_wall(args.command)
+    if not 1024 <= args.resource_log_bytes <= 64 * MIB:
+        raise ValueError("Resource log budget must be 1024-67108864 bytes")
     if args.wall_seconds is None or not math.isfinite(args.wall_seconds) or args.wall_seconds <= 0:
         raise ValueError("Pass --wall-seconds, CONTAINER_JOB_WALL_SECONDS or leading timeout duration")
 
@@ -206,13 +312,16 @@ class Supervisor:
         self.known = {}  # (pid,birth) -> pidfd; never kill a bare numeric PID
         self.root = None
         self.root_status = None
-        self.reaped = []
+        self.reaped = deque(maxlen=64)
+        self.reaped_total = 0
         self.no_children = False
         self.errors = []
         self.signal_counts = {"TERM": 0, "KILL": 0}
         self.registry = None
         self.source_sha256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
         self.outer_group = None
+        self.sent = {}
+        self.latest_rows = []
 
     def accounting_rows(self, rows):
         """Partition nested instances of this exact trusted launcher, not cleanup.
@@ -232,6 +341,8 @@ class Supervisor:
                 record = json.loads(path.read_text())
             except FileNotFoundError:
                 continue  # A child completed and removed its own registration.
+            if not isinstance(record, dict):
+                raise RuntimeError("Nested job registry record is not an object")
             if record.get("schema") != SCHEMA or record.get("source_sha256") != self.source_sha256:
                 raise RuntimeError("Nested job registry source mismatch")
             try:
@@ -254,13 +365,20 @@ class Supervisor:
 
     def discover(self):
         table = process_table()
+        # Drop pidfds and signal state after an identity disappears. Keeping
+        # historical identities exhausts NOFILE on long-lived browser jobs.
+        for identity in list(self.known):
+            current = table.get(identity[0])
+            if current is None or current["start_ticks"] != identity[1]:
+                os.close(self.known.pop(identity))
+                self.sent.pop(identity, None)
         rows = descendant_rows(table, os.getpid())
         for row in rows:
             identity = row["pid"], row["start_ticks"]
             if identity not in self.known:
                 fd = None
                 try:
-                    fd = os.pidfd_open(row["pid"])
+                    fd = pidfd_open(row["pid"])
                     fresh = proc_stat(row["pid"])
                 except (ProcessLookupError, FileNotFoundError):
                     if fd is not None:
@@ -271,7 +389,8 @@ class Supervisor:
                     continue
                 self.known[identity] = fd
         # Include already identified children during a reparenting snapshot race.
-        return [row for row in table.values() if (row["pid"], row["start_ticks"]) in self.known]
+        self.latest_rows = [row for row in table.values() if (row["pid"], row["start_ticks"]) in self.known]
+        return self.latest_rows
 
     def reap(self):
         self.no_children = False
@@ -284,14 +403,28 @@ class Supervisor:
             if pid == 0:
                 return
             self.reaped.append(pid)
-            if self.root and pid == self.root[0]:
+            self.reaped_total += 1
+            if self.root and pid == self.root[0] and self.root_status is None:
                 self.root_status = os.waitstatus_to_exitcode(status)
+            for identity in [key for key in self.known if key[0] == pid]:
+                os.close(self.known.pop(identity))
+                self.sent.pop(identity, None)
 
     def send(self, sig):
         for identity, fd in self.known.items():
+            if sig in self.sent.get(identity, set()):
+                continue
+            if sig == signal.SIGTERM:
+                # Signal direct roots once. Forwarding wrappers/nested guards
+                # own graceful delivery below them; signal newly adopted roots
+                # after their parent dies. Hard containment still kills all.
+                row = next((r for r in self.latest_rows if (r["pid"], r["start_ticks"]) == identity), None)
+                if row is not None and row["ppid"] != os.getpid():
+                    continue
             try:
-                signal.pidfd_send_signal(fd, sig)
+                pidfd_send_signal(fd, sig)
                 self.signal_counts["TERM" if sig == signal.SIGTERM else "KILL"] += 1
+                self.sent.setdefault(identity, set()).add(sig)
             except ProcessLookupError:
                 pass
             except OSError as error:
@@ -311,31 +444,33 @@ class Supervisor:
                         "pids.current", "pids.events", "cpu.stat")) if self.outer_group else {},
                     identities=[dict(pid=r["pid"], start_ticks=r["start_ticks"]) for r in live])
 
-    def cleanup(self):
+    def cleanup(self, immediate=False):
         start = time.monotonic()
         remaining = []
         while True:
             try:
                 rows = self.discover()
                 discovery_ok = True
-            except (OSError, ValueError, RuntimeError) as error:
+            except Exception as error:
                 rows = []
                 discovery_ok = False
                 if not any(e.get("phase") == "cleanup_discovery" for e in self.errors):
                     self.errors.append(dict(phase="cleanup_discovery", error_class=type(error).__name__))
             self.reap()
             remaining = [r for r in rows if r["state"] not in ("Z", "X")]
-            if not remaining and self.no_children:
+            if discovery_ok and not remaining and self.no_children:
                 return dict(complete=True, elapsed_s=round(time.monotonic() - start, 3),
-                            remaining=[], reaped_pids=self.reaped, signals=self.signal_counts,
+                            remaining=[], reaped_pids=list(self.reaped), reaped_total=self.reaped_total,
+                            reaped_history_limit=64, signals=self.signal_counts,
                             errors=self.errors, verified_no_waitable_children=True)
             elapsed = time.monotonic() - start
             if elapsed >= self.args.cleanup_seconds:
                 return dict(complete=False, elapsed_s=round(elapsed, 3), remaining=remaining,
-                            reaped_pids=self.reaped, signals=self.signal_counts,
+                            reaped_pids=list(self.reaped), reaped_total=self.reaped_total,
+                            reaped_history_limit=64, signals=self.signal_counts,
                             errors=self.errors, remaining_unknown=not discovery_ok,
                             verified_no_waitable_children=False)
-            self.send(signal.SIGTERM if elapsed < self.args.grace_seconds else signal.SIGKILL)
+            self.send(signal.SIGTERM if not immediate and elapsed < self.args.grace_seconds else signal.SIGKILL)
             time.sleep(min(self.args.sample_seconds, .1))
 
     def close(self):
@@ -355,7 +490,9 @@ def run(args):
     previous = {}
     entry_verified = False
     cleanup = dict(complete=True, payload_started=False, remaining=[])
-    samples, peaks = 0, dict(summed_rss_bytes=0, threads=0, process_count=0)
+    samples, logged_samples, logged_bytes = 0, 0, 0
+    log_truncated = False
+    peaks = dict(summed_rss_bytes=0, threads=0, process_count=0)
     launch = dict(schema=SCHEMA, mode="monitored_process_tree", started_at=dt.datetime.now(dt.timezone.utc).isoformat(),
                   supervisor=proc_stat(os.getpid()), executable=Path(args.command[0]).name if args.command else None,
                   argument_count=max(0, len(args.command) - 1), automatic_retries=0,
@@ -380,10 +517,16 @@ def run(args):
                 raise ValueError("Requested monitored thresholds exceed observed outer hard limits")
             if len(list(Path("/proc/self/task").iterdir())) != 1 or descendant_rows(process_table(), os.getpid()):
                 raise RuntimeError("Supervisor must start single-threaded without existing children")
-            if not hasattr(os, "pidfd_open") or not hasattr(signal, "pidfd_send_signal"):
-                raise RuntimeError("Linux pidfd APIs are required")
-            fd = os.pidfd_open(os.getpid())
-            os.close(fd)
+            routes = outer["pidfd"]["bindings"]
+            # Parent cleanup includes separately accounted nested trees. Keep
+            # enough descriptor capacity for the actual outer process ceiling,
+            # plus receipt/pipe overhead, before allowing any exec.
+            soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+            required_fds = outer["visible_effective_pids_max"] + 64
+            if hard != resource.RLIM_INFINITY and hard < required_fds:
+                raise RuntimeError("NOFILE hard limit cannot cover visible outer pids.max")
+            if soft != resource.RLIM_INFINITY and soft < required_fds:
+                resource.setrlimit(resource.RLIMIT_NOFILE, (required_fds, hard))
             subreaper()
             previous[signal.SIGCHLD] = signal.signal(signal.SIGCHLD, signal.SIG_DFL)
             for sig in STOP_SIGNALS:
@@ -411,7 +554,14 @@ def run(args):
                 os.close(gate)
                 for sig in STOP_SIGNALS:
                     signal.signal(sig, signal.SIG_DFL)
+                for name in ("SIGPIPE", "SIGXFSZ", "SIGXFZ"):
+                    if hasattr(signal, name):
+                        signal.signal(getattr(signal, name), signal.SIG_DFL)
+                signal.pthread_sigmask(signal.SIG_SETMASK, set())
                 try:
+                    libc = ctypes.CDLL(None, use_errno=True)
+                    if libc.prctl(1, signal.SIGKILL, 0, 0, 0) != 0 or os.getppid() != launch["supervisor"]["pid"]:
+                        os._exit(125)  # Root mitigation only; not whole-tree cleanup.
                     os.setsid()
                     token = os.read(read_gate, 1)
                     os.close(read_gate)
@@ -425,13 +575,18 @@ def run(args):
             os.close(read_gate)
             row = proc_stat(pid)
             supervisor.root = pid, row["start_ticks"]
-            supervisor.known[supervisor.root] = os.pidfd_open(pid)
+            supervisor.known[supervisor.root] = pidfd_open(pid)
             write_json(args.receipt / "entry.json", dict(schema=SCHEMA, mode="monitored_process_tree",
                        root=dict(pid=pid, start_ticks=row["start_ticks"]), supervisor=launch["supervisor"],
                        source_sha256=supervisor.source_sha256,
+                       pidfd_bindings=routes, pidfd_self_signal_zero_verified=True,
                        actual_outer=outer, cpus=sorted(os.sched_getaffinity(0)), subreaper_verified=True,
+                       guardian_rlimit_nofile=list(resource.getrlimit(resource.RLIMIT_NOFILE)),
                        thresholds=dict(summed_rss_bytes=args.memory_mib * MIB, linux_threads=args.tasks),
                        per_job_kernel_limits_installed=False, wall_seconds=args.wall_seconds,
+                       deadline_source=args.deadline_source, grace_seconds=args.grace_seconds,
+                       cleanup_seconds=args.cleanup_seconds,
+                       parent_death_policy="Immediate payload requests SIGKILL on guardian death; descendants need outer containment",
                        accounting="Own processes plus nested supervisor overhead; registered child payloads separately monitored",
                        job_registry=str(supervisor.registry),
                        deadline_monotonic=started + args.wall_seconds, sample_seconds=args.sample_seconds,
@@ -454,8 +609,14 @@ def run(args):
                     samples += 1
                     for key in peaks:
                         peaks[key] = max(peaks[key], sample[key])
-                    stream.write(json.dumps(sample) + "\n")
-                    stream.flush()
+                    encoded = json.dumps(sample) + "\n"
+                    if logged_bytes + len(encoded.encode()) <= args.resource_log_bytes:
+                        stream.write(encoded)
+                        stream.flush()
+                        logged_bytes += len(encoded.encode())
+                        logged_samples += 1
+                    else:
+                        log_truncated = True  # Monitoring and peaks still continue.
                     if interrupted:
                         stop_reason = "signal"
                         break
@@ -475,7 +636,7 @@ def run(args):
             returncode = {"signal": 128 + interrupted[0] if interrupted else 125,
                           "wall_deadline": 124, "monitored_memory_threshold": 137,
                           "monitored_task_threshold": 137}.get(stop_reason, supervisor.root_status)
-    except (OSError, ValueError, RuntimeError) as error:
+    except Exception as error:
         stop_reason = stop_reason or ("signal" if interrupted else ("supervisor_error" if root_started else "preflight_failed"))
         returncode = 125
         write_json(args.receipt / "error.json", dict(schema=SCHEMA, error_class=type(error).__name__,
@@ -485,19 +646,27 @@ def run(args):
             os.close(gate)
         if root_started:
             try:
-                cleanup = supervisor.cleanup()
-            except (OSError, ValueError, RuntimeError) as error:
+                immediate = stop_reason in ("monitored_memory_threshold", "monitored_task_threshold", "supervisor_error")
+                cleanup = supervisor.cleanup(immediate=immediate)
+            except Exception as error:
                 cleanup = dict(complete=False, error_class=type(error).__name__, remaining_unknown=True)
             supervisor.close()
-        for sig, handler in previous.items():
-            signal.signal(sig, handler)
     if not cleanup["complete"]:
         returncode = 125
     launcher_code = returncode if returncode >= 0 else 128 - returncode
     cleanup_verified = bool(root_started and cleanup["complete"]
                             and cleanup.get("verified_no_waitable_children") is True
                             and not cleanup.get("remaining") and not cleanup.get("remaining_unknown"))
-    write_json(args.receipt / "result.json", dict(schema=SCHEMA, mode="monitored_process_tree",
+    registration_cleanup = None
+    if registration is not None and cleanup["complete"]:
+        try:
+            registration.unlink()
+            registration_cleanup = dict(complete=True)
+        except OSError as error:
+            registration_cleanup = dict(complete=False, errno=error.errno)
+            launcher_code = 125
+    try:
+        write_json(args.receipt / "result.json", dict(schema=SCHEMA, mode="monitored_process_tree",
                returncode=launcher_code, command_returncode=supervisor.root_status,
                root=dict(pid=supervisor.root[0], start_ticks=supervisor.root[1]) if supervisor.root else None,
                supervisor=launch["supervisor"], source_sha256=supervisor.source_sha256,
@@ -506,9 +675,12 @@ def run(args):
                entry_verified=entry_verified, payload_forked=root_started,
                payload_gate_released=gate_released, cleanup=cleanup,
                interrupt_signals=interrupted, sample_count=samples, observed_peaks=peaks,
+               logged_samples=logged_samples, logged_bytes=logged_bytes,
+               resource_log_truncated=log_truncated, registration_cleanup=registration_cleanup,
                per_job_kernel_limits_installed=False, automatic_retries=0))
-    if registration is not None and cleanup["complete"]:
-        registration.unlink()
+    finally:
+        for sig, handler in previous.items():
+            signal.signal(sig, handler)
     return launcher_code
 
 
@@ -519,8 +691,9 @@ def main():
     parser.add_argument("--receipt", required=True, type=Path)
     parser.add_argument("--wall-seconds", type=float)
     parser.add_argument("--sample-seconds", type=float, default=.1)
-    parser.add_argument("--grace-seconds", type=float, default=2)
-    parser.add_argument("--cleanup-seconds", type=float, default=8)
+    parser.add_argument("--grace-seconds", type=float)
+    parser.add_argument("--cleanup-seconds", type=float)
+    parser.add_argument("--resource-log-bytes", type=int, default=4 * MIB)
     parser.add_argument("--cpus", help="Comma-separated subset of inherited CPU affinity")
     parser.add_argument("--probe", action="store_true", help="Read actual host bounds; never execute a payload")
     parser.add_argument("command", nargs=argparse.REMAINDER)
@@ -531,7 +704,7 @@ def main():
         parser.error("--probe cannot execute a command")
     try:
         return run(args)
-    except (OSError, ValueError, RuntimeError) as error:
+    except Exception as error:
         print("Container job refused/receipt failed: " + type(error).__name__, file=sys.stderr)
         return 125
 

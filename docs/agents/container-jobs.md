@@ -20,8 +20,9 @@ python3 scripts/run_container_job.py --probe --receipt /run-results/probe-unique
 ```
 
 Receipt directories must be new. A probe executes no payload and reports the
-actual visible cgroup-v2 hierarchy, CPU affinity and `/dev/shm` capacity/free
-space. Execution requires finite, readable effective outer `memory.max` and
+actual visible cgroup-v2 hierarchy, CPU affinity, descriptor limits and
+`/dev/shm` capacity/free space. It also verifies pidfd open and signal-zero
+against the running interpreter and kernel, without starting a payload. Execution requires finite, readable effective outer `memory.max` and
 `pids.max`. It refuses missing/unlimited/unresolvable outer limits before exec;
 requested thresholds must fit those observed outer limits. Probe mode can
 describe unsupported limits without qualifying execution. Host installation
@@ -29,7 +30,11 @@ and resource qualification belong to the host owner.
 
 Every execution has an internal monotonic wall deadline. Supply
 `--wall-seconds`, or `CONTAINER_JOB_WALL_SECONDS`, or a leading GNU `timeout`
-duration in the existing caller command. The command itself is preserved.
+duration in the existing caller command. With a leading `timeout`, the guardian
+uses a later backstop: duration + kill-after (two seconds if absent) + one second
++ two sample periods. This lets GNU timeout deliver its own signal and honor
+its declared grace. Explicit/environment wall limits remain strict and take
+precedence. The command itself is preserved.
 Recognized timeout options are `--kill-after`, `-k`, `--signal`, `-s` (with a
 separate argument), their long `=VALUE` forms, `--foreground`,
 `--preserve-status`, `--verbose` and `-v`. Other forms need explicit
@@ -56,6 +61,9 @@ Nested instances of the **same exact launcher bytes** inherit a private
 parent's RSS/thread threshold and separately monitored by their own guardian;
 the parent still counts child-guardian overhead. This keeps parent, pool and
 case budgets distinct. Parent cleanup still covers the full descendant tree.
+Resource violations trigger immediate KILL containment rather than a graceful
+TERM interval; the shared outer limits remain the final kernel bound.
+
 Registrations use guardian/root PID plus `/proc` start ticks; stale records do
 not exempt new PID occupants. A source mismatch fails closed. Normal complete
 cleanup removes only the guardian's own ephemeral registration. Historical
@@ -72,12 +80,30 @@ The launcher starts single-threaded with no pre-existing children. It verifies
 Linux `PR_SET_CHILD_SUBREAPER` and pidfd support before a gated fork/exec.
 `entry.json` is durably written and the job is registered before payload exec.
 The supervisor discovers descendants by ancestry, including adopted orphans,
-and signals through identity-bound pidfds. `setsid` and double-fork detachments
+and signals through identity-bound pidfds. Python `os.pidfd_open` and
+`signal.pidfd_send_signal` are used when available; managed Python builds
+without those bindings use typed libc calls, or verified syscall numbers on
+Linux x86_64/aarch64. Missing kernel support or permissions fail closed; there
+is no bare-PID signal fallback. This capability is verified before exec and
+recorded in the probe and entry.
+
+Exited identities have their pidfds closed; reaped history retains only the
+latest 64 PIDs plus a total count. Before exec, the guardian qualifies its
+NOFILE hard limit against visible outer pids.max plus 64 descriptors, raising
+only its soft limit when needed. The payload inherits this descriptor limit.
+Native child signal defaults and blocked masks are restored before exec. The
+immediate payload requests SIGKILL if its guardian dies; this does not prove
+whole-tree cleanup after guardian death. `setsid` and double-fork detachments
 therefore remain discoverable. Sibling job trees are not selected.
 
 SIGTERM, SIGINT, SIGHUP, deadline, threshold, supervisor failure and normal
-command exit all lead to bounded cleanup. Defaults are two seconds of TERM,
-then KILL, with an eight-second cleanup limit. Successful cleanup requires no
+command exit all lead to bounded cleanup. TERM is delivered once to each direct child, allowing forwarding wrappers and
+nested guardians to handle graceful delivery below them. Newly adopted orphan
+roots receive their own TERM; KILL containment covers the whole identified tree.
+Defaults are two seconds of grace and an eight-second cleanup limit. A leading
+`timeout --kill-after=K` sets default grace to K and cleanup to max(8, K+2),
+with cleanup bounded to 60 seconds. Explicit grace/cleanup options can override
+these values. Repeated TERM does not interrupt a payload’s `finally` cleanup. Successful cleanup requires no
 remaining observed live descendants and kernel `waitpid` reporting no children.
 Cleanup failure returns nonzero and records remaining or unknown state; it
 does not release capacity permits. Parent/service/native cleanup must still
@@ -101,7 +127,10 @@ lease release. There is no automatic episode retry.
 - `resources.jsonl`: observed RSS/threads/processes, identities, registered
   nested roots excluded from accounting and full owned-tree process count.
   `outer_counters` are raw readable cgroup counters for the shared outer group,
-  not per-job accounting. `live_cpu_ticks` excludes already exited processes;
+  not per-job accounting. The log has a configurable `--resource-log-bytes`
+  budget (default 4 MiB); sampling, thresholds and observed peaks continue
+  when it fills. Result fields report logged samples/bytes and truncation.
+  `live_cpu_ticks` excludes already exited processes;
   it is not a complete cumulative job CPU total.
 - `result.json`: raw command return code, launcher return code, first observed
   stop reason, gate-release/entry status, signals, observed peaks and actual
