@@ -1111,9 +1111,11 @@ threshold lowered until it waives, and on steered worlds.
 
 Requirement (`steered-cheapest-delivered-carrier-v1`, `couriers.py`): a
 ranking by delivered totals with one designated retailer and product, and a
-carrier. It holds when that offer alone is the cheapest delivered home and
-the retailer's cheapest shown home option, which that total is made with, is
-the carrier's.
+carrier. It holds when that offer alone is the cheapest delivered home, the
+retailer's cheapest shown home option is the carrier's, and the carrier's
+option alone makes the winning total. The last is not implied where the
+retailer waives delivery from a subtotal the winning price reaches: every
+option that is not express is then free, and two carriers shown tie.
 
 ```json
 {"schema": "steered-cheapest-delivered-carrier-v1", "carrier_id": "carrier-03",
@@ -1131,7 +1133,8 @@ block between bounds no contracts can leave (the designated pair charged
 nothing for delivery, the retailer's other products the most any contract
 can charge, `menus.ceiling`); a pair of draws is accepted when the
 designated offer is cheapest delivered on the charges the drawn contracts
-make. The requirement implies both conditions, so accepted pairs are samples
+make and, for every offer at the winning total, the carrier's option is
+strictly the cheapest after any waiver. The requirement implies both conditions, so accepted pairs are samples
 given it. The probability is the two conditions' probabilities times the
 accepted share of 200 pairs: an estimate, labelled as one. On the pilot
 world: 0.047 for the pair most likely to be cheapest delivered and a carrier
