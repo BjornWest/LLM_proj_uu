@@ -153,5 +153,20 @@ remain runnable. A test against an unreviewed caller candidate is preparation,
 not source adoption. Do not replace the caller's independent review or actual
 native-world/grade/viewer/recording acceptance with these mock HTTP results.
 The source hash is checked before loading the external test input. The default
-hash names the reviewed `97e2d82` caller's runtime (`4491d896…`); supply the exact release hash when
-deliberately testing a revised caller. No default skip is claimed as acceptance.
+hash names Evaluation's Claude-reviewed `ea28b1a` runtime:
+`c0684c3ff0923a5054d5804c85b61d231caf774837963ed94641046351419ff3`.
+This release adds the private opt-in `rental_bounded` submitted-read policy;
+the default `bounded_request` behavior and hosted timeout stay separate.
+Its ordered counter projection remains
+`e818865d35a1a4cd9c6d3abc1c3fa02786cad1cb8eb89bd57b870f2ae6b8c27e`.
+
+Bind the new full runtime path/hash in the caller, worker, measurement and fresh
+qualification inputs. An unchanged counter projection permits capability reuse
+only when the complete measured compatibility fingerprint and proof scope also
+match; it does not permit copying old session/readiness/deadline receipts.
+The exact source gate in `qualify_qwen_wire.py` uses the same reviewed hash;
+`measure_qwen_host.py` imports that loader even when reusing a capability.
+Update that pin together with the test default, not only the live binding JSON.
+Supply the exact release hash when deliberately testing a revised caller, and
+pair future runtime releases with a test-default pin update. Require zero skips
+for composition acceptance; a missing source and exit0 are not qualification.
