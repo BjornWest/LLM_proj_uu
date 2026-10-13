@@ -310,6 +310,43 @@ class TopicTests(Ratings):
             self.assertEqual((found.identical, found.agreed), ([True], [True]))
             self.assertEqual(found.satisfied, reading.holds(seed))
 
+    def test_a_topic_counts_in_its_shipping_class_only_and_the_runner_labels_the_estimate(self):
+        from collections import Counter
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from experiments.steered_generation import run
+        carrier = self.carriers[3]
+        classes = Counter(row["shipping_class"] for row in self.natural["carrier_evidence"]["private"]["shipments"]
+                          if row["carrier_id"] == carrier)
+        self.assertEqual(len(classes), 2)
+        rare = min(classes, key=classes.get)
+        requirement = self.need(3, average_stars={"min": 4.0}, topic={"aspect": "handling", "shipping_class": rare, "positive": {"min": 1}})
+        topic = {"schema": carriers.VERSION, "carrier_id": carrier, **requirement["topic"]}
+        everywhere = {key: value for key, value in topic.items() if key != "shipping_class"}
+        only_elsewhere = 0
+        for seed in range(8):
+            world, found, record = ratings.steer(self.session, self.natural, self.opened, requirement, self.api, Random(seed))
+            self.assertGreaterEqual(found["topic"]["counts"]["positive"], 1)
+            self.assertTrue(carriers.satisfied(world, topic, self.api))
+        # The same statement over every class is likelier, and holds in redraws where the class's own does not.
+        place = ratings.site(self.natural, requirement, self.api)
+        wide = ratings.site(self.natural, {**requirement, "topic": {k: v for k, v in requirement["topic"].items() if k != "shipping_class"}}, self.api)
+        for seed in range(10 ** 6, 10 ** 6 + 400):
+            levels = {name: ratings.level(place, name, seed) for name in place.aspects}
+            happened = ratings.histories(place, levels)
+            mentions = [ratings.reviewed(place, index, history, seed)[1] for index, history in enumerate(happened)]
+            narrow, broad = ratings.said(place, happened, mentions), ratings.said(wide, happened, mentions)
+            self.assertLessEqual(narrow, broad)
+            only_elsewhere += broad and not narrow
+        self.assertGreater(only_elsewhere, 10)
+        case = {"samples": [], "requirement_sha256": "x"}
+        with TemporaryDirectory() as folder:
+            run.stars_case(SimpleNamespace(samples=1, producer_redraws=1, validate_trials=1500), self.session, self.natural,
+                           self.opened, self.api, requirement, case, lambda index: Path(folder) / str(index))
+        self.assertEqual((case["status"], case["probability_is_estimated"]), ("sampled", True))
+        self.assertTrue(case["validation"]["within_four_standard_errors"])
+        self.assertIn("computed_standard_error", case["validation"])
+
     def test_samples_match_rejection_sampling(self):
         requirement = self.need(1, levels={"punctuality": "weak"}, topic={"aspect": "punctuality", "verdict": "more_positive"})
         place = ratings.site(self.natural, requirement, self.api)
