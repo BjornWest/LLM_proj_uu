@@ -172,3 +172,42 @@ against ordered UTF-8 JSON before backend construction. Instance readiness must
 expire at the allocation-anchored rental deadline; readiness remains freshly
 checked on each call. Capability-bearing runtime specifications are temporary
 private transport files and are excluded from returned artifacts.
+
+
+## Runtime concurrency control
+
+The optional `runtime_limits` setting binds three positive integers:
+`max_active_ceiling`, `max_generation_ceiling`, and `initial_generation_requests`.
+The initial episode target remains `max_concurrent_episodes`. The immutable
+browser pool and tokenizer capacity are created from the active ceiling plus
+`prewarm_count`; increases cannot exceed those reviewed resources. Omitting
+`runtime_limits` preserves fixed-cap behavior.
+
+The parent writes `runtime-limits-private.json` with mode 0600 outside the trace
+roots. Use the frozen `scripts/qwen_suite_observer.py` through SSH on the worker:
+
+```bash
+python -I -B scripts/qwen_suite_observer.py --descriptor RUN/runtime-limits-private.json limits
+python -I -B scripts/qwen_suite_observer.py --descriptor RUN/runtime-limits-private.json update_limits --max-active-episodes 3 --max-generation-requests 3 --expected-revision 0
+```
+
+Read the returned revision before each update. Stale revisions, malformed values,
+expired/finished suites and requests above fixed ceilings are rejected. Queue
+admission and controller CAS updates share the queue lock. Lowering targets
+drains already-created environments and in-flight requests without cancellation
+or prefix credit. An admitted actor still constructing its environment can park
+before native capacity registration until existing actors finish. The existing
+read-only observer and controller `status()` formats remain unchanged. The
+capability token never belongs in policy context, argv or public viewer metadata.
+Each accepted update is retained in `runtime-limits-events.jsonl`.
+
+Source/CPU approval does not qualify a new host's browser capacity, inference
+context or serving counter. Use actual bound startup/grade/HTTP controls and the
+current serving qualification before the finite authorized cohort is dispatched.
+
+When qualifying the exact caller in `scripted` mode with runtime controls enabled,
+the parent uses an explicit local `ScriptedMetrics` fixture and the real parent /
+child capacity RPC. Policy and formatter remain supplied scripted responses.
+`scripted-capacity-fixture.json` records that no serving readiness, Qwen counter
+parity or provider inference was established. This branch cannot run for a model
+episode; real mode still requires `ServingAdmission` and its current source proof.

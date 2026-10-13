@@ -1,5 +1,5 @@
 """Finite MiMo/Luna comparison cases sharing one capped, prewarming queue."""
-from contextlib import contextmanager
+from contextlib import contextmanager,nullcontext
 from hashlib import sha256
 from pathlib import Path
 import json,math,os,runpy,signal,socket,sqlite3,subprocess,sys,tempfile,threading,time,types,importlib.util
@@ -58,6 +58,18 @@ def capacity_modules(s):
   for key in (name,name+'.capacity_control',name+'.serving_telemetry'):sys.modules.pop(key,None)
   raise
 
+def runtime_limits(s):
+ cap=s['max_concurrent_episodes']
+ value=s.get('runtime_limits')
+ if value is None:return cap
+ if not qwen_mode(s):raise ValueError('Runtime limit updates require the private Qwen parent')
+ if (type(value) is not dict or set(value)!={'max_active_ceiling','max_generation_ceiling','initial_generation_requests'}
+     or any(type(v) is not int or v<1 for v in value.values())
+     or type(cap) is not int or not 1<=cap<=value['max_active_ceiling']
+     or value['initial_generation_requests']>value['max_generation_ceiling']):
+  raise ValueError('Explicit fixed episode/generation ceilings and initial targets required')
+ return value['max_active_ceiling']
+
 def validate_qwen_limits(s):
  if (s.get('max_steps') is not None or s.get('episode_timeout') is not None
      or s.get('max_input_tokens')!=250000 or s.get('server_context_tokens')!=262144
@@ -65,6 +77,7 @@ def validate_qwen_limits(s):
      or type(s.get('request_timeout')) is not int or not 0<s['request_timeout']<=600
      or type(s.get('startup_timeout')) is not int or not 0<s['startup_timeout']<=900):
   raise ValueError('Explicit Qwen native context/input/headroom and request/startup limits required')
+ runtime_limits(s)
  if any(c.get('policy_model')!='Qwen/Qwen3.8-27B-FP8' or c.get('max_input_tokens')!=250000
         or c.get('id')!='qwen-'+c.get('task_id','') for c in s['cases']):
   raise ValueError('One exact Qwen model and task identity per finite case required')
@@ -399,7 +412,7 @@ def execute(s,c,scripted=False):
    answer=load(checked(c['scripted_answer']))['text']
    journey=load(checked(c['scripted_journey'])) if c.get('scripted_journey') else None
    journey_index=0
-   def dispatched(req):
+   def response(req):
     nonlocal journey_index
     before_dispatch();before('policy')
     # Keeps initial active controls alive while the fourth environment parks.
@@ -409,6 +422,9 @@ def execute(s,c,scripted=False):
      response=journey[journey_index];journey_index+=1
      return httpx.Response(200,json=response)
     return httpx.Response(200,json={'choices':[{'finish_reason':'tool_calls','message':{'role':'assistant','content':None,'tool_calls':[{'id':'positive','type':'function','function':{'name':'send_msg_to_user','arguments':json.dumps({'text':answer})}}]}}],'usage':{}})
+   def dispatched(req):
+    with capacity_client.turn('policy') if capacity_client is not None else nullcontext():
+     return response(req)
    b.client=httpx.Client(transport=httpx.MockTransport(dispatched))
   elif qwen_mode(s):
    with factories.policy_session(before_dispatch=before_dispatch) as b:yield b
@@ -419,6 +435,9 @@ def execute(s,c,scripted=False):
  class Formatter:
   model='scripted'
   def complete(self,messages):
+   with capacity_client.turn('formatter') if capacity_client is not None else nullcontext():
+    return self._complete(messages)
+  def _complete(self,messages):
    before('formatter');payload=json.loads(messages[1]['content'])
    if payload['final_answer']!=load(checked(c['scripted_answer']))['text']:raise ValueError('Scripted delivered answer changed')
    text=json.dumps(load(checked(c['scripted_claims'])))
@@ -481,11 +500,15 @@ def execute(s,c,scripted=False):
    if current!=pending_snapshot['before']:raise RuntimeError('Browser state changed while parked; stale policy request not dispatched')
    record({'event':'fresh_after_capacity_wait','phase':phase,'browser_semantic_sha256':current})
  try:
-  if qwen_mode(s) and not scripted:
-   qwen,serving=qwen_live(s)
+  if qwen_mode(s) and (not scripted or s.get('runtime_limits') is not None):
+   if not scripted:qwen,serving=qwen_live(s)
    _,observer_module=qwen_modules(s)
    rpc=types.SimpleNamespace(**runpy.run_path(str(checked(s['qwen_sources']['rpc']))))
-   capacity_client=observer_module['connect_client'](rpc,s['capacity_bindings'][c['id']],deadline=time.monotonic()+serving.deadline-time.time(),on_event=lambda row:record_capacity(out,row))
+   binding=s['capacity_bindings'][c['id']]
+   expiry=binding['deadline_utc'] if scripted else serving.deadline
+   if type(expiry) not in (int,float) or not math.isfinite(expiry) or expiry<=time.time():
+    raise ValueError('Future parent capacity deadline required')
+   capacity_client=observer_module['connect_client'](rpc,binding,deadline=time.monotonic()+expiry-time.time(),on_event=lambda row:record_capacity(out,row))
   if qwen_mode(s) and not scripted:
    factories=qwen['QwenFactories'](backend_class=ChatCompletionsBackend,admission=serving,
     before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
@@ -578,13 +601,14 @@ def _supervise(s,scripted=False,stop=None):
   for ident in members:events.subscribe(s['suite_id']+'-'+ident,s['suite_id'],'codex:'+s['thread_id'],episode=ident,final=False)
   events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[n for n in (10,20,30,35,40,50) if n<len(members)],final=True)
  h['register_roots'](s)
- stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop) if qwen_mode(s) else None
+ ceiling=runtime_limits(s)
+ stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop) if qwen_mode(s) else None
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
   os.chmod(tmp,0o700);s=dict(s);s['tokenizer_socket']=str(Path(tmp)/'tokenizer.sock');s['sockets']={}
   assets=[checked(s['tokenizer'])] if qwen_mode(s) else [Path(s['counter_assets_root'])/'mimo-v2.6-pro-73875d00/tokenizer.json',checked(s['tokenizer'])]
   manifest=Path(tmp)/'assets.json';save(manifest,[{'path':str(a),'sha256':pin(a)['sha256'],'normalization':'raw'} for a in assets])
   root=s['cases'][0]['root']
-  service=subprocess.Popen([s['python'],'-I','-B','-c',"import sys;sys.path.insert(0,sys.argv[1]);from intent_browser.tokenizer_service import main;sys.argv=sys.argv[1:];sys.argv[0]='tokenizer_service';main()",root,'--socket',s['tokenizer_socket'],'--manifest',str(manifest),'--max-clients',str(s['max_concurrent_episodes']+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=(out/'tokenizer-stderr.log').open('x'),text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
+  service=subprocess.Popen([s['python'],'-I','-B','-c',"import sys;sys.path.insert(0,sys.argv[1]);from intent_browser.tokenizer_service import main;sys.argv=sys.argv[1:];sys.argv[0]='tokenizer_service';main()",root,'--socket',s['tokenizer_socket'],'--manifest',str(manifest),'--max-clients',str(ceiling+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=(out/'tokenizer-stderr.log').open('x'),text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
   try:
    import select
    if not select.select([service.stdout],[],[],30)[0] or json.loads(service.stdout.readline()).get('ready') is not True:raise RuntimeError('Shared tokenizer host not ready')
@@ -601,13 +625,20 @@ def _supervise(s,scripted=False,stop=None):
      if not required<=manifest['source_sha256'].keys():raise ValueError('Recipe omits pooled runtime source pins')
     owner=load(out/'supervisor-start.json')
     s['chromium_descriptor']=str(pool_directory/'descriptor.json')
-    pool_service=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','3072','--tasks','512','--receipt',str(out/'chromium-pool-bounded'),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',str(service_driver),'--source-root',root,'--owner-pid',str(owner['pid']),'--owner-start',owner['process_start'],'--directory',str(pool_directory),'--max-leases',str(2*(s['max_concurrent_episodes']+s['prewarm_count'])),'--per-server',str(s['max_concurrent_episodes']+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=pool_log,text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
+    pool_service=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','3072','--tasks','512','--receipt',str(out/'chromium-pool-bounded'),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',str(service_driver),'--source-root',root,'--owner-pid',str(owner['pid']),'--owner-start',owner['process_start'],'--directory',str(pool_directory),'--max-leases',str(2*(ceiling+s['prewarm_count'])),'--per-server',str(ceiling+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=pool_log,text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
     if not select.select([pool_service.stdout],[],[],45)[0]:raise RuntimeError('Chromium pool service did not become ready')
     descriptor=pool_service.stdout.readline().strip()
     if descriptor!=str(pool_directory/'descriptor.json') or not Path(descriptor).is_file():raise RuntimeError('Chromium pool descriptor differs')
     s['chromium_descriptor']=descriptor
-   if qwen_mode(s) and not scripted:
-    _,serving=qwen_live(s);modules=capacity_modules(s);_,observer_module=qwen_modules(s)
+   if qwen_mode(s) and (not scripted or s.get('runtime_limits') is not None):
+    modules=capacity_modules(s);_,observer_module=qwen_modules(s)
+    if scripted:
+     scripted_metrics=observer_module['ScriptedMetrics']()
+     serving=types.SimpleNamespace(raw=scripted_metrics.raw,session='scripted-'+s['suite_id'],
+      identity={'model':'scripted','serving_revision':'explicit-offline-metrics-fixture'},deadline=time.time()+s['suite_timeout'])
+     save(out/'scripted-capacity-fixture.json',{'scripted':True,'provider_requests':0,'serving_readiness':False,
+      'counter_parity':False,'scope':'Actual parent/client/control RPC with explicit offline policy/formatter/metrics fixtures'})
+    else:_,serving=qwen_live(s)
     capacity_host=observer_module['CapacityHost'](rpc=modules['rpc'],control=modules['control'],telemetry=modules['telemetry'],source=s,output=out,case_ids=s['start_order'],cap=s['max_concurrent_episodes'],deadline=time.monotonic()+serving.deadline-time.time(),stop_event=stop,directory=tmp,qualification=serving)
     s['capacity_bindings']={ident:capacity_host.child_binding(ident) for ident in s['start_order']}
     save(out/'observer-transport.json',{'socket':str(capacity_host.observer_rpc.path),'epoch':capacity_host.journal.epoch,'observer_id':capacity_host.observer.observer_id,'session_id':serving.session,'journal':str(out/'serving-telemetry.jsonl'),'maximum_batch_rows':120,'WandB_owner':'workstation controller; no credentials here'})
@@ -676,9 +707,13 @@ def _supervise(s,scripted=False,stop=None):
        if stdout is not None:stdout.close()
        if stderr is not None:stderr.close()
        with lock:clocks[ident]['lifecycle_finished_monotonic']=time.monotonic()
-   result=queue['run_ordered_suite']({c['id']:c for c in s['cases']},one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop)
+   options={}
+   if s.get('runtime_limits') is not None:
+    if capacity_host is None:raise ValueError('Runtime controls require a real capacity parent')
+    options={'max_concurrent_ceiling':ceiling,'on_queue_ready':lambda handle:capacity_host.bind_limits(handle,out)}
+   result=queue['run_ordered_suite']({c['id']:c for c in s['cases']},one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop,**options)
    result['max_observed_active']=max(e['active'] for e in result['events']);result['max_observed_warming']=max(e['warming_or_ready'] for e in result['events']);result['clocks']=clocks
-   if result['max_observed_active']>s['max_concurrent_episodes'] or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
+   if result['max_observed_active']>ceiling or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
    save(out/'suite-result.json',result)
    measurements=[]
    warm_ids={e['case'] for e in result['events'] if e['event']=='warmup_started'}
@@ -697,9 +732,13 @@ def _supervise(s,scripted=False,stop=None):
    for listener in listeners.values():listener.close()
    try:
     if capacity_host is not None:
-     try:save(out/'capacity-terminal.json',{'status':capacity_host.controller.status(),'parent_errors':capacity_host.parent.errors,'cleanup_failures':capacity_host.parent.cleanup_failures,'finished':sorted(capacity_host.parent.finished),'stop_cause':capacity_host.parent.stop_cause})
-     finally:capacity_host.close()
+     try:save(out/'capacity-terminal.json',{'status':capacity_host.controller.status(),**({'limits':capacity_host.controller.limits()} if s.get('runtime_limits') is not None else {}),'parent_errors':capacity_host.parent.errors,'cleanup_failures':capacity_host.parent.cleanup_failures,'finished':sorted(capacity_host.parent.finished),'stop_cause':capacity_host.parent.stop_cause})
+     finally:
+      try:capacity_host.close()
+      finally:
+       if scripted_metrics is not None:scripted_metrics.close();scripted_metrics=None
    finally:
+    if scripted_metrics is not None:scripted_metrics.close()
     try:
      if service and service.poll() is None:service.terminate();service.wait(timeout=10)
     finally:
