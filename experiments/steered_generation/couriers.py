@@ -3,9 +3,12 @@
 A requirement states a ranking by delivered totals with one designated
 retailer and product (the cheapest-available requirement with `delivered`)
 and a carrier. It holds when that retailer's product alone is the cheapest
-delivered home, and the retailer's cheapest shown home-delivery option, which
-is the one that total is made with, is the named carrier's: "the cheapest
-delivered offer comes with this carrier".
+delivered home, the retailer's cheapest shown home-delivery option is the
+named carrier's, and so is the option the winning total is made with, alone:
+"the cheapest delivered offer comes with this carrier". The last is not
+implied by the one before where the retailer waives delivery from a subtotal
+the winning price reaches: every option that is not express then costs
+nothing and two carriers shown tie.
 
 A ranking by delivered totals reads the winner's contracts, through what the
 retailer shows and charges, so the retailer's contracts and the concept's
@@ -89,10 +92,31 @@ def charged(found, contracts):
 
 
 def met(found, contracts, leaves):
-    """The requirement read off the winner's contracts and the block's leaves."""
+    """The requirement read off the winner's contracts and the block's leaves.
+
+    The contracts show the carrier cheapest; the designated pair alone is
+    cheapest delivered on the charges they make; and for every offer of the
+    pair at the winning total the carrier's option is strictly the cheapest
+    after any waiver, as the native task's winning rows have it.
+    """
     scope = charged(found, contracts)
-    return (scope is not None and policies.displayed(found.place, contracts) and
-            cheapest.judged(leaves, found.need, scope) is not None)
+    if scope is None or not policies.displayed(found.place, contracts):
+        return False
+    winning = cheapest.judged(leaves, found.need, scope)
+    if winning is None:
+        return False
+    charge, ships = scope.delivered[found.retailer], scope.sources[found.retailer]
+    for row in leaves["offers"].values():
+        if (row["retailer_id"], row["product_id"]) != (found.retailer, found.need["product_id"]) or row["sku_id"] not in scope.skus:
+            continue
+        holding = [name for name, quantity in row["stock_by_source"].items() if quantity and name in ships]
+        if not holding and not row["supplier_order"]:
+            continue
+        holding = holding or [charge.warehouse]
+        if (scope.key(row["sku_id"], row["price_minor"] + charge.at(row["price_minor"], holding)) == winning and
+                charge.carrier(row["price_minor"], holding) != found.requirement["carrier_id"]):
+            return False
+    return True
 
 
 def contracted(found, block, rng):
@@ -155,11 +179,14 @@ def prepare(natural, requirement, api, rng):
     else:
         raise NumericalLimit("Accepted pairs of draws are too rare to reach")
     concept, declared = block.requirement["concept_id"], footprint(natural, requirement, api)
+    # The ranks sampled are the bounded block's; what is recorded is what the accepted leaves and contracts give.
+    best, _ = cheapest.lowest(leaves, charged(found, contracts))
+    for pair, drawn in draws.items():
+        drawn.cheapest_available = best.get(pair)
 
     def record(world):
         if policies.listed(world, found.place)[0] != contracts or cheapest.recorded(world, concept, set(block.places)) != leaves:
             raise streams.PlanMismatch("The producer recorded other contracts or stock and price leaves than planned")
-        best, _ = cheapest.lowest(leaves, charged(found, contracts))
         return {"method": "independent_draws_between_bounds_then_joint_acceptance", "requirement": found.requirement,
                 "natural_world_id": natural["world_id"], "probability_given_upstream": whole.probability,
                 "log_probability_given_upstream": whole.log_probability, "probability_is_estimated": True,

@@ -164,6 +164,73 @@ class UniformCharges(Couriers):
         self.assertGreater(len(seen), 5)
         self.assertGreater(max(seen), found.ceiling - 5000)
 
+    def test_the_paying_carrier_is_the_oracles_also_under_a_waiver(self):
+        """Per offer, the carrier of the strictly cheapest home option the oracle quotes, with and without a waiver."""
+        from environments.website_world import delivery_options
+        from experiments.accepted_catalog_commerce import basket_quote, delivery_admission
+        seen = {"waived_tie": 0, "waived_one": 0, "paid": 0}
+        for retailer in self.natural["retailers"]:
+            for limit in (None, 1):
+                world = deepcopy(self.natural)
+                patched = next(r for r in world["retailers"] if r["retailer_id"] == retailer["retailer_id"])
+                patched["free_shipping_threshold_minor"] = limit
+                place = menus.oracle(world, retailer["retailer_id"], {}, self.api)
+                charge = menus.delivery(place)
+                if charge is None:
+                    continue
+                settings = delivery_options.options({"enabled": True, "admission_plan": menus.VERSION})
+                plan = basket_quote.make_plan(world)
+                sidecar = delivery_admission.make_plan(world, plan, seed=world["seed"], plan_version=menus.VERSION,
+                                                       count_weights=delivery_options.producer_weights(settings))
+                oracle = delivery_admission.Oracle(world, plan, sidecar)
+                ships = {s["source_id"] for s in patched["source_locations"] if s["shipping_enabled"]}
+                for offer in [o for o in patched["offers"] if o["sku_id"] in self.skus][:6]:
+                    quote = oracle.quote(world, retailer["retailer_id"], [{"line_id": "a", "offer_id": offer["offer_id"], "quantity": 1}],
+                                         plan=plan)
+                    choices = {row["choice_id"]: row for row in quote["delivery_choices"]}
+                    best = {}
+                    for option in quote["options"]:
+                        choice = choices[option["selection"]["a"]]
+                        if choice["destination_type"] == "home":
+                            best[choice["carrier_id"]] = min(best.get(choice["carrier_id"], option["shipping_minor"]), option["shipping_minor"])
+                    if not best:
+                        continue
+                    lowest = sorted(best.values())
+                    expected = None if len(lowest) > 1 and lowest[0] == lowest[1] else min(best, key=best.get)
+                    holding = [name for name, quantity in offer["stock_by_source"].items() if quantity and name in ships]
+                    found = charge.carrier(offer["price_minor"], holding or [charge.warehouse])
+                    self.assertEqual(found, expected, (retailer["retailer_id"], limit, offer["offer_id"]))
+                    self.assertEqual(charge.at(offer["price_minor"], holding or [charge.warehouse]), lowest[0])
+                    seen["paid" if limit is None else "waived_tie" if expected is None else "waived_one"] += 1
+        self.assertTrue(all(count > 3 for count in seen.values()), seen)
+
+    def test_a_waived_winner_with_two_carriers_shown_does_not_hold(self):
+        need = self.need(self.likely[0])
+        world = deepcopy(self.natural)
+        next(r for r in world["retailers"] if r["retailer_id"] == self.likely[0][0])["free_shipping_threshold_minor"] = 1
+        # The edited copy keeps the world's id, which the estimates of this process are kept by.
+        saved = dict(couriers.ESTIMATES)
+        couriers.ESTIMATES.clear()
+        try:
+            whole, reading = couriers.model(world, need, self.api), couriers.trial(world, need, self.api)
+        finally:
+            couriers.ESTIMATES.clear()
+            couriers.ESTIMATES.update(saved)
+        held = [reading.reading(seed) for seed in range(10 ** 6, 10 ** 6 + 2500) if reading.holds(seed)]
+        chance, trials = whole.probability, 2500
+        self.assertGreater(len(held), 30)
+        self.assertLess(abs(len(held) / trials - chance), 4.5 * (chance * (1 - chance) / trials + whole.error ** 2) ** .5)
+        # Under a waiver the carrier's option must still be strictly the cheapest of those shown, where every route
+        # that is not express costs nothing. Without a waiver other carriers' ordinary routes are shown beside it.
+        place, warehouse = whole.site.place.menu, whole.site.shared.scope.delivered[self.likely[0][0]].warehouse
+        ordinary = lambda contracts: {row["carrier_id"] for row in menus.shown(place, contracts) if row["tier"] != "express"}
+        for contracts, _ in held:
+            self.assertLessEqual(ordinary(contracts), {need["carrier_id"]})
+            self.assertEqual(menus.delivery(place, contracts).carrier(10 ** 6, [warehouse]), need["carrier_id"])
+        natural = couriers.trial(self.natural, need, self.api)
+        beside = [natural.reading(seed)[0] for seed in range(10 ** 6, 10 ** 6 + 2500) if natural.holds(seed)]
+        self.assertTrue(any(len(ordinary(contracts)) > 1 for contracts in beside))
+
     def test_what_it_reads_and_combines_with(self):
         need = self.need(self.likely[0])
         winner = self.likely[0][0]
@@ -220,6 +287,45 @@ class ChargesByLocation(Couriers):
     def split(self):
         frame = cheapest.frame(self.natural, {"schema": cheapest.VERSION, **self.base}, self.api)
         return [rid for rid, found in sorted(frame.scope.delivered.items()) if not found.uniform]
+
+    def test_a_threshold_the_winning_price_reaches_naturally(self):
+        """Astra v30: a retailer whose threshold a winning price reaches, with two carriers shown. Every plan must
+        pass the native check, whose winning rows are the carrier's alone; and the record's totals are the world's."""
+        base = {"concept_id": SHOES, "delivered": {},
+                "predicates": [{"field": "product.facts.reference_mass_g", "operator": "eq", "value": 317, "unit": "g"}]}
+        need = {"schema": couriers.VERSION, "carrier_id": self.carriers[2],
+                "cheapest": {**base, "retailer_ids": ["travel-02"], "product_id": "footwear-brand-06/footwear.walking_shoes/11"}}
+        retailer = next(r for r in self.natural["retailers"] if r["retailer_id"] == "travel-02")
+        self.assertEqual(retailer["free_shipping_threshold_minor"], 75000)
+        whole = couriers.model(self.natural, need, self.api)
+        found, waived, tied = whole.site, 0, 0
+        for seed in range(32):
+            step = couriers.prepare(self.natural, need, self.api, Random(seed))
+            if seed < 6:
+                world, seen, record = blocks.steer(self.session, self.natural, self.opened, step, self.api)
+                rows = seen["reference"]["winners"]
+                self.assertEqual({row["delivery"]["carrier_id"] for row in rows}, {need["carrier_id"]})
+                self.assertEqual(record["winning_total_minor"], seen["total_minor"])
+                totals = {}
+                for row in seen["reference"]["candidates"]:
+                    pair = (row["retailer_id"], row["product_id"])
+                    totals[pair] = min(totals.get(pair, row["option"]["total_minor"]), row["option"]["total_minor"])
+                for row in record["restocked"]:
+                    self.assertEqual(row["cheapest_available_minor"], totals.get((row["retailer_id"], row["product_id"])))
+                waived += seen["total_minor"] == rows[0]["price_minor"]
+        # The broader event, without the paying carrier, does happen here: redraws where the pair wins with a tie of carriers.
+        reading = couriers.trial(self.natural, need, self.api)
+        trials, hits = 3000, 0
+        for seed in range(10 ** 6, 10 ** 6 + trials):
+            contracts, leaves = reading.reading(seed)
+            scope = couriers.charged(found, contracts)
+            wins = scope is not None and policies.displayed(found.place, contracts) and cheapest.judged(leaves, found.need, scope) is not None
+            holds = reading.holds(seed)
+            self.assertLessEqual(holds, wins)
+            hits, tied = hits + holds, tied + (wins and not holds)
+        self.assertGreater(tied, 5)
+        chance = whole.probability
+        self.assertLess(abs(hits / trials - chance), 4.5 * (chance * (1 - chance) / trials + whole.error ** 2) ** .5)
 
     def test_a_winner_that_charges_by_location_and_one_that_does_not(self):
         split = self.split()

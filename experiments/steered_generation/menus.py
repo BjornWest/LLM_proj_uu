@@ -225,14 +225,29 @@ def delivery(place, contracts=None):
         routes.append(route)
     threshold = place.retailer["free_shipping_threshold_minor"]
 
-    def at(price, held):
+    def each(price, held):
         waived = threshold is not None and price >= threshold
         # The oracle's dispatch: per route the location with the lowest tariff before any waiver.
-        return min(route[min(held, key=lambda name: route[name][0])][waived] for route in routes)
+        return [route[min(held, key=lambda name: route[name][0])][waived] for route in routes]
+
+    def at(price, held):
+        return min(each(price, held))
+
+    def carrier(price, held):
+        """The carrier of the option the customer pays least for, where one carrier's is strictly the lowest; else None.
+
+        After a waiver every option that is not express costs nothing, so two
+        carriers shown tie however their tariffs differ.
+        """
+        best = {}
+        for row, charge in zip(rows, each(price, held)):
+            best[row["carrier_id"]] = min(best.get(row["carrier_id"], charge), charge)
+        lowest = sorted(best.values())
+        return None if len(lowest) > 1 and lowest[0] == lowest[1] else min(best, key=best.get)
 
     subsets = [[name for index, name in enumerate(shipping) if mask >> index & 1] for mask in range(1, 2 ** len(shipping))]
     bounds = lambda pick: (lambda price: pick(at(price, held) for held in subsets))
-    return SimpleNamespace(at=at, lowest=bounds(min), highest=bounds(max), warehouse=sources[0]["source_id"],
+    return SimpleNamespace(at=at, carrier=carrier, lowest=bounds(min), highest=bounds(max), warehouse=sources[0]["source_id"],
                            uniform=all(len(set(route.values())) == 1 for route in routes))
 
 
