@@ -15,6 +15,7 @@ import threading
 import time
 from urllib.parse import urlsplit,parse_qs,unquote
 from agent_trace.collections import CollectionStore, collection_post, declared_collection, declared_tags, normalize_collection, parent_ids
+from scripts.trace_failure_annotations import read_failure_annotations
 try:
     from .trace_grades import project_grade, FILENAME
 except ImportError:
@@ -156,6 +157,11 @@ class Hub:
             if Path(pattern).is_absolute() or '..' in Path(pattern).parts:raise ValueError('Root patterns must stay inside project')
             roots.extend(p.resolve() for p in base.glob(pattern) if p.is_dir())
         return {source_key(p):p for p in sorted(set(roots)) if p.is_dir()}
+
+    def collection_metadata(self):
+        result=self.collections.index()
+        annotations=read_failure_annotations(self.registry.parent/'failure-annotations.json')
+        return {**result,'failure_annotations':annotations} if annotations is not None else result
 
     def folder_label(self,root):
         root=Path(root).resolve()
@@ -336,7 +342,7 @@ def make_handler(registry, *, hub_class=Hub, html_factory=None):
                 if url.path=='/':
                     body=(html_factory or viewer_html)()
                     mime='text/html; charset=utf-8'
-                elif url.path=='/api/collections':body=json.dumps(hub.collections.index()).encode();mime='application/json'
+                elif url.path=='/api/collections':body=json.dumps(hub.collection_metadata()).encode();mime='application/json'
                 elif url.path=='/api/sessions':body,_=hub.snapshot();mime='application/json'
                 elif url.path=='/api/suites':
                     summaries=hub.suite_summaries()
@@ -391,7 +397,8 @@ def viewer_html(*, preview=False):
     html=enhance_viewer(html)
     # Suite refresh needs initialized collection/sidebar state. Install it last
     # and start once, rather than racing the shared runtime's initialization.
-    suite_client=Path(__file__).with_name('trace_sidebar_suite.js').read_text()
+    suite_client=Path(__file__).with_name('trace_failure_annotations.js').read_text()
+    suite_client+='\n'+Path(__file__).with_name('trace_sidebar_suite.js').read_text()
     suite_client+='\n'+Path(__file__).with_name('trace_suite_client.js').read_text()
     html=html.replace('</script>',suite_client+'\n</script>',1)
     if preview:

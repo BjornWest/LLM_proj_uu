@@ -11,7 +11,7 @@ let suiteGeneration=0,suiteSignature=null,suiteRequest=null,suiteRoute=null;
 const suiteFilters=new Map();
 const originalList=list;
 list=function(){
- originalList();renderSidebarSuiteBadges();
+ originalList();renderSidebarSuiteBadges();renderFailureAnnotation();renderSuiteFailureAnnotations();
 };
 function suiteMode(enabled){
  document.querySelector('main').dataset.suiteMode=String(enabled);
@@ -46,7 +46,7 @@ function renderSuiteDetail(suite){
  for(const text of ['Trace','Case / task','Model','Repeat','Execution','Outcome','Check scope','Grading','Requests','Tool calls','Max ISL','Input tokens¹','Output tokens¹','Cached input¹','Reported charge²'])header.append(node('th','',text));
  thead.append(header);table.append(thead);const tbody=node('tbody');
  for(const c of suite.cases){
-  const row=node('tr'),trace=node('td');if(c.trace_url){const link=node('a','','Open trace');link.href=c.trace_url;trace.append(link)}else trace.textContent='Not started';row.append(trace);
+  const row=node('tr'),trace=node('td');row.dataset.traceId=c.trace_id||'';if(c.trace_url){const link=node('a','','Open trace');link.href=c.trace_url;trace.append(link)}else trace.textContent='Not started';row.append(trace);
   const first=node('td');first.append(node('b','',c.case_id),node('div','suite-note',c.task_title));row.append(first);
   suiteCell(row,c.model);suiteCell(row,String(c.repeat));suiteCell(row,c.state.replaceAll('_',' '));
   suiteCell(row,suiteVerdict(c.verdict),c.verdict===true?'suite-pass':c.verdict===false?'suite-fail':'');
@@ -66,7 +66,7 @@ function renderSuiteDetail(suite){
    if(!row.hidden)visible++;
   });matching.textContent=`Showing ${visible} of ${suite.case_count} cases`;
  }
- search.oninput=applyFilters;models.onchange=applyFilters;outcomes.onchange=applyFilters;applyFilters();
+ search.oninput=applyFilters;models.onchange=applyFilters;outcomes.onchange=applyFilters;applyFilters();renderSuiteFailureAnnotations();
 }
 const originalRefresh=refresh;
 refresh=async function(options={}){
