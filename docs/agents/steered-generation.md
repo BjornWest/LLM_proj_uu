@@ -1040,6 +1040,9 @@ count too: the charge is the lowest over the shown routes of those kinds,
 and a retailer competes when it shows one. What follows is written for home
 delivery and holds for the kinds stated; the requirement of the next section
 (the carrier of the cheapest delivered offer) is for home delivery only.
+With `"max_total_minor"` the task's cap is carried: no offer above it
+counts, so the winner's total is at most the cap, and the requirement has
+no mass where the designated offer cannot be delivered under it.
 
 ```json
 {"schema": "steered-cheapest-available-v1", "concept_id": "footwear.walking_shoes",
@@ -1098,8 +1101,8 @@ samples and at the same price in two more
 (`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
 
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
-total; a cap, a deadline or a comparison site
-are refused; its delivery methods are carried) into the candidates of the other winner tasks, with the
+total; a deadline or a comparison site
+are refused; its delivery methods and its cap are carried) into the candidates of the other winner tasks, with the
 recipe's `delivery_options` beside the task where they are not the
 defaults. Where a charge depends on the location the candidate with an
 offer listed below the winner is left out (two candidates, not three), each

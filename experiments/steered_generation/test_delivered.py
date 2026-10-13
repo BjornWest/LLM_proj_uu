@@ -249,6 +249,72 @@ class SteeringTests(Delivered):
         charge = self.frame.scope.delivered[below["retailer_id"]].lowest
         self.assertLess(offer["price_minor"] + charge(offer["price_minor"]), min(total for total, _, _ in quoted.values()))
 
+    def test_a_cap_on_the_total(self):
+        """A delivery task with a cap counts no offer above it: the winner's total is under the cap."""
+        pair = max(self.chances, key=self.chances.get)
+        open_block = cheapest.model(self.natural, self.need(pair), self.api, self.frame)
+        totals_possible = sorted(open_block.log_terms)
+        cap = totals_possible[len(totals_possible) // 2]
+        capped = {**self.need(pair), "delivered": {"max_total_minor": cap}}
+        block = cheapest.model(self.natural, capped, self.api)
+        self.assertEqual(sorted(block.log_terms), [total for total in totals_possible if total <= cap])
+        self.assertLess(block.probability, open_block.probability)
+        self.assertAlmostEqual(block.probability, sum(share for total, share in open_block.shares.items() if total <= cap) *
+                               open_block.probability, places=12)
+        found, trials = cheapest.trial(self.natural, capped, self.api), 800
+        hits, chance = sum(found.holds(seed) for seed in range(10 ** 6, 10 ** 6 + trials)), block.probability
+        self.assertLess(abs(hits / trials - chance), 4 * (chance * (1 - chance) / trials) ** .5 + 1e-9)
+        for seed in range(4):
+            world, seen, record = cheapest.steer(self.session, self.natural, self.opened, capped, self.api, Random(seed))
+            self.assertEqual(seen["task"]["max_total_minor"], cap)
+            self.assertLessEqual(seen["reference"]["optimal_score"][0], cap)
+            self.assertEqual({(row["retailer_id"], row["product_id"]) for row in seen["reference"]["winners"]}, {pair})
+            self.assertTrue(all(row["option"]["total_minor"] <= cap for row in seen["reference"]["candidates"]))
+        # A cap under every total the pair can have leaves nothing; and the candidates tool carries a task's cap.
+        with self.assertRaises(prices.ZeroMass):
+            cheapest.model(self.natural, {**capped, "delivered": {"max_total_minor": totals_possible[0] - 1}}, self.api)
+        task = {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE, "max_total_minor": cap}
+        listed = variants.of(self.natural, task, self.api)
+        self.assertTrue(listed and all(row["requirement"].get("delivered", row["requirement"].get("cheapest", {}).get("delivered"))[
+            "max_total_minor"] == cap for row in listed))
+        for bad in ("900", 900.0, -1, True):
+            with self.assertRaises(ValueError) as caught:
+                cheapest.model(self.natural, {**capped, "delivered": {"max_total_minor": bad}}, self.api)
+            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+
+    def test_a_cap_through_the_seller_requirement(self):
+        """Astra v35: the seller requirement's own reading of who wins must honour the cap, as its model and check do."""
+        natural = self.frame.scope.reference(self.natural)[1]["optimal_score"][0]
+        ranking = {key: value for key, value in self.base.items() if key != "schema"}
+        seller = lambda cap: {"schema": sellers.VERSION, "policy": {"dispatch_days": {"min": 1}},
+                              "cheapest": {**ranking, "delivered": {"max_total_minor": cap}}}
+        need, trials = seller(natural - 1), 500
+        block = sellers.model(self.natural, need, self.api)
+        open_block = sellers.model(self.natural, {**need, "cheapest": ranking}, self.api)
+        self.assertLess(block.probability, open_block.probability)
+        hits, chance = sum(sellers.empirical(self.natural, need, self.api, trials, 10 ** 6).values()), block.probability
+        self.assertLess(abs(hits / trials - chance), 4.5 * (chance * (1 - chance) / trials + block.error ** 2) ** .5 + 1e-9)
+        reading = sellers.trial(self.natural, need, self.api)
+        scope = cheapest.frame(self.natural, sellers.ranking(need), self.api).scope
+        above = 0
+        for seed in range(10 ** 6, 10 ** 6 + 60):
+            best, _ = cheapest.lowest(reading.reading(seed)[0], scope)
+            if best and min(best.values()) > natural - 1:
+                above += 1
+                self.assertIsNone(reading.winner(seed))
+                self.assertFalse(reading.holds(seed))
+        self.assertGreater(above, 3)
+        for seed in (10 ** 6, 10 ** 6 + 9, 904):
+            found = blocks.redraw(self.session, self.natural, [reading], seed)
+            self.assertEqual((found.identical, found.agreed), ([True], [True]))
+        world, found, record = sellers.steer(self.session, self.natural, self.opened, need, self.api, Random(1))
+        self.assertLessEqual(found["cheapest"]["reference"]["optimal_score"][0], natural - 1)
+        # No total is at or under zero: no mass, and no redraw holds.
+        with self.assertRaises(prices.ZeroMass):
+            sellers.model(self.natural, seller(0), self.api)
+        nothing = sellers.trial(self.natural, seller(0), self.api)
+        self.assertFalse(any(nothing.holds(seed) for seed in range(10 ** 6, 10 ** 6 + 100)))
+
     def test_what_it_reads_cannot_be_redrawn_beside_it(self):
         pair = max(self.chances, key=self.chances.get)
         need, carrier = self.need(pair), self.natural["address_context"]["carriers"][0]["carrier_id"]
@@ -326,7 +392,9 @@ class SteeringTests(Delivered):
         counted = variants.of(self.natural, {**task, "delivery_options": {"count_weights": {"1": 1}}}, self.api)
         self.assertEqual(counted[0]["requirement"]["delivered"], {"delivery_options": {"count_weights": {"1": 1}}})
         for other in ({"objective": "fastest_then_cheapest"}, {"delivery_types": ["home", "retailer_branch"]},
-                      {"delivery_types": []}, {"max_total_minor": 90000}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
+                      {"delivery_types": []}, {"delivery_types": {"parcel_locker": False}}, {"delivery_types": None},
+                      {"delivery_types": ["home", 1]}, {"delivery_types": ["home", "home"]}, {"max_total_minor": 900.5},
+                      {"max_total_minor": -1}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
                       {"availability": "positive_stock"},
                       {"delivery_options": {"admission_plan": "retailer-delivery-admission-plan-v1"}}):
             with self.subTest(other=other), self.assertRaises(ValueError):
@@ -506,6 +574,22 @@ class ToAnyDestination(Delivered):
         task, reference = self.frame.scope.reference(self.natural)
         self.assertEqual(task["delivery_types"], sorted(self.delivered["delivery_types"]))
         self.assertEqual(reference["optimal_score"], [min(by_pair.values())])
+
+    def test_retailers_that_deliver_to_points_only_compete(self):
+        """Astra v34: with no carrier delivering to the door, retailers compete through collection points alone."""
+        world = deepcopy(self.natural)
+        for carrier in world["address_context"]["carriers"]:
+            carrier["home_delivery"] = False
+        points = cheapest.frame(world, self.base, self.api)
+        home = cheapest.frame(world, {**self.base, "delivered": {}}, self.api)
+        self.assertFalse(home.scope.delivered)
+        only = set(points.scope.delivered) - set(home.scope.delivered)
+        self.assertGreater(len(only), 3)
+        best, compared = cheapest.lowest(cheapest.recorded(world, SHOES, set(points.places)), points.scope)
+        quoted = totals(world, points.scope.skus, kinds=self.delivered["delivery_types"])
+        self.assertGreater(len(quoted), 10)
+        self.assertEqual({key: total for key, (total, _, _) in quoted.items()}, {key: compared[key] for key in quoted})
+        self.assertEqual({pair[0] for pair in best}, {rid for rid, _ in quoted})
 
     def test_probabilities_and_steered_worlds(self):
         likely = sorted(self.chances, key=self.chances.get, reverse=True)[:2]

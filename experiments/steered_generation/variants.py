@@ -48,7 +48,8 @@ DELIVERY = "matching_single_item_delivery"
 FIELDS = {**{kind: {"kind", "concept_id", *fields} for kind, fields in WINNERS.items()},
           # One unit delivered home at the lowest total; a cap, a deadline, other delivery methods or a comparison
           # site are not carried. The recipe's delivery settings come beside the task, not in it.
-          DELIVERY: {"kind", "concept_id", "predicates", "objective", "destination", "delivery_types", "delivery_options"},
+          DELIVERY: {"kind", "concept_id", "predicates", "objective", "destination", "delivery_types", "delivery_options",
+                     "max_total_minor"},
           "cheapest_matching_with_memory": {"kind", "concept_id", "recipient", "predicates", "memory_records",
                                             "availability", *SITE},
           "cheapest_matching_after_clarification": {"kind", "concept_id", "predicates", "hidden_requirement",
@@ -321,10 +322,14 @@ def of(world, task, api):
         if task.get("objective", "cheapest_total") != "cheapest_total" or task.get("destination", "user_home") != "user_home":
             raise ValueError("Steering reads this task for the cheapest total delivered for the customer's home address")
         # Home delivery alone is the task's default and is left unstated, as the native task leaves it.
-        kinds = {} if sorted(task.get("delivery_types", ["home"])) == ["home"] else {"delivery_types": sorted(task["delivery_types"])}
+        stated = task.get("delivery_types", ["home"])
+        if type(stated) is not list or not stated or any(type(kind) is not str for kind in stated) or len(set(stated)) != len(stated):
+            raise ValueError("A delivery task's methods are a nonempty list of distinct names")
+        kinds = {} if stated == ["home"] else {"delivery_types": sorted(stated)}
         return winners(world, {"kind": "cheapest_matching_available", "concept_id": task["concept_id"],
                                "predicates": task.get("predicates")}, api,
-                       extra={"delivered": {**{key: task[key] for key in ("delivery_options",) if key in task}, **kinds}})
+                       extra={"delivered": {**{key: task[key] for key in ("delivery_options", "max_total_minor") if key in task},
+                                            **kinds}})
     if kind in WINNERS:
         return winners(world, task, api)
     if kind not in OTHERS:
