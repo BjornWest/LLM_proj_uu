@@ -66,10 +66,13 @@ def safe_trace(case):
 
 
 class SuiteCatalog:
-    def __init__(self, registry=None, *, plan_paths=None):
+    native_state_grades = False
+
+    def __init__(self, registry=None, *, plan_paths=None, grade_reader=None):
         self.registry = Path(registry) if registry is not None else None
         self.plan_paths = plan_paths
         self.grade_cache = {}
+        self.grade_reader = grade_reader
 
     def plans(self):
         config = read(self.registry) if self.registry else {'project_root': str(Path.cwd())}
@@ -106,6 +109,10 @@ class SuiteCatalog:
         return result
 
     def verified_grade(self, trace):
+        if self.grade_reader is not None:
+            # Native readers revalidate nested/external evidence and dynamic
+            # registry bindings; the legacy stat cache cannot cover those.
+            return self.grade_reader(trace)
         # The detail view verifies original bindings once per file revision.
         # Sidebar/catalog enumeration never reads model payloads for this.
         from scripts.trace_grades import read_grade, BOUND_FILES, FILENAME, REVISION_FILENAME
@@ -161,10 +168,20 @@ class SuiteCatalog:
                 grade = self.verified_grade(trace) if verify else summary.get('derived_evaluation')
                 if grade:
                     row['grading_status'] = 'graded' if grade.get('binding_status') == 'verified' else 'binding_error'
-                    # Answer checks do not establish broader safe success.
-                    row['answer_checks'] = grade.get('structured_claims_correct') if grade.get('binding_status') == 'verified' else None
-                    if row['verdict_scope'] is None:
-                        row.update(verdict=row['answer_checks'], verdict_scope='derived_answer_checks')
+                    scope = grade.get('grading_scope')
+                    state_scope = (self.native_state_grades or self.grade_reader is not None) and scope in ('captured_cart_state', 'captured_address_state')
+                    check_field = 'state_checks' if state_scope else 'answer_checks'
+                    # Scoped checks never establish broader safe success.
+                    row[check_field] = grade.get('structured_claims_correct') if grade.get('binding_status') == 'verified' else None
+                    if state_scope:
+                        row['grading_scope'] = scope
+                        if grade.get('error'):
+                            row['grade_binding_error'] = grade['error']
+                        for field in ('scoring_scope', 'full_effects', 'full_order_completion', 'limitations'):
+                            if field in grade:
+                                row[field] = grade[field]
+                    if row['verdict_scope'] is None and (not state_scope or grade.get('binding_status') == 'verified'):
+                        row.update(verdict=row[check_field], verdict_scope='derived_' + scope if state_scope else 'derived_answer_checks')
             rows.append(row)
         verdicts = Counter('pass' if r['verdict'] is True else 'fail' if r['verdict'] is False else 'unknown' for r in rows)
         updated = suite_updated or max(episode_updates, default=None)
@@ -172,7 +189,7 @@ class SuiteCatalog:
                 'updated_at': updated.isoformat() if updated is not None else None,
                 'limits': plan.get('limits'), 'case_count': len(rows), 'counts': dict(verdicts),
                 'states': dict(Counter(r['state'] for r in rows)), 'cases': rows,
-                'training_eligible': False, 'grade_scope_note': 'Recorded safe success and derived answer checks are distinct. Unexecuted, unknown and technical errors are retained.'}
+                'training_eligible': False, 'grade_scope_note': 'Recorded safe success, derived answer checks and captured state checks are distinct. Address-only checks do not establish full ordering success or broader effects. Unexecuted, unknown and technical errors are retained.'}
 
     def index(self, summaries=None):
         rows = [{k: v for k, v in self.detail(ident, summaries=summaries, verify=True).items() if k != 'cases'}

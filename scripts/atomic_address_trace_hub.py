@@ -111,8 +111,17 @@ def read_grade(directory, entry):
 class AddressStateHub(cart_hub.CartStateHub):
     def __init__(self, registry, *args, **kwargs):
         super().__init__(registry, *args, **kwargs)
+        self.suites = cart_hub.StateSuiteCatalog(self.registry, grade_reader=self.suite_grade)
         self.addresses = json.loads(Path(registry).read_text()).get('address_grades', {})
         self.version = hashlib.sha256((self.version+Path(__file__).read_text()+json.dumps(self.addresses, sort_keys=True)).encode()).hexdigest()
+
+    def suite_grade(self, directory):
+        try:
+            grade = self.address_grade(directory)
+        except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
+            return {'binding_status': 'invalid', 'grading_scope': SCOPE,
+                    'structured_claims_correct': None, 'error': 'Address grade unavailable: ' + str(exc)}
+        return grade if grade is not None else cart.read_grade(directory)
 
     def address_grade(self, directory):
         # New episode grades are registered after native grading; never cache

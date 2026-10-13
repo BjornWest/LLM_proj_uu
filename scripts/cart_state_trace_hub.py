@@ -9,22 +9,12 @@ from scripts import cart_state_trace_grades as state
 
 
 class StateSuiteCatalog(trace_suites.SuiteCatalog):
+    native_state_grades = True
+
     def verified_grade(self, trace):
         # State evidence includes nested raw captures and external approvals;
         # the legacy cache's top-level file signature cannot validate these.
-        return state.read_grade(trace)
-
-    def detail(self, ident, *, summaries=None, verify=True):
-        result = super().detail(ident, summaries=summaries, verify=verify)
-        for row, case in zip(result['cases'], self.plans()[ident][1]['cases']):
-            trace = trace_suites.safe_trace(case)
-            grade = self.verified_grade(trace) if trace else None
-            if grade and grade.get('grading_scope') == state.SCOPE:
-                row['state_checks'] = row.pop('answer_checks', None)
-                if row['verdict_scope'] == 'derived_answer_checks':
-                    row['verdict_scope'] = 'derived_captured_cart_state'
-        result['grade_scope_note'] += ' Captured cart state is separate from answer checks and broader safety.'
-        return result
+        return super().verified_grade(trace) if self.grade_reader is not None else state.read_grade(trace)
 
 
 class CartStateHub(base.Hub):
