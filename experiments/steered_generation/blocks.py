@@ -112,7 +112,8 @@ class Step:
     besides. `record(world)` checks that the producer recorded the plan and
     describes the block; `check(world)` reads the requirement off the finished
     world. A block whose probability can fall below the float range gives its
-    logarithm as well; `probability` is then 0.0.
+    logarithm as well; `probability` is then 0.0. A block whose probability
+    is an estimate gives its standard error in `error`; zero says it is exact.
     """
     script: dict
     probability: float
@@ -121,6 +122,7 @@ class Step:
     record: Callable
     check: Callable
     log_probability: float = None
+    error: float = 0.0
 
 
 def bound(value):

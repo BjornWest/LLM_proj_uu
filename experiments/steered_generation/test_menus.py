@@ -282,6 +282,110 @@ class SteeringTests(Menus):
                         self.need("small", shown={"carriers": {"include": self.carriers[:4]}}), missing, None)
         self.assertEqual(missing["status"], "zero_probability_given_upstream")
 
+    def test_a_recipe_that_strands_another_retailer_has_no_site(self):
+        """Astra v26: the target can support the recipe's counts while a retailer whose contracts stay cannot."""
+        plan = basket_quote.make_plan(self.natural)
+        routes = {r["retailer_id"]: len(delivery_admission.enumerate_routes(self.natural, plan, r["retailer_id"]))
+                  for r in self.natural["retailers"]}
+        target = max(routes, key=routes.get)
+        fewest = min(count for rid, count in routes.items() if count and rid != target)
+        self.assertLess(fewest + 1, routes[target])
+        clause = lambda count: {"cheapest_carrier": self.carriers[0], "destination_type": "any",
+                                "delivery_options": {"count_weights": {str(count): 1}}}
+        stranding = {"schema": policies.VERSION, "retailer_id": target, "shown": clause(fewest + 1)}
+        with self.assertRaises(prices.ZeroMass) as caught:
+            policies.model(self.natural, stranding, self.api)
+        self.assertEqual(caught.exception.reason, "no_outcome")
+        with self.assertRaises(ValueError):
+            delivery_admission.make_plan(self.natural, plan, seed=self.natural["seed"], count_weights={fewest + 1: 1},
+                                         plan_version=V2)
+        place = menus.site(self.natural, target, clause(fewest + 1), self.api)
+        self.assertTrue(menus.stranded(place) and target not in menus.stranded(place))
+        # Counts every retailer can draw: a site is built, and with more than one route to draw the block reads
+        # every other retailer's contracts, which then cannot be redrawn beside it.
+        fine = {"schema": policies.VERSION, "retailer_id": target, "shown": clause(fewest)}
+        self.assertEqual(menus.stranded(menus.site(self.natural, target, clause(fewest), self.api)), [])
+        others = {("contracts", rid, "") for rid in routes if rid != target}
+        self.assertEqual(policies.footprint(self.natural, fine, self.api).reads, others if fewest > 1 else set())
+        self.assertEqual(policies.footprint(self.natural, self.requirements()[0], self.api).reads, set())
+        try:
+            world, found, record = policies.steer(self.session, self.natural, self.opened, fine, self.api, Random(71))
+        except prices.ZeroMass as error:
+            self.assertEqual(error.reason, "not_found")
+        else:
+            self.assertEqual(menus.cheapest(found["shown"]), self.carriers[0])
+        if fewest > 1:
+            other = {"schema": policies.VERSION, "retailer_id": next(rid for rid in routes if rid != target), "express": True}
+            with self.assertRaises(blocks.Coupled):
+                combined.prepare(self.natural, {"schema": combined.VERSION, "all": [fine, other]}, self.api, Random(0))
+
+    def test_an_estimate_is_labelled_and_checked_as_one(self):
+        from experiments.steered_generation import run, threshold
+        requirement = self.need(shown={"cheapest_carrier": self.carriers[2]})
+        block = policies.model(self.natural, requirement, self.api)
+        share = block.accepted / policies.PROPOSALS
+        self.assertAlmostEqual(block.error, block.probability * ((1 - share) / (share * policies.PROPOSALS)) ** .5, places=15)
+        self.assertEqual(policies.model(self.natural, self.need(express=True), self.api).error, 0.0)
+        step = policies.prepare(self.natural, requirement, self.api, Random(0))
+        self.assertEqual(step.error, block.error)
+        # A product with an exact block, and the seller requirement's sum, carry the flag and an error.
+        retailer = self.retailers["large"]
+        exact = {"schema": threshold.VERSION, "retailer_id": retailer["retailer_id"], "sku_id": retailer["offers"][0]["sku_id"],
+                 "quantity": 1, "subtotal_test": threshold.TESTS[0]}
+        world, found, record = combined.steer(self.session, self.natural, self.opened,
+                                              {"schema": combined.VERSION, "all": [requirement, exact]}, self.api, Random(1))
+        self.assertTrue(record["probability_is_estimated"])
+        self.assertAlmostEqual(record["probability_standard_error"] / record["probability_given_upstream"],
+                               block.error / block.probability, places=12)
+        plain = combined.steer(self.session, self.natural, self.opened, {"schema": combined.VERSION, "all": [
+            self.need(express=True), exact]}, self.api, Random(1))[2]
+        self.assertNotIn("probability_is_estimated", plain)
+        seller = {"schema": sellers.VERSION, "cheapest": {"concept_id": SANDALS}, "policy": {"shown": {"cheapest_carrier": self.carriers[3]}}}
+        sold = sellers.model(self.natural, seller, self.api)
+        self.assertGreater(sold.error, 0)
+        self.assertLess(sold.error, sold.probability)
+        self.assertLessEqual({pair[0] for pair, _ in sold.alternatives}, set(sold.estimates))
+        _, _, record = sellers.steer(self.session, self.natural, self.opened, seller, self.api, Random(2))
+        self.assertTrue(record["probability_is_estimated"])
+        self.assertEqual(record["probability_standard_error"], sold.error)
+        self.assertIn("approximate", record["distribution_claim"])
+        self.assertEqual(sellers.model(self.natural, {**seller, "policy": {"express": True}}, self.api).error, 0.0)
+        # The runner's comparison with other seeds allows for the estimate's own error (Astra's figures).
+        case = {}
+        run.frequency_check(case, .12375, 3234, 30000, .12375 * ((1 - .33) / (.33 * 400)) ** .5)
+        self.assertTrue(case["validation"]["within_four_standard_errors"])
+        with self.assertRaises(Exception):
+            run.frequency_check({}, .12375, 3234, 30000)
+
+    def test_not_found_is_not_reported_as_impossible(self):
+        from experiments.steered_generation import run
+        retailer = self.retailers["large"]["retailer_id"]
+        rare = {"schema": policies.VERSION, "retailer_id": retailer,
+                "shown": {"carriers": {"include": self.carriers[:4]}, "delivery_options": {"count_weights": {"4": 1}}}}
+        place = policies.site(self.natural, rare, self.api)
+        if menus.stranded(place.menu):
+            self.skipTest("the pilot world has a retailer with fewer than four routes")
+        with self.assertRaises(prices.ZeroMass) as caught:
+            policies.model(self.natural, rare, self.api)
+        self.assertEqual(caught.exception.reason, "not_found")
+        args = SimpleNamespace(samples=1, producer_redraws=0, validate_trials=0)
+        case = {"samples": [], "requirement_sha256": "x"}
+        run.policy_case(args, self.session, self.natural, self.opened, self.api, rare, case, None)
+        self.assertEqual((case["status"], case["reason"]), ("not_found_in_bounded_search", "not_found"))
+        seller = {"schema": sellers.VERSION, "cheapest": {"concept_id": SHOES}, "policy": {"shown": rare["shown"]}}
+        with self.assertRaises(prices.ZeroMass) as caught:
+            sellers.model(self.natural, seller, self.api)
+        self.assertEqual(caught.exception.reason, "not_found")
+        case = {"samples": [], "requirement_sha256": "x"}
+        run.seller_case(args, self.session, self.natural, self.opened, self.api, seller, case, None)
+        self.assertEqual(case["status"], "not_found_in_bounded_search")
+        # It does occur: the exact proposal reaches it in a few thousand draws (Astra found one at draw 2,292).
+        block = policies.model(self.natural, {key: value for key, value in rare.items() if key != "shown"} |
+                               {"carriers": {"include": self.carriers[:4]}}, self.api)
+        block.site = place
+        rng = Random(714601)
+        self.assertTrue(any(policies.displayed(place, policies.draw(block, rng)[1]) for _ in range(6000)))
+
     def unwaived(self, seller, rated, plain):
         """The same with no free shipping at the winner: what the menu costs is what every one of its offers is quoted."""
         seller = {**seller, "free_shipping": False}

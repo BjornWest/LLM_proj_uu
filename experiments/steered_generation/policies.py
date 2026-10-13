@@ -107,8 +107,12 @@ def footprint(world, requirement, api):
     retailer = requirement["retailer_id"]
     if not any(row["retailer_id"] == retailer for row in world["retailers"]):
         raise ValueError("Unknown retailer")
+    # Shown options need the recipe's counts to have support for every retailer; where they start above one route,
+    # that reads every other retailer's contracts.
+    reads = {("contracts", row["retailer_id"], "") for row in world["retailers"] if row["retailer_id"] != retailer} if (
+        "shown" in requirement and menus.least(menus.site(world, retailer, requirement["shown"], api)) > 1) else set()
     return SimpleNamespace(writes={(name, retailer, "") for name, about in (("contracts", CONTRACTS), ("dispatch", {"dispatch_days"}))
-                                   if about & set(requirement)}, reads=set())
+                                   if about & set(requirement)}, reads=reads)
 
 
 def site(world, requirement, api):
@@ -245,10 +249,14 @@ def model(world, requirement, api):
         days = {name: share for name, share in shares(place.days).items() if within(requirement["dispatch_days"], int(name))}
         if not days:
             raise ZeroMass("no_outcome", "No dispatch time of this retailer's warehouse satisfies the requirement")
-    block = SimpleNamespace(site=place, outcomes=outcomes, days=days, rows=rows, accepted=None,
+    block = SimpleNamespace(site=place, outcomes=outcomes, days=days, rows=rows, accepted=None, error=0.0,
                             probability=(fsum(found[0] for found in outcomes) if outcomes else 1.0) *
                                         (fsum(days.values()) if days else 1.0))
     if place.menu is not None:
+        others = [name for name in menus.stranded(place.menu) if name != place.retailer_id]
+        if others:
+            raise ZeroMass("no_outcome", "The recipe's delivery counts have no support for another retailer of this "
+                                         "world, so no site is built from it: " + ", ".join(others))
         key = world["world_id"], json.dumps(place.requirement, sort_keys=True)
         if key not in ESTIMATES:
             # The same draws for the same world and requirement, in this process and the next.
@@ -256,8 +264,12 @@ def model(world, requirement, api):
             ESTIMATES[key] = sum(displayed(place, draw(block, rng)[1]) for _ in range(PROPOSALS))
         block.accepted = ESTIMATES[key]
         if not block.accepted:
+            # Not a proof that it cannot occur: callers report it as not found.
             raise ZeroMass("not_found", f"None of {PROPOSALS} draws of this retailer's contracts shows what is required")
-        block.probability *= block.accepted / PROPOSALS
+        share = block.accepted / PROPOSALS
+        block.probability *= share
+        # The standard error of a share of a fixed number of draws, on the probability.
+        block.error = block.probability * ((1 - share) / (share * PROPOSALS)) ** .5
     return block
 
 
@@ -343,7 +355,8 @@ def prepare(natural, requirement, api, rng):
                 "requirement": place.requirement,
                 "natural_world_id": natural["world_id"], "probability_given_upstream": block.probability,
                 "retailer_id": place.retailer_id,
-                **({"probability_is_estimated": True, "proposals": PROPOSALS, "proposals_accepted": block.accepted,
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "proposals": PROPOSALS, "proposals_accepted": block.accepted,
                     "contract_draws_for_this_sample": draws,
                     "delivery_settings": place.menu.settings} if place.menu is not None else {}),
                 **({"natural_contracts": before[0], "steered_contracts": contracts} if contracts is not None else {}),
@@ -360,8 +373,9 @@ def prepare(natural, requirement, api, rng):
                                       "is the seed's own; the requirement depends on no other draw. Use the "
                                       "probability as the importance weight across seeds."}
 
-    return Step(script=script, probability=block.probability, **vars(footprint(natural, requirement, api)),
-                record=record, check=lambda world: check(world, requirement, api))
+    return Step(script=script, probability=block.probability, error=block.error,
+                **vars(footprint(natural, requirement, api)), record=record,
+                check=lambda world: check(world, requirement, api))
 
 
 def steer(session, natural, natural_opened, requirement, api, rng):

@@ -68,10 +68,16 @@ def sample_rng(natural, case, index):
     return Random(int(sha256(f"{natural['world_id']}/{case['requirement_sha256']}/{index}".encode()).hexdigest(), 16))
 
 
-def frequency_check(case, probability, hits, trials):
-    error = sqrt(probability * (1 - probability) / trials)
+def absent(error):
+    """The status of a requirement no sample was drawn for: proven to have no mass, or not found in a bounded search."""
+    return "not_found_in_bounded_search" if error.reason == "not_found" else "zero_probability_given_upstream"
+
+
+def frequency_check(case, probability, hits, trials, estimate=0.0):
+    """Compare a probability with a count over other seeds; `estimate` is its own standard error where it is one."""
+    error = sqrt(probability * (1 - probability) / trials + estimate ** 2)
     case["validation"] = {"trials": trials, "hits": hits, "frequency": hits / trials, "computed": probability,
-                          "standard_error": error,
+                          "standard_error": error, **({"computed_standard_error": estimate} if estimate else {}),
                           "within_four_standard_errors": abs(hits / trials - probability) <= 4 * error}
     pinned.ensure(case["validation"]["within_four_standard_errors"],
                   "Computed probability disagrees with the producer's draws")
@@ -405,11 +411,13 @@ def policy_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = policies.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason, detail=str(error))
         return
     place = block.site
     before = policies.listed(natural, place)
     case.update(status="sampled", probability_given_upstream=block.probability, retailer_id=place.retailer_id,
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "proposals": policies.PROPOSALS, "proposals_accepted": block.accepted} if block.error else {}),
                 natural={"contracts": before[0], "warehouse_dispatch_days": before[1]},
                 outcomes_modelled=len(block.outcomes or ()) + len(block.days or ()))
     for index in range(args.samples):
@@ -428,7 +436,7 @@ def policy_case(args, session, natural, opened, api, requirement, case, folder):
         producer_redraws(args, session, natural, [policies.trial(natural, requirement, api)], case)
     if args.validate_trials:
         hits = policies.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
-        frequency_check(case, block.probability, hits, args.validate_trials)
+        frequency_check(case, block.probability, hits, args.validate_trials, block.error)
 
 
 def stars_case(args, session, natural, opened, api, requirement, case, folder):
@@ -465,10 +473,13 @@ def seller_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = sellers.model(natural, requirement, api)
     except prices.ZeroMass as error:
-        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        case.update(status=absent(error), reason=error.reason, detail=str(error))
         return
     case.update(status="sampled", probability_given_upstream=block.probability or None,
-                log_probability_given_upstream=block.log_probability, alternatives_modelled=len(block.alternatives))
+                log_probability_given_upstream=block.log_probability, alternatives_modelled=len(block.alternatives),
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "policy_draws_accepted_by_retailer": block.estimates,
+                    "retailers_not_found_in_bounded_search": block.not_found} if block.estimates or block.not_found else {}))
     for index in range(args.samples):
         clock = time.monotonic()
         world, found, record = sellers.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
@@ -487,7 +498,7 @@ def seller_case(args, session, natural, opened, api, requirement, case, folder):
         producer_redraws(args, session, natural, [sellers.trial(natural, requirement, api)], case)
     if args.validate_trials:
         seen = sellers.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
-        frequency_check(case, block.probability, sum(seen.values()), args.validate_trials)
+        frequency_check(case, block.probability, sum(seen.values()), args.validate_trials, block.error)
 
 
 def reviews_case(args, session, natural, opened, api, requirement, case, folder):
@@ -545,7 +556,7 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
         try:
             world, found, record = combined.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
         except prices.ZeroMass as error:
-            case.update(status="zero_probability_given_upstream", reason=error.reason, part=error.part)
+            case.update(status=absent(error), reason=error.reason, part=error.part)
             return
         except (blocks.Coupled, cheapest.NumericalLimit) as error:
             case.update(status="refused", reason=error.reason, detail=str(error))
@@ -553,8 +564,11 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
         seconds = time.monotonic() - clock
         parts = [part["probability_given_upstream"] for part in record["blocks"]]
         files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        errors = [part.get("probability_standard_error", 0.0) for part in record["blocks"]]
         case.update(status="sampled", probability_given_upstream=record["probability_given_upstream"],
-                    part_probabilities=parts, methods=[part["method"] for part in record["blocks"]])
+                    part_probabilities=parts, methods=[part["method"] for part in record["blocks"]],
+                    **({"probability_is_estimated": True, "part_probability_standard_errors": errors,
+                        "probability_standard_error": record["probability_standard_error"]} if any(errors) else {}))
         case["samples"].append({
             "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
             "streams_steered": record["streams_steered"],
@@ -565,11 +579,13 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
     if args.validate_trials:
         alone, together = combined.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
         # A probability below the float range is recorded as None and has no frequency to compare.
-        validation = frequency_check(case, case["probability_given_upstream"] or 0.0, together, args.validate_trials)
+        validation = frequency_check(case, case["probability_given_upstream"] or 0.0, together, args.validate_trials,
+                                     case.get("probability_standard_error", 0.0))
         validation["parts"] = []
-        for probability, hits in zip(case["part_probabilities"], alone):
+        for probability, hits, estimate in zip(case["part_probabilities"], alone,
+                                               case.get("part_probability_standard_errors", [0.0] * len(alone))):
             probability = probability or 0.0
-            error = sqrt(probability * (1 - probability) / args.validate_trials)
+            error = sqrt(probability * (1 - probability) / args.validate_trials + estimate ** 2)
             validation["parts"].append({"hits": hits, "computed": probability, "standard_error": error})
             pinned.ensure(abs(hits / args.validate_trials - probability) <= 4 * error,
                           "A part's computed probability disagrees with the producer's draws")

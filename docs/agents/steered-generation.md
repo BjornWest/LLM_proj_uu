@@ -1004,10 +1004,20 @@ and the carriers the menu needs (a shown carrier is a contracted one), until
 the menu they give is as required. The sample is from the block's
 distribution given the whole requirement. The probability is the exact one
 of the contract statements times the share of 400 such draws that qualify:
-an estimate, recorded as one (`probability_is_estimated`, with the counts),
+an estimate, recorded as one (`probability_is_estimated`, with its standard
+error and the counts) in the block's record and in every record and runner
+case built from it (the seller requirement's sum, a combination's product),
 the same for the same world and requirement. A requirement none of the 400
-draws meets is reported as not found, which is not a proof that it cannot
-occur. On the pilot world a draw takes eight milliseconds, and "carrier X is
+draws meets is reported as not found (`not_found_in_bounded_search` in the
+runner), which is not a proof that it cannot occur; the seller requirement
+leaves such a retailer out and names it.
+
+A site has one admission plan for all its retailers, and generation rejects
+a world where the recipe's counts have no support for one of them (routes,
+but fewer than the smallest count). A shown clause therefore has probability
+zero where another retailer is stranded so, and with counts that start above
+one route it reads every other retailer's contracts, so that none can be
+redrawn beside it. On the pilot world a draw takes eight milliseconds, and "carrier X is
 the cheapest shown for home delivery" has probability 0.12 to 0.14 at a
 medium retailer.
 
@@ -1054,6 +1064,17 @@ threshold. Refused as not modelled: a retailer where what delivery costs, or
 whether it is possible, depends on which of its locations holds the stock;
 rankings other than the total; physical stock only; a comparison site.
 
+The first of these decides where this can be used today. On the pilot world
+(11 retailers) every retailer charges the same from each location that
+ships. On the medium world five of 21 do not: the large retailers have
+locations in several cities, and a parcel from a far one pays 25 kronor
+more for distance, so an offer's total depends on where its stock is. A
+ranking that includes such a retailer is refused there. Modelling it needs
+ranks per offer and distance class in the fourth block's chain of
+unavailable offers (a count of offers that must hold nothing per class of
+location, and the supplier order at the warehouse's class only when no
+location that ships holds the offer); that is not built.
+
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
 total, home delivery; a cap, a deadline, other methods or a comparison site
 are refused) into the same three candidates as the other winner tasks, with
@@ -1099,8 +1120,10 @@ the policy of every retailer in it.
 
 The policy may be about shown options, and the requirement may add
 `"free_shipping": false`: the winner offers no free-shipping threshold, so
-what its options cost is what a customer pays. That is a third block of the
-alternative (the seventh requirement's, with no threshold). Together with
+no order there has its delivery waived. That is a third block of the
+alternative (the seventh requirement's, with no threshold). The menu's
+figures are for the nearest location that ships; an offer held only farther
+away pays the distance on top, for every carrier alike. Together with
 the thirteenth requirement this is "the shop with the best offer delivers
 cheapest with a carrier that is badly rated":
 

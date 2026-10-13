@@ -33,6 +33,8 @@ SCOPES = ("home", "any")
 # The oracle's default terms for a contract's carrier, which is what a plan made without overrides carries.
 TERMS = {"bulky_supported": False, "bulky_surcharge_minor": 0, "bulky_extra_days": 0, "arrival_window_days": 0}
 UNSUPPORTED = "No positive count mass within the real route bound"
+# Per world and count weights: the retailers with routes and no count the recipe can draw for them.
+STRANDED = {}
 
 
 def resolve(clause):
@@ -91,6 +93,34 @@ def oracle(world, retailer_id, stated, api):
     return SimpleNamespace(clause=None, world=world, retailer=retailer, retailer_id=retailer_id, admission=admission,
                            backend=backend, settings=settings, weights=admission._weights(website.producer_weights(settings)),
                            destination=world["user_location"], scope="home")
+
+
+def least(place):
+    """The smallest number of routes the recipe's counts can draw."""
+    return min(row["count"] for row in place.weights if row["weight"] > 0)
+
+
+def stranded(place):
+    """The retailers of the world, as their contracts are, that have routes but fewer than the recipe can draw.
+
+    A site has one admission plan for all its retailers, and generation
+    rejects a world where the recipe's counts have no support for one of
+    them. So a statement about any retailer's shown options can hold only
+    where no other retailer is stranded; with counts from one upwards none is.
+    """
+    key = place.world["world_id"], json.dumps(place.weights, sort_keys=True)
+    if key not in STRANDED:
+        found = []
+        for retailer in place.world["retailers"]:
+            mine = {**retailer, "offers": []}
+            view = {**place.world, "products": [], "retailers": [mine]}
+            policy = {"retailer_id": retailer["retailer_id"],
+                      "carrier_terms": [{"carrier_id": row["carrier_id"], **TERMS} for row in retailer["contracts"]]}
+            routes = len(place.admission._potential(place.backend, view, mine, policy, place.destination))
+            if 0 < routes < least(place):
+                found.append(retailer["retailer_id"])
+        STRANDED[key] = sorted(found)
+    return STRANDED[key]
 
 
 def priced(place, world, retailer, policy, admitted, detail=False):

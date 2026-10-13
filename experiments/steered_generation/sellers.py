@@ -18,9 +18,12 @@ required and every other retailer's is the seed's own, which is their
 distribution given the requirement.
 
 A requirement may add that the winner offers no free shipping
-(`"free_shipping": false`), so that what its delivery options cost is what
-the customer pays: the winner's free-shipping threshold is then a third
-block of the alternative, and every other retailer's is the seed's own.
+(`"free_shipping": false`), so that no order there has its delivery waived:
+the winner's free-shipping threshold is then a third block of the
+alternative, and every other retailer's is the seed's own. What an option
+costs for a given offer can still be more than the menu's figure, which is
+for the nearest location that ships: an offer held only farther away pays
+the distance.
 """
 import json
 from math import exp, fsum, log
@@ -89,28 +92,41 @@ def model(world, requirement, api):
     requirement = resolve(requirement)
     footprint(world, requirement, api)
     shared = cheapest.frame(world, ranking(requirement), api)
-    suited, found = {}, []
+    suited, found, errors, estimates, missed, wins = {}, [], {}, {}, [], {}
     for pair in sorted(shared.places):
         if pair[0] not in suited:
             try:
-                suited[pair[0]] = policies.model(world, policy(requirement, pair[0]), api).probability * (
-                    threshold.model(world, unwaived(world, requirement, pair), api).probability
-                    if "free_shipping" in requirement else 1.0)
-            except ZeroMass:
+                block = policies.model(world, policy(requirement, pair[0]), api)
+                rest = (threshold.model(world, unwaived(world, requirement, pair), api).probability
+                        if "free_shipping" in requirement else 1.0)
+                suited[pair[0]], errors[pair[0]] = block.probability * rest, block.error * rest
+                if block.accepted is not None:
+                    estimates[pair[0]] = [block.accepted, policies.PROPOSALS]
+            except ZeroMass as error:
                 suited[pair[0]] = 0.0
+                if error.reason == "not_found":
+                    missed.append(pair[0])
         if not suited[pair[0]]:
             continue
         try:
             block = cheapest.model(world, ranking(requirement, pair), api, shared)
         except ZeroMass:
             continue
-        found.append((pair, (getattr(block, "log_probability", None) or log(block.probability)) + log(suited[pair[0]])))
+        won = getattr(block, "log_probability", None) or log(block.probability)
+        wins[pair[0]] = wins.get(pair[0], 0.0) + exp(won)
+        found.append((pair, won + log(suited[pair[0]])))
+    if not found and missed:
+        # A bounded search that found nothing is not a proof that nothing is there.
+        raise ZeroMass("not_found", f"For no retailer that can have the cheapest available offer did any of "
+                                    f"{policies.PROPOSALS} draws of its contracts show what is required")
     if not found:
         raise ZeroMass("no_outcome", "No retailer can both have the cheapest available offer and this policy in this world")
     top = max(value for _, value in found)
     total = min(0.0, top + log(fsum(exp(value - top) for _, value in found)))
+    # Where a retailer's policy share is an estimate, so are its alternatives' weights and the sum.
     return SimpleNamespace(requirement=requirement, shared=shared, alternatives=found, log_terms=dict(found),
-                           log_probability=total, probability=exp(total))
+                           log_probability=total, probability=exp(total), estimates=estimates, not_found=missed,
+                           error=fsum((wins[retailer] * errors[retailer]) ** 2 for retailer in wins) ** .5)
 
 
 def leader(world, requirement, shared):
@@ -154,6 +170,9 @@ def prepare(natural, requirement, api, rng):
         return {"method": "one_of_exclusive_alternatives", "requirement": block.requirement,
                 "natural_world_id": natural["world_id"], "probability_given_upstream": block.probability or None,
                 "log_probability_given_upstream": block.log_probability, "alternatives": len(block.alternatives),
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "policy_draws_accepted_by_retailer": block.estimates,
+                    "retailers_not_found_in_bounded_search": block.not_found} if block.estimates or block.not_found else {}),
                 "chosen": {"retailer_id": pair[0], "product_id": pair[1],
                            "log_probability_given_upstream": block.log_terms[pair]},
                 "blocks": rows,
@@ -162,7 +181,10 @@ def prepare(natural, requirement, api, rng):
                                       "shipping policy is as stated. One is picked in proportion to its probability "
                                       "and its blocks (the ranking's stock and prices; that retailer's policy; its "
                                       "free-shipping threshold where the requirement states there is none) "
-                                      "are sampled given it. Every other retailer's policy is the seed's own. Use "
+                                      "are sampled given it. Every other retailer's policy is the seed's own. "
+                                      "Where a policy is about shown delivery options its share is an estimate from "
+                                      "a fixed number of draws, so the pick among alternatives and the probability "
+                                      "are approximate, and a retailer for which no draw qualified is left out. Use "
                                       "the probability, which is the alternatives' sum, as the importance weight "
                                       "across seeds."}
 
@@ -173,7 +195,7 @@ def prepare(natural, requirement, api, rng):
         return found
 
     return Step(script={key: entry for step in steps for key, entry in step.script.items()}, probability=block.probability,
-                log_probability=block.log_probability, writes=writes,
+                log_probability=block.log_probability, error=block.error, writes=writes,
                 reads=footprint(natural, requirement, api).writes - writes, record=record, check=checked)
 
 

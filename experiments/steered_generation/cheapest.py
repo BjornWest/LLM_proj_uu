@@ -190,6 +190,9 @@ def delivering(world, requirement, api, skus, declared, feature):
     options = requirement["delivered"].get("delivery_options", {})
     listing = {r["retailer_id"] for r in world["retailers"] for o in r["offers"] if o["sku_id"] in skus}
     places = {rid: menus.oracle(world, rid, options, api) for rid in sorted(listing)}
+    if places and menus.stranded(next(iter(places.values()))):
+        raise ZeroMass("no_outcome", "The recipe's delivery counts have no support for a retailer of this world, so no "
+                                     "site is built from it")
     charges = {rid: menus.delivery(place) for rid, place in places.items()}
     delivered = {rid: charge for rid, charge in charges.items() if charge is not None}
     spec = {"kind": native.KIND, "concept_id": requirement["concept_id"], "predicates": requirement["predicates"]}
@@ -209,7 +212,10 @@ def delivering(world, requirement, api, skus, declared, feature):
                for o in r["offers"] if o["sku_id"] in skus},
         {r["retailer_id"]: {s["source_id"] for s in r["source_locations"] if s["shipping_enabled"]} for r in world["retailers"]},
         True, reference, delivered=delivered,
-        reads={(kind, rid, "") for rid in listing for kind in ("contracts", "threshold")})
+        # With counts that start above one route, every retailer's contracts decide whether a site is built at all.
+        reads={(kind, rid, "") for rid in listing for kind in ("contracts", "threshold")} | {
+            ("contracts", r["retailer_id"], "") for r in world["retailers"]
+            if places and menus.least(next(iter(places.values()))) > 1})
 
 
 def matching(world, concept, declared, predicates, feature):
