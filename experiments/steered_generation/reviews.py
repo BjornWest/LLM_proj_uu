@@ -15,7 +15,12 @@ review says something about a topic when it has a comment (its length is not
 zero) and the topic is among those chosen for it; what it says is the sign of
 the reviewer's score for the aspect, a normal draw around a centre set by the
 star rating. The rating, the aspect's score, the length and the topic choices
-of every review are the block. Every other concept's reviews come from its
+of every review are the block. Two aspects have more behind the score. The
+room at the forefoot is scored around a centre that also moves with the
+width of the option bought against the wearer's, both draws of the review,
+and both then in the block. Whether the size fits is no normal draw at all:
+it is what the reviewer's size adjustment and size experience come to, and
+does not follow the rating. Every other concept's reviews come from its
 package's review program, which `programs` reads; there the block is the
 draws the topic's statements depend on. Either way reviews draw independently
 and alike, so the counts are multinomial, and their probability is a sum over
@@ -60,8 +65,12 @@ VERSION = "steered-review-topic-v1"
 VERDICTS = ("more_positive", "more_negative", "tie", "insufficient_evidence")
 POSITIVE, NEGATIVE, REST = "positive", "negative", "rest"
 STARS, PAGE = "mean_rating", "first_page"
-# Aspects whose score depends on more than the rating and the product: the option bought and the wearer.
-UNMODELLED = ("size_fit", "forefoot_room")
+# The two aspects whose score depends on more than the rating and the product, with what the pilot sampler's own
+# lines have for them: the widths in order and the centre's step per width between the option and the wearer; the
+# size adjustments with their weights, the spread of the size experience and how far off a size still fits.
+ROOM, FIT = "forefoot_room", "size_fit"
+WIDTHS, STEP = ("narrow", "standard", "wide"), .08
+ADJUSTMENTS, EXPERIENCE, FITS = ((0, 8), (.5, 1), (-.5, 1)), .2, .3
 # A review's class is redrawn at most this often before the block gives up as numerically out of reach.
 TRIES = 10 ** 6
 
@@ -143,8 +152,6 @@ def site(world, requirement, api):
     if public["concept_id"] not in api.package_export.PILOTS:
         return programs.site(world, item, api, native, **common)
     concept, spec = public["concept"], footwear.load_spec()
-    if topic["aspect"] in UNMODELLED:
-        raise ValueError("Not modelled: a topic whose score depends on the option bought or the wearer")
     bank = json.loads((footwear.DATA / "statements.json").read_text())
     eligible = {name: row for name, row in bank["aspects"].items() if concept in row.get("concepts", [concept])}
     lengths = footwear.effective_review_lengths(spec["review_length_weights"],
@@ -157,26 +164,37 @@ def site(world, requirement, api):
         ranges = spec["concepts"][concept]["price_ranges_sek"]
         low, high = min(v[0] for v in ranges.values()), max(v[1] for v in ranges.values())
         shift = -(spec["execution_to_review"]["value_price_penalty"] * ((public["reference_price_sek"] - low) / (high - low) - .5))
+    # How many widths the option bought is above the wearer's, with its probability: both are uniform choices.
+    leans = Counter(WIDTHS.index(sku["width"]) - WIDTHS.index(wearer) for sku in public["skus"] for wearer in WIDTHS)
     # The rating's own draw has no other draw above it: it can be redrawn alone.
     return SimpleNamespace(
         **common, reader=sys.modules[__name__], staged=True, concept=concept, footwear=footwear, shift=shift,
         execution=private["execution"], concentration=spec["rating_concentration"], spread=spec["reviewer_spread"],
-        lengths=lengths, policy=footwear.review_topic_policy(item, spec, eligible))
+        lengths=lengths, policy=footwear.review_topic_policy(item, spec, eligible), skus=public["skus"], spec=spec,
+        tendency=private["fit_tendency"],
+        leans={lean: times / sum(leans.values()) for lean, times in sorted(leans.items())} if topic["aspect"] == ROOM else {None: 1.0})
 
 
 def keys(place, index):
     """The streams of one review that decide what it says about the topic."""
     base = f"reviews/{place.concept}/{index}"
-    names = ["rating", place.aspect, "length", "topics/value"] + [
+    own = {ROOM: ["sku", "wearer_width", ROOM], FIT: ["size_adjustment", "size_experience"]}.get(place.aspect, [place.aspect])
+    names = ["rating", *own, "length", "topics/value"] + [
         f"topics/other/{slot}" for slot in range(max(map(int, place.lengths)))]
     return [(streams.REVIEW, place.seed, base + "/" + name) for name in names]
 
 
-def centre(place, rating):
-    """The centre of the aspect's score for a star rating, in the producer's own order of arithmetic."""
+def centre(place, rating, lean=None):
+    """The centre of the aspect's score for a star rating, in the producer's own order of arithmetic.
+
+    `lean` is how many widths the option bought is above the wearer's, for
+    the one aspect whose centre moves with it.
+    """
     value = (rating - 1) / 4
     if place.shift:
         value += place.shift
+    if lean is not None:
+        value += STEP * lean
     return value
 
 
@@ -190,7 +208,17 @@ def drawn(place, index, seed, stars=None):
     footwear, key = place.footwear, f"reviews/{place.concept}/{index}"
     rating = footwear.sample_rating(footwear.stream(seed if stars is None else stars, key + "/rating"),
                                     place.execution, place.concentration)["rating"]
-    score = max(0, min(1, footwear.stream(seed, key + "/" + place.aspect).gauss(centre(place, rating), place.spread)))
+    if place.aspect == FIT:
+        # The producer's own reading of the reviewer's size; the option bought only names the sizes in the text.
+        sizing = footwear.reviewer_size_fit(place.skus[0], place.tendency, place.spec,
+                                            lambda suffix: footwear.stream(seed, key + "/" + suffix))
+        score = 1.0 if sizing["fit_result"] == "fits" else 0.0
+    else:
+        lean = None
+        if place.aspect == ROOM:
+            sku = footwear.stream(seed, key + "/sku").choice(place.skus)
+            lean = WIDTHS.index(sku["width"]) - WIDTHS.index(footwear.stream(seed, key + "/wearer_width").choice(list(WIDTHS)))
+        score = max(0, min(1, footwear.stream(seed, key + "/" + place.aspect).gauss(centre(place, rating, lean), place.spread)))
     length = int(footwear.choose(seed, key + "/length", place.lengths))
     return rating, score, length, footwear.select_review_topics(seed, key, length, place.policy)
 
@@ -240,7 +268,29 @@ def stars(place):
 
 def favourable(place, rating):
     """The probability that a reviewer of this rating scores the aspect at one half or above."""
-    return erfc((.5 - centre(place, rating)) / (place.spread * sqrt(2))) / 2
+    return sided(place, rating)[0]
+
+
+def sided(place, rating):
+    """The probabilities that a reviewer of this rating scores the aspect at one half or above, and below it.
+
+    A normal draw around the rating's centre, mixed over what else moves the
+    centre. Whether the size fits is apart from the rating: the size
+    adjustment plus a normal size experience around the brand's offset,
+    within the limit either way.
+    """
+    tail = lambda distance, spread: erfc(distance / (spread * sqrt(2))) / 2
+    if place.aspect == FIT:
+        offset, total = place.spec["brand_fit_offsets_eu"][place.tendency], sum(weight for _, weight in ADJUSTMENTS)
+        long = [weight / total * tail(FITS - offset - adjustment, EXPERIENCE) for adjustment, weight in ADJUSTMENTS]
+        short = [weight / total * tail(FITS + offset + adjustment, EXPERIENCE) for adjustment, weight in ADJUSTMENTS]
+        # Within the limit either way: between the two tails, from whichever side leaves the smaller numbers.
+        fits = [weight / total * (tail(-FITS - shift, EXPERIENCE) - tail(FITS - shift, EXPERIENCE) if shift <= 0 else
+                                  tail(shift - FITS, EXPERIENCE) - tail(shift + FITS, EXPERIENCE))
+                for adjustment, weight in ADJUSTMENTS for shift in [offset + adjustment]]
+        return fsum(fits), fsum(long + short)
+    return (fsum(share * tail(.5 - centre(place, rating, lean), place.spread) for lean, share in place.leans.items()),
+            fsum(share * tail(centre(place, rating, lean) - .5, place.spread) for lean, share in place.leans.items()))
 
 
 def kinds(place):
@@ -260,10 +310,9 @@ def kinds(place):
     assessed = fsum(told.values())
     other = fsum(mass - told[int(slots)] for slots, mass in length.items() if int(slots))
     silent = fsum(mass for slots, mass in length.items() if not int(slots))
-    against = lambda rating: erfc((centre(place, rating) - .5) / (place.spread * sqrt(2))) / 2
     return whole({(rating, name): mass * part for rating, mass in stars(place).items()
-                  for name, part in ((POSITIVE, assessed * favourable(place, rating)),
-                                     (NEGATIVE, assessed * against(rating)), (pages.OTHER, other), (pages.SILENT, silent))})
+                  for name, part in ((POSITIVE, assessed * sided(place, rating)[0]),
+                                     (NEGATIVE, assessed * sided(place, rating)[1]), (pages.OTHER, other), (pages.SILENT, silent))})
 
 
 def cells(place):
@@ -629,7 +678,10 @@ def prepare(natural, requirement, api, rng):
                 "distribution_claim": "The draws of every review of this product that decide what it says about "
                                       "the topic (" + (
                                           "the star rating, the topic's score, the comment length and the topic "
-                                          "choices" if reader is not programs else
+                                          "choices" + {ROOM: ", with the option bought and the wearer's width, which "
+                                                             "move the score", FIT: ", the score being whether the size "
+                                                             "fits by the reviewer's size adjustment and experience"}.get(
+                                              place.aspect, "") if reader is not programs else
                                           "the review program's steps " + ", ".join(sorted(place.drawn))) +
                                       ") are sampled from their distribution given "
                                       "the requirement: the counts exactly, " + (

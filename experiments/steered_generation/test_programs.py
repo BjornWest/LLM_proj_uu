@@ -7,12 +7,14 @@ the native review-summary task reads the steered worlds. The T-shirt package
 wraps its review program in checks that make one review take most of a
 second, so tests that run it through the producer use few of its products.
 """
-from collections import Counter
+from collections import Counter, defaultdict
 from copy import deepcopy
 from itertools import permutations
-from math import erfc, exp, lgamma, nextafter, prod, sqrt
+import json
+from math import erfc, exp, fsum, lgamma, nextafter, prod, sqrt
 from pathlib import Path
 from random import Random
+import re
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
@@ -22,7 +24,7 @@ from experiments.accepted_catalog_commerce import model as commerce, package_exp
 from experiments.footwear_world_pilot import model as native
 from experiments.world_sampling_defaults import model as population
 
-from experiments.steered_generation import blocks, combined, prices, programs, reviews, run, stock, streams, variants
+from experiments.steered_generation import blocks, combined, pages, prices, programs, reviews, run, stock, streams, variants
 
 TRAINERS, SHIRTS, TABLETS = "footwear.casual_trainers", "tops.t_shirts", "tablets.everyday_media_tablets"
 INPUTS = {"seed": 5, "concept_ids": [TRAINERS, SHIRTS, TABLETS], "tasks": [TRAINERS], "controls": None,
@@ -411,12 +413,18 @@ class ProducerTests(Programs):
         found = variants.of(self.natural, task, self.api)
         self.assertEqual({row["name"] for row in found[:4]}, {"verdict_" + verdict for verdict in reviews.VERDICTS})
         self.assertAlmostEqual(sum(2.718281828459045 ** row["log_probability"] for row in found[:4]), 1, places=10)
-        self.assertEqual([row["name"] for row in found[4:]], ["high_stars_verdict_more_negative", "low_stars_verdict_more_positive"])
+        self.assertEqual([row["name"] for row in found[4:]], [
+            "high_stars_verdict_more_negative", "low_stars_verdict_more_positive",
+            "first_page_more_positive_verdict_more_negative", "first_page_more_negative_verdict_more_positive"])
         for index, row in enumerate(found):
             world, seen, _ = reviews.steer(self.session, self.natural, self.opened, row["requirement"], self.api, Random(index))
             self.assertTrue(row["name"].endswith("verdict_" + seen["verdict"]))
             limits = row["requirement"].get("mean_rating", {})
             self.assertTrue(limits.get("min", 1) <= seen.get("mean_rating", 3) <= limits.get("max", 5))
+            self.assertEqual("first_page" in seen, "first_page" in row["requirement"])
+            if "first_page" in seen:
+                self.assertTrue(reviews.agreed(row["requirement"]["first_page"], seen["first_page"]["positive"],
+                                               seen["first_page"]["negative"]))
 
 
 def pool(document, name):
@@ -677,8 +685,8 @@ class RefusalTests(Programs):
         rows = programs.written(self.natural, place)
         self.assertEqual([programs.replayed(place, row) for row in rows], [row[1:] for row in rows])
         programs.reads(self.natural, place)
-        place.steps = [{**row, "derive": "review.value_favourability >= 1.5"} if row["id"] == "sentiment_value" else row
-                       for row in place.steps]
+        place.steps = place.every = [{**row, "derive": "review.value_favourability >= 1.5"} if row["id"] == "sentiment_value"
+                                     else row for row in place.steps]
         with self.assertRaises(ValueError) as caught:
             programs.reads(self.natural, place)
         self.assertIn("Following", str(caught.exception))
@@ -701,15 +709,12 @@ class RefusalTests(Programs):
 
     def test_zero_probability_and_bad_requirements(self):
         good = self.need(verdict="tie")
-        # The first page is read for the pilot concepts only so far; here it is refused, and no candidate is listed.
-        paged = {**good, "first_page": {"size": 4, "order": "highest", "verdict": "more_positive"}}
+        # A first page is not weighed together with a mean rating.
+        paged = {**good, "first_page": {"size": 4, "order": "highest", "verdict": "more_positive"}, "mean_rating": {"min": 4}}
         for call in (reviews.model, lambda *a: reviews.prepare(*a, Random(0))):
             with self.assertRaises(ValueError) as caught:
                 call(self.natural, paged, self.api)
             self.assertIn("Not modelled", str(caught.exception))
-        task = {"kind": "summarize_product_reviews", "concept_id": TRAINERS, "operation": "topic_counts", "product_index": 0,
-                "topic": good["topic"], "min_assessed": 1}
-        self.assertFalse(any("first_page" in row["name"] for row in variants.of(self.natural, task, self.api)))
         for impossible in (self.need(positive={"min": 17}), self.need(verdict="more_positive", positive={"max": 0})):
             with self.subTest(impossible=impossible), self.assertRaises(prices.ZeroMass):
                 reviews.model(self.natural, impossible, self.api)
@@ -753,3 +758,396 @@ class RefusalTests(Programs):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FirstPageTests(Programs):
+    """What a review site's first page of comments shows, where a review program writes the reviews."""
+    FREE = {"size": 2, "order": "highest", "positive": {"min": 0}}
+    altered, drawn_by = RefusalTests.altered, RefusalTests.drawn_by
+
+    def paged(self):
+        return [self.need(verdict="more_negative", first_page={"size": 2, "order": "highest", "verdict": "more_positive"}),
+                self.need(TRAINERS, "value", 1, first_page={"size": 3, "order": "lowest", "negative": {"min": 1}}),
+                self.need(positive={"min": 1}, first_page={"size": 2, "order": "identity", "verdict": "insufficient_evidence"}),
+                self.need(TABLETS, "value", first_page={"size": 2, "order": "highest", "positive": {"min": 1}}),
+                self.need(SHIRTS, "wear_feel", verdict="more_positive",
+                          first_page={"size": 3, "order": "lowest", "negative": {"min": 1}})]
+
+    def page(self, concept=TRAINERS, aspect="everyday_comfort"):
+        return reviews.site(self.natural, self.need(concept, aspect, first_page=self.FREE), self.api)
+
+    @staticmethod
+    def together(place):
+        """Every pool's draws walked together: the kinds with nothing taken as independent of anything."""
+        found, module = defaultdict(list), place.program.module
+
+        def end(context, mass, further):
+            side = programs.told(place, context)
+            found[module.get_path(context, place.rating["target"]), side if side != reviews.REST else
+                  pages.OTHER if programs.speaks(place, place.language, context) else pages.SILENT].append(mass)
+
+        programs.follow(place, lambda step, context: programs.drawable(place, step, context), end, place.every)
+        return {cell: fsum(parts) for cell, parts in found.items()}
+
+    @staticmethod
+    def whole(place, seed):
+        """One review as the program draws it under a seed of its own, by the producer's rule for what it states."""
+        twin = place.program.twin
+        review = twin.sample(seed, inputs=deepcopy(place.program.entities))
+        stated = [pool for pool in twin.document["language"] if "when" not in pool or twin._eval(pool["when"], review["entities"])]
+        names = {side: {pool["id"] for pool in rows} for side, rows in place.pools.items()}
+        side = next((side for side, own in names.items() if own & {pool["id"] for pool in stated}), reviews.REST)
+        return (programs.draws(place, json.loads(json.dumps(review["trace"]))), side,
+                review["entities"]["review"]["rating"], bool(stated))
+
+    def close(self, seen, model, trials):
+        for cell, chance in model.items():
+            self.assertLess(abs(seen[cell] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 1e-9, cell)
+
+    def test_a_reviews_stars_and_kind_together_match_other_seeds(self):
+        for (concept, aspect), trials in zip(((TRAINERS, "everyday_comfort"), (TRAINERS, "value"), (TABLETS, "pen_marks"),
+                                              (SHIRTS, "value")), (6000, 6000, 2500, 1500)):
+            with self.subTest(concept=concept, aspect=aspect):
+                place = self.page(concept, aspect)
+                model = programs.kinds(place)
+                self.assertAlmostEqual(sum(model.values()), 1, places=12)
+                self.assertEqual(len(model), 20)
+                rows = [programs.redrawn(place, seed % place.count, 10 ** 6 + seed) for seed in range(trials)]
+                self.close(Counter((programs.rated(place, row), programs.kind(place, row)) for row in rows), model, trials)
+                rows = [self.whole(place, 10 ** 7 + seed) for seed in range(trials)]
+                self.close(Counter((row[2], programs.kind(place, row)) for row in rows), model, trials)
+                self.assertGreater(sum(programs.kind(place, row) == pages.OTHER for row in rows), 100)
+                # Following the steps from the draws alone says what the program's own run says, comment and all.
+                self.assertEqual([programs.replayed(place, row) for row in rows[:200]], [row[1:] for row in rows[:200]])
+                # The three classes the counts use are these four kinds with the last two together, as without a page.
+                merged, plain = programs.cells(place), programs.cells(self.place(concept, aspect))
+                for rating in range(1, 6):
+                    self.assertAlmostEqual(merged[rating, reviews.REST], model[rating, pages.OTHER] + model[rating, pages.SILENT],
+                                           places=15)
+                    for side in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST):
+                        self.assertAlmostEqual(merged[rating, side], plain[rating, side], places=14)
+        with self.assertRaises(ValueError) as caught:
+            programs.kinds(self.place())
+        self.assertIn("Not modelled", str(caught.exception))
+
+    def test_the_block_is_every_pools_draws_and_the_groups_share_none(self):
+        place, plain = self.page(), self.place()
+        sentiments = {"sentiment_" + name for name in ("everyday_comfort", "forefoot_fit", "upper_upkeep", "sole_durability")}
+        self.assertEqual(place.drawn, {"rating", "topics", "value_favourability"} | sentiments)
+        self.assertEqual(place.drawn - plain.drawn, {"value_favourability"} | sentiments - {"sentiment_everyday_comfort"})
+        self.assertEqual({row["id"] for row in place.steps if "sample" in row}, plain.drawn)
+        self.assertEqual(sorted(len(pools) for pools, _ in place.groups), [2, 2, 2, 2])
+        self.assertEqual(sorted(row["id"] for _, steps in place.groups for row in steps if "sample" in row),
+                         sorted(place.drawn - plain.drawn))
+        order = [row["id"] for row in place.program.twin.document["steps"]]
+        self.assertEqual([row["id"] for row in place.every], [name for name in order if name in {row["id"] for row in place.every}])
+        self.assertEqual(programs.keys(place, 3), [(streams.PROGRAM, place.seed, 3, name) for name in sorted(place.block)])
+        self.assertTrue(place.staged)
+        for concept, aspect in ((SHIRTS, "wear_feel"), (TABLETS, "pen_marks")):
+            found = self.page(concept, aspect)
+            own = [{row["id"] for row in steps} for _, steps in found.groups]
+            common = {row["id"] for row in found.steps}
+            self.assertEqual(sum(map(len, own)) + len(common), len(set().union(common, *own)))
+            # The option reviewed is in every statement's condition there: common, and walked once.
+            self.assertIn("tested_sku", common)
+            self.assertEqual(len(found.program.twin.document["language"]), 2 + sum(len(pools) for pools, _ in found.groups))
+
+    def test_the_groups_product_is_the_walk_of_every_draw_together(self):
+        for concept, aspect in ((TRAINERS, "everyday_comfort"), (TRAINERS, "value"), (SHIRTS, "wear_feel")):
+            with self.subTest(concept=concept, aspect=aspect):
+                place = self.page(concept, aspect)
+                model, joint = programs.kinds(place), self.together(place)
+                self.assertEqual(set(joint) - set(model), set())
+                for cell, chance in model.items():
+                    self.assertAlmostEqual(chance, joint.get(cell, 0), places=13)
+
+    @staticmethod
+    def moody(document):
+        """A draw that two aspects' statements both need: common to them, though the topic does not depend on it."""
+        document["fields"]["review.mood"] = {"type": "boolean"}
+        document["steps"].insert(0, {"id": "mood", "target": "review.mood", "sample": "weighted_choice",
+                                     "weights": {"good": 1, "bad": 3}, "values": {"good": True, "bad": False}})
+        for name in ("forefoot_fit.positive", "forefoot_fit.negative", "upper_upkeep.positive", "upper_upkeep.negative"):
+            pool(document, name)["when"] += " and review.mood"
+
+    @staticmethod
+    def keen(document):
+        """A derived value two aspects' statements both read, and a draw of one aspect's own under it."""
+        document["fields"].update({"review.keen": {"type": "boolean"}, "review.wears": {"type": "integer", "min": 1, "max": 4}})
+        document["steps"] += [{"id": "keen", "target": "review.keen", "derive": "review.rating >= 3"},
+                              {"id": "wears", "target": "review.wears", "sample": "uniform_int", "min": 1, "max": 4,
+                               "when": "review.keen"}]
+        for name in ("forefoot_fit.positive", "forefoot_fit.negative"):
+            pool(document, name)["when"] += " and known(review.wears) and review.wears >= 2"
+        pool(document, "upper_upkeep.negative")["when"] += " and not review.keen"
+
+    @staticmethod
+    def chatty(document):
+        """A statement of no aspect, by a draw of its own: a review that picks no topic can still have a comment."""
+        document["fields"]["review.chatty"] = {"type": "boolean"}
+        document["steps"].append({"id": "chatty", "target": "review.chatty", "sample": "weighted_choice",
+                                  "weights": {"yes": 1, "no": 3}, "values": {"yes": True, "no": False}})
+        extra = deepcopy(pool(document, "sole_durability.positive"))
+        extra.update(id="aside", when="review.chatty", meaning={"kind": "catalog_fact"})
+        document["language"].append(extra)
+
+    @staticmethod
+    def constant(document):
+        """A statement under no condition: every review has a comment."""
+        extra = deepcopy(pool(document, "sole_durability.positive"))
+        extra.update(id="aside", meaning={"kind": "catalog_fact"})
+        del extra["when"]
+        document["language"].append(extra)
+
+    def test_groupings_no_program_in_git_has_are_followed(self):
+        plain = programs.kinds(self.page())
+        programs.BUILT.clear()
+        for change in (self.moody, self.keen, self.chatty, self.constant):
+            with self.subTest(change=change.__name__):
+                self.altered(change)
+                place, trials = self.page(), 6000
+                model, joint = programs.kinds(place), self.together(place)
+                self.assertAlmostEqual(sum(model.values()), 1, places=12)
+                for cell, chance in model.items():
+                    self.assertAlmostEqual(chance, joint.get(cell, 0), places=13)
+                rows = [self.whole(place, 10 ** 7 + seed) for seed in range(trials)]
+                self.close(Counter((row[2], programs.kind(place, row)) for row in rows), model, trials)
+                self.assertEqual([programs.replayed(place, row) for row in rows[:200]], [row[1:] for row in rows[:200]])
+                common, silent = {row["id"] for row in place.steps}, sum(model[rating, pages.SILENT] for rating in range(1, 6))
+                if change is self.moody:
+                    self.assertIn("mood", common)
+                    self.assertGreater(silent, sum(plain[rating, pages.SILENT] for rating in range(1, 6)) + .01)
+                elif change is self.keen:
+                    self.assertIn("keen", common)
+                    self.assertEqual([[row["id"] for row in steps] for pools, steps in place.groups
+                                      if pools[0]["id"].startswith("forefoot_fit")], [["sentiment_forefoot_fit", "wears"]])
+                elif change is self.chatty:
+                    self.assertEqual([[row["id"] for row in steps] for pools, steps in place.groups if pools[0]["id"] == "aside"],
+                                     [["chatty"]])
+                    for rating in range(1, 6):
+                        self.assertAlmostEqual(model[rating, pages.SILENT], plain[rating, pages.SILENT] * 3 / 4, places=13)
+                else:
+                    self.assertEqual(silent, 0)
+                programs.BUILT.clear()
+
+    @staticmethod
+    def asides(*streams):
+        """Two statements of aspects of their own, each on a draw of its own, the draws on the streams named."""
+        def change(document):
+            for name, stream in zip(("aside_a", "aside_b"), streams):
+                document["fields"]["review." + name] = {"type": "boolean"}
+                document["steps"].append({"id": name, "target": "review." + name, "sample": "weighted_choice",
+                                          "weights": {"yes": 1, "no": 1}, "values": {"yes": True, "no": False},
+                                          **({"stream": stream} if stream else {})})
+                extra = deepcopy(pool(document, "sole_durability.positive"))
+                extra.update(id=name, when="review." + name)
+                extra["meaning"]["aspect"] = name
+                document["language"].append(extra)
+        return change
+
+    def test_draws_on_one_stream_are_refused(self):
+        plain, quiet = programs.cells(self.place()), sum(programs.kinds(self.page())[rating, pages.SILENT] for rating in range(1, 6))
+        programs.BUILT.clear()
+        # Streams of their own, named or not: two more groups, each silent half the time.
+        for streams in ((None, None), ("one", "two")):
+            self.altered(self.asides(*streams))
+            place = self.page()
+            model, joint = programs.kinds(place), self.together(place)
+            self.assertAlmostEqual(sum(model[rating, pages.SILENT] for rating in range(1, 6)), quiet / 4, places=13)
+            for cell, chance in model.items():
+                self.assertAlmostEqual(chance, joint.get(cell, 0), places=13)
+            programs.BUILT.clear()
+        # One stream for both: the producer draws them alike, so a review is silent half as often as two draws
+        # followed one by one would have it. The page is refused; the topic without a page does not depend on them.
+        self.altered(self.asides("shared", "shared"))
+        with self.assertRaises(ValueError) as caught:
+            self.page()
+        self.assertIn("Not modelled: a draw on a random stream", str(caught.exception))
+        place = self.place()
+        self.assertEqual(programs.cells(place), plain)
+        twin, silent, trials = place.program.twin, 0, 3000
+        for seed in range(trials):
+            entities = twin.sample(10 ** 7 + seed, inputs=deepcopy(place.program.entities))["entities"]
+            self.assertEqual(entities["review"]["aside_a"], entities["review"]["aside_b"])
+            silent += not any("when" not in row or twin._eval(row["when"], entities) for row in twin.document["language"])
+        self.assertLess(abs(silent / trials - quiet / 2), 4.5 * (quiet / 2 * (1 - quiet / 2) / trials) ** .5)
+        programs.BUILT.clear()
+        # A stream of the topic's own draws that another draw opens, with or without a page: the rating's, the
+        # topic's own, a part of the topic choice, and the stream a statement's wording is chosen on.
+        for stream in ("rating", "sentiment_everyday_comfort", "topics/length", "topics/other/1"):
+            with self.subTest(stream=stream):
+                self.altered(self.asides(stream, None))
+                for site in (self.page, self.place):
+                    with self.assertRaises(ValueError) as caught:
+                        site()
+                    self.assertIn("Not modelled: a draw on a random stream", str(caught.exception))
+                programs.BUILT.clear()
+        self.altered(self.asides("language/aside_a/0", None))
+        with self.assertRaises(ValueError) as caught:
+            self.page()
+        self.assertIn("Not modelled: a draw on a random stream", str(caught.exception))
+        self.assertEqual(programs.cells(self.place()), plain)
+        programs.BUILT.clear()
+
+    def test_the_streams_a_draw_opens(self):
+        match = lambda step, looped, name: any(re.fullmatch(pattern, name) for pattern in programs.opens(step, looped))
+        plain, named = {"id": "a", "sample": "weighted_choice"}, {"id": "a", "stream": "b.c", "sample": "normal"}
+        self.assertEqual([match(plain, False, name) for name in ("a", "a/0", "b", "ab")], [True, False, False, False])
+        self.assertEqual([match(named, False, name) for name in ("b.c", "bxc", "a")], [True, False, False])
+        # In a loop the indices follow the name, or a template is filled from the loop's bindings.
+        self.assertEqual([match(plain, True, name) for name in ("a", "a/0", "a/3/11", "a/x")], [False, True, True, False])
+        filled = {"id": "a", "stream": "note/{kind}/own", "sample": "uniform_int"}
+        self.assertEqual([match(filled, True, name) for name in ("note/b/own", "note//own", "note/b", "a/0")],
+                         [True, True, False, False])
+        topics = {"id": "topics", "sample": "review_topics"}
+        self.assertEqual([match(topics, False, name) for name in ("topics", "topics/length", "topics/value", "topics/other/12",
+                                                                  "topics/other", "topics/more")], [True] * 4 + [False] * 2)
+        subset = {"id": "parts", "sample": "weighted_subset"}
+        self.assertEqual([match(subset, False, name) for name in ("parts/count", "parts/item_3", "parts/other")], [True, True, False])
+        chosen = {**subset, "streams": {"count": "how_many", "item": "which/{index}"}}
+        self.assertEqual([match(chosen, False, name) for name in ("how_many", "which/2", "parts/count")], [True, True, False])
+        # Every program in the test world: each stream of a block is one draw's.
+        steps = [row for row, _ in programs.drawing(self.place().program.twin.document["steps"])]
+        self.assertEqual(len(steps), len({row["id"] for row in steps}))
+        self.assertIn("rating", {row["id"] for row in steps})
+
+    def test_probabilities_match_other_seeds(self):
+        for requirement, trials in zip(self.paged(), (2500, 2500, 2500, 400, 250)):
+            with self.subTest(requirement=requirement):
+                block = reviews.model(self.natural, requirement, self.api)
+                hits, chance = sum(reviews.empirical(self.natural, requirement, self.api, trials, 10 ** 6).values()), block.probability
+                self.assertLess(abs(hits / trials - chance), 4 * (chance * (1 - chance) / trials) ** .5 + 1e-9)
+                self.assertAlmostEqual(sum(exp(value) for value in block.log_terms.values()), chance, places=12)
+        # A page with nothing asked of it leaves the counts' own probability, whatever its size and order.
+        for concept, aspect in ((TRAINERS, "everyday_comfort"), (SHIRTS, "wear_feel")):
+            plain = reviews.model(self.natural, self.need(concept, aspect, verdict="more_negative"), self.api).probability
+            for size, order in ((1, "highest"), (3, "lowest"), (20, "identity")):
+                free = self.need(concept, aspect, verdict="more_negative",
+                                 first_page={"size": size, "order": order, "positive": {"min": 0}})
+                self.assertAlmostEqual(reviews.model(self.natural, free, self.api).probability, plain, places=10)
+        # A page that holds every comment is the whole.
+        whole = self.need(verdict="more_negative", first_page={"size": 16, "order": "highest", "verdict": "more_positive"})
+        with self.assertRaises(prices.ZeroMass):
+            reviews.model(self.natural, whole, self.api)
+
+    def test_samples_match_rejection_sampling(self):
+        requirement = self.need(first_page={"size": 2, "order": "highest", "positive": {"min": 1}})
+        place = reviews.site(self.natural, requirement, self.api)
+        reading = reviews.trial(self.natural, requirement, self.api)
+        accepted = [rows for rows in map(reading.reading, range(10 ** 6, 10 ** 6 + 4000))
+                    if reviews.holds(requirement, *reviews.counted(place, rows))]
+        rng, sampled, rating = Random(11), [], programs.rating_key(place, 0)[-1]
+        for _ in range(min(300, len(accepted))):
+            step = reviews.prepare(self.natural, requirement, self.api, rng)
+            seeds = [{key[-1]: step.script[key].seed for key in programs.keys(place, index)} for index in range(place.count)]
+            self.assertTrue(all(len({seed for name, seed in found.items() if name != rating}) == 1 for found in seeds))
+            sampled.append([programs.redrawn(place, index, next(seed for name, seed in found.items() if name != rating),
+                                             found[rating]) for index, found in enumerate(seeds)])
+            self.assertTrue(reviews.holds(requirement, *reviews.counted(place, sampled[-1])))
+        self.assertGreater(len(accepted), 200)
+        page = lambda rows: pages.first([(row[2], programs.kind(place, row)) for row in rows], place.ranks, 2, "highest")
+        drew = lambda row, name: json.loads(dict(row[0])[name]) if name in dict(row[0]) else None
+        features = {
+            "positive": lambda rows: reviews.counted(place, rows)[0],
+            "negative": lambda rows: reviews.counted(place, rows)[1],
+            "page_positive": lambda rows: reviews.counted(place, rows)[3][0],
+            "page_negative": lambda rows: reviews.counted(place, rows)[3][1],
+            "written": lambda rows: sum(row[3] for row in rows),
+            "stars": lambda rows: sum(row[2] for row in rows),
+            "page_stars": lambda rows: sum(rows[index][2] for index in page(rows)),
+            "page_least_stars": lambda rows: min((rows[index][2] for index in page(rows)), default=0),
+            "page_place": lambda rows: sum(page(rows)),
+            "topics": lambda rows: sum(len(drew(row, "topics")) for row in rows),
+            # Draws of the other statements' own: in the block for the page, and as the comments leave them.
+            "fit_praised": lambda rows: sum(drew(row, "sentiment_forefoot_fit") == "positive" for row in rows),
+            "upkeep_said": lambda rows: sum("upper_upkeep" in drew(row, "topics") for row in rows),
+            "value_score": lambda rows: sum(drew(row, "value_favourability") for row in rows)}
+        for name, feature in features.items():
+            with self.subTest(feature=name):
+                mine, theirs = [feature(rows) for rows in sampled], [feature(rows) for rows in accepted]
+                spread = lambda values: (sum((v - sum(values) / len(values)) ** 2 for v in values) / len(values) ** 2) ** .5
+                self.assertLess(abs(sum(mine) / len(mine) - sum(theirs) / len(theirs)),
+                                4.5 * (spread(mine) ** 2 + spread(theirs) ** 2) ** .5 + 1e-9)
+
+    def listed(self, world, requirement):
+        """The first page from the saved reviews alone, as the review site sorts and cuts them, with the native classes."""
+        product, page = requirement["product_id"], requirement["first_page"]
+        item = self.item(world, product)
+        concept = item["public"]["concept_id"]
+        spec = {"kind": catalog_review_task.KIND, "concept_id": concept, "operation": "topic_counts",
+                "product_index": self.products[concept].index(product), "topic": requirement["topic"],
+                "min_assessed": requirement.get("min_assessed", 1)}
+        reference = catalog_review_task.reference(world, catalog_review_task.make(world, spec, inventory=self.declared[concept]),
+                                                  inventory=self.declared[concept])
+        said = {row["review_id"]: row["classification"] for row in reference["review_classifications"]}
+        rows = [row for row in item["reviews"] if row["text"]]
+        # The site's own sort: `native_review_pages.reader_section`.
+        rows.sort(key=lambda r: (r["rating"] if page["order"] == "lowest" else -r["rating"] if page["order"] == "highest" else 0,
+                                 r["review_id"]))
+        shown = Counter(said[row["review_id"]] for row in rows[:page["size"]])
+        return (shown["positive"], shown["negative"]), reference
+
+    def test_steered_worlds_hold_through_the_producer_and_the_sites_order(self):
+        for index, requirement in enumerate(self.paged()):
+            with self.subTest(requirement=requirement):
+                product, page = requirement["product_id"], requirement["first_page"]
+                world, found, record = reviews.steer(self.session, self.natural, self.opened, requirement, self.api, Random(index))
+                shown, reference = self.listed(world, requirement)
+                self.assertTrue(reviews.agreed(page, *shown), shown)
+                self.assertTrue(reviews.agreed(requirement, reference["counts"]["positive"], reference["counts"]["negative"]))
+                self.assertEqual((found["first_page"]["positive"], found["first_page"]["negative"]), shown)
+                self.assertEqual(record["steered_first_page"], {"positive": shown[0], "negative": shown[1]})
+                self.assertEqual(len(found["first_page"]["review_ids"]), min(page["size"], reference["written_review_count"]))
+                self.assertIn("sentiment_", record["distribution_claim"])
+                before, after = self.item(self.natural, product), self.item(world, product)
+                self.assertEqual({k: v for k, v in after.items() if k not in ("reviews", "rating_summary")},
+                                 {k: v for k, v in before.items() if k not in ("reviews", "rating_summary")})
+                self.assertEqual([row["review_id"] for row in after["reviews"]], [row["review_id"] for row in before["reviews"]])
+                self.assertEqual([p for p in world["products"] if p is not after],
+                                 [p for p in self.natural["products"] if p is not before])
+                self.assertEqual(world["retailers"], self.natural["retailers"])
+        first, tablet = self.paged()[0], self.paged()[3]
+        self.assertFalse(reviews.satisfied(self.natural, first, self.api))
+        for requirement, seeds in ((first, range(900, 903)), (tablet, range(900, 901))):
+            reading = reviews.trial(self.natural, requirement, self.api)
+            for seed in seeds:
+                found = blocks.redraw(self.session, self.natural, [reading], seed)
+                self.assertEqual((found.identical, found.agreed), ([True], [True]))
+                self.assertEqual(found.satisfied, reading.holds(seed))
+        # The review ids' order, which the site breaks ties by, is not the order the reviews are drawn in.
+        place = reviews.site(self.natural, first, self.api)
+        self.assertNotEqual(place.ranks, list(range(place.count)))
+
+    def test_what_the_page_cannot_be_read_for_is_refused(self):
+        requirement = self.paged()[0]
+        # A review whose text is there without a statement: the site would list it, the reading would not.
+        other = deepcopy(self.natural)
+        review = next(row for row in self.item(other, requirement["product_id"])["reviews"] if not row["statements"])
+        review["text"] = "Fine."
+        for call in (reviews.model, reviews.trial, lambda *a: reviews.prepare(*a, Random(0))):
+            with self.assertRaises(ValueError) as caught:
+                call(other, requirement, self.api)
+            self.assertIn("text is not there", str(caught.exception))
+        self.assertGreater(reviews.model(other, {k: v for k, v in requirement.items() if k != "first_page"}, self.api).probability, 0)
+        # More ways for the other statements to fall than the reading walks.
+        programs.BUILT.clear()
+        limit, programs.WAYS = programs.WAYS, 50
+        self.addCleanup(setattr, programs, "WAYS", limit)
+        with self.assertRaises(ValueError) as caught:
+            reviews.model(self.natural, requirement, self.api)
+        self.assertIn("Not modelled", str(caught.exception))
+        self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        programs.WAYS = limit
+        self.assertGreater(reviews.model(self.natural, requirement, self.api).probability, 0)
+
+    def test_candidates_for_the_review_summary_task(self):
+        task = {"kind": "summarize_product_reviews", "concept_id": TRAINERS, "operation": "topic_counts", "product_index": 0,
+                "topic": self.topic(TRAINERS, "everyday_comfort"), "min_assessed": 1}
+        paged = [row for row in variants.of(self.natural, task, self.api) if "first_page" in row["name"]]
+        self.assertEqual([row["name"] for row in paged], ["first_page_more_positive_verdict_more_negative",
+                                                          "first_page_more_negative_verdict_more_positive"])
+        for index, row in enumerate(paged):
+            world, seen, _ = reviews.steer(self.session, self.natural, self.opened, row["requirement"], self.api, Random(index))
+            shown, reference = self.listed(world, row["requirement"])
+            self.assertTrue(reviews.agreed(row["requirement"]["first_page"], *shown))
+            self.assertEqual(reference["verdict"], row["requirement"]["verdict"])
