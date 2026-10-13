@@ -1099,7 +1099,12 @@ defaults. Where a charge depends on the location the candidate with an
 offer listed below the winner is left out (two candidates, not three), each
 candidate is marked as an estimate, and modelling every pair of a medium
 world takes 200 samples of the block apiece (19 seconds there), so it is
-slow.
+slow. One more candidate is listed for this task,
+`cheapest_delivered_with_lowest_rated_carrier`: the likeliest winner again,
+with the carrier the world rates lowest as the one its total is made with
+(the requirement of the next section; the carrier's stars are left as the
+seed has them, and can be lowered by combining it with the thirteenth
+requirement).
 
 The check is the native task's reference on the steered world (through
 `prepared_quote` with the plans a site is built from). The tests also read

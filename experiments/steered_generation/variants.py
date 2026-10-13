@@ -25,7 +25,8 @@ import json
 from math import log
 from pathlib import Path
 
-from . import blocks, carriers, cheapest, combined, listed, prices, reviews, shipments, shortlist, stock, streams, threshold
+from . import (blocks, carriers, cheapest, combined, couriers, listed, prices, reviews, shipments, shortlist, stock, streams,
+               threshold)
 
 # Native task kinds read by the cheapest-available block, with the fields of the task that state the reading.
 # A comparison site goes with the surrounding-site controls the world is published with (`surrounding`).
@@ -112,6 +113,16 @@ def winners(world, task, api, extra=None):
     if len(alone) > 2:
         found.append(entry("unlikely_winner", "the retailer and product at the middle of the ranking by probability",
                            alone[len(alone) // 2]))
+    if scope.delivered is not None:
+        # The likeliest winner again, delivered by the carrier this world rates lowest.
+        rated = min(world["carrier_evidence"]["public"]["carriers"],
+                    key=lambda row: (row["summary"]["average_stars"], row["carrier_id"]))
+        with_carrier = ranked(world, [{"schema": couriers.VERSION, "carrier_id": rated["carrier_id"],
+                                       "cheapest": {key: value for key, value in top.items() if key != "schema"}}], api, couriers)
+        if with_carrier:
+            found.append(entry("cheapest_delivered_with_lowest_rated_carrier", "the same winner, whose cheapest delivery "
+                               "option, the one its total is made with, is the carrier this world rates lowest",
+                               with_carrier[0]))
     return found
 
 
