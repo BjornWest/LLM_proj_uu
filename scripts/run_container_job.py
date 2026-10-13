@@ -248,14 +248,15 @@ def validate(args):
             args.deadline_source = "leading_timeout_backstop"
     if args.grace_seconds is None:
         args.grace_seconds = parsed["kill_after"] if parsed and parsed["kill_after"] is not None else 2
+    args.leading_timeout = parsed is not None
     if args.cleanup_seconds is None:
         args.cleanup_seconds = max(8, args.grace_seconds + 2)
     for name in ("sample_seconds", "grace_seconds", "cleanup_seconds"):
         value = getattr(args, name)
         if not math.isfinite(value) or value <= 0:
             raise ValueError(name + " must be finite and positive")
-    if not .02 <= args.sample_seconds <= 2 or not args.grace_seconds < args.cleanup_seconds <= 60:
-        raise ValueError("Sample must be .02-2s; cleanup must exceed grace and be <=60s")
+    if not args.grace_seconds < args.cleanup_seconds <= 60:
+        raise ValueError("Cleanup must exceed grace and be <=60s; long kill-after needs explicit grace/cleanup options")
     if not 1024 <= args.resource_log_bytes <= 64 * MIB:
         raise ValueError("Resource log budget must be 1024-67108864 bytes")
     if args.wall_seconds is None or not math.isfinite(args.wall_seconds) or args.wall_seconds <= 0:
@@ -384,6 +385,10 @@ class Supervisor:
                     if fd is not None:
                         os.close(fd)
                     continue
+                except Exception:
+                    if fd is not None:
+                        os.close(fd)
+                    raise
                 if (fresh["pid"], fresh["start_ticks"], fresh["ppid"]) != (row["pid"], row["start_ticks"], row["ppid"]):
                     os.close(fd)
                     continue
@@ -492,6 +497,7 @@ def run(args):
     cleanup = dict(complete=True, payload_started=False, remaining=[])
     samples, logged_samples, logged_bytes = 0, 0, 0
     log_truncated = False
+    active_deadline = None
     peaks = dict(summed_rss_bytes=0, threads=0, process_count=0)
     launch = dict(schema=SCHEMA, mode="monitored_process_tree", started_at=dt.datetime.now(dt.timezone.utc).isoformat(),
                   supervisor=proc_stat(os.getpid()), executable=Path(args.command[0]).name if args.command else None,
@@ -509,6 +515,7 @@ def run(args):
             returncode = 0
         else:
             validate(args)
+            active_deadline = started + args.wall_seconds
             if not args.command:
                 raise ValueError("Specify a foreground command after --")
             if outer["visible_effective_memory_max"] is None or outer["visible_effective_pids_max"] is None:
@@ -560,13 +567,15 @@ def run(args):
                 signal.pthread_sigmask(signal.SIG_SETMASK, set())
                 try:
                     libc = ctypes.CDLL(None, use_errno=True)
-                    if libc.prctl(1, signal.SIGKILL, 0, 0, 0) != 0 or os.getppid() != launch["supervisor"]["pid"]:
+                    death_signal = signal.SIGTERM if args.leading_timeout else signal.SIGKILL
+                    if libc.prctl(1, death_signal, 0, 0, 0) != 0 or os.getppid() != launch["supervisor"]["pid"]:
                         os._exit(125)  # Root mitigation only; not whole-tree cleanup.
                     os.setsid()
                     token = os.read(read_gate, 1)
                     os.close(read_gate)
                     if token != b"1":
                         os._exit(125)
+                    resource.setrlimit(resource.RLIMIT_NOFILE, tuple(outer["rlimit_nofile"]))
                     os.execvpe(args.command[0], args.command, os.environ)
                 except BaseException:
                     os.write(2, b"Container payload exec failed\n")
@@ -586,10 +595,14 @@ def run(args):
                        per_job_kernel_limits_installed=False, wall_seconds=args.wall_seconds,
                        deadline_source=args.deadline_source, grace_seconds=args.grace_seconds,
                        cleanup_seconds=args.cleanup_seconds,
-                       parent_death_policy="Immediate payload requests SIGKILL on guardian death; descendants need outer containment",
+                       payload_rlimit_nofile=outer["rlimit_nofile"],
+                       parent_death_policy="Leading timeout requests SIGTERM to preserve forwarding/deadline; direct payload requests SIGKILL; descendants need outer containment",
                        accounting="Own processes plus nested supervisor overhead; registered child payloads separately monitored",
                        job_registry=str(supervisor.registry),
-                       deadline_monotonic=started + args.wall_seconds, sample_seconds=args.sample_seconds,
+                       deadline_monotonic=active_deadline if args.deadline_source != "leading_timeout_backstop" else None,
+                       deadline_anchor="gate_release" if args.deadline_source == "leading_timeout_backstop" else "guardian_start",
+                       preparation_deadline_monotonic=started + args.wall_seconds,
+                       sample_seconds=args.sample_seconds,
                        cpu_quota_installed=False, gpu_memory_accounted=False,
                        limitations="Sampling can overshoot; RSS counts shared pages more than once; no GPU, page-cache or hostile-code containment"))
             entry_verified = True
@@ -597,6 +610,8 @@ def run(args):
             write_json(registration, dict(schema=SCHEMA, supervisor=launch["supervisor"],
                        root=dict(pid=pid, start_ticks=row["start_ticks"]), source_sha256=supervisor.source_sha256))
             if not interrupted and time.monotonic() < started + args.wall_seconds:
+                if args.deadline_source == "leading_timeout_backstop":
+                    active_deadline = time.monotonic() + args.wall_seconds
                 os.write(gate, b"1")
                 gate_released = True
             os.close(gate)
@@ -620,7 +635,7 @@ def run(args):
                     if interrupted:
                         stop_reason = "signal"
                         break
-                    if time.monotonic() >= started + args.wall_seconds:
+                    if time.monotonic() >= active_deadline:
                         stop_reason = "wall_deadline"
                         break
                     if sample["summed_rss_bytes"] > args.memory_mib * MIB:
@@ -677,6 +692,7 @@ def run(args):
                interrupt_signals=interrupted, sample_count=samples, observed_peaks=peaks,
                logged_samples=logged_samples, logged_bytes=logged_bytes,
                resource_log_truncated=log_truncated, registration_cleanup=registration_cleanup,
+               effective_deadline_monotonic=active_deadline,
                per_job_kernel_limits_installed=False, automatic_retries=0))
     finally:
         for sig, handler in previous.items():

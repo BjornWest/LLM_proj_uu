@@ -33,7 +33,10 @@ Every execution has an internal monotonic wall deadline. Supply
 duration in the existing caller command. With a leading `timeout`, the guardian
 uses a later backstop: duration + kill-after (two seconds if absent) + one second
 + two sample periods. This lets GNU timeout deliver its own signal and honor
-its declared grace. Explicit/environment wall limits remain strict and take
+its declared grace. This backstop starts at exec-gate release; finite preparation
+has its own bound of the same duration from guardian start. Entry records the
+anchor, and result records the effective monotonic deadline. Explicit/environment
+wall limits remain strict from guardian start and take
 precedence. The command itself is preserved.
 Recognized timeout options are `--kill-after`, `-k`, `--signal`, `-s` (with a
 separate argument), their long `=VALUE` forms, `--foreground`,
@@ -61,7 +64,7 @@ Nested instances of the **same exact launcher bytes** inherit a private
 parent's RSS/thread threshold and separately monitored by their own guardian;
 the parent still counts child-guardian overhead. This keeps parent, pool and
 case budgets distinct. Parent cleanup still covers the full descendant tree.
-Resource violations trigger immediate KILL containment rather than a graceful
+Resource violations and supervisor errors trigger immediate KILL containment rather than a graceful
 TERM interval; the shared outer limits remain the final kernel bound.
 
 Registrations use guardian/root PID plus `/proc` start ticks; stale records do
@@ -90,19 +93,28 @@ recorded in the probe and entry.
 Exited identities have their pidfds closed; reaped history retains only the
 latest 64 PIDs plus a total count. Before exec, the guardian qualifies its
 NOFILE hard limit against visible outer pids.max plus 64 descriptors, raising
-only its soft limit when needed. The payload inherits this descriptor limit.
+only its soft limit when needed. The payload restores the original soft/hard
+descriptor limits before exec; entry records both guardian and payload limits.
 Native child signal defaults and blocked masks are restored before exec. The
-immediate payload requests SIGKILL if its guardian dies; this does not prove
-whole-tree cleanup after guardian death. `setsid` and double-fork detachments
+immediate payload requests SIGKILL if its guardian dies. A recognized leading
+GNU timeout instead requests SIGTERM so it can forward the signal and preserve
+its own kill-after deadline. This does not prove whole-tree cleanup or produce
+a guardian terminal receipt after guardian death; the outer rental guard remains
+necessary, especially when timeout has no kill-after or cannot forward a signal. `setsid` and double-fork detachments
 therefore remain discoverable. Sibling job trees are not selected.
 
 SIGTERM, SIGINT, SIGHUP, deadline, threshold, supervisor failure and normal
 command exit all lead to bounded cleanup. TERM is delivered once to each direct child, allowing forwarding wrappers and
-nested guardians to handle graceful delivery below them. Newly adopted orphan
+nested guardians to handle graceful delivery below them. A wrapper that stays
+alive without forwarding TERM prevents descendant grace; those descendants
+receive KILL after the grace interval. Newly adopted orphan
 roots receive their own TERM; KILL containment covers the whole identified tree.
 Defaults are two seconds of grace and an eight-second cleanup limit. A leading
 `timeout --kill-after=K` sets default grace to K and cleanup to max(8, K+2),
-with cleanup bounded to 60 seconds. Explicit grace/cleanup options can override
+and refuses automatic grace/cleanup above that 60-second bound. Long kill-after
+values therefore need explicit valid grace/cleanup options. The derived grace
+applies to external signals and remaining descendants after normal command exit
+as well as deadline stops. Explicit grace/cleanup options can override
 these values. Repeated TERM does not interrupt a payload’s `finally` cleanup. Successful cleanup requires no
 remaining observed live descendants and kernel `waitpid` reporting no children.
 Cleanup failure returns nonzero and records remaining or unknown state; it

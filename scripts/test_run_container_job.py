@@ -500,3 +500,65 @@ def test_native_exec_restores_signal_defaults_and_blocked_mask(tmp_path):
     status = dict(line.split(':',1) for line in proc.stdout.splitlines() if ':' in line)
     assert int(status["SigBlk"].strip(),16) == 0
     assert not int(status["SigIgn"].strip(),16) & (1 << (signal.SIGPIPE-1))
+
+
+def test_pidfd_is_closed_when_proc_stat_has_unexpected_error():
+    supervisor = guard.Supervisor(None, time.monotonic())
+    row = dict(pid=123, start_ticks=456, ppid=os.getpid(), state="S")
+    with patch.object(guard, "process_table", return_value={123:row}), patch.object(guard,"pidfd_open",return_value=99), patch.object(guard,"proc_stat",side_effect=ValueError), patch.object(os,"close") as close:
+        with pytest.raises(ValueError):supervisor.discover()
+    close.assert_called_once_with(99)
+    assert not supervisor.known
+
+
+def test_payload_keeps_original_soft_nofile_limit(tmp_path):
+    marker = tmp_path / "nofile"
+    proc = boot_run(tmp_path, f"import resource; open({str(marker)!r},'w').write(str(resource.getrlimit(resource.RLIMIT_NOFILE)[0]))", "g.resource.setrlimit(g.resource.RLIMIT_NOFILE,(64,g.resource.getrlimit(g.resource.RLIMIT_NOFILE)[1]))")
+    entry = json.loads((tmp_path / "receipt/entry.json").read_text())
+    assert proc.returncode == 0 and marker.read_text() == "64"
+    assert entry["guardian_rlimit_nofile"][0] >= entry["actual_outer"]["visible_effective_pids_max"]+64
+    assert entry["payload_rlimit_nofile"][0] == 64
+
+
+def test_guardian_death_preserves_timeout_forwarding_and_child_deadline(tmp_path):
+    receipt, marker = tmp_path / "receipt", tmp_path / "child"
+    code = f"import os,signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); open({str(marker)!r},'w').write(str(os.getpid())); time.sleep(60)"
+    command = [sys.executable, "-I", "-B", str(LAUNCHER), "--memory-mib", "96", "--tasks", "16", "--receipt",str(receipt),"--sample-seconds",".02","--","timeout","--kill-after=0.3s","0.5s",sys.executable,"-I","-B","-c",code]
+    # A separate subreaper contains/reaps survivors of the intentionally killed
+    # guardian, without modifying pytest's own child ownership.
+    boot = f"""import importlib.util,subprocess,time,os,sys,signal
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('g',{str(LAUNCHER)!r});g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)
+g.subreaper()
+owner=subprocess.Popen({command!r},stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+try:
+ deadline=time.monotonic()+3
+ while not Path({str(marker)!r}).exists():
+  assert owner.poll() is None and time.monotonic()<deadline
+  time.sleep(.01)
+ owner.kill();assert owner.wait(timeout=3)==-signal.SIGKILL
+ deadline=time.monotonic()+2
+ while True:
+  try:pid,status=os.waitpid(-1,os.WNOHANG)
+  except ChildProcessError:break
+  assert time.monotonic()<deadline,'timeout lost descendant deadline'
+  time.sleep(.02)
+ assert not Path({str(receipt/'result.json')!r}).exists()
+finally:
+ if owner.poll() is None:owner.kill();owner.wait(timeout=3)
+ supervisor=g.Supervisor(type('A',(),dict(cleanup_seconds=2,grace_seconds=.1,sample_seconds=.02))(),time.monotonic())
+ supervisor.cleanup(immediate=True);supervisor.close();owner.stderr.close()
+"""
+    proc = subprocess.run([sys.executable,'-I','-B','-c',boot],capture_output=True,timeout=8)
+    assert proc.returncode == 0, proc.stderr
+
+
+def test_timeout_backstop_anchors_after_slow_entry_persistence(tmp_path):
+    receipt = tmp_path / 'receipt'
+    command = [sys.executable,'-I','-B',str(LAUNCHER),'--memory-mib','96','--tasks','16','--receipt',str(receipt),'--sample-seconds','.02','--','timeout','--kill-after=0.2s','0.2s',sys.executable,'-I','-B','-c','import time; time.sleep(.05)']
+    boot = "import importlib.util,sys,time; s=importlib.util.spec_from_file_location('g',sys.argv[1]); g=importlib.util.module_from_spec(s); s.loader.exec_module(g); original=g.write_json; g.write_json=lambda p,v:(time.sleep(.3) if p.name=='entry.json' else None) or original(p,v); sys.argv=sys.argv[1:]; raise SystemExit(g.main())"
+    proc = subprocess.run([sys.executable,'-I','-B','-c',boot,str(LAUNCHER),*command[4:]],capture_output=True,timeout=5)
+    result=json.loads((receipt/'result.json').read_text());entry=json.loads((receipt/'entry.json').read_text())
+    assert proc.returncode==0 and result['cleanup_verified']
+    assert entry['deadline_anchor']=='gate_release' and entry['deadline_monotonic'] is None
+    assert result['effective_deadline_monotonic']>entry['preparation_deadline_monotonic']+.25
