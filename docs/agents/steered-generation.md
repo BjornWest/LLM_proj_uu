@@ -574,7 +574,15 @@ comfort on a cushioned shoe and for value by the price), the comment's length
 review is positive or negative about a topic when it has a comment, the topic
 is among those chosen, and the score is at or above one half or below it. Per
 review the rating, the topic's score, the length and the topic choices are
-the block.
+the block. Two topics have more behind the score. The room at the forefoot
+is scored around a centre that also moves with the width of the option
+bought against the wearer's own (0.08 per width), both draws of the review;
+those two draws join the block, and a review's chance of praise is the
+mixture over them. Whether the size fits is no normal score: it is what the
+reviewer's size adjustment (none, or half a size either way) and a normal
+size experience around the brand's offset come to, within 0.3 of a size
+either way, and it does not follow the stars. Those two draws stand in the
+block in the score's place.
 
 Every other concept gets its reviews from the review program of its product
 package: a list of steps, each a draw or a value derived from earlier ones,
@@ -711,9 +719,26 @@ placed on the reviews whose ids come first. Every review then has a kind and
 a rating to be redrawn to, in the two steps described above. The check reads
 the page off the saved reviews by the site's own sort and takes what each
 comment says from the native task's reference. A first page is not combined
-with a mean rating yet, and it is read for the pilot concepts only: for a
-review program, whether a review has a comment at all depends on every
-topic's statements, which the reading does not follow yet. Everything is
+with a mean rating yet.
+
+For a review program, a review has a comment when any pool of the program's
+language holds for it, so a first page needs every pool's draws and not the
+topic's alone: they all join the block. Walking them together would cost the
+product of their numbers (a tablet has eight favourable-or-not draws besides
+the topic's). `programs.kinds` groups the other pools by the aspect they
+report. A step is common when the topic or the rating depends on it or two
+groups do, and so is everything such a step depends on; what is left of a
+group's steps is its own. Given how the common part falls, the groups' own
+draws are independent, so the chance that a review which says nothing about
+the topic says nothing at all is a product over the groups, each factor a
+short walk of that group's own steps from where the common walk stands. The
+grouping is a choice of cost only: any grouping gives the same numbers, and
+the tests compare them with the walk of every draw together. Trainers take
+0.04 s, a T-shirt about 1 s and a tablet about 20 s, once per product and
+topic; a program that takes more than four million steps over all the
+ways its draws can fall (some minutes) is refused.
+A natural world in which a review's text is not there exactly when the
+review states something is refused for a first page. Everything is
 kept as logarithms, each term one exponent of a sum of logarithms: the
 integrand at a point is a product of hundreds of small powers and a large
 multinomial number, far outside the floats on its own while their product is
@@ -752,8 +777,7 @@ check reads the steered world with the native
 `catalog_review_task.reference`, and compares its counts with the recorded
 draws read by the rule written out in `reviews.said`.
 
-Limits. On the pilot concepts, not the topics whose score depends on the
-option bought or the wearer (`size_fit`, `forefoot_room`). A review program
+Limits. A review program
 is refused ("Not modelled") where what the topic depends on includes a loop
 that draws or holds another loop, a collected value under a condition of its
 own, a draw of another kind than the six above, a normal draw read otherwise
@@ -1339,7 +1363,7 @@ the block model gives each:
 | `shortlist_matching_models` with an integer `limit` | `natural_shortlist`; `tie_at_cutoff`; `another_shortlist`, the last two the likeliest among the first limit + 3 models of the natural ranking, not among all models |
 | `comparison_cheapest_exact_sku_stock` (with the bound `sku_id`) | the retailer shown cheapest holds the variant, has it only on supplier order, or has it unavailable |
 | `audit_free_shipping_claim` | no threshold; meets; below; just below; just meets |
-| `summarize_product_reviews` (topic counts over a product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed`; against the stars, `high_stars_verdict_more_negative` (mean rating of 4 or more) and `low_stars_verdict_more_positive` (2 or less); and, for walking shoes and sandals, the first page against the whole, `first_page_more_positive_verdict_more_negative` and `first_page_more_negative_verdict_more_positive` (four comments to a page, highest ratings first, as in the suite's instance; the task does not say how its site pages) |
+| `summarize_product_reviews` (topic counts over a product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed`; against the stars, `high_stars_verdict_more_negative` (mean rating of 4 or more) and `low_stars_verdict_more_positive` (2 or less); and the first page against the whole, `first_page_more_positive_verdict_more_negative` and `first_page_more_negative_verdict_more_positive` (four comments to a page, highest ratings first, as in the suite's instance; the task does not say how its site pages) |
 | `summarize_carrier_reviews` (topic counts) | the same four verdicts in the task's scope, without those the shipments' histories rule out; for `handoff` and `punctuality` also `redrawn_shipments_verdict_...`, the four verdicts with the carrier's shipments redrawn |
 
 A task is translated field by field, and a task with a field the tool does
@@ -2221,9 +2245,8 @@ carries review and description text that the checks also digest.
 - **Reviews, in part.** Steered: what a product's reviews say about a topic,
   for any concept, with or without a bound on the mean of its stars; and
   which of a carrier's reviews mention an aspect. Not steered: the count of
-  each star; one option's reviews; on walking shoes and sandals the two
-  topics that depend on the option bought or the wearer; what a review
-  site's first page shows for concepts other than those two. Not reachable by steering at all, because
+  each star; one option's reviews; a first page together with a bound on
+  the mean of the stars. Not reachable by steering at all, because
   no producer draws them: a neutral or a mixed comment, and a second
   statement on a topic under other circumstances (the suite's "opposite
   opinions in one comment" and "same words, different circumstances"). Those
