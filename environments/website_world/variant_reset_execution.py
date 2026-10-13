@@ -7,10 +7,9 @@ from copy import deepcopy
 from hashlib import sha256
 import json
 from pathlib import Path
-import re
 
 from experiments.answer_grading import task_answer
-from experiments.answer_grading.extraction import claim, obj, validate_claims
+from experiments.answer_grading.extraction import claim, obj, validate_claims, _quote
 from intent_browser.connected_world_task import checked_files
 from . import variant_reset_task as native, variant_reset_grading as grading
 from . import generation as shared
@@ -38,15 +37,6 @@ def reset_schema(task):
         'requested_selection': obj({k: claim() for k in task['requested_selection']}),
         'exact_combination_available': claim('boolean'),
         'source_urls': {'type': 'array', 'items': obj({'value': {'type': 'string'}, 'evidence': {'type': 'string'}})}})
-
-
-def _availability_supported(value, evidence):
-    text = evidence.casefold().replace('’', "'")
-    negative = r"\b(?:unavailable|not (?:available|offered|carried)|does(?: not|n't) exist|cannot be selected)\b"
-    has_negative = bool(re.search(negative, text))
-    positive_text = re.sub(negative, '', text)
-    has_positive = bool(re.search(r'\b(?:available|in stock|offered|carried)\b', positive_text))
-    return has_positive and not has_negative if value else has_negative and not has_positive
 
 
 class ResetAnswerGrader:
@@ -79,15 +69,19 @@ class ResetAnswerGrader:
         if type(value['requested_selection']) is not dict:raise ValueError('Option claims must be objects')
         for key in self.task['requested_selection']:
             value['requested_selection'].setdefault(key, {'value': None, 'evidence': None})
-        c = validate_claims(value, answer, schema=self.schema)
+        # The extractor interprets availability/negation; validation binds its
+        # typed semantic value to an exact answer span, not a phrase whitelist.
+        c = validate_claims(value, answer, schema=self.schema,
+                            semantic_fields=('exact_combination_available',))
+        # Keep axes independent of the flat validator's reserved field names.
         for entry in c['requested_selection'].values():
             if entry['value'] is None:
                 if entry['evidence'] is not None:raise ValueError('Missing option requires absent evidence')
-            elif entry['value'] not in entry['evidence']:
-                raise ValueError('Option is absent from its actual answer quote')
+            else:
+                _quote(entry['evidence'], answer)
+                if entry['value'] not in entry['evidence']:
+                    raise ValueError('Option is absent from its actual answer quote')
         available = c['exact_combination_available']
-        if available['value'] is not None and not _availability_supported(available['value'], available['evidence']):
-            raise ValueError('Combination availability meaning is unsupported by its answer quote')
         supplied = {'requested_selection': {k:v['value'] for k,v in c['requested_selection'].items() if v['value'] is not None},
                     'exact_combination_available': available['value']}
         report = grading.grade(self.world,self.task,self.reference,claims=supplied,**self.inputs)

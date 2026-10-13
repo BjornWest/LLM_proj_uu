@@ -1,6 +1,6 @@
 # Native answer validation boundary
 
-Prospective contract for the eight affected Website task families. Frozen
+Prospective contract for the affected Website task families. Frozen
 recipes, source trees, outputs and grades keep their original implementation.
 Actual source-bound lifecycle acceptance is separate from these local controls.
 
@@ -30,6 +30,7 @@ interpretation accuracy requires separate extraction regression checks.
 | Catalog statistics | `undefined` | Typed population count and finite statistic, currency, citation population, native aggregation |
 | Review passages | Passage/no-match/uncertain status | Complete literal passage, exact reader-note route and native topic/subject matching |
 | Variant links | `link_encodes_full_selection`, `recipient_must_select` | Exact URL, literal selected/manual options, independently bound recipient capability |
+| Variant reset | `exact_combination_available` | Boolean/null schema, exact answer quotes, literal requested options/URLs, native availability plus actual ordered actions/cart/completion; broader effects retain their existing scope |
 
 Normalized decimal fields (`mean_rating`, `statistic_sek`) use declared shared
 `semantic_fields` to permit equivalent decimal formatting, then enforce finite typed decimal validity and authentic quotes. Validators do

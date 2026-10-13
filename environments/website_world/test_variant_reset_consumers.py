@@ -64,16 +64,19 @@ class ResetConsumerTests(unittest.TestCase):
                     runtime_options=options, asset_sha256=assets)
 
     def test_actual_shared_formatter_path_uses_answer_and_separate_scripted_journal(self):
+        quote = "the Hedmark Ylva sandals don't come in black EU 38."
         class Backend:
             def complete(self, _):
                 value = claims()
+                value['exact_combination_available']['evidence'] = quote
                 return SimpleNamespace(text=json.dumps(value), request={'synthetic': True}, raw={
                     'model': 'synthetic-zero-provider', 'choices': [{'finish_reason': 'stop',
                     'message': {'content': json.dumps(value)}}]})
         g = grader()
+        answer = 'The black EU38 requested options: '+quote
         with tempfile.TemporaryDirectory() as directory:
             report = execution.task_answer.extract_and_grade(g, {'user_message': g.task['user_message']},
-                ANSWER, Path(directory)/'extraction', Backend())
+                answer, Path(directory)/'extraction', Backend())
         self.assertTrue(report['structured_claims_correct'])
         self.assertEqual(report['native_report']['components']['ordered_selector_actions']['status'], 'pass')
 
@@ -83,10 +86,19 @@ class ResetConsumerTests(unittest.TestCase):
         g = grader();g.inputs['interaction'] = None
         self.assertIsNone(g.grade(claims(), ANSWER)['structured_claims_correct'])
 
-    def test_negated_or_contradictory_availability_is_not_repaired(self):
-        self.assertFalse(execution._availability_supported(True, 'The combination is not available'))
-        self.assertFalse(execution._availability_supported(False, 'Available in stock'))
-        self.assertFalse(execution._availability_supported(False, 'Unavailable or available, I am unsure'))
+    def test_wrong_semantics_and_reported_ambiguity_are_not_repaired(self):
+        g = grader(); value = claims()
+        value['exact_combination_available']['value'] = True
+        before = deepcopy(value)
+        result = g.grade(value, ANSWER)
+        self.assertFalse(result['structured_claims_correct'])
+        self.assertEqual(value, before)
+        self.assertTrue(result['claims']['exact_combination_available']['value'])
+        value = claims(); value['interpretation'] = 'ambiguous'
+        value['issues'] = ['Contradictory availability statements']
+        result = g.grade(value, ANSWER)
+        self.assertFalse(result['structured_claims_correct'])
+        self.assertEqual(result['claims']['issues'], value['issues'])
 
     def test_missing_authority_blocks_before_recipe_load(self):
         with patch.object(execution.shared, 'load', side_effect=AssertionError('Must reject first')):
