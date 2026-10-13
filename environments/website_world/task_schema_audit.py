@@ -99,6 +99,26 @@ def _domain(node, root, seen=frozenset()):
     return None
 
 
+def _container_restricted(node, root, kind, seen=frozenset()):
+    # Alternatives inherit their own restrictions; absence of a keyword on
+    # the wrapper is not proof that the allowed values are open.
+    if node is False:return True
+    if node is True:return False
+    if 'enum' in node or 'const' in node:return True
+    if kind=='object' and (node.get('additionalProperties') is False or node.get('unevaluatedProperties') is False):return True
+    if kind=='array':
+        if node.get('items',True) is not True:return True
+        if node.get('maxItems',float('inf'))<=len(node.get('prefixItems',[])):return True
+    if '$ref' in node and node['$ref'] not in seen:
+        if _container_restricted(_resolve(root,node['$ref']),root,kind,seen|{node['$ref']}):return True
+    if any(_container_restricted(child,root,kind,seen) for child in node.get('allOf',[])):return True
+    for key in ('anyOf','oneOf'):
+        if key in node:
+            relevant=[child for child in node[key] if not _types(child,root) or kind in _types(child,root)]
+            return all(_container_restricted(child,root,kind,seen) for child in relevant)
+    return False
+
+
 def _pair_wire_gap(schema, node):
     # Do not infer pairing from the mere presence of an unrelated applicator.
     # Prove rejection of invalid pairs only for an isolated value/evidence node.
@@ -143,10 +163,10 @@ def audit_schema(schema, *, expectations=()):
             finding(path, 'type_not_enforced', 'No explicit wire type or categorical restriction.')
         if '$dynamicRef' in node:
             finding(path,'unsupported_dynamic_reference','Dynamic reference behavior is not audited.')
-        if 'array' in types and node.get('items',True) is True and not node.get('prefixItems'):
+        if 'array' in types and not _container_restricted(node,schema,'array'):
             finding(path,'array_items_unconstrained','Array items have no declared wire restriction.')
         if 'object' in types:
-            if node.get('additionalProperties') is not False:
+            if not _container_restricted(node,schema,'object'):
                 finding(path, 'open_object', 'Unexpected fields are not explicitly prohibited.')
             props = node.get('properties',{})
             for name in props:

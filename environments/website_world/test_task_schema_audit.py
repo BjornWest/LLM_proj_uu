@@ -86,3 +86,12 @@ def test_native_verdict_mismatch_is_visible_in_audit():
     report=audit_grader(Grader(),observations=[{'control':'wrong','expected_verdict':False,'grade':{'structured_claims_correct':True}}])
     assert any(f['kind']=='native_verdict_mismatch' for f in report['findings'])
     assert report['source_hash_scope']=='defining_class_module_only_not_transitive_dependencies'
+
+
+def test_closed_alternatives_do_not_become_false_open_container_findings():
+    schema={'anyOf':[{'type':'object','properties':{'amount':{'type':'string'}},'required':['amount'],'additionalProperties':False},{'type':'null'}]}
+    assert not any(f['kind']=='open_object' for f in audit_schema(schema)['findings'])
+    array={'anyOf':[{'type':'array','items':{'type':'integer'}},{'type':'null'}]}
+    assert not any(f['kind']=='array_items_unconstrained' for f in audit_schema(array)['findings'])
+    array={'type':'array','prefixItems':[{'type':'integer'}]}
+    assert any(f['kind']=='array_items_unconstrained' for f in audit_schema(array)['findings'])
