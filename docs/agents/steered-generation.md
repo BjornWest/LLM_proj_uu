@@ -1947,6 +1947,37 @@ B08 are read through the feature task their native modules resolve them to.
 What is steered is the world's stock and prices; a task's memories, prompts
 and start state are not part of this.
 
+### A delivery task's answer kept, its carriers rated lowest
+
+`answer_carrier_rated_lowest` on the medium world (21 retailers, 90
+products), for size-42 walking shoes; outputs under
+`.local/coordination/world-requirement-construction-20261010/steering/answers-r20/`.
+Pinned runs: `cheapest-kept` at `a811938` (the cheapest total, asked for
+with `--candidate` alone) and `fastest`, `deadline-anywhere` (arrival by
+2 October at home or a collection point) and `order-set` (a shoe and a
+sandal) at `7dad7b4`. Each lists the candidate in about three seconds after
+the natural pass, samples four worlds at two seconds apiece, and its
+probability, 0.0093 as the product of two carriers' (0.095 and 0.098), is
+within four standard errors of 1,500 other seeds (17 hits); the whole
+`cheapest-kept` run took 178 s, 157 of them the natural pass. On this world
+one retailer has the answer under every one of these rankings, so the four
+tasks rate the same two carriers.
+
+Side by side (`side-by-side.py`, `side-by-side.json`; the working tree at
+`7dad7b4`, not pinned), three samples each for earliest arrival first, a
+deadline of 1 October, earliest arrival at home or a collection point, and
+the order set. The seed rates the answer's carriers 4.34 and 3.94 among
+eight from 3.78 to 4.59. In every sample the native task reads the same
+answer as on the natural world (the same offers, options and totals; for
+the order set the same twelve tied sets of orders at 700 kronor), the two
+carriers' averages are 3.44 to 3.75, the other six are the seed's, and
+retailers, products and addresses are unchanged.
+
+The small test worlds have what this one lacks: answers that differ between
+the rankings, and charges that depend on the location that ships
+(`test_answers.py`, where the answer is read again after steering by a
+ranking written out in the test).
+
 These are dev-producer worlds from the suite's inputs, not the suite's frozen
 worlds, and nothing here is published or bound to a task instance.
 
