@@ -69,3 +69,21 @@ class ConcurrencyAmendmentTests(unittest.TestCase):
             self.assertEqual(caller.hosted_attempt_ids(spec,effective),['qwen-two'])
             with self.assertRaisesRegex(ValueError,'Every prior measured'):
                 caller.hosted_attempt_ids({**spec,'resume':[],'start_order':['qwen-one','qwen-two']},effective)
+
+    def test_pending_pool_compatibility_rejects_mixed_clients_but_ignores_retained(self):
+        with tempfile.TemporaryDirectory()as tmp:
+            base=Path(tmp);cases=[]
+            names=['intent_browser/chromium_pool.py','intent_browser/assets/chromium_pool.cjs','intent_browser/shared_browsergym.py','intent_browser/browser_shutdown.py','intent_browser/runner.py']
+            for ident in ('old','first','second'):
+                root=base/ident;hashes={}
+                for name in names:
+                    p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(ident if ident=='old'else 'matching');hashes[name]=caller.pin(p)['sha256']
+                manifest=root/'manifest.json';manifest.write_text(json.dumps({'source_sha256':hashes}))
+                cases.append({'id':ident,'root':str(root),'recipe_manifest':caller.pin(manifest)})
+            spec={'runtime_mode':'qwen-openrouter-v1','cases':cases,'start_order':['first','second']}
+            self.assertEqual(len(caller.check_pool_source_pins(spec)),5)
+            p=base/'second/intent_browser/browser_shutdown.py';p.write_text('other client');manifest=base/'second/manifest.json';v=caller.load(manifest);v['source_sha256']['intent_browser/browser_shutdown.py']=caller.pin(p)['sha256'];manifest.write_text(json.dumps(v));cases[-1]['recipe_manifest']=caller.pin(manifest)
+            with self.assertRaisesRegex(ValueError,'disagree'):caller.check_pool_source_pins(spec)
+            # A declaration which conceals actual source drift also fails.
+            v['source_sha256']['intent_browser/browser_shutdown.py']=caller.pin(base/'first/intent_browser/browser_shutdown.py')['sha256'];manifest.write_text(json.dumps(v));cases[-1]['recipe_manifest']=caller.pin(manifest)
+            with self.assertRaisesRegex(ValueError,'Pinned input changed'):caller.check_pool_source_pins(spec)

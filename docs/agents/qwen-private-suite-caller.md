@@ -347,3 +347,8 @@ same installed pool adapter/shutdown/asset qualification. `pool_memory_mib`
 (default3072, range1024–8192) and `pool_tasks` (default512, range128–512) are
 finite per-service ceilings, not reservations. Bind these settings in actual
 native/browser/HTTP acceptance and report measured concurrency and memory.
+
+Shared services verify that all pending cases bind the same pool client, broker,
+BrowserGym adapter/shutdown and runner bytes before registering the attempt.
+Retained outcomes keep their historical sources and are excluded from this
+prospective service compatibility check.

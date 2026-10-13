@@ -367,6 +367,18 @@ def pool_source_case(spec):
  return matches[0]
 
 
+def check_pool_source_pins(spec):
+ required={'intent_browser/chromium_pool.py','intent_browser/assets/chromium_pool.cjs','intent_browser/shared_browsergym.py','intent_browser/browser_shutdown.py','intent_browser/runner.py'}
+ first=pool_source_case(spec)
+ expected={name:pin(Path(first['root'])/name)['sha256']for name in required}
+ for case in queue_cases(spec).values():
+  declared=load(checked(case['recipe_manifest'])).get('source_sha256',{})
+  if any(declared.get(name)!=digest for name,digest in expected.items()):
+   raise ValueError('Pending case pooled runtime source pins disagree')
+  for name,digest in expected.items():checked({'path':str(Path(case['root'])/name),'sha256':digest})
+ return expected
+
+
 def pool_resource_options(spec):
  memory=spec.get('pool_memory_mib',3072);tasks=spec.get('pool_tasks',512)
  if type(memory)is not int or not 1024<=memory<=8192 or type(tasks)is not int or not 128<=tasks<=512:
@@ -880,6 +892,7 @@ def _supervise(s,scripted=False,stop=None):
  if type(grace) is not int or not 1<=grace<=120:raise ValueError('Explicit cleanup grace must be1..120 seconds')
  if not scripted:check_release(s)
  h=helper(s);source_guard(s)
+ if s.get('shared_chromium'):check_pool_source_pins(s)
  queue=runpy.run_path(str(checked(s['queue'])));channel=runpy.run_path(str(checked(s['channel'])))
  out=Path(s['output']);out.mkdir(parents=True,exist_ok=False)
  save(out/'supervisor-start.json',{'pid':os.getpid(),'process_start':h['process_identity'](os.getpid()),'epoch':time.time(),'monotonic':time.monotonic()})
@@ -913,10 +926,7 @@ def _supervise(s,scripted=False,stop=None):
     if 'source_export' in s:h['verify_source_export'](s['caller_root'],s['caller_commit'],s['source_export'],{'scripts/shared_chromium_service.py':s['pool_service_driver']['sha256']})
     elif service_driver.read_bytes()!=subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':scripts/shared_chromium_service.py']):raise ValueError('Pool service driver differs from committed source')
     checked(s['launcher'])
-    for case in s['cases']:
-     manifest=h['recipe_check'](case)
-     required={'intent_browser/chromium_pool.py','intent_browser/assets/chromium_pool.cjs','intent_browser/shared_browsergym.py','intent_browser/browser_shutdown.py','intent_browser/runner.py'}
-     if not required<=manifest['source_sha256'].keys():raise ValueError('Recipe omits pooled runtime source pins')
+    for case in queue_cases(s).values():h['recipe_check'](case)
     owner=load(out/'supervisor-start.json')
     s['chromium_descriptor']=str(pool_directory/'descriptor.json')
     pool_service=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib',str(pool_resource_options(s)[0]),'--tasks',str(pool_resource_options(s)[1]),'--receipt',str(out/'chromium-pool-bounded'),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',str(service_driver),'--source-root',root,'--owner-pid',str(owner['pid']),'--owner-start',owner['process_start'],'--directory',str(pool_directory),'--max-leases',str(2*(ceiling+s['prewarm_count'])),'--per-server',str(ceiling+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=pool_log,text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
