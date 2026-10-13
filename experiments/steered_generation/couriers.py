@@ -20,7 +20,8 @@ contracts are: the designated pair charged nothing for delivery, and the
 retailer's other products the most any contract can charge (`menus.ceiling`),
 every other retailer as the ranking does. A pair of draws is accepted when
 the designated pair is cheapest on the charges as they are with the drawn
-contracts. The requirement implies both conditions the draws were made
+contracts and the carrier's option alone makes the winning total, after any
+waiver. The requirement implies both conditions the draws were made
 under, so accepted pairs are samples given the requirement. The probability
 is the product of the two conditions' probabilities and the accepted share
 of a fixed number of pairs: an estimate, labelled as one.
@@ -200,7 +201,8 @@ def prepare(natural, requirement, api, rng):
                                       "requirement: contracts given that they show the carrier cheapest, stock and "
                                       "prices between bounds on the winner's delivery charge that hold for any "
                                       "contracts, and the pair accepted when the designated offer is cheapest "
-                                      "delivered on the charges as they are. The probability is those two conditions' "
+                                      "delivered on the charges as they are and the carrier's option alone makes that "
+                                      "total after any waiver. The probability is those two conditions' "
                                       "probabilities times an estimated accepted share. Every other draw is the "
                                       "seed's own; the requirement also reads the other retailers' contracts and "
                                       "thresholds. Use the probability as the importance weight across seeds."}

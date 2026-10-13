@@ -271,6 +271,142 @@ class ProducerTests(Ratings):
         self.assertEqual(case["producer_redraws"]["identical_to_reading"], 2)
 
 
+class TopicTests(Ratings):
+    """Stars and levels together with what the carrier's comments say of one aspect."""
+
+    def topics(self):
+        return [self.need(average_stars={"max": 3.8}, topic={"aspect": "punctuality", "verdict": "more_negative"}),
+                self.need(average_stars={"max": 3.8}, topic={"aspect": "handling", "negative": {"min": 2}}),
+                self.need(1, levels={"punctuality": "weak"}, topic={"aspect": "punctuality", "verdict": "more_positive",
+                                                                     "shipping_class": "regular"}),
+                self.need(2, average_stars={"min": 4.3}, topic={"aspect": "handoff", "positive": {"min": 1}, "negative": {"max": 0}})]
+
+    def test_probabilities_are_estimates_that_match_other_seeds(self):
+        trials = 3000
+        for requirement in self.topics():
+            with self.subTest(requirement=requirement):
+                block = ratings.model(self.natural, requirement, self.api)
+                alone = ratings.model(self.natural, {k: v for k, v in requirement.items() if k != "topic"}, self.api)
+                self.assertTrue(block.estimated and not alone.estimated)
+                self.assertAlmostEqual(block.probability, alone.probability * block.accepted / ratings.PROPOSALS, places=12)
+                hits, chance = ratings.empirical(self.natural, requirement, self.api, trials, 10 ** 6), block.probability
+                self.assertLess(abs(hits / trials - chance), 4.5 * (chance * (1 - chance) / trials + block.error ** 2) ** .5 + 1e-9)
+                self.assertEqual(ratings.model(self.natural, requirement, self.api).probability, chance)
+
+    def test_steered_worlds_pass_the_native_review_task(self):
+        for index, requirement in enumerate(self.topics()):
+            with self.subTest(requirement=requirement):
+                world, found, record = ratings.steer(self.session, self.natural, self.opened, requirement, self.api, Random(index))
+                topic = {"schema": carriers.VERSION, "carrier_id": requirement["carrier_id"], **requirement["topic"]}
+                self.assertEqual(found["topic"], carriers.check(world, topic, self.api))
+                self.assertTrue(carriers.satisfied(world, topic, self.api))
+                self.assertTrue(ratings.satisfied(world, {k: v for k, v in requirement.items() if k != "topic"}, self.api))
+                self.assertTrue(record["probability_is_estimated"])
+                self.assertGreaterEqual(record["block_samples_for_this_sample"], 1)
+                self.assertEqual((world["products"], world["retailers"]), (self.natural["products"], self.natural["retailers"]))
+        reading = ratings.trial(self.natural, self.topics()[0], self.api)
+        for seed in range(900, 904):
+            found = blocks.redraw(self.session, self.natural, [reading], seed)
+            self.assertEqual((found.identical, found.agreed), ([True], [True]))
+            self.assertEqual(found.satisfied, reading.holds(seed))
+
+    def test_a_topic_counts_in_its_shipping_class_only_and_the_runner_labels_the_estimate(self):
+        from collections import Counter
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from experiments.steered_generation import run
+        carrier = self.carriers[3]
+        classes = Counter(row["shipping_class"] for row in self.natural["carrier_evidence"]["private"]["shipments"]
+                          if row["carrier_id"] == carrier)
+        self.assertEqual(len(classes), 2)
+        rare = min(classes, key=classes.get)
+        requirement = self.need(3, average_stars={"min": 4.0}, topic={"aspect": "handling", "shipping_class": rare, "positive": {"min": 1}})
+        topic = {"schema": carriers.VERSION, "carrier_id": carrier, **requirement["topic"]}
+        everywhere = {key: value for key, value in topic.items() if key != "shipping_class"}
+        only_elsewhere = 0
+        for seed in range(8):
+            world, found, record = ratings.steer(self.session, self.natural, self.opened, requirement, self.api, Random(seed))
+            self.assertGreaterEqual(found["topic"]["counts"]["positive"], 1)
+            self.assertTrue(carriers.satisfied(world, topic, self.api))
+        # The same statement over every class is likelier, and holds in redraws where the class's own does not.
+        place = ratings.site(self.natural, requirement, self.api)
+        wide = ratings.site(self.natural, {**requirement, "topic": {k: v for k, v in requirement["topic"].items() if k != "shipping_class"}}, self.api)
+        for seed in range(10 ** 6, 10 ** 6 + 400):
+            levels = {name: ratings.level(place, name, seed) for name in place.aspects}
+            happened = ratings.histories(place, levels)
+            mentions = [ratings.reviewed(place, index, history, seed)[1] for index, history in enumerate(happened)]
+            narrow, broad = ratings.said(place, happened, mentions), ratings.said(wide, happened, mentions)
+            self.assertLessEqual(narrow, broad)
+            only_elsewhere += broad and not narrow
+        self.assertGreater(only_elsewhere, 10)
+        case = {"samples": [], "requirement_sha256": "x"}
+        with TemporaryDirectory() as folder:
+            run.stars_case(SimpleNamespace(samples=1, producer_redraws=1, validate_trials=1500), self.session, self.natural,
+                           self.opened, self.api, requirement, case, lambda index: Path(folder) / str(index))
+        self.assertEqual((case["status"], case["probability_is_estimated"]), ("sampled", True))
+        self.assertTrue(case["validation"]["within_four_standard_errors"])
+        self.assertIn("computed_standard_error", case["validation"])
+
+    def test_samples_match_rejection_sampling(self):
+        requirement = self.need(1, levels={"punctuality": "weak"}, topic={"aspect": "punctuality", "verdict": "more_positive"})
+        place = ratings.site(self.natural, requirement, self.api)
+        aspect = "punctuality"
+
+        def features(levels, happened, found):
+            signs = [next((row["sentiment"] for row in history["observations"] if row["aspect"] == aspect), None)
+                     for history in happened]
+            said = [sign for sign, (_, mentioned) in zip(signs, found) if sign and aspect in mentioned]
+            return {"stars": sum(stars for stars, _ in found), "weak": sum(level == "weak" for level in levels.values()),
+                    "positive": said.count("positive"), "negative": said.count("negative"),
+                    "comments": sum(bool(mentioned) for _, mentioned in found)}
+
+        theirs = []
+        for seed in range(10 ** 6, 10 ** 6 + 4000):
+            levels = {name: ratings.level(place, name, seed) for name in place.aspects}
+            happened = ratings.histories(place, levels)
+            found = [ratings.reviewed(place, index, history, seed) for index, history in enumerate(happened)]
+            if ratings.holds(place.requirement, levels, [stars for stars, _ in found]) and ratings.said(
+                    place, happened, [mentioned for _, mentioned in found]):
+                theirs.append(features(levels, happened, found))
+        self.assertGreater(len(theirs), 150)
+        block, rng, mine = ratings.model(self.natural, requirement, self.api), Random(3), []
+        while len(mine) < 250:
+            drawn = ratings.draw(block, rng)
+            if ratings.said(place, drawn.histories, drawn.mentions):
+                mine.append(features(drawn.levels, drawn.histories, list(zip(drawn.stars, drawn.mentions))))
+        for name in mine[0]:
+            with self.subTest(feature=name):
+                a, b = [float(row[name]) for row in mine], [float(row[name]) for row in theirs]
+                error = lambda values: (sum((v - sum(values) / len(values)) ** 2 for v in values) / len(values) ** 2) ** .5
+                self.assertLess(abs(sum(a) / len(a) - sum(b) / len(b)), 4.5 * (error(a) ** 2 + error(b) ** 2) ** .5 + 1e-9)
+
+    def test_refusals_not_found_and_combination(self):
+        good = self.topics()[0]
+        for bad in ({**good, "topic": {}}, {**good, "topic": {"aspect": "punctuality"}},
+                    {**good, "topic": {"aspect": "speed", "verdict": "more_negative"}},
+                    {**good, "topic": {"aspect": "punctuality", "verdict": "awful"}},
+                    {**good, "topic": {"schema": carriers.VERSION, "aspect": "punctuality", "verdict": "more_negative"}},
+                    {**good, "topic": {"carrier_id": self.carriers[1], "aspect": "punctuality", "verdict": "more_negative"}},
+                    {"schema": ratings.VERSION, "carrier_id": self.carriers[0], "topic": good["topic"]}, {**good, "topic": []}):
+            for call in (ratings.model, ratings.trial):
+                with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
+                    call(self.natural, bad, self.api)
+                self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        with self.assertRaises(prices.ZeroMass) as caught:
+            ratings.model(self.natural, {**good, "topic": {"aspect": "punctuality", "positive": {"min": 30}}}, self.api)
+        self.assertEqual(caught.exception.reason, "not_found")
+        # The comments are the block's own reviews: another statement about them is coupled; another carrier's is not.
+        told = lambda carrier: {"schema": carriers.VERSION, "carrier_id": carrier, "aspect": "handling", "positive": {"min": 1}}
+        with self.assertRaises(blocks.Coupled):
+            combined.prepare(self.natural, {"schema": combined.VERSION, "all": [good, told(good["carrier_id"])]}, self.api, Random(0))
+        together = {"schema": combined.VERSION, "all": [good, told(self.carriers[5])]}
+        world, found, record = combined.steer(self.session, self.natural, self.opened, together, self.api, Random(4))
+        self.assertTrue(all(combined.KINDS[part["schema"]].satisfied(world, part, self.api) for part in together["all"]))
+        self.assertTrue(record["probability_is_estimated"])
+        plain = ratings.prepare(self.natural, self.need(average_stars={"max": 3.8}), self.api, Random(0))
+        self.assertEqual((plain.estimated, plain.error), (False, 0.0))
+
+
 def json_levels(found):
     return tuple(sorted(found["aspect_levels"].items())), found["average_stars"]
 

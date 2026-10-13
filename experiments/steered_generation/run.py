@@ -484,7 +484,9 @@ def stars_case(args, session, natural, opened, api, requirement, case, folder):
     case.update(status="sampled", probability_given_upstream=block.probability,
                 log_probability_given_upstream=block.log_probability, carrier_id=place.carrier_id,
                 natural={"aspect_levels": levels, "average_stars": ratings.average(sum(stars), len(stars))},
-                level_choices_modelled=len(block.alternatives))
+                level_choices_modelled=len(block.alternatives),
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "proposals": ratings.PROPOSALS, "proposals_accepted": block.accepted} if block.estimated else {}))
     for index in range(args.samples):
         clock = time.monotonic()
         world, found, record = ratings.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
