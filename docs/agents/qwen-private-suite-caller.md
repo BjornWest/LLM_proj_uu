@@ -312,3 +312,19 @@ an infrastructure failure with unknown action effects; never replay the action
 or report that it was not executed. Native cleanup budgets and actual browser,
 grading and viewer acceptance remain separate qualification requirements. CPU
 containment checks alone do not establish healthy pooled leases after a timeout.
+
+
+Hosted retry history is qualified only for canonical
+`launch-spec-approved-v*.json` files beside the authorization file with its exact
+unchanged authorization pin. Other filenames/locations or a re-pinned
+authorization can hide earlier attempts; generic history discovery is not a
+complete duplicate-attempt guard. Do not use those configurations for retries.
+
+Quote-pair refinement covers closed objects with exactly required `value` and
+`evidence`, `additionalProperties=false`, explicit list-valued nullable types
+and string-or-null evidence, without existing object composites. Other shapes
+are unchanged, and the saved wire artifact alone does not certify enforcement
+on every claim. Unresolvable field references fail before provider dispatch.
+The request watchdog retains the enclosing suite alarm: an expiring outer alarm
+can interrupt failure recording during suite shutdown; parent terminal evidence
+remains necessary. These limits do not imply provider schema acceptance.

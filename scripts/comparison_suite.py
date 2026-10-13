@@ -38,6 +38,13 @@ def hosted_qwen_mode(s):return s.get('runtime_mode')=='qwen-openrouter-v1'
 def pooled_model_mode(s):return qwen_mode(s) or hosted_qwen_mode(s)
 def hosted_runtime(s):return runpy.run_path(str(checked(s['hosted_runtime'])))
 
+def queue_cases(spec):
+    # Only hosted resume selects a subset. Other modes retain the queue's
+    # exact-order validation, including scripted diagnostics.
+    return {case['id']:case for case in spec['cases']
+            if not hosted_qwen_mode(spec) or case['id'] in spec['start_order']}
+
+
 def hosted_counter_bindings(s,cases):
  readiness=load(checked(s['hosted_readiness']))
  expected={Path(row['path']).name:row['sha256']for row in readiness['exact_existing_asset_and_counter_pins']}
@@ -962,7 +969,7 @@ def _supervise(s,scripted=False,stop=None):
    if s.get('runtime_limits') is not None:
     if capacity_host is None:raise ValueError('Runtime controls require a real capacity parent')
     options={'max_concurrent_ceiling':ceiling,'on_queue_ready':lambda handle:capacity_host.bind_limits(handle,out)}
-   result=queue['run_ordered_suite']({c['id']:c for c in s['cases']if c['id']in s['start_order']},one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop,**options)
+   result=queue['run_ordered_suite'](queue_cases(s),one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop,**options)
    result['max_observed_active']=max(e['active'] for e in result['events']);result['max_observed_warming']=max(e['warming_or_ready'] for e in result['events']);result['clocks']=clocks
    if result['max_observed_active']>ceiling or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
    save(out/'suite-result.json',result)

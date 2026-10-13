@@ -79,7 +79,12 @@ def coherent_claim_schema(schema):
             return node
         from jsonschema.validators import validator_for
         branches = []
-        if all(validator_for(field)(field).is_valid(None) for field in fields):
+        from referencing.exceptions import Unresolvable
+        try:
+            nullable = all(validator_for(field)(field).is_valid(None) for field in fields)
+        except Unresolvable as exc:
+            raise ValueError('Quote-pair schema cannot resolve field-local references; no dispatch') from exc
+        if nullable:
             branches.append({'type': 'object', 'properties': {
                 'value': {'type': 'null'}, 'evidence': {'type': 'null'}},
                 'required': ['value', 'evidence'], 'additionalProperties': False})

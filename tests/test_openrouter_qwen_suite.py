@@ -454,3 +454,19 @@ class HostedClaimWireSchemaTests(unittest.TestCase):
         self.assertEqual(hosted.coherent_claim_schema(plain),plain)
 
 if __name__ == '__main__':unittest.main()
+
+
+class PreservingPortRegressionTests(unittest.TestCase):
+    def test_ordinary_scripted_queue_retains_all_cases_for_order_validation(self):
+        spec={'cases':[{'id':'one'},{'id':'two'}],'start_order':['one']}
+        self.assertEqual(set(caller.queue_cases(spec)),{'one','two'})
+        spec['runtime_mode']='qwen-openrouter-v1'
+        self.assertEqual(set(caller.queue_cases(spec)),{'one'})
+
+    def test_unresolvable_field_reference_has_opt_in_no_dispatch_error(self):
+        schema={'type':'object','properties':{
+            'value':{'type':['number','null'],'$ref':'#/$defs/value'},
+            'evidence':{'type':['string','null']}},'required':['value','evidence'],
+            'additionalProperties':False,'$defs':{'value':{'type':['number','null']}}}
+        with self.assertRaisesRegex(ValueError,'Quote-pair schema.*no dispatch'):
+            hosted.coherent_claim_schema(schema)
