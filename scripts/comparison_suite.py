@@ -154,7 +154,7 @@ def case_binding(c):
  return sha256(json.dumps({k:v for k,v in c.items() if not k.startswith('scripted_') and k!='accepted_trace'},sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
 
 def execution_binding(s,c):
- excluded={'review','ready','cases','start_order','output','completion_db','suite_id','spec_path','sockets','tokenizer_socket','chromium_descriptor','scripted_hold_seconds','case_dependencies'}
+ excluded={'review','ready','cases','start_order','output','completion_db','suite_id','spec_path','sockets','tokenizer_socket','chromium_descriptor','scripted_hold_seconds','case_dependencies','caller_acceptance'}
  if qwen_mode(s):excluded|={'serving_live','rental_deadline_utc','capacity_bindings','chromium_descriptor'}
  if hosted_qwen_mode(s):excluded|={'suite_deadline_utc'}
  fields={k:v for k,v in s.items() if k not in excluded}
@@ -172,6 +172,47 @@ def verify_ready_case(s,c,row):
      or result.get('status')!='graded_and_projected'
      or result['result']['viewer_projection'].get('task_completed') is not True):
   raise ValueError('Acceptance does not bind this scripted case/driver/recipe')
+
+def verify_finite_ready_case(s,c,row):
+ # Independent native controls retain their actual producer; never relabel them
+ # as executions of this hosted caller. Frozen caller/counter checks are separate.
+ if (row.get('case')!=c['id'] or row.get('recipe_manifest')!=c['recipe_manifest']
+     or row.get('prepared_receipt')!=c['prepared_receipt']
+     or row.get('native_source_root')!=c['root']):
+  raise ValueError('Native acceptance belongs to another prepared/source instance')
+ control=load(checked(row['control']))
+ result=load(checked(row['result']));canonical=load(checked(row['canonical']))
+ http=load(checked(row['HTTP']));metadata=load(checked(row['metadata']))
+ task=load(checked(row['public_task']))
+ trace=Path(result['trace']).resolve()
+ expected={'canonical':'evaluation.json','metadata':'metadata.json','public_task':'policy-task.json'}
+ if (control.get('status')!='passed' or control.get('expected_verdict') is not True
+     or control.get('external_provider_requests')!=0
+     or control['instance'].get('case_id')!=c['task_id']
+     or control['instance'].get('max_input_tokens')!=c['max_input_tokens']
+     or Path(control['instance']['prepared']).resolve()!=Path(c['argument']).resolve()
+     or Path(control['trace']).resolve()!=trace
+     or result.get('status')!='graded_and_projected'
+     or result['native_grade'].get('structured_claims_correct') is not True
+     or canonical.get('task_completed') is not True
+     or canonical.get('technical_error') is not None
+     or 'scripted' not in metadata.get('tags',[])
+     or task.get('user_message')!=c['public_request']
+     or any(checked(row[key]).resolve()!=trace/name for key,name in expected.items())
+     or http.get('recording_id')!=trace.name
+     or http.get('derived_evaluation',{}).get('episode_id')!=trace.name
+     or http.get('derived_evaluation',{}).get('binding_status')!='verified'
+     or http['derived_evaluation'].get('structured_claims_correct') is not True):
+  raise ValueError('Actual positive native/canonical/HTTP/public binding is incomplete')
+ checked(row['producer'])
+ producer=load(checked(row['producer_acceptance']))
+ proofs=[p for p in producer['cases'] if p.get('case_id')==c['task_id']]
+ if (len(proofs)!=1 or producer.get('passed')!=len(producer['cases'])
+     or proofs[0].get('trace')!=str(trace)
+     or row['producer'] not in producer['inputs']
+     or any(row[key] not in proofs[0]['evidence'] for key in ('result','canonical','HTTP','recipe_manifest','prepared_receipt'))):
+  raise ValueError('Native control evidence differs from pinned producer acceptance')
+
 
 def browser_step_options(spec):
  seconds=spec.get('browser_step_watchdog_seconds')
@@ -386,8 +427,16 @@ def check_pool_source_pins(spec):
  expected={name:pin(Path(first['root'])/name)['sha256']for name in required}
  for case in queue_cases(spec).values():
   declared=load(checked(case['recipe_manifest'])).get('source_sha256',{})
-  if any(declared.get(name)!=digest for name,digest in expected.items()):
+  missing={name:digest for name,digest in expected.items() if name not in declared}
+  if any(name in declared and declared[name]!=digest for name,digest in expected.items()):
    raise ValueError('Pending case pooled runtime source pins disagree')
+  if missing:
+   if spec.get('hosted_limit_profile')!='finite-task-limits-v1' or 'source_export' not in case:
+    raise ValueError('Pending case pooled runtime source pins disagree')
+   # New task-instance collectors may omit optional shared-harness modules.
+   # The explicit frozen execution index supplements absences only; a native
+   # declaration is never overwritten and actual bytes/modes remain checked.
+   helper(spec)['verify_source_export'](case['root'],case['commit'],case['source_export'],missing)
   for name,digest in expected.items():checked({'path':str(Path(case['root'])/name),'sha256':digest})
  return expected
 
@@ -482,6 +531,22 @@ def hosted_attempt_ids(s,authorization):
  if not pending or s['start_order']!=pending:raise ValueError('Attempt must contain exactly remaining cases, in original order')
  return pending
 
+def finite_dispatch_claim_path(authorized):
+ return checked(authorized['request']).parent/('.finite-task-dispatch-'+authorized['request']['sha256']+'.json')
+
+def check_finite_dispatch_claim(s,authorized):
+ claim=finite_dispatch_claim_path(authorized)
+ if not claim.exists():return
+ stored=load(claim);authority_path=Path(s['output'])/'supervisor-start.json'
+ if (stored.get('suite_id')!=s['suite_id'] or stored.get('output')!=s['output']
+     or stored.get('configuration_sha256')!=config_hash(s) or not authority_path.is_file()):
+  raise ValueError('Finite tasks do not authorize an automatic repeat')
+ authority=load(authority_path)
+ if (stored['pid']!=authority['pid'] or stored['process_start']!=authority['process_start']
+     or helper(s)['process_identity'](authority['pid'])!=authority['process_start']):
+  raise ValueError('Finite task dispatch owner is no longer active; no automatic repeat')
+
+
 def load_json_list(value):
  result=json.loads(value)
  if type(result)is not list or any(type(x)is not str for x in result):raise ValueError('Invalid prior membership')
@@ -490,22 +555,57 @@ def load_json_list(value):
 def check_hosted_release(s):
  hosted_runtime(s)['validate_limits'](s)
  authorized=hosted_authorization(s);ids=[c['id'] for c in s['cases']]
- if (len(ids)!=34 or len(set(ids))!=34 or ids!=authorized['case_ids']
-     or authorized.get('dispatch_authorized') is not True
-     or authorized.get('policy_model')!='qwen/qwen3.8-27b'
-     or authorized.get('formatter_model')!='qwen/qwen3.8-27b'
-     or authorized.get('max_input_tokens')!=150000
-     or authorized.get('max_active_combined')!=s['max_concurrent_episodes']
-     or authorized.get('prewarm_count')!=s['prewarm_count']):
-  raise ValueError('Exact new finite34 hosted Qwen authorization required')
- request=load(checked(authorized['request']))
- requested=request['finite_episode_list']
- if (len(requested)!=34 or [c['task_id'] for c in s['cases']]!=[row['id'] for row in requested]
-     or any(c['public_request']!=row['request']for c,row in zip(s['cases'],requested))):
-  raise ValueError('Hosted cases/public requests differ from newly authorized finite list')
- attempt=hosted_attempt_ids(s,authorized)
+ if s.get('hosted_limit_profile')=='finite-task-limits-v1':
+  request=load(checked(authorized['request']));requested=request['cases']
+  if (authorized.get('schema')!='hosted-finite-task-authorization-v1'
+      or not 1<=len(ids)<=34 or len(set(ids))!=len(ids)
+      or ids!=authorized['case_ids'] or len(requested)!=len(ids)
+      or authorized.get('dispatch_authorized') is not True
+      or authorized.get('automatic_retries') is not False
+      or s.get('resume') is not None or s.get('resume_attempts')
+      or s.get('authorization_amendments')
+      or s['start_order']!=ids
+      or authorized.get('policy_model')!='qwen/qwen3.8-27b'
+      or authorized.get('formatter_model')!='qwen/qwen3.8-27b'
+      or request.get('policy_and_formatter_model')!='qwen/qwen3.8-27b'
+      or authorized.get('max_active_combined')!=s['max_concurrent_episodes']
+      or request.get('concurrency')!=s['max_concurrent_episodes']
+      or request.get('request_timeout_seconds')!=s['request_timeout']
+      or authorized.get('prewarm_count')!=s['prewarm_count']):
+   raise ValueError('Exact once-only finite hosted task authorization required')
+  for c,row in zip(s['cases'],requested):
+   if (c['task_id']!=row['id'] or c['public_request']!=row['public_request']
+       or c['max_input_tokens']!=row['maximum_complete_input_tokens']
+       or c['max_steps']!=row['max_steps'] or s['max_tokens']!=row['max_output_tokens']
+       or c.get('family')!=row['family']
+       or Path(c['argument']).resolve()!=Path(row['prepared']).resolve()
+       or Path(c['root']).resolve()!=Path(request['source_root']).resolve()
+       or c['callable']['module']!='environments.website_world.task_instances'
+       or c['callable']['symbol']!='run'
+       or checked(c['recipe_manifest'])!=Path(row['prepared']).resolve()/'recipe/manifest.json'
+       or c['recipe_manifest']['sha256']!=row['manifest_sha256']
+       or checked(c['prepared_receipt'])!=Path(row['prepared']).resolve()/'prepared-instance.json'
+       or c['prepared_receipt']['sha256']!=row['prepared_receipt_sha256']):
+    raise ValueError('Finite task/prose/recipe/input/turn limits differ from authorized selection')
+  check_finite_dispatch_claim(s,authorized)
+  attempt=ids
+ else:
+  if (len(ids)!=34 or len(set(ids))!=34 or ids!=authorized['case_ids']
+      or authorized.get('dispatch_authorized') is not True
+      or authorized.get('policy_model')!='qwen/qwen3.8-27b'
+      or authorized.get('formatter_model')!='qwen/qwen3.8-27b'
+      or authorized.get('max_input_tokens')!=150000
+      or authorized.get('max_active_combined')!=s['max_concurrent_episodes']
+      or authorized.get('prewarm_count')!=s['prewarm_count']):
+   raise ValueError('Exact new finite34 hosted Qwen authorization required')
+  request=load(checked(authorized['request']))
+  requested=request['finite_episode_list']
+  if (len(requested)!=34 or [c['task_id'] for c in s['cases']]!=[row['id'] for row in requested]
+      or any(c['public_request']!=row['request']for c,row in zip(s['cases'],requested))):
+   raise ValueError('Hosted cases/public requests differ from newly authorized finite list')
+  attempt=hosted_attempt_ids(s,authorized)
  canaries=s.get('canary_task_ids')
- if canaries!=[ident.removeprefix('qwen-')for ident in attempt[:4]]:
+ if canaries!=[ident.removeprefix('qwen-')for ident in attempt[:min(4,len(attempt))]]:
   raise ValueError('Explicit four leading parallel canaries required before hosted remainder')
  readiness=load(checked(s['hosted_readiness']))
  order=[row.get('configured_name') for row in readiness.get('endpoints_in_existing_order',[])]
@@ -529,10 +629,21 @@ def check_hosted_release(s):
  # not at Training's temporary worktree paths.
  review=load(checked(s['review']));ready=load(checked(s['ready']))
  if (review.get('status')!='approved' or review.get('configuration_sha256')!=config_hash(s)
-     or ready.get('status')!='passed' or ready.get('driver')!=s['driver']
+     or ready.get('status')!='passed'
+     or (s.get('hosted_limit_profile')!='finite-task-limits-v1' and ready.get('driver')!=s['driver'])
+     or (s.get('hosted_limit_profile')=='finite-task-limits-v1' and ready.get('schema')!='finite-hosted-native-controls-v1')
      or len(ready['cases'])!=len(attempt) or {v['case']for v in ready['cases']}!=set(attempt)):
-  raise ValueError('Reviewed hosted configuration and all34 actual native/HTTP acceptances required')
- for row in ready['cases']:verify_ready_case(s,next(c for c in s['cases']if c['id']==row['case']),row)
+  raise ValueError('Reviewed hosted configuration and exact actual native/HTTP acceptances required' if s.get('hosted_limit_profile')=='finite-task-limits-v1' else 'Reviewed hosted configuration and all34 actual native/HTTP acceptances required')
+ verifier=verify_finite_ready_case if s.get('hosted_limit_profile')=='finite-task-limits-v1' else verify_ready_case
+ for row in ready['cases']:verifier(s,next(c for c in s['cases']if c['id']==row['case']),row)
+ if s.get('hosted_limit_profile')=='finite-task-limits-v1':
+  accepted=load(checked(s['caller_acceptance']))
+  first=s['cases'][:min(4,len(s['cases']))]
+  if (accepted.get('schema')!='finite-hosted-caller-controls-v1'
+      or accepted.get('status')!='passed' or accepted.get('driver')!=s['driver']
+      or [row['case']for row in accepted['cases']]!=[c['id']for c in first]):
+   raise ValueError('Exact shared caller/queue/recording/projection acceptance required')
+  for c,row in zip(first,accepted['cases']):verify_ready_case(s,c,row)
 
 
 def check_qwen_release(s):
@@ -707,7 +818,8 @@ def execute(s,c,scripted=False):
     counter=module['MemoizedCounter'](model_matched_input_counter(b,assets_root=s['counter_assets_root'],shared_tokenizer=shared))
     return module['HostedQwenBackend'](b,counter,phase=phase,maximum=s['max_tokens'],
      deadline=s['suite_deadline_utc'],timeout=s['request_timeout'],directory=directory,meter=record,
-     quote_pair_schema=s.get('formatter_quote_pair_schema',False) if phase=='formatter' else False)
+     quote_pair_schema=s.get('formatter_quote_pair_schema',False) if phase=='formatter' else False,
+     input_limit=c['max_input_tokens'])
    except BaseException:b.close();raise
   return b
  @contextmanager
@@ -825,7 +937,7 @@ def execute(s,c,scripted=False):
     before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
     max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],
     read_wait_policy=private_read_wait_policy(s),turn=qwen_turn)
-  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda path:Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter',directory=path)))
+  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else c['max_steps'] if s.get('hosted_limit_profile')=='finite-task-limits-v1' else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda path:Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter',directory=path)))
   if result.get('status')!='graded_and_projected':raise ValueError('Missing automatic grading/HTTP projection: '+str(result))
   if scripted and result['viewer_projection']['task_completed'] is not True:raise ValueError('Scripted positive native grade did not pass')
   if timings['reset_calls']!=1:raise ValueError('Warm activation reset or duplicated environment')
@@ -908,6 +1020,10 @@ def _supervise(s,scripted=False,stop=None):
  h=helper(s);source_guard(s)
  if s.get('shared_chromium'):check_pool_source_pins(s)
  queue=runpy.run_path(str(checked(s['queue'])));channel=runpy.run_path(str(checked(s['channel'])))
+ if not scripted and s.get('hosted_limit_profile')=='finite-task-limits-v1':
+  authorized=hosted_authorization(s)
+  save(finite_dispatch_claim_path(authorized),{'suite_id':s['suite_id'],'output':s['output'],
+   'configuration_sha256':config_hash(s),'pid':os.getpid(),'process_start':h['process_identity'](os.getpid())})
  out=Path(s['output']);out.mkdir(parents=True,exist_ok=False)
  save(out/'supervisor-start.json',{'pid':os.getpid(),'process_start':h['process_identity'](os.getpid()),'epoch':time.time(),'monotonic':time.monotonic()})
  api=runpy.run_path(str(checked(s['events_helper'])));events=api['Events'](s.get('completion_db',out/'completion.sqlite'))
@@ -918,7 +1034,7 @@ def _supervise(s,scripted=False,stop=None):
   events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[n for n in (10,20,30,35,40,50) if n<len(members)],final=True)
  h['register_roots'](s)
  ceiling=runtime_limits(s)
- stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop,admission_only=hosted_qwen_mode(s),require_formatter=any(i not in ('B17','B19','H01','H02','A03','A04')for i in s['canary_task_ids'])) if qwen_mode(s) or (hosted_qwen_mode(s) and not scripted) else None
+ stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop,admission_only=hosted_qwen_mode(s),require_formatter=s.get('hosted_limit_profile')!='finite-task-limits-v1' and any(i not in ('B17','B19','H01','H02','A03','A04')for i in s['canary_task_ids'])) if qwen_mode(s) or (hosted_qwen_mode(s) and not scripted) else None
  deadline_timer=None
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
   os.chmod(tmp,0o700);s=dict(s);s['tokenizer_socket']=str(Path(tmp)/'tokenizer.sock');s['sockets']={}
