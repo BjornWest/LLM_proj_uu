@@ -85,6 +85,55 @@ def test_delete_acceptance_needs_actual_removal_and_never_records_tokens(tmp_pat
     assert (tmp_path / 'cleanup.json').stat().st_mode & 0o777 == 0o600
 
 
+@pytest.mark.parametrize('ambiguous', [False, True])
+def test_deleted_compute_id_tombstone_confirms_without_redeleting(tmp_path, ambiguous):
+    tombstone = row(); tombstone['status'] = 'discontinued'
+    client = Client([row(), tombstone], error_on_delete=ambiguous)
+    result = cleanup(client, tmp_path)
+    assert result['termination_confirmed']
+    assert result['provider_terminal_status'] == 'discontinued'
+    assert result['consecutive_absent_reads'] == 2
+    assert result['delete_accepted'] is not ambiguous
+    assert len(client.deletes) == 1
+
+
+def test_discontinued_tombstone_without_prior_live_ownership_is_not_confirmation(tmp_path):
+    tombstone = row(); tombstone['status'] = 'discontinued'
+    client = Client([tombstone])
+    with pytest.raises(RuntimeError): cleanup(client, tmp_path)
+    saved = json.loads((tmp_path / 'cleanup.json').read_text())
+    assert not saved['termination_confirmed'] and saved['unobserved_absence']
+    assert not client.deletes
+
+
+@pytest.mark.parametrize('field,value', [('id', str(UUID(int=4))),
+    ('tags', []), ('created_at', '2026-10-12T12:00:02Z')])
+def test_discontinued_tombstone_still_requires_exact_identity(tmp_path, field, value):
+    tombstone = row(); tombstone.update(status='discontinued'); tombstone[field] = value
+    client = Client([row(), tombstone])
+    with pytest.raises(RuntimeError): cleanup(client, tmp_path)
+    assert len(client.deletes) == 1
+    assert not json.loads((tmp_path / 'cleanup.json').read_text())['termination_confirmed']
+
+
+def test_transient_tombstone_does_not_confirm_until_two_terminal_reads(tmp_path):
+    tombstone = row(); tombstone['status'] = 'discontinued'
+    client = Client([tombstone, row(), tombstone, tombstone]); clock = Clock()
+    result = deadline.cleanup(client, spec(), tmp_path / 'receipt.json', reason='test',
+        ownership_observed=True, monotonic=clock.monotonic, sleep=clock.sleep,
+        confirmation_seconds=12)
+    assert result['termination_confirmed'] and result['consecutive_absent_reads'] == 2
+    assert len(client.deletes) == 1
+
+
+@pytest.mark.parametrize('status', ['offline', 'error', 'unknown'])
+def test_nonterminal_provider_status_does_not_confirm_deletion(tmp_path, status):
+    current = row(); current['status'] = status
+    client = Client([current])
+    with pytest.raises(RuntimeError): cleanup(client, tmp_path)
+    assert not json.loads((tmp_path / 'cleanup.json').read_text())['termination_confirmed']
+
+
 def test_ambiguous_delete_is_read_back_without_reallocating(tmp_path):
     deleting = row(); deleting['status'] = 'deleting'
     client = Client([row(), deleting, None], error_on_delete=True)
@@ -166,7 +215,8 @@ def test_oauth_and_authenticated_call_share_one_timeout(monkeypatch):
     assert budgets == [10, 3]
 
 
-def test_real_http_mock_auth_identity_delete_and_confirmation(tmp_path, monkeypatch):
+@pytest.mark.parametrize('deleted_response', ['empty', 'list_tombstone', 'object_tombstone'])
+def test_real_http_mock_auth_identity_delete_and_confirmation(tmp_path, monkeypatch, deleted_response):
     calls = []; state = {'deleted': False, 'query_count': 0}
     class Handler(http.server.BaseHTTPRequestHandler):
         protocol_version = 'HTTP/1.1'
@@ -184,7 +234,10 @@ def test_real_http_mock_auth_identity_delete_and_confirmation(tmp_path, monkeypa
         def do_GET(self):
             assert self.headers['Authorization'] == 'Bearer fake-token'
             calls.append(('GET', self.path)); state['query_count'] += 1
-            if state['deleted']: self.respond([])
+            if state['deleted']:
+                tombstone = row(); tombstone['status'] = 'discontinued'
+                self.respond([] if deleted_response == 'empty' else
+                             [tombstone] if deleted_response == 'list_tombstone' else tombstone)
             else: self.respond(row())  # Documented single-object variant.
         def do_PUT(self):
             assert self.headers['Authorization'] == 'Bearer fake-token'
@@ -215,7 +268,8 @@ def test_receipt_storage_failure_cannot_block_owned_vm_deletion(tmp_path, monkey
     assert len(client.deletes) == 1
 
 
-@pytest.mark.parametrize('absent', [None, {'id': ID, 'status': 'notfound'}])
+@pytest.mark.parametrize('absent', [None, {'id': ID, 'status': 'notfound'},
+                                 {**row(), 'status': 'discontinued'}])
 def test_never_observed_instance_is_not_reported_as_terminated(tmp_path, absent):
     client = Client([absent])
     with pytest.raises(RuntimeError):

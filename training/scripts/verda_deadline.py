@@ -257,7 +257,13 @@ def cleanup(client, spec, receipt, *, reason, monotonic=time.monotonic, sleep=ti
         while monotonic() < end:
             try:
                 row = client.instance(spec['instance_id'], timeout=min(10, max(.01, end - monotonic())))
-                if row is None or row.get('status') == 'notfound':
+                discontinued = row is not None and row.get('status') == 'discontinued'
+                if discontinued:
+                    # Verda retains a deleted computeId as a tombstone while
+                    # the normal instance listing omits it. Bind the retained
+                    # identity; never issue another DELETE against this row.
+                    identity(row, spec)
+                if row is None or row.get('status') == 'notfound' or discontinued:
                     # Wrong project credentials/wrong UUID can also yield404.
                     # Only a previously observed, owned VM can be confirmed gone.
                     state['unobserved_absence'] = not state['ownership_observed']
@@ -265,6 +271,8 @@ def cleanup(client, spec, receipt, *, reason, monotonic=time.monotonic, sleep=ti
                         break
                     absent_reads += 1
                     state['consecutive_absent_reads'] = absent_reads
+                    if discontinued:
+                        state['provider_terminal_status'] = 'discontinued'
                     if absent_reads >= 2:
                         state['termination_confirmed'] = True
                         break
@@ -337,7 +345,7 @@ def watch(client, spec, receipt, *, finish_marker=None, wall=time.time,
                 if monotonic() >= startup_end:
                     raise
                 sleep(min(2, max(0, startup_end - monotonic())))
-        if row is None or row.get('status') == 'notfound':
+        if row is None or row.get('status') in ('notfound', 'discontinued'):
             raise ValueError('Bound instance has never been observed')
         identity(row, spec)
         observed = True

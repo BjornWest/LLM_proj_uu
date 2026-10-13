@@ -308,13 +308,19 @@ The local finish marker must contain exactly `{"run_id": "...", "instance_id":
 "..."}` and should be written after bounded artifact return. SIGINT, SIGTERM, SIGHUP, SIGQUIT, a finish
 marker or the absolute deadline lead to deletion; a backward wall-clock jump
 does not renew the running allowance. Deletion acceptance remains distinct from
-confirmed removal through two consecutive absent reads. Absence before any verified ownership observation is an
+confirmed removal through two consecutive absent reads or identity-bound
+`discontinued` tombstones. The actual Verda compute-ID endpoint can retain a
+deleted row even after the full instance listing omits it. Never delete this
+tombstone again or classify `offline`, `error` or `unknown` as termination.
+Absence before any verified live ownership observation is an
 error, not confirmed termination. Receipt-storage failures do not prevent
 deleting the owned VM; incomplete API responses are retried and ambiguous
 deletions are read back. A brief startup read outage is retried for at most30s
 within the original allowance. Cleanup retries are bounded and never create/retry an
 allocation. Storage drift causes deletion of the owned GPU with all disks
 retained and an explicit failure, preserving any unbound disk.
+VM termination confirmation does not establish disk deletion: independently
+query the volume inventory and check every explicitly selected disk UUID.
 
 Keep this workstation/process alive through cleanup. The API has no demonstrated
 provider-enforced TTL, so local power loss or provider/network failure can leave
@@ -329,7 +335,12 @@ provider is already deleting the VM and no longer exposes identity fields, a
 restart cannot reuse an old receipt as authority: inspect the provider console
 and retain this as an unqualified restart boundary until real API behavior is known.
 
-No current VM exists. The final reviewed portable bundle, caller/telemetry
-integration, global termination controller, fresh host acceptance and allocation
-approval are still outstanding. Historical Modal restores qualify their exact
-probe stack; they do not certify this new combined deployment.
+The first Verda deployment on 13 October 2026 qualified the actual FP8/MTP3
+server, native counter and all 34 scripted host controls. Its four model
+canaries ran once; H03's extracted answer failed native grading validation,
+aborting the cohort before the other 30 cases received model dispatch. H05
+completed cleanly; B02 retains a passing automatic grade with failed cleanup,
+and B14 was interrupted. All final evidence returned before the VM and disk
+were removed. This is remote deployment evidence, not a completed 34-case model
+evaluation. Future launches require a concrete corrected caller/configuration
+release; historical qualification does not authorize retries or rentals.
