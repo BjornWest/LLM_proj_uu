@@ -104,9 +104,12 @@ def stated(requirement):
         raise ValueError("Surrounding-site controls are a mapping and go with a comparison site")
     if "delivered" in requirement:
         delivered = requirement["delivered"]
-        if (type(delivered) is not dict or set(delivered) - {"delivery_options"} or
-                type(delivered.get("delivery_options", {})) is not dict):
-            raise ValueError("Delivered totals take a site recipe's delivery options, or nothing")
+        kinds = delivered.get("delivery_types", ["home"]) if type(delivered) is dict else None
+        if (type(delivered) is not dict or set(delivered) - {"delivery_options", "delivery_types"} or
+                type(delivered.get("delivery_options", {})) is not dict or type(kinds) is not list or not kinds or
+                any(type(kind) is not str for kind in kinds) or len(set(kinds)) != len(kinds) or set(kinds) - set(menus.TYPES)):
+            raise ValueError("Delivered totals take a site recipe's delivery options and the kinds of destination that "
+                             "count (home, parcel_locker, staffed_counter; home alone unless stated)")
         if ranking or availability != PURCHASABLE or "comparison_site_id" in requirement or "predicates" not in requirement:
             raise ValueError("Delivered totals are read for predicates, purchasable offers and every shop, ranked by "
                              "the total alone")
@@ -202,11 +205,13 @@ def delivering(world, requirement, api, skus, declared, feature):
         ".prepared_quote", ".basket_quote", ".delivery_admission"))
     website = import_module(package + ".delivery_options")
     options = requirement["delivered"].get("delivery_options", {})
+    kinds = sorted(requirement["delivered"].get("delivery_types", ["home"]))
     listing = {r["retailer_id"] for r in world["retailers"] for o in r["offers"] if o["sku_id"] in skus}
-    places = {rid: menus.oracle(world, rid, options, api) for rid in sorted(listing)}
+    places = {rid: menus.oracle(world, rid, options, api, kinds) for rid in sorted(listing)}
     charges = {rid: menus.delivery(place) for rid, place in places.items()}
     delivered = {rid: charge for rid, charge in charges.items() if charge is not None}
-    spec = {"kind": native.KIND, "concept_id": requirement["concept_id"], "predicates": requirement["predicates"]}
+    spec = {"kind": native.KIND, "concept_id": requirement["concept_id"], "predicates": requirement["predicates"],
+            "delivery_types": kinds}
 
     def reference(found):
         settings = next(iter(places.values())).settings if places else website.options({"enabled": True})

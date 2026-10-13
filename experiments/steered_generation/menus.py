@@ -30,6 +30,8 @@ from types import SimpleNamespace
 
 VERSION = "retailer-delivery-admission-plan-v2"
 SCOPES = ("home", "any")
+# The kinds of destination a carrier delivers to, as the native delivery task names them.
+TYPES = ("home", "parcel_locker", "staffed_counter")
 # The oracle's default terms for a contract's carrier, which is what a plan made without overrides carries.
 TERMS = {"bulky_supported": False, "bulky_surcharge_minor": 0, "bulky_extra_days": 0, "arrival_window_days": 0}
 UNSUPPORTED = "No positive count mass within the real route bound"
@@ -70,11 +72,12 @@ def site(world, retailer_id, clause, api):
         raise ValueError("Unknown carrier")
     found = oracle(world, retailer_id, clause.get("delivery_options", {}), api)
     found.clause, found.scope = clause, clause.get("destination_type", "home")
+    found.types = {"home"} if found.scope == "home" else set(TYPES)
     return found
 
 
-def oracle(world, retailer_id, stated, api):
-    """The same for a recipe's delivery settings alone, for home delivery."""
+def oracle(world, retailer_id, stated, api, types=("home",)):
+    """The same for a recipe's delivery settings alone, for home delivery or the kinds of destination given."""
     website = import_module(api.basic.__package__ + ".delivery_options")
     # A recipe's own settings; version 2 is the only one a menu can be read for, so it is what is asked for.
     if (type(stated) is not dict or type(stated.get("enabled", True)) is not bool or not stated.get("enabled", True) or
@@ -92,7 +95,7 @@ def oracle(world, retailer_id, stated, api):
         raise ValueError("The world does not record the seed its delivery menus are drawn on")
     return SimpleNamespace(clause=None, world=world, retailer=retailer, retailer_id=retailer_id, admission=admission,
                            backend=backend, settings=settings, weights=admission._weights(website.producer_weights(settings)),
-                           destination=world["user_location"], scope="home")
+                           destination=world["user_location"], scope="home", types=set(types))
 
 
 def least(place):
@@ -135,8 +138,7 @@ def priced(place, world, retailer, policy, admitted, detail=False):
     rows = []
     for choice in place.admission._potential(place.backend, world, retailer, policy, place.destination):
         key = place.admission.route_key(choice)
-        if key not in admitted or choice["destination_type"] == "retailer_branch" or (
-                place.scope == "home" and choice["destination_type"] != "home"):
+        if key not in admitted or choice["destination_type"] not in place.types:
             continue
         found = place.backend._carrier_candidates(world, retailer, policy, product, offer, 1, choice)
         if not found:
@@ -187,7 +189,7 @@ def ceiling(place):
              "carrier_terms": [{"carrier_id": row["carrier_id"], **TERMS} for row in contracts]}
     every = {place.admission.route_key(choice)
              for choice in place.admission._potential(place.backend, view, retailer, terms, place.destination)}
-    home = SimpleNamespace(**{**vars(place), "scope": "home"})
+    home = SimpleNamespace(**{**vars(place), "scope": "home", "types": {"home"}})
     return max((found["raw_shipping_minor"] for row in priced(home, view, retailer, terms, every, detail=True)
                 for found in row["candidates"]), default=0)
 
