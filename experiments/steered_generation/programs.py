@@ -17,7 +17,9 @@ probability of each outcome of a resolved draw: a weighted or uniform choice,
 a whole number from a range, the star rating, the set of topics, and a normal
 draw that the program reads only through `>=` thresholds (found on the
 expressions as the program parses them). A loop is followed where it only
-derives and collects values.
+derives and collects values. Each draw is taken to fall by itself, so a
+program in which a stream of the block is opened by another draw as well
+is refused.
 
 A review site's first page lists written comments, and a review has a
 comment when any pool at all holds for it. So a requirement on a first page
@@ -44,6 +46,7 @@ from copy import deepcopy
 from importlib import import_module
 import json
 from math import erfc, fsum, prod, sqrt
+import re
 import sys
 from types import SimpleNamespace
 
@@ -211,6 +214,32 @@ def needs(twin, paths):
     return steps
 
 
+def drawing(steps, looped=False):
+    """Every step of a program that draws, with whether a loop runs it."""
+    for step in steps:
+        if "for_each" in step:
+            yield from drawing(step.get("steps", []), True)
+        elif "sample" in step:
+            yield step, looped
+
+
+def opens(step, looped):
+    """The names of the random streams a drawing step can open, as patterns.
+
+    As the program's `sample` and `draw` name them: the step's stream (its id
+    unless stated), with a loop's indices after it, or a template filled from
+    the loop's bindings; under it the streams of a comment's length, of value
+    and of each further topic, or of a subset's count and items.
+    """
+    pattern = lambda text: ".*".join(re.escape(part) for part in re.split(r"\{[^{}]*\}", text))
+    name = step.get("stream", step["id"])
+    base = pattern(name) + (r"(/\d+)+" if looped and "{" not in name else "")
+    under = {"review_topics": [base + r"/(length|value|other/\d+)"],
+             "weighted_subset": [pattern(step.get("streams", {}).get("count", "")) or base + "/count",
+                                 pattern(step.get("streams", {}).get("item", "")) or base + r"/item_.*"]}
+    return [base, *under.get(step["sample"], [])]
+
+
 def site(world, item, api, native, **common):
     """Where one product's review draws sit, and what its review program reads them with.
 
@@ -279,6 +308,12 @@ def site(world, item, api, native, **common):
             if twin.fields[step["target"]].get("unknown_values"):
                 raise unmodelled("a continuous draw some of whose values count as unknown")
             bounds[step["id"]] = sorted({cut for found in cuts for cut in found})
+    # Each of the block's streams is one draw's own. Two draws on one stream fall together, which following them
+    # one by one does not see; a statement's wording is chosen on streams named `language/...`.
+    opened = [opens(step, looped) for step, looped in drawing(twin.document.get("steps", []))]
+    if any(name.startswith("language/") or sum(any(re.fullmatch(pattern, name) for pattern in found) for found in opened) != 1
+           for name in block):
+        raise unmodelled("a draw on a random stream that another draw, or a statement's wording, opens as well")
     # Whether the rating can be redrawn on its own: no other draw sets its parameters.
     above, staged = read_by(twin, rating[0]), True
     for step in reversed(every[:every.index(rating[0])]):

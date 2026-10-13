@@ -14,6 +14,7 @@ import json
 from math import erfc, exp, fsum, lgamma, nextafter, prod, sqrt
 from pathlib import Path
 from random import Random
+import re
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
@@ -929,6 +930,87 @@ class FirstPageTests(Programs):
                     self.assertEqual(silent, 0)
                 programs.BUILT.clear()
 
+    @staticmethod
+    def asides(*streams):
+        """Two statements of aspects of their own, each on a draw of its own, the draws on the streams named."""
+        def change(document):
+            for name, stream in zip(("aside_a", "aside_b"), streams):
+                document["fields"]["review." + name] = {"type": "boolean"}
+                document["steps"].append({"id": name, "target": "review." + name, "sample": "weighted_choice",
+                                          "weights": {"yes": 1, "no": 1}, "values": {"yes": True, "no": False},
+                                          **({"stream": stream} if stream else {})})
+                extra = deepcopy(pool(document, "sole_durability.positive"))
+                extra.update(id=name, when="review." + name)
+                extra["meaning"]["aspect"] = name
+                document["language"].append(extra)
+        return change
+
+    def test_draws_on_one_stream_are_refused(self):
+        plain, quiet = programs.cells(self.place()), sum(programs.kinds(self.page())[rating, pages.SILENT] for rating in range(1, 6))
+        programs.BUILT.clear()
+        # Streams of their own, named or not: two more groups, each silent half the time.
+        for streams in ((None, None), ("one", "two")):
+            self.altered(self.asides(*streams))
+            place = self.page()
+            model, joint = programs.kinds(place), self.together(place)
+            self.assertAlmostEqual(sum(model[rating, pages.SILENT] for rating in range(1, 6)), quiet / 4, places=13)
+            for cell, chance in model.items():
+                self.assertAlmostEqual(chance, joint.get(cell, 0), places=13)
+            programs.BUILT.clear()
+        # One stream for both: the producer draws them alike, so a review is silent half as often as two draws
+        # followed one by one would have it. The page is refused; the topic without a page does not depend on them.
+        self.altered(self.asides("shared", "shared"))
+        with self.assertRaises(ValueError) as caught:
+            self.page()
+        self.assertIn("Not modelled: a draw on a random stream", str(caught.exception))
+        place = self.place()
+        self.assertEqual(programs.cells(place), plain)
+        twin, silent, trials = place.program.twin, 0, 3000
+        for seed in range(trials):
+            entities = twin.sample(10 ** 7 + seed, inputs=deepcopy(place.program.entities))["entities"]
+            self.assertEqual(entities["review"]["aside_a"], entities["review"]["aside_b"])
+            silent += not any("when" not in row or twin._eval(row["when"], entities) for row in twin.document["language"])
+        self.assertLess(abs(silent / trials - quiet / 2), 4.5 * (quiet / 2 * (1 - quiet / 2) / trials) ** .5)
+        programs.BUILT.clear()
+        # A stream of the topic's own draws that another draw opens, with or without a page: the rating's, the
+        # topic's own, a part of the topic choice, and the stream a statement's wording is chosen on.
+        for stream in ("rating", "sentiment_everyday_comfort", "topics/length", "topics/other/1"):
+            with self.subTest(stream=stream):
+                self.altered(self.asides(stream, None))
+                for site in (self.page, self.place):
+                    with self.assertRaises(ValueError) as caught:
+                        site()
+                    self.assertIn("Not modelled: a draw on a random stream", str(caught.exception))
+                programs.BUILT.clear()
+        self.altered(self.asides("language/aside_a/0", None))
+        with self.assertRaises(ValueError) as caught:
+            self.page()
+        self.assertIn("Not modelled: a draw on a random stream", str(caught.exception))
+        self.assertEqual(programs.cells(self.place()), plain)
+        programs.BUILT.clear()
+
+    def test_the_streams_a_draw_opens(self):
+        match = lambda step, looped, name: any(re.fullmatch(pattern, name) for pattern in programs.opens(step, looped))
+        plain, named = {"id": "a", "sample": "weighted_choice"}, {"id": "a", "stream": "b.c", "sample": "normal"}
+        self.assertEqual([match(plain, False, name) for name in ("a", "a/0", "b", "ab")], [True, False, False, False])
+        self.assertEqual([match(named, False, name) for name in ("b.c", "bxc", "a")], [True, False, False])
+        # In a loop the indices follow the name, or a template is filled from the loop's bindings.
+        self.assertEqual([match(plain, True, name) for name in ("a", "a/0", "a/3/11", "a/x")], [False, True, True, False])
+        filled = {"id": "a", "stream": "note/{kind}/own", "sample": "uniform_int"}
+        self.assertEqual([match(filled, True, name) for name in ("note/b/own", "note//own", "note/b", "a/0")],
+                         [True, True, False, False])
+        topics = {"id": "topics", "sample": "review_topics"}
+        self.assertEqual([match(topics, False, name) for name in ("topics", "topics/length", "topics/value", "topics/other/12",
+                                                                  "topics/other", "topics/more")], [True] * 4 + [False] * 2)
+        subset = {"id": "parts", "sample": "weighted_subset"}
+        self.assertEqual([match(subset, False, name) for name in ("parts/count", "parts/item_3", "parts/other")], [True, True, False])
+        chosen = {**subset, "streams": {"count": "how_many", "item": "which/{index}"}}
+        self.assertEqual([match(chosen, False, name) for name in ("how_many", "which/2", "parts/count")], [True, True, False])
+        # Every program in the test world: each stream of a block is one draw's.
+        steps = [row for row, _ in programs.drawing(self.place().program.twin.document["steps"])]
+        self.assertEqual(len(steps), len({row["id"] for row in steps}))
+        self.assertIn("rating", {row["id"] for row in steps})
+
     def test_probabilities_match_other_seeds(self):
         for requirement, trials in zip(self.paged(), (2500, 2500, 2500, 400, 250)):
             with self.subTest(requirement=requirement):
@@ -1069,4 +1151,3 @@ class FirstPageTests(Programs):
             shown, reference = self.listed(world, row["requirement"])
             self.assertTrue(reviews.agreed(row["requirement"]["first_page"], *shown))
             self.assertEqual(reference["verdict"], row["requirement"]["verdict"])
-

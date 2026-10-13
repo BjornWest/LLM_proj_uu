@@ -738,7 +738,15 @@ the tests compare them with the walk of every draw together. Trainers take
 topic; a program that takes more than four million steps over all the
 ways its draws can fall (some minutes) is refused.
 A natural world in which a review's text is not there exactly when the
-review states something is refused for a first page. Everything is
+review states something is refused for a first page.
+
+With or without a page, each draw of the block is followed as falling by
+itself. A program may name one random stream for two draws, which then fall
+together; a block with a stream that another draw opens as well (or that a
+statement's wording is chosen on) is refused. No program of the 120
+concepts with topics in the saved all-concepts world does that, on any of
+their 754 topics
+(`steering/general-r19/all-concepts-streams.out`). Everything is
 kept as logarithms, each term one exponent of a sum of logarithms: the
 integrand at a point is a product of hundreds of small powers and a large
 multinomial number, far outside the floats on its own while their product is
@@ -2131,10 +2139,11 @@ Nothing but the product's reviews and rating summary differs in any of them.
 Every supported concept (`all-concepts.out`, from the shared tree on the
 saved 126-concept world, so not reproducible from a commit): the four kinds
 a first page needs were read for one topic of each of 119 concepts and
-compared with 300 whole reviews by the producer's rule; 95 concepts take
-under 2 s, 20 between 2 and 30 s, three monitors 26 to 45 s and strap
-harnesses 182 s; padded harnesses are refused by the step cap, as their
-plain topics were already too slow; four concepts declare no topic. The
+compared with 300 whole reviews by the producer's rule; 94 concepts take
+under 2 s, 21 between 2 and 30 s, and four longer (soft toys 34 s, creative
+monitors 45 s, pen-work tablets 57 s, strap harnesses 182 s); padded
+harnesses are refused by the step cap, as their plain topics were already
+too slow; four concepts declare no topic. The
 five largest deviations (up to 4.9 standard errors on cells of five expected
 reviews) were rechecked with 6,000 reviews: 2.6 at most.
 
