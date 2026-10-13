@@ -1054,6 +1054,12 @@ threshold. Refused as not modelled: a retailer where what delivery costs, or
 whether it is possible, depends on which of its locations holds the stock;
 rankings other than the total; physical stock only; a comparison site.
 
+The candidates tool reads a `matching_single_item_delivery` task (cheapest
+total, home delivery; a cap, a deadline, other methods or a comparison site
+are refused) into the same three candidates as the other winner tasks, with
+the recipe's `delivery_options` beside the task where they are not the
+defaults.
+
 The check is the native task's reference on the steered world (through
 `prepared_quote` with the plans a site is built from). The tests also read
 the admitted oracle's quotes for every competing offer: who can be
