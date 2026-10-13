@@ -1514,22 +1514,22 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         if env is not None:
             trace.event('environment_close_started',scope='Inference ended; cleanup/teardown in progress')
             def cleanup_phase(name,callback,seconds=2.0):
-                started=time.monotonic();failure=None
+                started=time.monotonic();failure=None;connection_count=0
                 trace.event('cleanup_phase_started',phase=name)
                 try:
-                    if human_browser is not None:
-                        from .native_capture import CaptureBudget
-                        limit=CaptureBudget(env.unwrapped.page,trace,seconds=seconds,scope='browser_cleanup')
-                        limit.phase='teardown_'+name
-                        with limit.rpc_deadline():return callback()
-                    return callback()
+                    from .browser_shutdown import cleanup_rpc_budget
+                    with cleanup_rpc_budget(env,trace,seconds=seconds,phase=name,
+                                            required=human_browser is not None) as connection_count:
+                        return callback()
                 except Exception as exc:
                     failure=f'{type(exc).__name__}: {exc}'
                     cleanup_errors.append({'phase':name,'error':failure})
                     raise
                 finally:
                     trace.event('cleanup_phase_completed',phase=name,seconds=time.monotonic()-started,
-                        error=failure,rpc_budget_seconds=seconds if human_browser is not None else None)
+                        error=failure,rpc_budget_seconds=seconds if connection_count else None,
+                        rpc_budget_connection_count=connection_count,
+                        rpc_budget_scope='Owned task/chat RPC awaits; sync callbacks require parent containment')
             if navigation is not None:
                 try:cleanup_phase('navigation',navigation.close)
                 except Exception as exc:
