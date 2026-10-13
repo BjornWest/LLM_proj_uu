@@ -24,22 +24,38 @@ the contracts in one at a time, keeping only what the requirement reads of
 them: whether a tier was seen, and the lowest fees so far. A sample chooses
 the number and that summary, then the contracts back from the last to the
 first, then the carriers, and replays all of it through the producer.
+
+A requirement may also state what the retailer shows of its delivery options
+(`shown`, read by `menus.py`): which carriers are among the routes a site
+built from the world shows, and which carrier has the cheapest one. That is
+a fixed function of the contracts, with no closed form: contracts are drawn
+as above, given the rest of the requirement and the carriers the shown
+options need, until the menu they give is as required. The sample is from
+the block's distribution given the whole requirement; the probability is the
+exact one of the contract statements times the share of a fixed number of
+such draws that show what is required, which is an estimate and is recorded
+as one.
 """
 import json
 from math import comb, fsum
+from random import Random
 import sys
 from types import SimpleNamespace
 
-from . import blocks
-from .blocks import Step, Unmet, bound, pick, within
+from . import blocks, menus
+from .blocks import NumericalLimit, Step, Unmet, bound, pick, within
 from .prices import UNMATCHED, ZeroMass
 
 VERSION = "steered-retailer-shipping-v1"
 TIERS = ("economy", "express")
 FEES = ("collection_fee_minor", "home_fee_minor")
-STATED = {"carriers", "carrier_count", *TIERS, *FEES, "dispatch_days"}
+STATED = {"carriers", "carrier_count", *TIERS, *FEES, "dispatch_days", "shown"}
 # What of the requirement is about contracts; the rest is the warehouse's dispatch.
 CONTRACTS = STATED - {"dispatch_days"}
+# How many draws of the contracts estimate the share that shows what is required, and how many a sample may take.
+PROPOSALS, TRIES = 400, 20000
+# The estimates made in this process, by world and requirement: a model is asked for more than once per sample.
+ESTIMATES = {}
 
 
 def resolve(requirement):
@@ -62,7 +78,27 @@ def resolve(requirement):
             raise ValueError("A fee is a whole min, max or both, in minor units")
     if any(key in requirement and type(requirement[key]) is not bool for key in TIERS):
         raise ValueError("A tier is true where some contract must offer it and false where none may")
+    if "shown" in requirement:
+        menus.resolve(requirement["shown"])
     return json.loads(json.dumps(requirement))
+
+
+def contracted(requirement):
+    """What a requirement states of the contracts themselves, with the carriers its shown options need.
+
+    A carrier can be shown only where there is a contract with it. None where
+    a carrier the shown options need is one the contracts must not include.
+    """
+    stated = {key: value for key, value in requirement.items() if key != "shown"}
+    if "shown" not in requirement:
+        return stated
+    named, needed = stated.get("carriers", {}), menus.needed(requirement["shown"])
+    if set(needed) & set(named.get("exclude", [])):
+        return None
+    include = sorted(set(named.get("include", [])) | set(needed))
+    if include:
+        stated["carriers"] = {**named, "include": include}
+    return stated
 
 
 def footprint(world, requirement, api):
@@ -71,8 +107,12 @@ def footprint(world, requirement, api):
     retailer = requirement["retailer_id"]
     if not any(row["retailer_id"] == retailer for row in world["retailers"]):
         raise ValueError("Unknown retailer")
+    # Shown options need the recipe's counts to have support for every retailer; where they start above one route,
+    # that reads every other retailer's contracts.
+    reads = {("contracts", row["retailer_id"], "") for row in world["retailers"] if row["retailer_id"] != retailer} if (
+        "shown" in requirement and menus.least(menus.site(world, retailer, requirement["shown"], api)) > 1) else set()
     return SimpleNamespace(writes={(name, retailer, "") for name, about in (("contracts", CONTRACTS), ("dispatch", {"dispatch_days"}))
-                                   if about & set(requirement)}, reads=set())
+                                   if about & set(requirement)}, reads=reads)
 
 
 def site(world, requirement, api):
@@ -96,7 +136,8 @@ def site(world, requirement, api):
     rid, base = retailer["retailer_id"], api.commerce.VERSION + "/" + retailer["retailer_id"]
     timing = plan["retailer_population_contract"]["geography_and_delivery_policy"]["dispatch_timing"]
     return SimpleNamespace(
-        requirement=requirement, retailer_id=rid, carriers=carriers,
+        requirement=requirement, retailer_id=rid, carriers=carriers, contract=contracted(requirement),
+        menu=menus.site(world, rid, requirement["shown"], api) if "shown" in requirement else None,
         # The population sampler names a carrier by its place in the pool; the world by its id.
         names={carrier: f"carrier-{index}" for index, carrier in enumerate(carriers)},
         counts=range(selection["carrier_count_ranges_by_scale"][retailer["scale"]][0],
@@ -166,7 +207,7 @@ def suits(requirement, state):
 
 def chosen(place, count):
     """The chance that `count` carriers drawn from the pool include and exclude the named ones."""
-    named = place.requirement.get("carriers", {})
+    named = place.contract.get("carriers", {})
     include, exclude = len(named.get("include", [])), len(named.get("exclude", []))
     free = len(place.carriers) - include - exclude
     if not 0 <= count - include <= free or count > len(place.carriers):
@@ -187,11 +228,16 @@ def model(world, requirement, api):
 
     `outcomes` are (mass, number of carriers, summary of the contracts) where
     the requirement is about contracts; `days` the dispatch days it allows
-    with their probabilities where it is about dispatch.
+    with their probabilities where it is about dispatch. With shown options,
+    the outcomes are those of the contract statements, `accepted` is how many
+    of `PROPOSALS` draws from them show what is required, and the probability
+    is an estimate.
     """
     place = site(world, requirement, api)
-    requirement, outcomes, days = place.requirement, None, None
-    if CONTRACTS & set(requirement):
+    requirement, outcomes, days, rows = place.contract, None, None, None
+    if requirement is None:
+        raise ZeroMass("no_outcome", "A carrier that must be shown is one the retailer must not have a contract with")
+    if CONTRACTS & set(place.requirement):
         rows = folded(place, place.counts[-1])
         outcomes = [(chosen(place, count) / len(place.counts) * mass, count, state)
                     for count in place.counts if within(requirement.get("carrier_count", {}), count)
@@ -203,9 +249,64 @@ def model(world, requirement, api):
         days = {name: share for name, share in shares(place.days).items() if within(requirement["dispatch_days"], int(name))}
         if not days:
             raise ZeroMass("no_outcome", "No dispatch time of this retailer's warehouse satisfies the requirement")
-    return SimpleNamespace(site=place, outcomes=outcomes, days=days, rows=rows if outcomes else None,
-                           probability=(fsum(found[0] for found in outcomes) if outcomes else 1.0) *
-                                       (fsum(days.values()) if days else 1.0))
+    block = SimpleNamespace(site=place, outcomes=outcomes, days=days, rows=rows, accepted=None, error=0.0,
+                            estimated=place.menu is not None,
+                            probability=(fsum(found[0] for found in outcomes) if outcomes else 1.0) *
+                                        (fsum(days.values()) if days else 1.0))
+    if place.menu is not None:
+        others = [name for name in menus.stranded(place.menu) if name != place.retailer_id]
+        if others:
+            raise ZeroMass("no_outcome", "The recipe's delivery counts have no support for another retailer of this "
+                                         "world, so no site is built from it: " + ", ".join(others))
+        key = world["world_id"], json.dumps(place.requirement, sort_keys=True)
+        if key not in ESTIMATES:
+            # The same draws for the same world and requirement, in this process and the next.
+            rng = Random(api.native.digest({"world_id": world["world_id"], "requirement": place.requirement}))
+            ESTIMATES[key] = sum(displayed(place, draw(block, rng)[1]) for _ in range(PROPOSALS))
+        block.accepted = ESTIMATES[key]
+        if not block.accepted:
+            # Not a proof that it cannot occur: callers report it as not found.
+            raise ZeroMass("not_found", f"None of {PROPOSALS} draws of this retailer's contracts shows what is required")
+        share = block.accepted / PROPOSALS
+        block.probability *= share
+        # The standard error of a share of a fixed number of draws, on the probability.
+        block.error = block.probability * ((1 - share) / (share * PROPOSALS)) ** .5
+    return block
+
+
+def displayed(place, contracts):
+    """Whether a retailer with these contracts shows what the requirement states of its delivery options."""
+    return menus.holds(place.menu.clause, menus.shown(place.menu, contracts))
+
+
+def draw(block, rng):
+    """One sample of the contracts given what the requirement states of them: the plan for their streams, and the contracts."""
+    place, script = block.site, {}
+    _, count, state = pick(rng, block.outcomes, [found[0] for found in block.outcomes])
+    # The contracts, from the last to the first: each with the summary of those before it.
+    found, drawn = kinds(place), []
+    for position in range(count, 0, -1):
+        options = [(before, kind) for before in block.rows[position - 1] for kind in found if after(before, kind) == state]
+        state, kind = pick(rng, options, [block.rows[position - 1][before] * found[kind] for before, kind in options])
+        drawn.append(kind)
+    drawn.reverse()
+    named = place.contract.get("carriers", {})
+    include = named.get("include", [])
+    free = [carrier for carrier in place.carriers if carrier not in include and carrier not in named.get("exclude", [])]
+    carriers = include + rng.sample(free, count - len(include))
+    rng.shuffle(carriers)
+    script[place.keys.count] = [("randint", count)]
+    script[place.keys.carriers] = [("sample", [place.names[carrier] for carrier in carriers])]
+    contracts = []
+    for carrier, (economy, express, fee, home) in zip(carriers, drawn):
+        script[place.keys.tier(carrier, "economy")] = [("random", 0.0 if economy else UNMATCHED)]
+        script[place.keys.tier(carrier, "express")] = [("random", 0.0 if express else UNMATCHED)]
+        script[place.keys.fee(carrier)] = [("choices", fee)]
+        script[place.keys.home(carrier)] = [("choices", home)]
+        contracts.append({"carrier_id": carrier, "tiers": ["standard", *(["economy"] if economy else []),
+                                                           *(["express"] if express else [])],
+                          "collection_fee_minor": int(fee), "home_delta_minor": int(home)})
+    return script, contracts
 
 
 def listed(world, place):
@@ -218,40 +319,30 @@ def check(world, requirement, api):
     """Read the requirement off a world's recorded contracts and dispatch days."""
     place = site(world, requirement, api)
     contracts, days = listed(world, place)
-    if not holds(place.requirement, contracts, days):
-        raise Unmet(f"{place.retailer_id}: contracts {json.dumps(contracts)}, dispatch in {days} days")
-    return {"retailer_id": place.retailer_id, "contracts": contracts, "warehouse_dispatch_days": days}
+    rows = None
+    if place.menu is not None:
+        # Through the plans a site is built from, and equal to what the block read off the contracts alone.
+        rows = menus.official(world, place.menu)
+        if rows != menus.shown(place.menu, contracts):
+            raise AssertionError("The shown options read off the contracts are not those of the finished world's plans")
+    if not holds(place.requirement, contracts, days) or place.menu is not None and not menus.holds(place.menu.clause, rows):
+        raise Unmet(f"{place.retailer_id}: contracts {json.dumps(contracts)}, dispatch in {days} days" +
+                    (f", shown {json.dumps(rows)}" if place.menu is not None else ""))
+    return {"retailer_id": place.retailer_id, "contracts": contracts, "warehouse_dispatch_days": days,
+            **({"shown": rows} if place.menu is not None else {})}
 
 
 def prepare(natural, requirement, api, rng):
     """Sample the block on the natural world; the step replays it and reads the result."""
     block = model(natural, requirement, api)
-    place, script, contracts, days = block.site, {}, None, None
+    place, script, contracts, days, draws = block.site, {}, None, None, 0
     if block.outcomes:
-        _, count, state = pick(rng, block.outcomes, [found[0] for found in block.outcomes])
-        # The contracts, from the last to the first: each with the summary of those before it.
-        found, drawn = kinds(place), []
-        for position in range(count, 0, -1):
-            options = [(before, kind) for before in block.rows[position - 1] for kind in found if after(before, kind) == state]
-            state, kind = pick(rng, options, [block.rows[position - 1][before] * found[kind] for before, kind in options])
-            drawn.append(kind)
-        drawn.reverse()
-        named = place.requirement.get("carriers", {})
-        include = named.get("include", [])
-        free = [carrier for carrier in place.carriers if carrier not in include and carrier not in named.get("exclude", [])]
-        carriers = include + rng.sample(free, count - len(include))
-        rng.shuffle(carriers)
-        script[place.keys.count] = [("randint", count)]
-        script[place.keys.carriers] = [("sample", [place.names[carrier] for carrier in carriers])]
-        contracts = []
-        for carrier, (economy, express, fee, home) in zip(carriers, drawn):
-            script[place.keys.tier(carrier, "economy")] = [("random", 0.0 if economy else UNMATCHED)]
-            script[place.keys.tier(carrier, "express")] = [("random", 0.0 if express else UNMATCHED)]
-            script[place.keys.fee(carrier)] = [("choices", fee)]
-            script[place.keys.home(carrier)] = [("choices", home)]
-            contracts.append({"carrier_id": carrier, "tiers": ["standard", *(["economy"] if economy else []),
-                                                               *(["express"] if express else [])],
-                              "collection_fee_minor": int(fee), "home_delta_minor": int(home)})
+        for draws in range(1, (TRIES if place.menu is not None else 1) + 1):
+            script, contracts = draw(block, rng)
+            if place.menu is None or displayed(place, contracts):
+                break
+        else:
+            raise NumericalLimit("Contracts that show what is required are too rare to reach by drawing them")
     if block.days:
         days = pick(rng, list(block.days), list(block.days.values()))
         script[place.keys.dispatch] = [("choices", days)]
@@ -261,21 +352,31 @@ def prepare(natural, requirement, api, rng):
         if contracts is not None and recorded[0] != contracts or days is not None and recorded[1] != int(days):
             raise blocks.streams.PlanMismatch(f"{place.retailer_id}: producer recorded another policy than planned")
         before = listed(natural, place)
-        return {"method": "exact_conditional_policy_draws", "requirement": place.requirement,
+        return {"method": "exact_conditional_policy_draws" + ("_then_rejection_on_shown_options" if place.menu is not None else ""),
+                "requirement": place.requirement,
                 "natural_world_id": natural["world_id"], "probability_given_upstream": block.probability,
                 "retailer_id": place.retailer_id,
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "proposals": PROPOSALS, "proposals_accepted": block.accepted,
+                    "contract_draws_for_this_sample": draws,
+                    "delivery_settings": place.menu.settings} if place.menu is not None else {}),
                 **({"natural_contracts": before[0], "steered_contracts": contracts} if contracts is not None else {}),
                 **({"natural_dispatch_days": before[1], "steered_dispatch_days": int(days)} if days is not None else {}),
                 "distribution_claim": "This retailer's " + " and ".join(
                     name for name, used in (("carrier contracts (how many carriers, which, each contract's tiers and "
                                              "two fees)", contracts is not None),
                                             ("warehouse dispatch days", days is not None)) if used) +
-                                      " are sampled from their distribution given the requirement. Every other draw "
+                                      " are sampled from their distribution given the requirement" +
+                                      (": contracts are drawn given what it states of them until the delivery options "
+                                       "they show are as required, and the probability is the contract statements' own "
+                                       "times the share of a fixed number of such draws that qualified, an estimate"
+                                       if place.menu is not None else "") + ". Every other draw "
                                       "is the seed's own; the requirement depends on no other draw. Use the "
                                       "probability as the importance weight across seeds."}
 
-    return Step(script=script, probability=block.probability, **vars(footprint(natural, requirement, api)),
-                record=record, check=lambda world: check(world, requirement, api))
+    return Step(script=script, probability=block.probability, error=block.error, estimated=place.menu is not None,
+                **vars(footprint(natural, requirement, api)), record=record,
+                check=lambda world: check(world, requirement, api))
 
 
 def steer(session, natural, natural_opened, requirement, api, rng):
@@ -317,9 +418,14 @@ def trial(natural, requirement, api):
         keys.add(place.keys.dispatch)
     return SimpleNamespace(
         keys=keys, **vars(footprint(natural, requirement, api)), reading=reading,
-        holds=lambda seed: holds(place.requirement, *reading(seed)),
+        holds=lambda seed: met(place, *reading(seed)),
         recorded=lambda world: tuple(listed(world, place)),
         satisfied=lambda world: satisfied(world, requirement, api))
+
+
+def met(place, contracts, days):
+    """The whole requirement read off contracts and dispatch days, shown options included."""
+    return holds(place.requirement, contracts, days) and (place.menu is None or displayed(place, contracts))
 
 
 def satisfied(world, requirement, api):

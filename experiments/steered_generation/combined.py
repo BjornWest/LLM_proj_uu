@@ -72,6 +72,11 @@ def steer(session, natural, natural_opened, requirement, api, rng):
                                     "means every draw outside these blocks. "
                                     "Upstream draws are not reweighted; use probability_given_upstream as the "
                                     "importance weight across seeds."}
+    if any(step.estimated for step in steps):
+        # A product of estimates and exact numbers: the relative errors add in squares.
+        record["probability_is_estimated"] = True
+        record["probability_standard_error"] = record["probability_given_upstream"] * fsum(
+            (step.error / step.probability) ** 2 for step in steps if step.error and step.probability) ** .5
     if any(step.log_probability is not None for step in steps):
         record["log_probability_given_upstream"] = fsum(
             log(step.probability) if step.log_probability is None else step.log_probability for step in steps)

@@ -40,11 +40,12 @@ from functools import lru_cache
 from importlib import import_module
 import json
 from math import exp, fsum, log, prod
+from random import Random
 from types import SimpleNamespace
 
 from experiments.world_requirement_construction import model as edits
 
-from . import blocks, prices, stock, streams
+from . import blocks, menus, prices, stock, streams
 from .blocks import NumericalLimit, Step, Unmet, pick, power, times
 from .prices import UNMATCHED, ZeroMass
 from .stock import DISPATCH, NOT_SHIPPABLE, NOWHERE, after
@@ -60,7 +61,7 @@ RANKINGS = {"priorities": ".catalog_priority_task", "unit_basis": ".catalog_unit
 def resolve(requirement):
     required = {"schema", "concept_id", "product_id", "retailer_ids"}
     optional = {"listed_below", "predicates", "availability", "city", "country", "comparison_site_id", "surrounding",
-                "selected", *RANKINGS}
+                "selected", "delivered", *RANKINGS}
     if (type(requirement) is not dict or not required <= set(requirement) <= required | optional or
             requirement["schema"] != VERSION):
         raise ValueError("Declare a concept, a product, the retailers that are cheapest and optionally offers "
@@ -101,6 +102,14 @@ def stated(requirement):
     if "surrounding" in requirement and ("comparison_site_id" not in requirement or
                                          type(requirement["surrounding"]) is not dict):
         raise ValueError("Surrounding-site controls are a mapping and go with a comparison site")
+    if "delivered" in requirement:
+        delivered = requirement["delivered"]
+        if (type(delivered) is not dict or set(delivered) - {"delivery_options"} or
+                type(delivered.get("delivery_options", {})) is not dict):
+            raise ValueError("Delivered totals take a site recipe's delivery options, or nothing")
+        if ranking or availability != PURCHASABLE or "comparison_site_id" in requirement or "predicates" not in requirement:
+            raise ValueError("Delivered totals are read for predicates, purchasable offers and every shop, ranked by "
+                             "the total alone")
 
 
 def winner(requirement):
@@ -140,12 +149,90 @@ def listed(world, requirement, package):
     return LISTED[key], sidecar
 
 
-def reading(skus, pairs, sources, supplier, reference, key=None, barred=(), settled=None):
+def reading(skus, pairs, sources, supplier, reference, key=None, barred=(), settled=None, delivered=None, reads=(),
+            stranded=()):
     """One native task's reading of a requirement; see `scope`."""
     return SimpleNamespace(
         skus=set(skus) - set(barred), pairs=pairs, sources=sources, supplier=supplier, reference=reference,
-        key=key or (lambda sku_id, price: price), barred=frozenset(barred),
+        key=key or (lambda sku_id, price: price), barred=frozenset(barred), delivered=delivered, reads=set(reads),
+        # Retailers a recipe's delivery counts cannot serve: no site is built from such a world (see `model`).
+        stranded=list(stranded),
         settled=settled or (lambda found: found if found["status"] == "match" else None))
+
+
+def ranks(found, retailer_id, best=False):
+    """What an offer of a retailer is ranked by, as a function of its SKU and listed price.
+
+    The scope's key of the price; of the price with home delivery where the
+    requirement compares delivered totals, which differ by retailer. Where a
+    retailer's charge depends on which location ships, this is the highest it
+    can be, or with `best` the lowest: the two the block model works between
+    (see `model`). What an offer is actually charged is `lowest`'s to say,
+    from where its stock is.
+    """
+    if found.delivered is None:
+        return found.key
+    charge = found.delivered[retailer_id].lowest if best else found.delivered[retailer_id].highest
+    return lambda sku_id, price: found.key(sku_id, price + charge(price))
+
+
+# For a ranking by delivered totals where a charge depends on the location that ships: how many samples of the
+# block estimate the share that holds on the charges as they are, how many a sample may take, and the estimates
+# made in this process.
+PROPOSALS, TRIES, ESTIMATES = 200, 20000, {}
+
+
+def delivering(world, requirement, api, skus, declared, feature):
+    """The reading of a requirement that compares what one unit costs delivered home.
+
+    The native single-item delivery task: among the offers that meet the
+    predicates, the lowest payable total over the home-delivery options the
+    retailer shows, for one unit and no coupon. A retailer's shown options and
+    their tariffs are a fixed function of its contracts under admission plan
+    version 2, and the waiver of its free-shipping threshold; both are read
+    off the world as it is, so the reading depends on them (`reads`). An
+    offer can be delivered when a location that ships holds it or it can be
+    ordered from the supplier; pairs of retailers that show no home route do
+    not compete.
+    """
+    package = api.basic.__package__
+    native = import_module(package + ".quote_offer_task")
+    commerce = api.commerce.__package__
+    quotes, baskets, admission = (import_module(commerce + name) for name in (
+        ".prepared_quote", ".basket_quote", ".delivery_admission"))
+    website = import_module(package + ".delivery_options")
+    options = requirement["delivered"].get("delivery_options", {})
+    listing = {r["retailer_id"] for r in world["retailers"] for o in r["offers"] if o["sku_id"] in skus}
+    places = {rid: menus.oracle(world, rid, options, api) for rid in sorted(listing)}
+    charges = {rid: menus.delivery(place) for rid, place in places.items()}
+    delivered = {rid: charge for rid, charge in charges.items() if charge is not None}
+    spec = {"kind": native.KIND, "concept_id": requirement["concept_id"], "predicates": requirement["predicates"]}
+
+    def reference(found):
+        settings = next(iter(places.values())).settings if places else website.options({"enabled": True})
+        plan = baskets.make_plan(found)
+        try:
+            sidecar = admission.make_plan(found, plan, seed=found["seed"], plan_version=menus.VERSION,
+                                          count_weights=website.producer_weights(settings))
+        except ValueError as error:
+            if str(error) != menus.UNSUPPORTED:
+                raise
+            raise Unmet("The recipe's delivery counts have no support for a retailer of this world") from error
+        context = quotes.prepare(found, plan=plan, admission_plan=sidecar)
+        task = native.make(found, spec, inventory=declared, quote_context=context)
+        return task, native.reference(found, task, inventory=declared, quote_context=context)
+
+    products = {s["sku_id"]: p["public"]["product_id"] for p in world["products"] for s in p["public"]["skus"]}
+    return reading(
+        skus, {(r["retailer_id"], o["product_id"]) for r in world["retailers"] if r["retailer_id"] in delivered
+               for o in r["offers"] if o["sku_id"] in skus},
+        {r["retailer_id"]: {s["source_id"] for s in r["source_locations"] if s["shipping_enabled"]} for r in world["retailers"]},
+        True, reference, delivered=delivered,
+        stranded=menus.stranded(next(iter(places.values()))) if places else [],
+        # With counts that start above one route, every retailer's contracts decide whether a site is built at all.
+        reads={(kind, rid, "") for rid in listing for kind in ("contracts", "threshold")} | {
+            ("contracts", r["retailer_id"], "") for r in world["retailers"]
+            if places and menus.least(next(iter(places.values()))) > 1})
 
 
 def matching(world, concept, declared, predicates, feature):
@@ -250,6 +337,8 @@ def scope(world, requirement, api):
     if ranking:
         return ranked(world, requirement, api, ranking, declared, pairs, sidecar, site)
     skus = matching(world, concept, declared, requirement["predicates"], feature)
+    if "delivered" in requirement:
+        return delivering(world, requirement, api, skus, declared, feature)
     spec = {"concept_id": concept, "predicates": requirement["predicates"], **site}
     if requirement.get("availability", PURCHASABLE) != BRANCH:
         spec.update(kind=feature.KIND, availability=requirement.get("availability", PURCHASABLE))
@@ -322,7 +411,7 @@ def footprint(world, requirement, api):
     """What the block decides: the stock and the price of every listed pair with an offer that competes."""
     requirement, _, found = named(world, requirement, api)
     pairs = competing(world, requirement, found)
-    return SimpleNamespace(writes={(kind, *pair) for pair in pairs for kind in ("stock", "price")}, reads=set())
+    return SimpleNamespace(writes={(kind, *pair) for pair in pairs for kind in ("stock", "price")}, reads=set(found.reads))
 
 
 def site(world, retailer, product_id, api, found):
@@ -356,7 +445,8 @@ def site(world, retailer, product_id, api, found):
     return SimpleNamespace(
         pair=(rid, product_id), offers=offers, locations=locations, config=config, scale=retailer["scale"],
         competing=[o for o in offers if o["sku_id"] in found.skus], supplier_counts=found.supplier,
-        barred=[o for o in offers if o["sku_id"] in found.barred], rank=found.key,
+        barred=[o for o in offers if o["sku_id"] in found.barred], rank=ranks(found, rid),
+        best=ranks(found, rid, best=True),
         counting=[l for l in locations if found.sources is None or l.source_id in found.sources[rid]],
         supplier_enabled=retailer["supplier_enabled"],
         eligible=min(1, max(0, config["supplier"]["sku_eligible_probability"])) if retailer["supplier_enabled"] else 0,
@@ -547,10 +637,23 @@ def model(world, requirement, api, shared=None):
 
     `shared` is a `frame` for this world and this requirement's reading; the
     result is the same with and without it.
+
+    A ranking by delivered totals with a retailer whose charge depends on the
+    location that ships has no such product: an offer's rank then depends on
+    where its stock is. For one designated pair the block is modelled with
+    that pair charged the least it can be and every other pair the most. The
+    requirement on the charges as they are implies that one, so samples of
+    the latter that also satisfy the former are samples given the
+    requirement (`prepare` draws until one does), and the probability is the
+    modelled one times the share of `PROPOSALS` such samples that do: an
+    estimate, with its standard error in `error`.
     """
     if shared is not None and (shared.world is not world or shared.reading != reading_of(resolve(requirement))):
         raise ValueError("A shared frame serves one world and one reading")
     requirement, named_below, block_scope = named(world, requirement, api, shared and shared.scope)
+    if block_scope.stranded:
+        raise ZeroMass("no_outcome", "The recipe's delivery counts have no support for a retailer of this world, so no "
+                                     "site is built from it: " + ", ".join(block_scope.stranded))
     shared = shared or SimpleNamespace(places=places(world, block_scope, api), plain={})
     sited = shared.places
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
@@ -563,10 +666,19 @@ def model(world, requirement, api, shared=None):
             raise ZeroMass("not_listed", "The retailer does not list this SKU in this world")
         below.setdefault(pair, []).append(offer["offer_id"])
     config, native_round = world["config"]["retailer_price"], api.native.rounded_price
+    bounded = block_scope.delivered is not None and not all(found.uniform for found in block_scope.delivered.values())
+    if bounded and (len(designated) != 1 or below):
+        raise ValueError("Not modelled: several winners, or offers listed below the winner, where a retailer's delivery "
+                         "charge depends on which location ships")
     spread = {}
     for pair, place in sited.items():
         if pair in below:
             spread[pair] = Spread(outcomes(place, below[pair], config, native_round))
+        elif bounded and pair in designated:
+            lowered = vars(shared).setdefault("best", {})
+            if pair not in lowered:
+                lowered[pair] = Spread(outcomes(SimpleNamespace(**{**vars(place), "rank": place.best}), (), config, native_round))
+            spread[pair] = lowered[pair]
         else:
             if pair not in shared.plain:
                 shared.plain[pair] = Spread(outcomes(place, (), config, native_round))
@@ -584,10 +696,34 @@ def model(world, requirement, api, shared=None):
         raise ZeroMass("no_outcome", "No stock and price outcome of the concept satisfies the requirement in this world")
     top = max(log_terms.values())
     log_probability = top + log(fsum(exp(value - top) for value in log_terms.values()))
-    return SimpleNamespace(requirement=requirement, places=sited, designated=designated, spread=spread,
-                           log_terms=log_terms, log_probability=log_probability, probability=exp(log_probability),
-                           shares={price: exp(value - log_probability) for price, value in log_terms.items()},
-                           below=below, config=config, native_round=native_round, scope=block_scope)
+    block = SimpleNamespace(requirement=requirement, places=sited, designated=designated, spread=spread,
+                            log_terms=log_terms, log_probability=log_probability, probability=exp(log_probability),
+                            shares={price: exp(value - log_probability) for price, value in log_terms.items()},
+                            below=below, config=config, native_round=native_round, scope=block_scope,
+                            bounded=bounded, estimated=bounded, accepted=None, error=0.0)
+    if bounded:
+        key = world["world_id"], json.dumps(requirement, sort_keys=True)
+        if key not in ESTIMATES:
+            # The same draws for the same world and requirement, in this process and the next.
+            rng = Random(api.native.digest({"world_id": world["world_id"], "requirement": requirement}))
+            ESTIMATES[key] = sum(true(block, sample(block, rng)[1]) for _ in range(PROPOSALS))
+        block.accepted = ESTIMATES[key]
+        if not block.accepted:
+            # Not a proof that it cannot occur: callers report it as not found.
+            raise ZeroMass("not_found", f"None of {PROPOSALS} samples of the block has the designated pair cheapest on "
+                                        "the delivery charges as they are")
+        share = block.accepted / PROPOSALS
+        block.log_probability += log(share)
+        block.probability *= share
+        block.error = block.probability * ((1 - share) / (share * PROPOSALS)) ** .5
+        # The winning ranks above are the bounded block's; given the requirement they are not modelled.
+        block.shares = None
+    return block
+
+
+def true(block, draws):
+    """Whether planned draws satisfy the requirement on what every offer is actually charged for delivery."""
+    return judged(planned(block, draws), block.requirement, block.scope) is not None
 
 
 def pick_log(rng, options, logs):
@@ -765,7 +901,8 @@ def check(world, requirement, api, found=None):
     if decided is None or not decided["winners"] or {
             (w["retailer_id"], w["product_id"]) for w in decided["winners"]} != designated:
         raise Unmet("The best available offers are not exactly the designated retailers' product")
-    winning = found.key(decided["winners"][0]["sku_id"], decided["winners"][0]["price_minor"])
+    winning = ranks(found, decided["winners"][0]["retailer_id"])(decided["winners"][0]["sku_id"],
+                                                                 decided["winners"][0]["price_minor"])
     listed = {o["offer_id"]: o for r in world["retailers"] for o in r["offers"]}
     offers = {(r["retailer_id"], o["sku_id"]): o["offer_id"] for r in world["retailers"] for o in r["offers"]}
     candidates = {row["offer_id"] for row in decided["candidates"]}
@@ -773,7 +910,7 @@ def check(world, requirement, api, found=None):
     for row in requirement.get("listed_below", []):
         offer_id = offers.get((row["retailer_id"], row["sku_id"]))
         if (offer_id is None or offer_id in candidates or
-                found.key(row["sku_id"], listed[offer_id]["price_minor"]) >= winning):
+                ranks(found, row["retailer_id"])(row["sku_id"], listed[offer_id]["price_minor"]) >= winning):
             raise Unmet(f"{row['retailer_id']} does not list {row['sku_id']} unavailable below the winner")
         below.append({"offer_id": offer_id, "price_minor": listed[offer_id]["price_minor"]})
     return {"task": task, "reference": reference, "listed_below": below}
@@ -782,14 +919,29 @@ def check(world, requirement, api, found=None):
 def prepare(natural, requirement, api, rng):
     """Sample the block on the natural world; the step replays it and reads the result."""
     block = model(natural, requirement, api)
-    winning, draws = sample(block, rng)
+    for tries in range(1, TRIES + 1):
+        winning, draws = sample(block, rng)
+        if not block.bounded or true(block, draws):
+            break
+    else:
+        raise NumericalLimit("Samples that hold on the delivery charges as they are are too rare to reach")
+    if block.bounded:
+        # The ranks sampled are the bounded block's; what is recorded is what the accepted leaves give.
+        best, _ = lowest(planned(block, draws), block.scope)
+        winning = min(best.values())
+        for pair, drawn in draws.items():
+            drawn.cheapest_available = best.get(pair)
     concept_id = block.requirement["concept_id"]
 
     def record(world):
         if recorded(world, concept_id, set(block.places)) != planned(block, draws):
             raise streams.PlanMismatch("The producer recorded other stock or price leaves than planned")
-        return {"method": "exact_conditional_stock_and_price_block", "requirement": block.requirement,
+        return {"method": "exact_conditional_stock_and_price_block" + (
+                    "_between_charge_bounds_then_rejection" if block.bounded else ""), "requirement": block.requirement,
                 "natural_world_id": natural["world_id"],
+                **({"probability_is_estimated": True, "probability_standard_error": block.error,
+                    "proposals": PROPOSALS, "proposals_accepted": block.accepted,
+                    "block_samples_for_this_sample": tries} if block.bounded else {}),
                 # None when the probability is below the float range; the logarithm always holds.
                 "probability_given_upstream": block.probability or None,
                 "log_probability_given_upstream": block.log_probability,
@@ -803,12 +955,19 @@ def prepare(natural, requirement, api, rng):
                                       "stock condition at every location and every SKU's stock and supplier "
                                       "draws are sampled from their distribution given the requirement and all "
                                       "upstream draws, under the models in prices.atoms and cheapest.chain. "
-                                      "None of the seed's own draws of these is kept. Upstream draws are not "
+                                      "None of the seed's own draws of these is kept. " + (
+                                          "A delivery charge here depends on which location ships: the block was "
+                                          "modelled with the winner charged its least and the others their most, "
+                                          "samples were drawn until one held on the charges as they are, and the "
+                                          "probability is the modelled one times an estimated share. "
+                                          if block.bounded else "") + "Upstream draws are not "
                                       "reweighted; use the probability given upstream as the importance "
                                       "weight across seeds."}
 
     return Step(script=scripts(block, draws), probability=block.probability, log_probability=block.log_probability,
-                writes={(kind, *pair) for pair in block.places for kind in ("stock", "price")}, reads=set(),
+                error=block.error, estimated=block.bounded,
+                writes={(kind, *pair) for pair in block.places for kind in ("stock", "price")},
+                reads=set(block.scope.reads),
                 record=record, check=lambda world: check(world, requirement, api, block.scope))
 
 
@@ -841,7 +1000,15 @@ def lowest(found, limits=None):
             if available:
                 return None, None
             continue
-        rank = row["price_minor"] if limits is None else limits.key(row["sku_id"], row["price_minor"])
+        if limits is None:
+            rank = row["price_minor"]
+        elif limits.delivered is None:
+            rank = limits.key(row["sku_id"], row["price_minor"])
+        else:
+            # The charge as the oracle makes it: from the locations that ship and hold the offer, else the warehouse.
+            charged = limits.delivered[row["retailer_id"]]
+            holding = [name for name, quantity in row["stock_by_source"].items() if quantity and name in sources]
+            rank = limits.key(row["sku_id"], row["price_minor"] + charged.at(row["price_minor"], holding or [charged.warehouse]))
         compared[(row["retailer_id"], row["sku_id"])] = rank
         if available:
             pair = (row["retailer_id"], row["product_id"])
@@ -937,7 +1104,8 @@ def trial(natural, requirement, api):
     requirement = block.requirement
     reading, keys = reader(natural, block.places, api)
     return SimpleNamespace(
-        keys=keys, writes={(kind, *pair) for pair in block.places for kind in ("stock", "price")}, reads=set(),
+        keys=keys, writes={(kind, *pair) for pair in block.places for kind in ("stock", "price")},
+                reads=set(block.scope.reads),
         reading=reading,
         winning=lambda seed: judged(reading(seed), requirement, block.scope),
         holds=lambda seed: judged(reading(seed), requirement, block.scope) is not None,

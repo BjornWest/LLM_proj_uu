@@ -43,7 +43,11 @@ RESOLVED = {"cheapest_matching_with_memory": ".memory_offer_task",
             "cheapest_matching_after_clarification": ".hidden_offer_task"}
 # Every field of a task that this module reads or knowingly leaves alone, by kind. A task with any other field
 # is refused: a native field that changes the answer (a price cap, say) must not be dropped in translation.
+DELIVERY = "matching_single_item_delivery"
 FIELDS = {**{kind: {"kind", "concept_id", *fields} for kind, fields in WINNERS.items()},
+          # One unit delivered home at the lowest total; a cap, a deadline, other delivery methods or a comparison
+          # site are not carried. The recipe's delivery settings come beside the task, not in it.
+          DELIVERY: {"kind", "concept_id", "predicates", "objective", "destination", "delivery_types", "delivery_options"},
           "cheapest_matching_with_memory": {"kind", "concept_id", "recipient", "predicates", "memory_records",
                                             "availability", *SITE},
           "cheapest_matching_after_clarification": {"kind", "concept_id", "predicates", "hidden_requirement",
@@ -70,12 +74,14 @@ def ranked(world, needs, api, module=cheapest, shared=None):
             block = module.model(world, need, api, shared) if shared else module.model(world, need, api)
         except prices.ZeroMass:
             continue
-        found.append((getattr(block, "log_probability", None) or log(block.probability), need))
+        found.append((getattr(block, "log_probability", None) or log(block.probability), need,
+                      {"probability_is_estimated": True, "probability_standard_error": block.error}
+                      if getattr(block, "estimated", False) else {}))
     return sorted(found, key=lambda row: (-row[0], json.dumps(row[1], sort_keys=True)))
 
 
 def entry(name, summary, row):
-    return {"name": name, "summary": summary, "log_probability": row[0], "requirement": row[1]}
+    return {"name": name, "summary": summary, "log_probability": row[0], "requirement": row[1], **(row[2] if len(row) > 2 else {})}
 
 
 def winners(world, task, api, extra=None):
@@ -95,9 +101,11 @@ def winners(world, task, api, extra=None):
         return []
     found = [entry("likeliest_winner", "the retailer and product most likely to be the only best available offer", alone[0])]
     top = alone[0][1]
-    behind = ranked(world, ({**top, "listed_below": [{"retailer_id": rid, "sku_id": o["sku_id"]}]} for rid, o in offers
-                            if (rid, o["product_id"]) != (top["retailer_ids"][0], top["product_id"])), api,
-                    shared=shared)
+    # A ranking by delivered totals with a charge that depends on the location takes no offers listed below the winner.
+    bounded = scope.delivered is not None and not all(charge.uniform for charge in scope.delivered.values())
+    behind = [] if bounded else ranked(
+        world, ({**top, "listed_below": [{"retailer_id": rid, "sku_id": o["sku_id"]}]} for rid, o in offers
+                if (rid, o["product_id"]) != (top["retailer_ids"][0], top["product_id"])), api, shared=shared)
     if behind:
         found.append(entry("better_offer_unavailable", "the same winner, with the likeliest single offer of another "
                            "retailer or product that would rank ahead of it listed and unavailable", behind[0]))
@@ -163,7 +171,7 @@ def comparison_stock(world, task, api):
     advertised = ranked(world, ({"schema": listed.VERSION, "product_id": product, "retailer_ids": [rid], **site}
                                 for rid in sellers), api, listed)
     found = []
-    for log_chance, need in advertised[:1]:
+    for log_chance, need, _ in advertised[:1]:
         retailer = next(r for r in world["retailers"] if r["retailer_id"] == need["retailer_ids"][0])
         nothing = {source["source_id"]: {"max": 0} for source in retailer["source_locations"]}
         for name, summary, stated in (
@@ -298,6 +306,13 @@ def of(world, task, api):
         # The remembered or hidden requirement joins the stated predicates; the answer is that feature task's.
         return winners(world, {**selection, "kind": "cheapest_matching_available",
                                **{key: task[key] for key in ("surrounding",) if key in task}}, api)
+    if kind == DELIVERY:
+        if (task.get("objective", "cheapest_total") != "cheapest_total" or task.get("destination", "user_home") != "user_home" or
+                task.get("delivery_types", ["home"]) != ["home"]):
+            raise ValueError("Steering reads this task for the cheapest total delivered to the customer's home only")
+        return winners(world, {"kind": "cheapest_matching_available", "concept_id": task["concept_id"],
+                               "predicates": task.get("predicates")}, api,
+                       extra={"delivered": {key: task[key] for key in ("delivery_options",) if key in task}})
     if kind in WINNERS:
         return winners(world, task, api)
     if kind not in OTHERS:

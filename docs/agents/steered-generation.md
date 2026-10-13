@@ -964,9 +964,147 @@ sampling defaults and the delivery plan are not the files' is refused.
 
 Limits. Fees are the contract's own standard numbers: what a shopper is
 quoted adds the tier's difference, distance and the free-shipping threshold
-(`basket_quote`), and which options a site shows is decided after the world
-is finished (see "What is not done"). A branch's dispatch days and whether a
-carrier takes bulky parcels are the seed's.
+(`basket_quote`). A branch's dispatch days and whether a carrier takes bulky
+parcels are the seed's.
+
+### What the retailer shows of its delivery options
+
+A site built with delivery options on does not show every route a retailer's
+contracts allow: the commerce oracle admits a menu per retailer
+(`delivery_admission`). Under its plan version 1 the menu is drawn on the
+finished world's id, so it is redrawn by any steering and cannot be stated
+in advance. Plan version 2 (opt-in: a recipe's `delivery_options` with
+`"admission_plan": "retailer-delivery-admission-plan-v2"`) draws on the
+seed, the retailer and that retailer's routes, so in a given world a
+retailer's menu is a fixed function of its contracts. `menus.py` reads it,
+with the oracle's own lines on a view of the world in which the retailer's
+contracts are replaced: the admitted carrier routes to the customer's
+address, each with the oracle's tariff for an ordinary parcel before any
+free-shipping waiver.
+
+The policy requirement takes a `shown` clause, for version 2 only:
+
+```json
+{"schema": "steered-retailer-shipping-v1", "retailer_id": "footwear-04",
+ "shown": {"cheapest_carrier": "carrier-03",
+           "carriers": {"exclude": ["carrier-01"]},
+           "destination_type": "home"}}
+```
+
+`carriers` are those that must and must not be among the shown routes;
+`cheapest_carrier` has a shown route strictly cheaper than every other
+carrier's; `destination_type` is `home` (the default) or `any`, which adds
+collection points (pickup at the retailer's own branches is no carrier's);
+`delivery_options` are the recipe's settings where they are not the
+defaults, since the number of shown routes is drawn from its count weights.
+
+A menu has no closed form, so this part is sampled by drawing: contracts
+come from their exact distribution given what the requirement states of them
+and the carriers the menu needs (a shown carrier is a contracted one), until
+the menu they give is as required. The sample is from the block's
+distribution given the whole requirement. The probability is the exact one
+of the contract statements times the share of 400 such draws that qualify:
+an estimate, recorded as one (`probability_is_estimated`, with its standard
+error and the counts) in the block's record and in every record and runner
+case built from it (the seller requirement's sum, a combination's product),
+the same for the same world and requirement. A requirement none of the 400
+draws meets is reported as not found (`not_found_in_bounded_search` in the
+runner), which is not a proof that it cannot occur; the seller requirement
+leaves such a retailer out and names it.
+
+A site has one admission plan for all its retailers, and generation rejects
+a world where the recipe's counts have no support for one of them (routes,
+but fewer than the smallest count). A shown clause therefore has probability
+zero where another retailer is stranded so, and with counts that start above
+one route it reads every other retailer's contracts, so that none can be
+redrawn beside it. On the pilot world a draw takes eight milliseconds, and "carrier X is
+the cheapest shown for home delivery" has probability 0.12 to 0.14 at a
+medium retailer.
+
+A steered world is checked through the plans a site is built from
+(`basket_quote.make_plan`, `delivery_admission.make_plan` with the recipe's
+weights and version 2), which must give the menu read from the contracts. The
+tests also ask the admitted oracle for quotes of the retailer's real offers:
+wherever nothing is waived, the carriers of the home options and the
+cheapest among them are the clause's.
+
+### Who is cheapest delivered
+
+The fourth requirement (who has the cheapest available offer) takes
+`"delivered": {}`: offers are compared on what one unit costs delivered home,
+as the native single-item delivery task compares them
+(`quote_offer_task`, cheapest total, home delivery, no coupon).
+
+```json
+{"schema": "steered-cheapest-available-v1", "concept_id": "footwear.walking_shoes",
+ "predicates": [{"field": "sku.size_eu", "operator": "eq", "value": 42}],
+ "delivered": {}, "retailer_ids": ["footwear-01"],
+ "product_id": "footwear-brand-12/footwear.walking_shoes/10"}
+```
+
+A retailer's delivery charge is a function of the price: the lowest tariff
+among the home routes it shows, with the ordinary, distance and geographic
+parts waived where it offers free shipping from a subtotal the price
+reaches and the parcel does not cross a border. `menus.delivery` reads it
+off the retailer's contracts and threshold as the world has them, under
+admission plan version 2. The block is the fourth block's own (the
+concept's stock and prices), with each pair ranked by price plus its
+retailer's charge; an offer competes when a location that ships holds it or
+it can be ordered from the supplier, and the pairs of a retailer that shows
+no home route do not compete. So the order of offers is not the order of
+their listed prices: on the pilot world the pair most likely to be cheapest
+delivered wins with probability 0.54, and one retailer's charge is 339
+kronor because it ships across a border.
+
+The block declares that it reads the contracts and the threshold of every
+retailer that lists a competing offer; a requirement that redraws either
+cannot be combined with it, and the twelfth requirement refuses a ranking by
+delivered totals together with a statement about the winner's contracts or
+threshold. Refused as not modelled: a retailer where whether an offer can be
+delivered depends on which of its locations holds it (a location that ships
+without a route, a warehouse that does not ship; none on the worlds here);
+rankings other than the total; physical stock only; a comparison site.
+
+A retailer with locations in several cities charges more for distance from
+a far one (25 kronor on the worlds here), so an offer's total depends on
+where its stock is; five of the medium world's 21 retailers are so. The
+fourth block's product over pairs has no place for that. For one designated
+pair the block is then modelled between bounds: that pair charged the least
+it can be and every other pair the most. If the pair is cheapest on the
+charges as they are, it is cheapest between the bounds too, so samples of
+the bounded block that also hold on the charges as they are (read from where
+each offer's stock is) are samples given the requirement; `prepare` draws
+until one does. The probability is the bounded block's own times the share
+of 200 such samples that hold: an estimate, labelled as one, in the block's
+record, in the seller requirement's (whose alternatives then have estimated
+weights) and in the runner. The record's winning total and each pair's best
+total are those of the accepted leaves, and the runner compares no
+distribution of winning totals there. Several designated retailers, or
+offers listed below the winner, are refused there.
+
+On the medium world, for size-42 walking shoes: by listed price six
+retailers are about equally likely to have the cheapest (0.13 each);
+delivered, one with free delivery at these prices has it with probability
+0.64, two others with 0.15 and 0.14, and one that ships across a border for
+224 to 249 kronor practically never. Steered to the first, the lowest listed
+price among available offers is at another retailer in seven of eight
+samples (`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
+
+The candidates tool reads a `matching_single_item_delivery` task (cheapest
+total, home delivery; a cap, a deadline, other methods or a comparison site
+are refused) into the candidates of the other winner tasks, with the
+recipe's `delivery_options` beside the task where they are not the
+defaults. Where a charge depends on the location the candidate with an
+offer listed below the winner is left out (two candidates, not three), each
+candidate is marked as an estimate, and modelling every pair of a medium
+world takes 200 samples of the block apiece (19 seconds there), so it is
+slow.
+
+The check is the native task's reference on the steered world (through
+`prepared_quote` with the plans a site is built from). The tests also read
+the admitted oracle's quotes for every competing offer: who can be
+delivered and each total are the block's, on the natural world, with a
+threshold lowered until it waives, and on steered worlds.
 
 ## The twelfth requirement: who is cheapest, with that retailer's policy
 
@@ -998,6 +1136,25 @@ requirement. The check finds the winner in the saved leaves, then asks the
 native oracle and the recorded contracts. As a part of several requirements
 it declares everything it could decide: the ranking's stock and prices and
 the policy of every retailer in it.
+
+The policy may be about shown options, and the requirement may add
+`"free_shipping": false`: the winner offers no free-shipping threshold, so
+no order there has its delivery waived. That is a third block of the
+alternative (the seventh requirement's, with no threshold). The menu's
+figures are for the nearest location that ships; an offer held only farther
+away pays the distance on top, for every carrier alike. Together with
+the thirteenth requirement this is "the shop with the best offer delivers
+cheapest with a carrier that is badly rated":
+
+```json
+{"schema": "steered-requirements-v1", "all": [
+  {"schema": "steered-cheapest-seller-policy-v1",
+   "cheapest": {"concept_id": "footwear.walking_shoes"},
+   "policy": {"shown": {"cheapest_carrier": "carrier-06"}},
+   "free_shipping": false},
+  {"schema": "steered-carrier-stars-v1", "carrier_id": "carrier-06",
+   "average_stars": {"max": 3.6}}]}
+```
 
 ## The thirteenth requirement: a carrier's stars and how well it serves
 
@@ -1051,8 +1208,9 @@ a retailer that ships with this carrier only, and this carrier is rated at
 most 3.9" is two independent blocks. It does not combine with the ninth or
 the tenth requirement on the same carrier, whose reviews it redraws.
 
-Limits. The history streams are not redrawn for the stars: given the levels,
-what happened to each shipment is the seed's. The levels are private
+Limits. The history streams are not redrawn for the stars: the sample and its
+probability are given those streams, and what happened to each shipment is
+what they give under the sampled levels. The levels are private
 parameters; a task sees them through the metrics and the reviews.
 
 ### The three together on the medium world
@@ -1066,10 +1224,10 @@ world of "A medium world" (21 retailers, 90 products), four seconds a sample:
   delivery whose warehouse takes two days to dispatch": probability 0.060;
   under 1,500 other seeds of the same streams it held in 7.0%. In the seed's
   own world two retailers have such a policy and one of them never has the
-  cheapest shoe. Over 200 samples seven retailers win, each about as often
-  as its chance of winning times its chance of such a policy says (0.10 to
-  0.21), and the winner's contracts and dispatch days are redrawn; the other
-  twenty retailers' are the seed's.
+  cheapest shoe. Over 200 samples nine retailers win: seven of them each
+  about as often as its chance of winning times its chance of such a policy
+  says (0.10 to 0.21), two once each. The winner's contracts and dispatch
+  days are redrawn; the other twenty retailers' are the seed's.
 - "... at a retailer that ships with one named carrier only, and that
   carrier's punctuality comments are more negative than positive": 0.0093
   times 0.17, as two independent blocks. Only a small retailer can have one
@@ -1080,6 +1238,17 @@ world of "A medium world" (21 retailers, 90 products), four seconds a sample:
   the carrier has one weak aspect in 5, two in 12 and three in 3, and its
   delivery metrics follow (attempts on the promised day 84% to 66% where
   punctuality turns weak).
+
+- With shown options (`case-shown`; admission plan version 2): "the retailer
+  with the cheapest available walking shoe shows the carrier the seed rates
+  highest as its cheapest home-delivery option, offers no free shipping, and
+  that carrier is rated at most 3.6". In the seed's own world no retailer
+  shows that carrier cheapest. Probability about 0.046 (an estimate; a
+  minute to model, once) times 0.012; 5.4 seconds a sample. In 16 samples
+  six retailers win; in the four worlds whose quotes were read, the admitted
+  oracle quotes that carrier as the cheapest home option for every one of
+  the winner's offers (36 to 60 each), and the carrier's average is 3.44 to
+  3.59.
 
 ## Requirement candidates for a native task
 
@@ -1989,16 +2158,16 @@ carries review and description text that the checks also digest.
   services are the seed's. Which reviews a review
   site shows, and which products a comparison site lists, are the seed's.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
-  against a basket's subtotal, and so can its contracts: which carriers and
-  tiers it has and their standard fees. The delivered total of an order (the
-  single-item delivery and order-set tasks) is not modelled: it adds tier
-  differences, distance and the threshold to those fees, over every retailer
-  that lists the product. One obstacle is outside this code: with
-  delivery options enabled, which routes a retailer admits is decided by a
-  hash that includes the finished world's identity
-  (`delivery_admission.py`), so any steered change reshuffles the admitted
-  routes afterwards; an exact conditional sample of a delivered total needs
-  that keyed on something upstream of stock, prices and fees.
+  against a basket's subtotal, and so can its contracts and, under admission
+  plan version 2, the delivery options it shows and which carrier's is
+  cheapest, and who is cheapest delivered for one unit sent home with the
+  contracts as the seed drew them. Not modelled: who is cheapest delivered
+  together with redrawn contracts or thresholds (the two are one block
+  then); delivery to a collection point, by a deadline or fastest first;
+  the order-set task, whose optimum is over baskets. Under plan version 1,
+  which existing recipes use, a retailer's shown routes are redrawn by any
+  steered change (`delivery_admission.py` draws on the finished world's
+  id), so nothing about them can be stated there.
 - **No publication.** Steered worlds are native worlds only:
   `browser_runtime_ready` is false. `unified_generation.generate` accepts a
   `world_factory`, which is where a steered world would enter so that

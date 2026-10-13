@@ -7,8 +7,7 @@ both: "a carrier rated at most 3.7", "a carrier that is weak on punctuality".
 
 The producer draws a carrier's four levels first, each on its own stream.
 Each shipment's history then follows on the shipment's stream, where a level
-is the chance that the aspect goes well: the same stream under a worse level
-gives a history that is the same or worse. Last, on one more stream per
+is the chance that the aspect goes well. Last, on one more stream per
 shipment, comes the review: whether it has a comment and which observations
 that mentions, and the stars, which are likelier high the more of the
 history went well and are held to the comment's tone (no fewer than three
@@ -16,8 +15,10 @@ with praise only, no more than three with complaints only, no more than four
 with both).
 
 The block is the four level streams and every review stream of the carrier.
-The history streams are the seed's own, so for each choice of levels the
-histories are known, and with them every review's distribution of stars; the
+The history streams are the seed's own and the block is sampled given them:
+for each choice of levels the histories are known (not simply the same or
+worse under a worse level, since what a stream's later draws decide shifts
+with the earlier outcomes), and with them every review's distribution of stars; the
 reviews draw independently, so the total is a sum of independent numbers.
 The requirement's probability is a sum over the level choices it allows of
 the chance of the levels times the chance that the average is as required.
@@ -318,9 +319,10 @@ def prepare(natural, requirement, api, rng):
                                       "proportion to their chance times the chance of the required average under "
                                       "them, then the total of stars exactly, then each review by redrawing its "
                                       "stream until it gives its stars. The shipments' history streams are the "
-                                      "seed's own, read under the sampled levels, and so is every other draw; the "
-                                      "requirement depends on no other draw. Use the probability as the importance "
-                                      "weight across seeds."}
+                                      "seed's own, read under the sampled levels: the sample and its probability "
+                                      "are given those streams, which the requirement depends on. Every other draw "
+                                      "is the seed's own too, and the requirement depends on none of them. Use the "
+                                      "probability as the importance weight across seeds."}
 
     return Step(script={key: streams.Reseeded(seed) for key, seed in seeds.items()}, probability=block.probability,
                 log_probability=block.log_probability, **vars(footprint(natural, requirement, api)), record=record,
