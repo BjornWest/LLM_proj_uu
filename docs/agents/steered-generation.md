@@ -2100,6 +2100,44 @@ against 572 expected (1.8 standard errors) and the second never against 1.4
 expected. Redraws through the producer equalled the reading's in all six
 passes.
 
+The first page for the other concepts, and the two shoe topics
+(`steering/general-r19/`, steering commit `6d9205f`, four runner commands
+with `--task` on the same input: 100 reviews a product). Every case lists
+eight candidates, all sampled, all within four standard errors of their
+redraws, and every producer redraw equal to the reading's.
+
+| Product and topic | First page praises, the whole complains | First page complains, the whole praises | Redraws | A sample |
+| --- | --- | --- | --- | --- |
+| Trainer Vallheden Vara, everyday comfort | 0.026 (17 of 600) | 0.063 (46 of 600) | 600 | 3.2 to 3.8 s |
+| Tablet, reading | 0.029 (5 of 150) | 0.043 (7 of 150) | 150 | 9 to 12 s |
+| Walking shoe Vallheden Strand, size fit | 0.078 (154 of 2,000) | 0.0065 (11 of 2,000) | 2,000 | 2.6 to 2.8 s |
+| The same shoe, room at the forefoot | 0.31 (643 of 2,000) | 8.3e-4 (0 of 2,000) | 2,000 | 2.6 to 2.8 s |
+
+Side by side (`side-by-side-*.json` there; the natural world's reviews of a
+product are taken from a sample that steered another product). The trainer
+has 100 ratings averaging 4.41 and 26 written comments, three for its
+comfort and five against, and the first four comments by rating hold one
+complaint. Steered to "the first page complains, the whole praises" it has a
+mean of 4.15, 23 comments, four for and three against, and one complaint
+among the first four; steered the other way, 4.29, 27 comments, two for and
+four against, and one comment of praise on the page. The shoe's size fits
+for about one reviewer in five (its brand's sizes run large), so 0.90 of its
+worlds have more complaints than praise about the fit; the natural world is
+one of the others (four to two). For the room at the forefoot the natural
+world has four for and three against with one comment of praise on the
+page; the steered one three for and seven against with two on the page.
+Nothing but the product's reviews and rating summary differs in any of them.
+
+Every supported concept (`all-concepts.out`, from the shared tree on the
+saved 126-concept world, so not reproducible from a commit): the four kinds
+a first page needs were read for one topic of each of 119 concepts and
+compared with 300 whole reviews by the producer's rule; 95 concepts take
+under 2 s, 20 between 2 and 30 s, three monitors 26 to 45 s and strap
+harnesses 182 s; padded harnesses are refused by the step cap, as their
+plain topics were already too slow; four concepts declare no topic. The
+five largest deviations (up to 4.9 standard errors on cells of five expected
+reviews) were rechecked with 6,000 reviews: 2.6 at most.
+
 All of these are dev-producer worlds from the suite's inputs, not the
 suite's frozen worlds, and nothing here is published or bound to a task
 instance.
