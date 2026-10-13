@@ -169,9 +169,32 @@ def shown(place, contracts, detail=False):
     return priced(place, view, retailer, policy, set(row["admitted_route_keys"]), detail)
 
 
-def delivery(place):
+def ceiling(place):
+    """An amount no home route of the retailer costs more than, whatever its contracts.
+
+    The dearest tariff over every carrier, tier and location that ships, with
+    the highest fees the producer draws for a contract.
+    """
+    policy = place.world["shipping_policy"]
+    highest = lambda table: max(int(value) for value in policy[table])
+    contracts = [{"carrier_id": row["carrier_id"], "tiers": sorted(policy["service_relations"], key=lambda tier: tier != "standard"),
+                  "collection_fee_minor": highest("retailer_carrier_standard_collection_base_fee_minor_probabilities"),
+                  "home_delta_minor": highest("home_delivery_relative_to_collection_minor_probabilities")}
+                 for row in place.world["address_context"]["carriers"]]
+    retailer = {**place.retailer, "contracts": contracts, "offers": []}
+    view = {**place.world, "products": [], "retailers": [retailer]}
+    terms = {"retailer_id": place.retailer_id,
+             "carrier_terms": [{"carrier_id": row["carrier_id"], **TERMS} for row in contracts]}
+    every = {place.admission.route_key(choice)
+             for choice in place.admission._potential(place.backend, view, retailer, terms, place.destination)}
+    home = SimpleNamespace(**{**vars(place), "scope": "home"})
+    return max((found["raw_shipping_minor"] for row in priced(home, view, retailer, terms, every, detail=True)
+                for found in row["candidates"]), default=0)
+
+
+def delivery(place, contracts=None):
     """What home delivery of one unit adds to a price at the retailer, as the oracle charges it; None where it shows no
-    home route.
+    home route. For the retailer's own contracts, or for others in their place.
 
     Per shown home route the oracle ships from the location, among those that
     hold the offer and ship, with the lowest tariff, and the offer's charge is
@@ -186,7 +209,7 @@ def delivery(place):
     location holds it (a location that ships without a route, a warehouse
     that does not ship).
     """
-    rows = shown(place, place.retailer["contracts"], detail=True)
+    rows = shown(place, place.retailer["contracts"] if contracts is None else contracts, detail=True)
     if not rows:
         return None
     sources = place.retailer["source_locations"]
