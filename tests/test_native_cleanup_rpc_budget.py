@@ -126,7 +126,7 @@ def test_pooled_resources_get_fresh_budgets_preserve_wrapper_and_attempt_connect
     from intent_browser.shared_browsergym import SharedBrowserEnv,PoolEpisode,SharedChat,_BrowserLease
     import time
     events=[];released=[];originals=[]
-    episode=PoolEpisode.__new__(PoolEpisode);episode.closed=False;episode.leases=[]
+    episode=PoolEpisode.__new__(PoolEpisode);episode.closed=False;episode.leases=[];episode.owner='owner'
     episode.client=SimpleNamespace(request=lambda op,payload:released.append(payload['lease_id']))
     def resource(role,kind,conn):
         def close():
