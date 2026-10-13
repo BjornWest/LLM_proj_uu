@@ -118,6 +118,39 @@ class ReadingTests(Delivered):
                     seen += charge(price) < before(price)
                     self.assertEqual(total, price + charge(price))
         self.assertGreater(seen, 10)
+        # At the threshold itself the charge is waived, as the oracle waives it.
+        at = 0
+        for retailer in self.natural["retailers"]:
+            offers = [o for o in retailer["offers"] if o["sku_id"] in self.frame.scope.skus]
+            if retailer["retailer_id"] not in self.frame.scope.delivered or not offers:
+                continue
+            world = deepcopy(self.natural)
+            patched = next(r for r in world["retailers"] if r["retailer_id"] == retailer["retailer_id"])
+            patched["free_shipping_threshold_minor"] = offers[0]["price_minor"]
+            charge = cheapest.frame(world, self.base, self.api).scope.delivered[retailer["retailer_id"]]
+            quoted = totals(world, {offers[0]["sku_id"]})
+            if (retailer["retailer_id"], offers[0]["sku_id"]) in quoted:
+                at += 1
+                self.assertEqual(quoted[(retailer["retailer_id"], offers[0]["sku_id"])][0],
+                                 offers[0]["price_minor"] + charge(offers[0]["price_minor"]))
+                self.assertLessEqual(charge(offers[0]["price_minor"]), charge(offers[0]["price_minor"] - 1))
+        self.assertGreater(at, 3)
+
+    def test_a_retailer_that_delivers_nowhere_does_not_compete(self):
+        listing = sorted({pair[0] for pair in self.frame.places})
+        world = deepcopy(self.natural)
+        patched = next(r for r in world["retailers"] if r["retailer_id"] == listing[0])
+        patched["geography"]["fulfilment_policy"]["delivery_countries"] = []
+        frame = cheapest.frame(world, self.base, self.api)
+        self.assertNotIn(listing[0], frame.scope.delivered)
+        self.assertEqual({pair[0] for pair in frame.places}, set(listing[1:]))
+        quoted = totals(world, frame.scope.skus)
+        self.assertFalse(any(rid == listing[0] for rid, _ in quoted))
+        best, compared = cheapest.lowest(cheapest.recorded(world, SHOES, set(frame.places)), frame.scope)
+        self.assertEqual({key: total for key, (total, _, _) in quoted.items()}, {key: compared[key] for key in quoted})
+        self.assertFalse(any(rid == listing[0] for rid, _ in compared))
+        with self.assertRaises(prices.ZeroMass):
+            cheapest.model(world, self.need(next(pair for pair in sorted(self.frame.places) if pair[0] == listing[0])), self.api)
 
     def test_refusals(self):
         pair = max(self.chances, key=self.chances.get)

@@ -1018,6 +1018,48 @@ tests also ask the admitted oracle for quotes of the retailer's real offers:
 wherever nothing is waived, the carriers of the home options and the
 cheapest among them are the clause's.
 
+### Who is cheapest delivered
+
+The fourth requirement (who has the cheapest available offer) takes
+`"delivered": {}`: offers are compared on what one unit costs delivered home,
+as the native single-item delivery task compares them
+(`quote_offer_task`, cheapest total, home delivery, no coupon).
+
+```json
+{"schema": "steered-cheapest-available-v1", "concept_id": "footwear.walking_shoes",
+ "predicates": [{"field": "sku.size_eu", "operator": "eq", "value": 42}],
+ "delivered": {}, "retailer_ids": ["footwear-01"],
+ "product_id": "footwear-brand-12/footwear.walking_shoes/10"}
+```
+
+A retailer's delivery charge is a function of the price: the lowest tariff
+among the home routes it shows, with the ordinary, distance and geographic
+parts waived where it offers free shipping from a subtotal the price
+reaches and the parcel does not cross a border. `menus.delivery` reads it
+off the retailer's contracts and threshold as the world has them, under
+admission plan version 2. The block is the fourth block's own (the
+concept's stock and prices), with each pair ranked by price plus its
+retailer's charge; an offer competes when a location that ships holds it or
+it can be ordered from the supplier, and the pairs of a retailer that shows
+no home route do not compete. So the order of offers is not the order of
+their listed prices: on the pilot world the pair most likely to be cheapest
+delivered wins with probability 0.54, and one retailer's charge is 339
+kronor because it ships across a border.
+
+The block declares that it reads the contracts and the threshold of every
+retailer that lists a competing offer; a requirement that redraws either
+cannot be combined with it, and the twelfth requirement refuses a ranking by
+delivered totals together with a statement about the winner's contracts or
+threshold. Refused as not modelled: a retailer where what delivery costs, or
+whether it is possible, depends on which of its locations holds the stock;
+rankings other than the total; physical stock only; a comparison site.
+
+The check is the native task's reference on the steered world (through
+`prepared_quote` with the plans a site is built from). The tests also read
+the admitted oracle's quotes for every competing offer: who can be
+delivered and each total are the block's, on the natural world, with a
+threshold lowered until it waives, and on steered worlds.
+
 ## The twelfth requirement: who is cheapest, with that retailer's policy
 
 Requirement (`steered-cheapest-seller-policy-v1`): a ranking in the fourth
@@ -2070,12 +2112,14 @@ carries review and description text that the checks also digest.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
   against a basket's subtotal, and so can its contracts and, under admission
   plan version 2, the delivery options it shows and which carrier's is
-  cheapest. The delivered total of an order compared across retailers (the
-  single-item delivery and order-set tasks: the lowest price plus delivery
-  over every retailer that lists the product) is not modelled. Under plan
-  version 1, which existing recipes use, a retailer's shown routes are
-  redrawn by any steered change (`delivery_admission.py` draws on the
-  finished world's id), so nothing about them can be stated there.
+  cheapest, and who is cheapest delivered for one unit sent home with the
+  contracts as the seed drew them. Not modelled: who is cheapest delivered
+  together with redrawn contracts or thresholds (the two are one block
+  then); delivery to a collection point, by a deadline or fastest first;
+  the order-set task, whose optimum is over baskets. Under plan version 1,
+  which existing recipes use, a retailer's shown routes are redrawn by any
+  steered change (`delivery_admission.py` draws on the finished world's
+  id), so nothing about them can be stated there.
 - **No publication.** Steered worlds are native worlds only:
   `browser_runtime_ready` is false. `unified_generation.generate` accepts a
   `world_factory`, which is where a steered world would enter so that
