@@ -1,7 +1,6 @@
 """Typed answer claims -> factual checks -> bounded optional reward. No inference."""
 from copy import deepcopy
 from decimal import Decimal
-import re
 
 VERSION = 'shopping-factual-reward-v1'
 INSTRUCTION = '''
@@ -36,7 +35,7 @@ def schema_for_details(contract, money_schema):
 
 
 def validate_details(rows, final_answer):
-    from .extraction import _quote, money_minor, _decimal
+    from .extraction import _quote, money_minor
     for row in rows:
         quote = row['evidence']; _quote(quote, final_answer)
         if row['offer_url'] is not None and row['offer_url'] not in quote:
@@ -48,10 +47,8 @@ def validate_details(rows, final_answer):
         elif isinstance(value, str) and value not in quote:
             raise ValueError('Detail value absent from evidence')
         elif type(value) in (int, float):
-            # No normalization from a request, conversion or inferred interval.
-            tokens = re.findall(r'(?<![\w.+-])\d+(?:[.,]\d+)?(?!\w|[.,]\d)', quote)
-            if value < 0 or not any(_decimal(t) == Decimal(str(value)) for t in tokens):
-                raise ValueError('Detail number absent from evidence')
+            if value < 0 or not Decimal(str(value)).is_finite():
+                raise ValueError('Invalid extracted detail number')
 
 
 def expected_fact(episode, selected, prop):

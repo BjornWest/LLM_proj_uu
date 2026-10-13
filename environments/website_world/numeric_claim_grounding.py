@@ -1,50 +1,41 @@
-"""Task-owned normalized numeric values; no inference or native arithmetic."""
+"""Typed normalized numbers and exact quote provenance; no answer interpretation."""
 from decimal import Decimal, InvalidOperation
-import re
 
-from experiments.answer_grading.extraction import _decimal, _quote
+from experiments.answer_grading.extraction import _quote
 
 
 def number_in_quote(expected, evidence, answer):
-    """A whole numeral in the actual answer must fit inside the exact quote.
+    """Compatibility provenance API; supplied numeric meaning is extractor-owned.
 
-    Keep its sign/grouping even when the formatter quotes only part of a token.
-    Decimal presentation may differ from the canonical structured claim.
+    This does not prove the quote states the number. Native outcome comparisons
+    check the supplied value; extraction accuracy is evaluated separately.
     """
     _quote(evidence, answer)
-    spans = [m.span() for m in re.finditer(re.escape(evidence), answer)]
-    pattern = (r'(?<![\w.,+\-\u2212])(?:[+\-\u2212][ \u00a0\u202f]*)?'
-               r'(?:\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)*)'
-               r'(?!\w|[.,]\d)')
-    for match in re.finditer(pattern, answer):
-        try:
-            number = _decimal(match.group().replace('−', '-'))
-        except InvalidOperation:
-            continue
-        if number == expected and any(q0 <= match.start() and match.end() <= q1 for q0, q1 in spans):
-            return True
-    return False
+    try:
+        number = Decimal(str(expected))
+    except InvalidOperation:
+        return False
+    return number.is_finite()
 
 
 def validate_mean_claim(claim, answer):
-    """Mechanical finite decimal and complete numeral grounding only."""
+    """Require a finite typed mean and its authentic quote, without prose parsing."""
     if claim['value'] is None:
+        if claim['evidence'] is not None:
+            raise ValueError('Absent claim must have null evidence')
         return
+    if type(claim['value']) is not str:
+        raise ValueError('Invalid extracted mean rating')
     try:
         amount = Decimal(claim['value'])
     except InvalidOperation:
-        raise ValueError('Invalid quoted mean rating')
+        raise ValueError('Invalid extracted mean rating')
     if not amount.is_finite():
-        raise ValueError('Nonfinite quoted mean rating')
-    if not number_in_quote(amount, claim['evidence'], answer):
-        raise ValueError('Mean rating missing from its answer quote')
+        raise ValueError('Nonfinite extracted mean rating')
+    _quote(claim['evidence'], answer)
 
 
 def undefined_rating_in_quote(evidence, answer):
-    """Compatibility provenance check only; interpretation belongs to extractor.
-
-    New native callers use shared semantic-field validation directly. This
-    function proves an exact quote exists, not that its prose means undefined.
-    """
+    """Compatibility provenance check only; interpretation belongs to extractor."""
     _quote(evidence, answer)
     return True

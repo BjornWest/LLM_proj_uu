@@ -161,11 +161,10 @@ def test_absent_statistics_claim_requires_absent_evidence(field):
     ('statistic_sek','765.00','The mean is -765.00 SEK.'),
     ('currency','SEK','The SEKing service is useful.'),
 ])
-def test_correct_oracle_values_still_require_the_claimed_value_in_its_quote(field,value,quote):
+def test_statistics_trusts_extracted_values_with_authentic_quotes(field,value,quote):
     w,s,t,r,sites=fixture();text,c=answer(r)
     text+=' '+quote;c[field]={'value':value,'evidence':quote}
-    with pytest.raises(ValueError,match='missing from its answer quote|Integer claim missing'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    assert CatalogStatisticsGrader(w,t,r,sites,surrounding=s).validate_claims(c,text)[field] == c[field]
 
 
 @pytest.mark.parametrize('amount', ['765.00','765,00'])
@@ -178,19 +177,23 @@ def test_canonical_statistic_can_be_grounded_in_ordinary_decimal_presentation(am
 
 
 @pytest.mark.parametrize('quote', ['There are -2 models.','There are −2 models.','There are 2 000 models.'])
-def test_count_quote_preserves_sign_and_grouping(quote):
+def test_count_quote_is_provenance_not_a_second_numeric_interpretation(quote):
     w,s,t,r,sites=fixture();text,c=answer(r)
     text+=' '+quote;c['population_count']={'value':2,'evidence':quote}
-    with pytest.raises(ValueError,match='Population count missing|Integer claim missing'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['population_count']==c['population_count']
+    c['population_count']['value']=3
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('quote',['The mean is −765.00 SEK.','The mean is -765.00 SEK.'])
-def test_statistic_quote_preserves_signed_value(quote):
+def test_statistic_sign_interpretation_belongs_to_extractor(quote):
     w,s,t,r,sites=fixture();text,c=answer(r)
     text+=' '+quote;c['statistic_sek']={'value':'765.00','evidence':quote}
-    with pytest.raises(ValueError,match='Statistic missing'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['statistic_sek']==c['statistic_sek']
+    c['statistic_sek']['value']='766.00'
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('quote',['The mean is 765.00, 2 models.','Amounts: 1.00 765.00 SEK.'])
@@ -235,14 +238,16 @@ def test_extractor_owned_negated_or_json_false_undefined_does_not_ground_true(qu
 
 
 @pytest.mark.parametrize('actual,quoted', [('-2','2'),('−2','2'),('2 000','2')])
-def test_numeral_quote_cannot_cut_sign_or_grouping_from_actual_answer(actual,quoted):
+def test_quote_authenticity_does_not_reinterpret_sign_or_grouping(actual,quoted):
     w,s,t,r,sites=fixture();text,c=answer(r)
     text=f'summary; https://compare.test/; There are {actual} models; 765.00 SEK'
     for claim in c.values():
         if isinstance(claim,dict) and claim.get('value') is not None:claim['evidence']=text
     c['population_count']={'value':2,'evidence':quoted}
-    with pytest.raises(ValueError,match='Population count missing|Integer claim missing'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['population_count']==c['population_count']
+    c['population_count']['value']=3
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('actual',[
@@ -259,14 +264,16 @@ def test_extractor_owned_short_undefined_quote_cannot_drop_actual_negation(actua
     assert not g.grade(c,text)['structured_claims_correct']
 
 
-def test_currency_quote_cannot_cut_token_from_actual_answer_word():
+def test_currency_is_extracted_not_reclassified_from_quote_word_boundaries():
     w,s,t,r,sites=fixture();text,c=answer(r)
     text=text.replace('SEK','SEKing')
     for claim in c.values():
         if isinstance(claim,dict) and claim.get('value') is not None:claim['evidence']=text
     c['currency']={'value':'SEK','evidence':'SEK'}
-    with pytest.raises(ValueError,match='Currency missing'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['currency']==c['currency']
+    c['currency']['value']='EUR'
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('shown,canonical',[
@@ -282,12 +289,14 @@ def test_statistics_semantic_decimal_claim_preserves_canonical_value_and_quote(s
 
 
 @pytest.mark.parametrize('shown',['- 765.00','− 765,00'])
-def test_statistic_semantic_quote_retains_spaced_negative_sign(shown):
+def test_statistic_semantics_are_not_reparsed_from_spaced_signs(shown):
     w,s,t,r,sites=fixture();text,c=answer(r)
     text+=' The mean is '+shown+' SEK.'
     c['statistic_sek']={'value':'765.00','evidence':shown}
-    with pytest.raises(ValueError,match='Statistic missing'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['statistic_sek']==c['statistic_sek']
+    c['statistic_sek']['value']='766.00'
+    assert not g.grade(c,text)['structured_claims_correct']
 
 def rich_citation_fixture(operation='mean',grain='model',empty=False):
     from . import rich_ecosystem

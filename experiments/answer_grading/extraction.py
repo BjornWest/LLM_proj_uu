@@ -1,8 +1,7 @@
 """Untrusted prose -> grounded claims. No world, oracle, browser, or network access."""
 from copy import deepcopy
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 import json
-import re
 
 from jsonschema import Draft202012Validator
 
@@ -192,55 +191,32 @@ def _decimal(token):
 
 
 def money_minor(value):
-    """Currency conversion and arithmetic stay out of the language model."""
-    if not re.fullmatch(r'\d+(?:\.\d{1,2})?', value['amount']):
+    """Convert a typed extracted amount; never interpret its evidence prose."""
+    amount = value['amount']
+    if type(amount) is not str:
         raise ValueError('Amount must be a nonnegative decimal with at most two places')
-    amount = Decimal(value['amount'])
-    # Require the same amount next to the claimed currency in the cited text.
-    aliases = {'SEK': r'SEK', 'EUR': r'EUR|€', 'USD': r'USD|\$', 'GBP': r'GBP|£'}
-    currency = aliases[value['currency']]
-    number = r'(?<![\w.])\d[\d\s\u00a0\u202f,.]*\d|\d'
-    evidence = value['evidence'].replace('**', '')
-    patterns = [rf'({number})\s*(?:{currency})(?!\w)', rf'(?:{currency})\s*({number})']
-    matches = [m.group(1).strip() for pat in patterns for m in re.finditer(pat, evidence)]
-    supported = False
-    for token in matches:
-        try: supported |= _decimal(token) == amount
-        except InvalidOperation: pass
-    if not supported: raise ValueError('Monetary claim lacks matching amount/currency in its quote')
-    return int(amount * 100)
-
-
-def _integer_in_quote(value, evidence, answer):
-    """Match complete signed numerals, including outside a cropped quote."""
-    pattern = (r'(?<![\w.,+\-\u2212])(?:[+\-\u2212][ \u00a0\u202f]*)?'
-               r'(?:\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)*)'
-               r'(?!\w|[.,]\d)')
-    spans = [m.span() for m in re.finditer(re.escape(evidence), answer)]
-    for match in re.finditer(pattern, answer):
-        try:
-            number = _decimal(match.group().replace('\u2212', '-'))
-        except InvalidOperation:
-            continue
-        if number == value and any(start <= match.start() and match.end() <= end
-                                   for start, end in spans):
-            return True
-    return False
+    whole, dot, fraction = amount.partition('.')
+    if (not whole or any(c not in '0123456789' for c in whole)
+            or dot and (not fraction or len(fraction) > 2
+                        or any(c not in '0123456789' for c in fraction))):
+        raise ValueError('Amount must be a nonnegative decimal with at most two places')
+    if value['currency'] not in ('SEK', 'EUR', 'USD', 'GBP'):
+        raise ValueError('Unsupported extracted currency')
+    return int(whole) * 100 + int((fraction + '00')[:2])
 
 
 def validate_claims(value, answer, *, schema=None, semantic_fields=()):
     """Ground declared top-level claims, including task-specific field names.
 
-    Ordinary literal strings and nonnegative counts need matching quoted values.
+    Literal identifiers keep exact string binding; counts retain typed nonnegative validation.
     The extractor interprets categorical/Boolean meaning and ambiguity. Booleans
     already have quote-only binding; declaring them records semantic ownership.
-    For other semantic_fields, shared literal/numeral value binding is skipped.
+    For other semantic_fields, shared literal string binding is skipped.
     Schema/type/null and exact quote checks always remain mandatory.
-    Adapters must mechanically ground normalized decimals and other literal or
-    numeric fields that bypass shared binding, plus task-specific values.
-    Native graders compare supplied meanings against references. Normalized
-    status retains its legacy contract. Existing shared monetary checks and
-    separate nested/task-specific validators remain in place.
+    Numeric values and currency are supplied by the extractor, not reparsed from
+    answer quotes. Validators retain finite/typed value and decimal-shape checks;
+    native graders compare those values against references. Normalized status
+    retains its legacy contract. Separate nested/task schemas remain in place.
     """
     schema=schema or SCHEMA
     value=normalize_claims(value,schema=schema)
@@ -266,9 +242,6 @@ def validate_claims(value, answer, *, schema=None, semantic_fields=()):
             raise ValueError('String claim not present in its quote: ' + key)
         if 'integer' in field_types[key]:
             if type(c['value']) is not int or c['value'] < 0: raise ValueError('Invalid integer claim')
-            # Complete numeric tokens, not fragments cropped from a larger or signed number.
-            if key not in semantic_fields and not _integer_in_quote(c['value'], c['evidence'], answer):
-                raise ValueError('Integer claim missing from evidence')
     for key in ['total', 'average']:
         if value.get(key) is not None:
             _quote(value[key]['evidence'], answer); money_minor(value[key])
@@ -284,16 +257,6 @@ def validate_claims(value, answer, *, schema=None, semantic_fields=()):
             raise ValueError('Conditional price requires its stated condition')
         if offer['total'] is not None:
             _quote(offer['total']['evidence'],answer);money_minor(offer['total'])
-            # At least one actual span must support amount AND currency; separate
-            # spans cannot manufacture a monetary claim by joining their text.
-            for quote in quotes:
-                try:
-                    money_minor({**offer['total'],'evidence':quote})
-                    break
-                except ValueError:
-                    continue
-            else:
-                raise ValueError('Monetary claim lacks matching amount/currency in its offer quotes')
         for condition in offer['conditions']:
             _quote(condition['evidence'],answer)
             if (not condition['value'].strip() or condition['value'] not in condition['evidence']

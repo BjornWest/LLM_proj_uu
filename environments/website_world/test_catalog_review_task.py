@@ -158,9 +158,9 @@ def test_rating_and_opinion_source_prose_tampering_rejects():
     with pytest.raises(ValueError,match='binding'):api.reference(w,t,inventory=i)
 
 
-def test_extraction_count_quote_must_contain_claimed_number():
+def test_wrong_extracted_count_fails_native_comparison():
     args=fixture();text,c=claims_for(args[1],args[2]);c['positive']={'value':100,'evidence':text}
-    with pytest.raises(ValueError,match='Integer'):grader(*args).grade(c,text)
+    assert not grader(*args).grade(c,text)['structured_claims_correct']
 
 
 def test_accepted_dsl_context_reports_use_rendered_first_hand_meanings():
@@ -198,14 +198,16 @@ def test_review_mean_semantic_claim_binds_decimal_presentation(shown):
     ('13.43','3.43'),('-3.43','3.43'),('−3.43','3.43'),
     ('- 3.43','3.43'),('− 3,43','3,43'),('3 430','3'),
 ])
-def test_review_mean_cannot_cut_a_sign_or_larger_number_from_its_quote(shown,quote):
+def test_review_mean_uses_extracted_value_not_quote_token_interpretation(shown,quote):
     args=fixture('rating_summary');text,c=claims_for(args[1],args[2])
     text=text.replace('3.43',shown)
     for value in c.values():
         if isinstance(value,dict) and value.get('value') is not None:value['evidence']=text
     c['mean_rating']={'value':'3.43','evidence':quote}
-    with pytest.raises(ValueError,match='Mean rating missing'):
-        grader(*args).grade(c,text)
+    g=grader(*args)
+    assert g.validate_claims(c,text)['mean_rating'] == c['mean_rating']
+    c['mean_rating']['value']='4.00'
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('value',['NaN','Infinity','-Infinity'])

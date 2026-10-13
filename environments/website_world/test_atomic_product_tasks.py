@@ -116,14 +116,15 @@ class AtomicProductTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 fixture('read_public_fact', fact={'field': 'sku.facts.' + field})
 
-    def test_reference_configuration_label_is_formatting_only(self):
+    def test_native_fact_grading_compares_supplied_canonical_qualifier_without_rewriting(self):
         f = fixture('read_public_fact')
         original = deepcopy(f)
         expected = f[2]['expected_claims']
+        self.assertEqual(run(f, claims=expected)['verdict'], 'pass')
         for label in ('reference configuration: ', 'Reference Configuration : '):
             claims = {**expected, 'qualifier': label + expected['qualifier']}
             frozen = deepcopy(claims)
-            self.assertEqual(run(f, claims=claims)['verdict'], 'pass')
+            self.assertEqual(run(f, claims=claims)['verdict'], 'fail')
             self.assertEqual(claims, frozen)
         self.assertEqual(f, original)
         for qualifier in (None, 'reference configuration: ',
