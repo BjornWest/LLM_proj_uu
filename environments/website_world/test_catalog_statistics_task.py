@@ -122,7 +122,7 @@ def test_common_once_only_formatter_receives_public_task_not_observations(tmp_pa
         def close(self):pass
     kw=dict(trace=trace,inputs=inputs,output=tmp_path/'grading',grader_factory=CatalogStatisticsGrader,backend_factory=lambda _:Backend(),source_paths=[])
     result=grade_saved_once(**kw);assert result['structured_claims_correct'] and len(calls)==1
-    assert json.loads((trace/FILENAME).read_text())['grading_version']=='website-catalog-statistics-grading-v5'
+    assert json.loads((trace/FILENAME).read_text())['grading_version']=='website-catalog-statistics-grading-v6'
     assert read_grade(trace)['binding_status'] == 'verified'
     with pytest.raises(FileExistsError):grade_saved_once(**kw)
     assert len(calls)==1
