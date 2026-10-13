@@ -224,3 +224,68 @@ death or missing acknowledgement retains ownership; abort alone never frees a
 sent request. Explicit cancellation and final host close still force transport
 containment and do not claim verified HTTP cleanup. This is prospective source
 behavior; the original Verda B02 failure and all grades remain unchanged.
+# Hosted OpenRouter Qwen preparation
+
+`scripts/comparison_suite.py` also supports explicit `runtime_mode="qwen-openrouter-v1"`
+for the newly authorized finite 34-case suite. This mode uses ordinary OpenRouter
+inference and the same source-bound native graders, recording, pool and capped
+prewarming queue. It never imports private serving admission or emulates GPU
+telemetry/capacity. Legacy MiMo/Luna and private-Qwen gates remain separate.
+
+The exact new authorization pins the request's ordered task list and public prose.
+All 34 cases require fresh driver/execution/recipe-bound scripted positive native
+and HTTP acceptance, plus reviewed configuration. Bind `hosted_runtime` to
+`scripts/openrouter_qwen_runtime.py` and `hosted_readiness` to Training's read-only
+provider/counter release. Both policy and formatter retain the exact existing
+provider allowlist/order/fallback settings and reasoning configuration.
+
+The input ceiling is 150,000 tokens of estimated complete next input using the
+registered official local Qwen tokenizer/template and existing image estimator.
+The formatter adds a labelled conservative schema overhead estimate and sends
+the actual saved schema with strict `response_format`. Provider prompt usage is
+authoritative; local estimates are not a parity qualification. Output is clipped
+to `min(65536, 262144-estimated_input_tokens)`. Unknown assets, missing schema,
+expired suite deadline and oversized requests reject before dispatch. There are
+no automatic formatter retries or provider model substitutions.
+
+There is no artificial turn or per-episode time ceiling. Explicit request/startup
+watchdogs and one finite `suite_timeout` bound the local job; the supervisor's
+runtime-only `suite_deadline_utc` reaches child requests and parent watchdogs.
+Independent case failures are retained individually rather than treated as task
+verdicts. Model episodes are not tagged `scripted`; zero-provider controls are.
+Source/CPU preparation alone does not authorize dispatch or runtime promotion.
+
+Hosted dispatch starts with the four leading cases in parallel and waits for their
+automatic grade projections before admitting the remainder. Ordinary native
+failures still count as measured completions. Infrastructure failure stops
+further claims, preserving not-started events. A total-duration request watchdog
+also interrupts stalled HTTP reads; it does not retry the paid request. Actual
+case counter sources and asset bundles must match the qualified source hashes.
+
+A failed hosted canary stops future admission while healthy active cases finish
+and grade. At least one canary must exercise the formatter; budget-stopped
+cases remain measured native outcomes. A retry configuration keeps all34
+authorized cases but declares only the remaining IDs in start_order, plus
+evidence-bound resume records for completed real cases. Native failures are
+retained too. Different attempt directories/suite IDs preserve earlier evidence.
+Pending cases receive not_started events even after supervisor interruption.
+
+Prospective corrected hosted attempts allow up to65,536 output tokens and1,800s
+per request, retaining the150k complete-input ceiling and actual output headroom.
+The first attempt16k truncation is preserved. The wrapper supports the saved
+extractor request_options setter, tested through actual extract_and_grade.
+Resume requires pinned prior spec/completion database/terminal inventory and
+retains every grade-complete result, including nativeFalse after cleanupfailed.
+Viewer evidence must belong to the same case trace; missing/omitted results
+fail closed. A later hosted infrastructurefailure blocks new admissions while
+healthy active work drains. Formatter-free retries do not require extraction.
+
+Future hosted callers may opt in with `formatter_quote_pair_schema=true`.
+The decoder then requires nullable `{value,evidence}` claims to be either both
+null or both non-null, including false and zero values. All native schema
+constraints remain in force; the native schema and returned claims are unchanged.
+The exact refined wire schema is saved in `transport/response-format-schema.json`
+and included in the input estimate. This does not enforce quote substring
+authenticity or semantic correctness, replace native grading, or authorize retries.
+Existing frozen callers retain their original schema; provider acceptance of the
+refined schema requires separate real formatter qualification.

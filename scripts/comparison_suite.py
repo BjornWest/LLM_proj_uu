@@ -34,6 +34,34 @@ def checked(r):
  return p
 
 def qwen_mode(s):return s.get('runtime_mode')=='qwen-private-v1'
+def hosted_qwen_mode(s):return s.get('runtime_mode')=='qwen-openrouter-v1'
+def pooled_model_mode(s):return qwen_mode(s) or hosted_qwen_mode(s)
+def hosted_runtime(s):return runpy.run_path(str(checked(s['hosted_runtime'])))
+
+def hosted_counter_bindings(s,cases):
+ readiness=load(checked(s['hosted_readiness']))
+ expected={Path(row['path']).name:row['sha256']for row in readiness['exact_existing_asset_and_counter_pins']}
+ for case in cases:
+  root=Path(case['root']).resolve()
+  required={}
+  for name in ('model_input_budget.py','input_budget.py','model_tokenizers.json'):
+   relative='intent_browser/'+name;required[relative]=expected[name]
+   checked({'path':str(root/relative),'sha256':expected[name]})
+  if 'source_export' in case:helper(s)['verify_source_export'](root,case['commit'],case['source_export'],required)
+  else:
+   for relative,digest in required.items():
+    if sha256(subprocess.check_output(['git','-C',str(root),'show',case['commit']+':'+relative])).hexdigest()!=digest:
+     raise ValueError('Actual hosted counter differs from committed case source')
+  registry=load(root/'intent_browser/model_tokenizers.json');entry=registry['models']['qwen/qwen3.8-27b']
+  if entry['repository']!=readiness['official_tokenizer_repository'] or entry['revision']!=readiness['official_tokenizer_revision']:
+   raise ValueError('Hosted counter registry revision differs from CPU qualification')
+  bundle=Path(s['counter_assets_root'])/entry['bundle']
+  if bundle.is_symlink() or not bundle.is_dir():raise ValueError('Actual hosted tokenizer bundle missing')
+  for name in ('tokenizer.json','tokenizer_config.json','chat_template.jinja'):
+   if entry['files'][name]['sha256']!=expected[name]:raise ValueError('Actual hosted tokenizer registry asset differs')
+   checked({'path':str(bundle/name),'sha256':expected[name]})
+ if s['tokenizer']['sha256']!=expected['tokenizer.json']:raise ValueError('Shared AX/input tokenizer must match hosted qualification')
+ checked(s['tokenizer'])
 
 def qwen_modules(s):
  for value in s['qwen_sources'].values():checked(value)
@@ -98,6 +126,7 @@ def qwen_live(s):
 def helper(s):return runpy.run_path(str(checked(s['helpers'])))
 def config_hash(s):
  excluded={'review','sockets','tokenizer_socket'}
+ if hosted_qwen_mode(s):excluded|={'suite_deadline_utc','chromium_descriptor'}
  if qwen_mode(s):excluded|={'serving_live','rental_deadline_utc','capacity_bindings','chromium_descriptor'}
  return sha256(json.dumps({k:v for k,v in s.items() if k not in excluded},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
 
@@ -108,6 +137,7 @@ def case_binding(c):
 def execution_binding(s,c):
  excluded={'review','ready','cases','start_order','output','completion_db','suite_id','spec_path','sockets','tokenizer_socket','chromium_descriptor','scripted_hold_seconds','case_dependencies'}
  if qwen_mode(s):excluded|={'serving_live','rental_deadline_utc','capacity_bindings','chromium_descriptor'}
+ if hosted_qwen_mode(s):excluded|={'suite_deadline_utc'}
  fields={k:v for k,v in s.items() if k not in excluded}
  fields['case_dependencies']=s.get('case_dependencies',{}).get(c['id'],[])
  return sha256(json.dumps(fields,sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
@@ -175,22 +205,28 @@ class CaseWatchdog:
   if self.thread.is_alive():raise RuntimeError('Case watchdog did not stop')
 
 class CanaryBarrier:
- def __init__(self,case_ids,stop_event):
-  self.ids=set(case_ids);self.stop=stop_event;self.completed=set();self.event=threading.Event();self.lock=threading.Lock()
+ def __init__(self,case_ids,stop_event,*,admission_only=False,require_formatter=True):
+  self.require_formatter=require_formatter
+  self.ids=set(case_ids);self.stop=stop_event;self.completed=set();self.event=threading.Event();self.lock=threading.Lock();self.failed=False;self.admission_only=admission_only;self.formatter_exercised=False
   if not self.ids:raise ValueError('Explicit nonempty canary cohort required')
  def wait(self,ident):
   if ident in self.ids:return
   while not self.event.wait(.05):
    if self.stop.is_set():raise RuntimeError('Canary qualification aborted; remainder not dispatched')
-  if self.stop.is_set():raise RuntimeError('Suite stopped before remainder activation')
+  if self.stop.is_set() or self.failed:raise RuntimeError('Suite stopped before remainder activation')
  def fail(self,ident):
-  if ident in self.ids:self.stop.set();self.event.set()
- def complete(self,ident):
+  if ident in self.ids or self.admission_only:
+   self.failed=True
+   if not self.admission_only:self.stop.set()
+   self.event.set()
+ def complete(self,ident,*,formatter_exercised=True):
   if ident not in self.ids:return
   with self.lock:
    if ident in self.completed:raise RuntimeError('Duplicate canary completion')
-   self.completed.add(ident)
-   if self.completed==self.ids:self.event.set()
+   self.completed.add(ident);self.formatter_exercised|=formatter_exercised
+   if self.completed==self.ids:
+    if self.admission_only and self.require_formatter and not self.formatter_exercised:self.failed=True
+    self.event.set()
 
 
 class WatchedAdmission:
@@ -203,18 +239,23 @@ def source_guard(s,c=None):
  if c is not None:
   checked(c['recipe_manifest'])
   if 'source_export' in c:
-   if not qwen_mode(s):raise ValueError('Exported cases require explicit Qwen mode')
+   if not pooled_model_mode(s):raise ValueError('Exported cases require explicit Qwen mode')
    helper(s)['verify_source_export'](c['root'],c['commit'],c['source_export'],{})
  if qwen_mode(s):
   for row in s['qwen_sources'].values():checked(row)
+ if hosted_qwen_mode(s):
+  location=checked(s['hosted_runtime']);relative='scripts/openrouter_qwen_runtime.py'
+  if location.resolve()!=Path(s['caller_root']).resolve()/relative:raise ValueError('Hosted runtime must be inside committed caller root')
+  if 'source_export' not in s and location.read_bytes()!=subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':'+relative]):raise ValueError('Hosted runtime differs from committed caller')
+  hosted_counter_bindings(s,[c]if c is not None else s['cases'])
  if 'authorization' in s:checked(s['authorization'])
  if 'transport' in s:
   for row in s['transport']['files']:checked(row)
   for name in ('node','bridge_worker','pi'):checked(s[name])
  if 'source_export' in s:
-  if not qwen_mode(s):raise ValueError('Exported sources require explicit Qwen mode')
+  if not pooled_model_mode(s):raise ValueError('Exported sources require explicit Qwen mode')
   required={'scripts/comparison_suite.py':s['driver']['sha256'],'scripts/comparison_suite_helpers.py':s['helpers']['sha256']}
-  for row in s['qwen_sources'].values():
+  for row in (s['qwen_sources'].values() if qwen_mode(s) else [s['hosted_runtime']]):
    location=Path(row['path']).resolve()
    if location.is_relative_to(Path(s['caller_root']).resolve()):required[str(location.relative_to(Path(s['caller_root']).resolve()))]=row['sha256']
   helper(s)['verify_source_export'](s['caller_root'],s['caller_commit'],s['source_export'],required)
@@ -223,6 +264,7 @@ def source_guard(s,c=None):
 def check_release(s):
  source_guard(s)
  if qwen_mode(s):return check_qwen_release(s)
+ if hosted_qwen_mode(s):return check_hosted_release(s)
  authorized=load(checked(s['authorization']))
  if ([c['id'] for c in s['cases']]!=s['start_order'] or s['start_order']!=[i for i in authorized['case_ids'] if i in {c['id'] for c in s['cases']}]
      or len(set(s['start_order']))!=len(s['cases']) or s['max_concurrent_episodes']!=authorized['max_active_combined'] or s['prewarm_count']!=authorized['prewarm_count']
@@ -237,6 +279,142 @@ def check_release(s):
  if len(a['cases'])!=len(s['cases']):raise ValueError('Duplicate acceptance case')
  by_id={c['id']:c for c in s['cases']}
  for v in a['cases']:verify_ready_case(s,by_id[v['case']],v)
+
+def hosted_prior_specs(s):
+ # This finite hosted cohort keeps approved attempt specs beside its immutable
+ # user authorization. Discover launched attempts; an omitted resume record
+ # must not turn an earlier measured native failure into spending permission.
+ cohort=checked(s['authorization']).parent;found={}
+ for path in cohort.glob('launch-spec-approved-v*.json'):
+  prior=load(path)
+  if prior.get('runtime_mode')!='qwen-openrouter-v1' or prior.get('authorization')!=s['authorization']:continue
+  out=Path(prior['output']).resolve()
+  if out==Path(s['output']).resolve():continue
+  if not (out/'supervisor-start.json').is_file():continue
+  if prior.get('suite_id')==s['suite_id']:raise ValueError('Attempt ID reused with different output')
+  found[str(path.resolve())]=prior
+ return found
+
+def hosted_attempt_ids(s,authorization):
+ ids=[c['id']for c in s['cases']]
+ resume=s.get('resume');discovered=hosted_prior_specs(s)
+ if resume is None:
+  for prior in discovered.values():
+   with sqlite3.connect('file:'+str(prior['completion_db'])+'?mode=ro',uri=True)as db:
+    states=[r[0]for r in db.execute('SELECT state FROM episodes WHERE suite=?',(prior['suite_id'],))]
+   if not states or any(v in ('pending','running')for v in states):raise ValueError('Prior attempt still active')
+   if any(load(p).get('status')=='graded_and_projected'and load(p).get('scripted')is False for p in Path(prior['output']).glob('qwen-*/result.json')):raise ValueError('Measured prior outcomes require explicit resume')
+  if s.get('resume_attempts')or s['start_order']!=ids:raise ValueError('Initial attempt must include all34 cases')
+  return ids
+ attempts=s.get('resume_attempts')
+ if type(resume)is not list or type(attempts)is not list or not attempts:raise ValueError('Authoritative prior attempt snapshots required')
+ if {str(checked(a['spec']).resolve())for a in attempts}!=set(discovered):raise ValueError('Every prior launched attempt must be bound')
+ authoritative={};seen_attempts=set()
+ for attempt in attempts:
+  spec_path=checked(attempt['spec']);prior=load(spec_path);suite=prior.get('suite_id')
+  if suite in seen_attempts or suite==s['suite_id']or prior.get('runtime_mode')!='qwen-openrouter-v1' or prior.get('authorization')!=s['authorization']:
+   raise ValueError('Invalid prior attempt identity/authorization')
+  seen_attempts.add(suite);out=Path(prior['output']).resolve()
+  database=checked(attempt['completion_db'])
+  if database.resolve()!=Path(prior['completion_db']).resolve()or database.resolve()!=out/'completion.sqlite':raise ValueError('Prior completion database escaped its output')
+  terminal=load(checked(attempt['terminal_inventory']))
+  if terminal.get('suite_id')!=suite or terminal.get('source_driver')!=prior['driver'] or terminal.get('rejected_symlinks')!=[]:raise ValueError('Prior terminal inventory incomplete')
+  inventory={row['relative_path']:row for row in terminal['files']}
+  if inventory.get('completion.sqlite',{}).get('sha256')!=attempt['completion_db']['sha256']:raise ValueError('Prior database differs from terminal inventory')
+  with sqlite3.connect('file:'+str(database)+'?mode=ro',uri=True)as db:
+   members=db.execute('SELECT episodes FROM suites WHERE id=?',(suite,)).fetchone()
+   states=dict(db.execute('SELECT id,state FROM episodes WHERE suite=?',(suite,)))
+  if members is None or load_json_list(members[0])!=prior['start_order']or set(states)!=set(prior['start_order'])or any(v not in ('succeeded','failed','interrupted','not_started')for v in states.values()):
+   raise ValueError('Prior attempt membership is incomplete or still active')
+  # Grade-complete results survive even a later cleanup/Events failure. Do not
+  # treat state=failed as permission to repeat a measured native outcome.
+  for previous in prior['cases']:
+   ident=previous['id'];path=out/ident/'result.json'
+   if not path.is_file():
+    if states.get(ident)=='succeeded':raise ValueError('Succeeded prior case lacks its result')
+    continue
+   result=load(path)
+   if result.get('scripted')is not False or result.get('status')!='graded_and_projected':continue
+   relative=str(path.relative_to(out));record=inventory.get(relative)
+   if record is None or pin(path)['sha256']!=record['sha256']:raise ValueError('Prior measured result differs from terminal inventory')
+   current=next((c for c in s['cases']if c['id']==ident),None)
+   viewer_path=out/ident/'grade-viewer.json';viewer=load(viewer_path)
+   view_record=inventory.get(str(viewer_path.relative_to(out)))
+   if (current is None or case_binding(current)!=case_binding(previous)
+       or result.get('case')!=ident or result.get('caller_driver')!=prior['driver']or result.get('caller_commit')!=prior['caller_commit']
+       or result.get('case_binding_sha256')!=case_binding(previous)or result.get('execution_binding_sha256')!=execution_binding(prior,previous)
+       or view_record is None or pin(viewer_path)['sha256']!=view_record['sha256']or viewer.get('status')!='verified'):
+    raise ValueError('Prior completed case provenance disagrees')
+   trace=Path(result['result']['trace']).resolve()
+   if not trace.is_relative_to(out/ident/'live/runs')or checked(viewer['canonical']).resolve()!=trace/'evaluation.json'or checked(viewer['automatic']).resolve()!=trace/'automatic-grading.json':
+    raise ValueError('Prior viewer belongs to another case/trace')
+   canonical=load(checked(viewer['canonical']));automatic=load(checked(viewer['automatic']))
+   if (automatic.get('status')!='graded'or canonical.get('technical_error')is not None
+       or canonical.get('task_completed')is not result['result']['viewer_projection']['task_completed']
+       or viewer.get('task_completed')is not canonical.get('task_completed')):raise ValueError('Prior canonical/native outcome disagrees')
+   authoritative[ident]=(pin(spec_path),pin(path),pin(viewer_path))
+ retained={}
+ for row in resume:
+  result_path=checked(row['result']);result=load(result_path);ident=result.get('case')
+  if ident in retained or ident not in authoritative or (row['spec'],row['result'],row['viewer'])!=authoritative[ident]:
+   raise ValueError('Retained list omits/misbinds authoritative case evidence')
+  retained[ident]=row
+ if set(retained)!=set(authoritative):raise ValueError('Every prior measured native outcome must be retained')
+ pending=[ident for ident in ids if ident not in retained]
+ if not pending or s['start_order']!=pending:raise ValueError('Attempt must contain exactly remaining cases, in original order')
+ return pending
+
+def load_json_list(value):
+ result=json.loads(value)
+ if type(result)is not list or any(type(x)is not str for x in result):raise ValueError('Invalid prior membership')
+ return result
+
+def check_hosted_release(s):
+ hosted_runtime(s)['validate_limits'](s)
+ authorized=load(checked(s['authorization']));ids=[c['id'] for c in s['cases']]
+ if (len(ids)!=34 or len(set(ids))!=34 or ids!=authorized['case_ids']
+     or authorized.get('dispatch_authorized') is not True
+     or authorized.get('policy_model')!='qwen/qwen3.8-27b'
+     or authorized.get('formatter_model')!='qwen/qwen3.8-27b'
+     or authorized.get('max_input_tokens')!=150000
+     or authorized.get('max_active_combined')!=s['max_concurrent_episodes']
+     or authorized.get('prewarm_count')!=s['prewarm_count']):
+  raise ValueError('Exact new finite34 hosted Qwen authorization required')
+ request=load(checked(authorized['request']))
+ requested=request['finite_episode_list']
+ if (len(requested)!=34 or [c['task_id'] for c in s['cases']]!=[row['id'] for row in requested]
+     or any(c['public_request']!=row['request']for c,row in zip(s['cases'],requested))):
+  raise ValueError('Hosted cases/public requests differ from newly authorized finite list')
+ attempt=hosted_attempt_ids(s,authorized)
+ canaries=s.get('canary_task_ids')
+ if canaries!=[ident.removeprefix('qwen-')for ident in attempt[:4]]:
+  raise ValueError('Explicit four leading parallel canaries required before hosted remainder')
+ readiness=load(checked(s['hosted_readiness']))
+ order=[row.get('configured_name') for row in readiness.get('endpoints_in_existing_order',[])]
+ if (readiness.get('status')!='read_only_model_key_assets_and_CPU_counter_verified_no_provider_completion'
+     or readiness.get('model')!='qwen/qwen3.8-27b'
+     or readiness.get('key_authentication_HTTP')!=200
+     or readiness.get('common_context_ceiling')!=262144
+     or 'image' not in readiness.get('architecture',{}).get('input_modalities',[])
+     or not order or len(set(order))!=len(order)
+     or any(row.get('required_tools_and_structured_parameters_present') is not True
+       or row.get('context_length',0)<262144 or row.get('max_completion_tokens',0)<s['max_tokens']
+       for row in readiness['endpoints_in_existing_order'])
+     or readiness.get('exact_existing_request_options',{}).get('provider',{}).get('only')!=order
+     or readiness['exact_existing_request_options'].get('reasoning')!={'enabled':True}
+     or any(options!=readiness['exact_existing_request_options']['provider']
+       for options in (s['provider_options'],s['extractor_provider_options']))):
+  raise ValueError('Exact hosted model/provider/counter readiness required')
+ smoke=readiness['counter_smoke'];checked({'path':smoke['path'],'sha256':smoke['sha256']})
+ if load(smoke['path']).get('status')!='passed':raise ValueError('Actual hosted counter smoke must pass')
+ # Source/asset pins are checked at their actual case/runtime paths by source_guard,
+ # not at Training's temporary worktree paths.
+ review=load(checked(s['review']));ready=load(checked(s['ready']))
+ if (review.get('status')!='approved' or review.get('configuration_sha256')!=config_hash(s)
+     or ready.get('status')!='passed' or ready.get('driver')!=s['driver']
+     or len(ready['cases'])!=len(attempt) or {v['case']for v in ready['cases']}!=set(attempt)):
+  raise ValueError('Reviewed hosted configuration and all34 actual native/HTTP acceptances required')
+ for row in ready['cases']:verify_ready_case(s,next(c for c in s['cases']if c['id']==row['case']),row)
 
 
 def check_qwen_release(s):
@@ -315,7 +493,7 @@ def record_capacity(out,row):
 
 def execute(s,c,scripted=False):
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
- if s.get('shared_chromium') and not scripted and not qwen_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
+ if s.get('shared_chromium') and not scripted and not pooled_model_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
  if not scripted:
   check_release(s)
   with sqlite3.connect('file:'+str(Path(s.get('completion_db',str(Path(s['output'])/'completion.sqlite'))))+'?mode=ro',uri=True) as db:
@@ -372,7 +550,7 @@ def execute(s,c,scripted=False):
  def record(value):
   if qwen_mode(s) and value.get('event')=='response':counts['responses_without_cost']+=1
   with (out/'http-attempts.jsonl').open('a') as f:f.write(json.dumps({'epoch':time.time(),**value})+'\n')
- def backend(phase,consumer_before_dispatch=None):
+ def backend(phase,consumer_before_dispatch=None,directory=None):
   def dispatched_guard():
    if consumer_before_dispatch is not None:consumer_before_dispatch()
    before(phase)
@@ -403,7 +581,17 @@ def execute(s,c,scripted=False):
    if type(cost) in (int,float):counts['reported_cost_usd']+=cost
    else:counts['responses_without_cost']+=1
    record({'event':'response','phase':phase,'http_status':resp.status_code,'model':v.get('model'),'provider':v.get('provider'),'usage':u,'response_id':v.get('id')})
-  b.client.event_hooks={'request':[dispatched],'response':[received]};return b
+  b.client.event_hooks={'request':[dispatched],'response':[received]}
+  if hosted_qwen_mode(s):
+   try:
+    shared=SharedTokenizerConfig(s['tokenizer_socket'])
+    module=hosted_runtime(s)
+    counter=module['MemoizedCounter'](model_matched_input_counter(b,assets_root=s['counter_assets_root'],shared_tokenizer=shared))
+    return module['HostedQwenBackend'](b,counter,phase=phase,maximum=s['max_tokens'],
+     deadline=s['suite_deadline_utc'],timeout=s['request_timeout'],directory=directory,meter=record,
+     quote_pair_schema=s.get('formatter_quote_pair_schema',False) if phase=='formatter' else False)
+   except BaseException:b.close();raise
+  return b
  @contextmanager
  def session(*,before_dispatch):
   if scripted:
@@ -447,7 +635,7 @@ def execute(s,c,scripted=False):
   timings['environment_ready_monotonic']=time.monotonic();timings['ready_episode_id']=ready.episode_id;timings['ready_trace']=str(ready.directory)
   save(out/'warm-ready.json',dict(timings));signal.alarm(0)
   admission.environment_admission(ready)
-  timings['activated_monotonic']=time.monotonic();save(out/'activated.json',dict(timings));signal.alarm(180 if scripted else max(1,math.ceil(serving.deadline-time.time())) if qwen_mode(s) else s['episode_timeout'])
+  timings['activated_monotonic']=time.monotonic();save(out/'activated.json',dict(timings));signal.alarm(180 if scripted else max(1,math.ceil(serving.deadline-time.time())) if qwen_mode(s) else max(1,math.ceil(s['suite_deadline_utc']-time.time())) if hosted_qwen_mode(s) else s['episode_timeout'])
   if lease is not None:
    proof=lease.begin_episode(c['id']);save(out/'subscription-admission.json',proof)
  def runner(factory,b,metadata,**kw):
@@ -463,6 +651,8 @@ def execute(s,c,scripted=False):
   kw['harness_profile']=replace(p,ax_config=replace(p.ax_config,shared_tokenizer=shared))
   if qwen_mode(s):
    kw['input_counter']=QwenInputCounter(checked(s['tokenizer']),shared_tokenizer=shared) if scripted else serving.runner_count
+  elif hosted_qwen_mode(s) and not scripted:
+   kw['input_counter']=b.counter
   elif model=='gpt-6-luna':
    kw['input_counter']=OpaqueReasoningInputCounter(QwenInputCounter(checked(s['tokenizer']),shared_tokenizer=shared))
   else:
@@ -513,7 +703,7 @@ def execute(s,c,scripted=False):
    factories=qwen['QwenFactories'](backend_class=ChatCompletionsBackend,admission=serving,
     before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
     max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],turn=qwen_turn)
-  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda path:Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter')))
+  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda path:Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter',directory=path)))
   if result.get('status')!='graded_and_projected':raise ValueError('Missing automatic grading/HTTP projection: '+str(result))
   if scripted and result['viewer_projection']['task_completed'] is not True:raise ValueError('Scripted positive native grade did not pass')
   if timings['reset_calls']!=1:raise ValueError('Warm activation reset or duplicated environment')
@@ -572,7 +762,7 @@ def stop_pool_service(spec, root, output, process):
 
 def supervise(s,scripted=False):
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
- if s.get('shared_chromium') and not scripted and not qwen_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
+ if s.get('shared_chromium') and not scripted and not pooled_model_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
  stop=threading.Event();previous={kind:signal.getsignal(kind) for kind in (signal.SIGTERM,signal.SIGINT,signal.SIGALRM)}
  def terminate_suite(*args):stop.set();signal_deadline(*args)
  try:
@@ -583,9 +773,10 @@ def supervise(s,scripted=False):
 
 def _supervise(s,scripted=False,stop=None):
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
- if s.get('shared_chromium') and not scripted and not qwen_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
+ if s.get('shared_chromium') and not scripted and not pooled_model_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
  if qwen_mode(s):validate_qwen_limits(s)
- for name in (('startup_timeout','suite_timeout') if qwen_mode(s) else ('startup_timeout','episode_timeout','suite_timeout')):
+ if hosted_qwen_mode(s):hosted_runtime(s)['validate_limits'](s)
+ for name in (('startup_timeout','suite_timeout') if pooled_model_mode(s) else ('startup_timeout','episode_timeout','suite_timeout')):
   if type(s.get(name)) is not int or not 0<s[name]<2**31:raise ValueError('Positive integer '+name+' required before any case claim')
  grace=s.get('shutdown_grace_seconds',30)
  if type(grace) is not int or not 1<=grace<=120:raise ValueError('Explicit cleanup grace must be1..120 seconds')
@@ -595,21 +786,26 @@ def _supervise(s,scripted=False,stop=None):
  out=Path(s['output']);out.mkdir(parents=True,exist_ok=False)
  save(out/'supervisor-start.json',{'pid':os.getpid(),'process_start':h['process_identity'](os.getpid()),'epoch':time.time(),'monotonic':time.monotonic()})
  api=runpy.run_path(str(checked(s['events_helper'])));events=api['Events'](s.get('completion_db',out/'completion.sqlite'))
- members=load(checked(s['authorization']))['case_ids'] if not scripted else [c['id'] for c in s['cases']]
+ members=s['start_order'] if hosted_qwen_mode(s) else load(checked(s['authorization']))['case_ids'] if not scripted else [c['id'] for c in s['cases']]
  events.register(s['suite_id'],members)
  if not scripted:
   for ident in members:events.subscribe(s['suite_id']+'-'+ident,s['suite_id'],'codex:'+s['thread_id'],episode=ident,final=False)
   events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[n for n in (10,20,30,35,40,50) if n<len(members)],final=True)
  h['register_roots'](s)
  ceiling=runtime_limits(s)
- stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop) if qwen_mode(s) else None
+ stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop,admission_only=hosted_qwen_mode(s),require_formatter=any(i not in ('B17','B19','H01','H02','A03','A04')for i in s['canary_task_ids'])) if qwen_mode(s) or (hosted_qwen_mode(s) and not scripted) else None
+ deadline_timer=None
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
   os.chmod(tmp,0o700);s=dict(s);s['tokenizer_socket']=str(Path(tmp)/'tokenizer.sock');s['sockets']={}
-  assets=[checked(s['tokenizer'])] if qwen_mode(s) else [Path(s['counter_assets_root'])/'mimo-v2.6-pro-73875d00/tokenizer.json',checked(s['tokenizer'])]
+  if hosted_qwen_mode(s):
+   s['suite_deadline_utc']=time.time()+s['suite_timeout']
+  assets=[checked(s['tokenizer'])] if pooled_model_mode(s) else [Path(s['counter_assets_root'])/'mimo-v2.6-pro-73875d00/tokenizer.json',checked(s['tokenizer'])]
   manifest=Path(tmp)/'assets.json';save(manifest,[{'path':str(a),'sha256':pin(a)['sha256'],'normalization':'raw'} for a in assets])
   root=s['cases'][0]['root']
   service=subprocess.Popen([s['python'],'-I','-B','-c',"import sys;sys.path.insert(0,sys.argv[1]);from intent_browser.tokenizer_service import main;sys.argv=sys.argv[1:];sys.argv[0]='tokenizer_service';main()",root,'--socket',s['tokenizer_socket'],'--manifest',str(manifest),'--max-clients',str(ceiling+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=(out/'tokenizer-stderr.log').open('x'),text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
   try:
+   if hosted_qwen_mode(s):
+    deadline_timer=threading.Timer(s['suite_timeout'],stop.set);deadline_timer.daemon=True;deadline_timer.start()
    import select
    if not select.select([service.stdout],[],[],30)[0] or json.loads(service.stdout.readline()).get('ready') is not True:raise RuntimeError('Shared tokenizer host not ready')
    if s.get('shared_chromium'):
@@ -648,13 +844,17 @@ def _supervise(s,scripted=False,stop=None):
    runtime=Path(tmp)/'runtime-spec.json';save(runtime,s)
    save(out/'runtime-spec.redacted.json',{k:v for k,v in s.items() if k not in {'capacity_bindings','sockets','tokenizer_socket','chromium_descriptor'}})
    def one(c,admission):
-    ident=c['id'];events.start(s['suite_id'],ident);started=time.monotonic();process=None;connection=None;watchdog=None;connections={};stdout=None;stderr=None
+    ident=c['id']
+    if hosted_qwen_mode(s) and (stop.is_set() or (canary_barrier is not None and canary_barrier.failed) or time.time()>=s['suite_deadline_utc']):
+     if time.time()>=s['suite_deadline_utc']:stop.set()
+     raise queue['QueueCancelled']('Suite deadline/stop before case claim')
+    events.start(s['suite_id'],ident);started=time.monotonic();process=None;connection=None;watchdog=None;connections={};stdout=None;stderr=None
     with lock:clocks[ident]={'process_launch_monotonic':started}
     try:
      stdout=(out/(ident+'-stdout.log')).open('x');stderr=(out/(ident+'-stderr.log')).open('x')
      if capacity_host is not None:capacity_host.begin_relay(ident)
      process=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','2048','--tasks','256','--receipt',str(out/(ident+'-bounded')),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',s['driver']['path'],'scripted-case' if scripted else 'case',str(runtime),ident],stdout=stdout,stderr=stderr,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
-     watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop,rental_deadline=None if serving is None else time.monotonic()+serving.deadline-time.time())
+     watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop,rental_deadline=time.monotonic()+s['suite_deadline_utc']-time.time() if hosted_qwen_mode(s) else None if serving is None else time.monotonic()+serving.deadline-time.time())
      connection,_=listeners[ident].accept();connection.settimeout(s['suite_timeout'])
      connections['connection']=connection
      # Ready receipt precedes gate; activation reply is emitted only under queue's cap.
@@ -681,7 +881,7 @@ def _supervise(s,scripted=False,stop=None):
      events.finish(s['suite_id'],ident,'succeeded',payload)
      if not scripted:
       with delivery_lock:flush_completions(s,events,api)
-     if canary_barrier is not None:canary_barrier.complete(ident)
+     if canary_barrier is not None:canary_barrier.complete(ident,formatter_exercised=not hosted_qwen_mode(s) or result['usage']['formatter_requests']==1)
      return {'case':ident,'state':'succeeded','payload':payload,'admission':proof}
     except BaseException as e:
      if canary_barrier is not None:canary_barrier.fail(ident)
@@ -711,10 +911,14 @@ def _supervise(s,scripted=False,stop=None):
    if s.get('runtime_limits') is not None:
     if capacity_host is None:raise ValueError('Runtime controls require a real capacity parent')
     options={'max_concurrent_ceiling':ceiling,'on_queue_ready':lambda handle:capacity_host.bind_limits(handle,out)}
-   result=queue['run_ordered_suite']({c['id']:c for c in s['cases']},one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop,**options)
+   result=queue['run_ordered_suite']({c['id']:c for c in s['cases']if c['id']in s['start_order']},one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop,**options)
    result['max_observed_active']=max(e['active'] for e in result['events']);result['max_observed_warming']=max(e['warming_or_ready'] for e in result['events']);result['clocks']=clocks
    if result['max_observed_active']>ceiling or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
    save(out/'suite-result.json',result)
+   if hosted_qwen_mode(s):
+    for ident,row in result['cases'].items():
+     if ident not in clocks:events.finish(s['suite_id'],ident,'not_started',{'stage':'suite_admission','reason':'Canary infrastructure failure or suite stop before claim','queue_state':row['status'],'evidence':pin(out/'suite-result.json')})
+    if not scripted:flush_completions(s,events,api)
    measurements=[]
    warm_ids={e['case'] for e in result['events'] if e['event']=='warmup_started'}
    for ident in s['start_order']:
@@ -729,6 +933,7 @@ def _supervise(s,scripted=False,stop=None):
    if not scripted:flush_completions(s,events,api)
   finally:
    stop.set()
+   if deadline_timer is not None:deadline_timer.cancel();deadline_timer.join(2)
    for listener in listeners.values():listener.close()
    try:
     if capacity_host is not None:
@@ -758,6 +963,11 @@ def _supervise(s,scripted=False,stop=None):
 
 
 
+def finalize_unclaimed(s,events,reason):
+ with events.transaction()as db:
+  pending=[row[0]for row in db.execute("SELECT id FROM episodes WHERE suite=? AND state='pending'",(s['suite_id'],))]
+ for ident in pending:events.finish(s['suite_id'],ident,'not_started',{'stage':'suite_admission','reason':reason,'provider_dispatches':0})
+
 def main():
  mode,path,*rest=sys.argv[1:];s=load(path)
  if mode in ('case','scripted-case'):execute(s,next(c for c in s['cases'] if c['id']==rest[0]),mode=='scripted-case')
@@ -768,13 +978,19 @@ def main():
    owner_path=Path(s['output'])/'supervisor-start.json'
    primary=sys.exception()
    try:
-    if qwen_mode(s) and not prior_output and owner_path.is_file() and load(owner_path).get('pid')==os.getpid():terminal_inventory(s)
+    if hosted_qwen_mode(s) and not prior_output and owner_path.is_file() and load(owner_path).get('pid')==os.getpid():
+     api=runpy.run_path(str(checked(s['events_helper'])));events=api['Events'](s.get('completion_db',str(Path(s['output'])/'completion.sqlite')))
+     finalize_unclaimed(s,events,'Supervisor ended before case admission')
+     if mode!='scripted':flush_completions(s,events,api)
+    if pooled_model_mode(s) and not prior_output and owner_path.is_file() and load(owner_path).get('pid')==os.getpid():terminal_inventory(s)
    except BaseException as inventory_error:
     if primary is None:raise
     primary.add_note('Terminal inventory also failed: '+repr(inventory_error))
  elif mode=='prepare-qwen':
-  if not qwen_mode(s):raise ValueError('Explicit Qwen runtime mode required')
-  validate_qwen_limits(s);source_guard(s)
+  if not pooled_model_mode(s):raise ValueError('Explicit Qwen runtime mode required')
+  if qwen_mode(s):validate_qwen_limits(s)
+  else:hosted_runtime(s)['validate_limits'](s)
+  source_guard(s)
   h=helper(s)
   for c in s['cases']:h['recipe_check'](c)
   print(json.dumps({'status':'source_prepared_NOT_runtime_ready','cases':[c['id'] for c in s['cases']],'models':0,'provider_requests':0,'caller':s['driver']}))
