@@ -18,12 +18,12 @@ combinations must remain visible in execution results.
 `run_native(selection, fresh_output, workers=2, prepare=True, share_assets=True)`
 uses actual `task_instances.inspect`, `task_instances.prepare` and the ordinary
 source freezer. It does not mock references, source collection or world reads.
-Every case has a separate directory and retained stage result. An exception
+Every case has a separate directory and retained stage result. Preflight holds and compaction have separate stages, preserving successful preparation receipts. An exception
 means triage, not necessarily a model failure or an unsupported task family.
-The returned report distinguishes design coverage from passed stage coverage.
+The returned report distinguishes design coverage from passed stage coverage. A pair with one passing case is not universally accepted: mixed/failing pairs are explicit, and attempted preparation pairs count invoked freezes only. Factor labels remain caller supplied, not authenticated against native parameters.
 Use the repository bounded launcher for these batches.
 
-The 1 GiB free-space preflight may hold a preparation before launch. It does not
+The 1 GiB free-space preflight records a structured `held` result before freeze. It does not
 reserve disk atomically across workers. Budget the simultaneous temporary
 copies as well as completed recipes, and do not erase failed outputs.
 
@@ -43,7 +43,7 @@ winners or the sampled merchant menu. A missing wire restriction can still be
 enforced by a post-extraction mechanical validator; report that distinction.
 
 `audit_grader(grader, observations=..., expectations=...)` binds the actual grader
-class, code hash, response contract and extraction-instruction digest. It exposes
+class, code hash, response contract and extraction-instruction digest. The file hash covers the defining class module, not all delegated dependencies; the enclosing release must bind those. Expected verdict mismatches are audit findings. It exposes
 native checks emitted by correct/wrong/missing/malformed controls. Reference to
 grade roundtrips do not independently prove population scope or oracle validity.
 
@@ -70,18 +70,15 @@ failures; do not substitute the footwear basis. The pool heavily exercises
 interval boundaries/no-match cases. Four additional public interior-size cases
 exercise successful feature/priority recommendations without editing worlds.
 
-The initial grader/schema audit ran 356 supplied correct/wrong native controls
-on 178 configurations. Capture-dependent families were explicitly left out of
-that audit. Count fields and many categorical variant choices already have
+The initial audit ran 356 supplied controls on 178 configurations; 106 offer-family negative fixtures were empty selections in no-match worlds. That is retained historical wiring evidence, not broad discrimination coverage. The corrected audit uses concrete real offers for no-match counterexamples, and adds wrong SKU, currency, real nonwinner, aggregate, mean, direction and citation mutations where applicable. Positive priority selection controls use the four interior supplements. Five basic-offer configurations have an additional actual native audit. Capture-dependent families remain separate. No-match negatives may fail on expected status even with concrete rows; do not infer independent eligibility/ranking coverage from that branch. Count fields and many categorical variant choices already have
 wire types/enums. Some numeric variant values and decimal aggregates remain
 strings; decimal validators and literal evidence checks are separate from wire
 types. Nullable pairing findings indicate a validator dependency, not absent
 validation. Topic-only contracts need not grade unused rating-mean fields.
 
-The scripted browser plan covers ten configurations across five answer families,
+All 30 scripted browser controls pass, spanning ten configurations across five answer families,
 with correct/wrong/missing controls, actual BrowserGym, automatic native grading,
-canonical artifacts and live local HTTP projection. Consult final receipts for
-actual pass counts and retained infrastructure failures. The current experiment
+canonical artifacts and live local HTTP projection. The original disk preflight holds are retained; only unstarted cases continued after duplicate-file compaction. Completed episodes were reused without rerun. Consult final receipts for exact stage/source bindings. The current experiment
 contains no real model calls and no newly sampled worlds. Fresh-world diversity,
 all capture-dependent families, delivery/hidden/memory combinations and real
 extractor interpretation require additional coverage; they are not implied by

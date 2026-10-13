@@ -51,10 +51,15 @@ def controls(grader, family, world, *, site_registry=None, bindings=None):
         wrong=deepcopy(result)
         if result['status']['value']=='no_match':
             wrong['status']=scalar('shortlist' if family=='catalog_shortlist' else 'selection')
+            available=[o for o in offers.values() if o['offer_id'] in bindings['retailer_offers']]
+            if not available:raise ValueError('Concrete no-match counterexample needs a real public offer')
+            chosen=next((o for o in available if products[o['product_id']]['public']['concept_id']==task.get('concept_id')),available[0])
+            if family=='catalog_shortlist':wrong['rows']=[row(chosen)]
+            else:wrong.update(row(chosen))
         else:
             changed=wrong['rows'][0] if family=='catalog_shortlist' else wrong
             changed['total']['amount']=str(Decimal(changed['total']['amount'])+1)
-        mutation='reported_item_price_plus_one_SEK' if ref.get('status')=='match' else 'false_selection_in_no_match_world'
+        mutation='reported_item_price_plus_one_SEK' if ref.get('status')=='match' else 'concrete_real_offer_in_no_match_world'
     elif family=='catalog_statistics':
         site=next(s for s in site_registry if s['site_id']==task['comparison_site_id'])
         result.update(status=scalar('summary'),comparison_url=scalar(site['origin'].rstrip('/')+'/search'),
@@ -83,6 +88,33 @@ def controls(grader, family, world, *, site_registry=None, bindings=None):
             wrong=deepcopy(result);wrong['positive']['value']+=1;mutation='positive_comment_count_plus_one'
     else:raise ValueError('No supplied-answer control for this family')
 
+    mutations=[(mutation,wrong)]
+    if family in ('feature_offer','catalog_priority','catalog_shortlist','basic_offer') and result['status']['value']!='no_match':
+        wrong=deepcopy(result);changed=wrong['rows'][0] if family=='catalog_shortlist' else wrong
+        changed['sku_id']=scalar('__nonexistent_sku__');mutations.append(('nonexistent_sku_identity',wrong))
+        wrong=deepcopy(result);changed=wrong['rows'][0] if family=='catalog_shortlist' else wrong
+        changed['total']['currency']='EUR';mutations.append(('wrong_currency',wrong))
+        selected={o['offer_id'] for m in ref['selected_models'] for o in m['winners']} if family=='catalog_shortlist' else {o['offer_id'] for o in ref['winners']}
+        alternatives=[o for o in offers.values() if o['offer_id'] not in selected and o['offer_id'] in bindings['retailer_offers']
+                      and products[o['product_id']]['public']['concept_id']==task.get('concept_id')]
+        if alternatives:
+            wrong=deepcopy(result)
+            if family=='catalog_shortlist':wrong['rows'][0]=row(alternatives[0])
+            else:wrong.update(row(alternatives[0]))
+            mutations.append(('real_nonwinner_or_ineligible_offer',wrong))
+    if family=='catalog_statistics':
+        if task['operation']!='count' and ref['aggregate_sek'] is not None:
+            wrong=deepcopy(result);wrong['statistic_sek']=scalar(str(Decimal(ref['aggregate_sek'])+1));mutations.append(('aggregate_plus_one_SEK',wrong))
+        elif task['operation']!='count':
+            wrong=deepcopy(result);wrong['statistic_sek']=scalar('0.00');wrong['undefined']=scalar(False);wrong['currency']=scalar('SEK');mutations.append(('invented_aggregate_for_empty_population',wrong))
+        wrong=deepcopy(result);wrong['comparison_url']=scalar(site['origin'].rstrip('/')+'/not-a-catalog');mutations.append(('wrong_citation_route',wrong))
+    if family=='catalog_review':
+        wrong=deepcopy(result);wrong['review_url']=scalar(site['origin'].rstrip('/')+'/not-a-review');mutations.append(('wrong_review_citation_route',wrong))
+        if task['operation']=='rating_summary':
+            wrong=deepcopy(result);wrong['mean_rating']=scalar('0.00' if ref['summary']['mean_rounded']!='0.00' else '1.00');wrong['mean_undefined']=scalar(False);mutations.append(('wrong_rating_mean',wrong))
+        else:
+            wrong=deepcopy(result);wrong['verdict']=scalar('tie' if ref['verdict']!='tie' else 'more_positive');mutations.append(('wrong_directional_verdict',wrong))
+
     def ground(value):
         # Output is a literal structured answer fixture. No text is interpreted
         # or normalized; all evidence authenticates this exact answer only.
@@ -104,4 +136,4 @@ def controls(grader, family, world, *, site_registry=None, bindings=None):
         fill(value)
         return {'answer':answer,'claims':value}
     return [{'control':'correct','expected_verdict':True,**ground(result)},
-            {'control':'wrong','expected_verdict':False,'mutation':mutation,**ground(wrong)}]
+            *[{'control':'wrong','expected_verdict':False,'mutation':name,**ground(value)} for name,value in mutations]]

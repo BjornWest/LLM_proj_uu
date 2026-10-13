@@ -82,3 +82,54 @@ def test_compaction_rejects_unfinished_preparation_and_corrupted_store(tmp_path)
     (directory/'prepared-instance.json').write_text('{}')
     target=store/(sha256(b'{}').hexdigest()+'-644');target.write_text('changed')
     with pytest.raises(ValueError,match='changed'):compact_prepared(directory,store)
+
+
+def _fake_inspection(instance):
+    return {'task':{'task_id':str(instance['value'])},'reference':{},'setup':{},'metrics':{'status':'ready','population':1}}
+
+
+def _selection(*values):
+    rows=[{'id':str(i),'factors':{'family':'fixture','axis':'same'},'instance':{'value':v}} for i,v in enumerate(values)]
+    return select_cases(rows,limit=len(rows))
+
+
+def test_compaction_failure_does_not_erase_preparation_success(tmp_path,monkeypatch):
+    from . import task_compatibility_sweep as sweep,task_instances
+    monkeypatch.setattr(task_instances,'inspect',_fake_inspection)
+    def prepare(instance,path):path.mkdir();return {'recipe':'recipe'}
+    monkeypatch.setattr(task_instances,'prepare',prepare)
+    monkeypatch.setattr(sweep.shutil,'disk_usage',lambda _:type('Disk',(),{'free':2*1024**3})())
+    def broken(*args):raise OSError('EMLINK')
+    monkeypatch.setattr(sweep,'compact_prepared',broken)
+    report=sweep.run_native(_selection('one'),tmp_path/'out',prepare=True,share_assets=True)
+    row=report['results'][0];assert row['stages']['unmocked_preparation']['status']=='passed'
+    assert row['stages']['unmocked_preparation']['receipt']=={'recipe':'recipe'}
+    assert row['stages']['immutable_compaction']['status']=='error'
+    assert report['observed_stage_pair_coverage']['unmocked_preparation']['passed_pairs']==1
+
+
+def test_disk_preflight_is_held_not_an_attempted_freeze(tmp_path,monkeypatch):
+    from . import task_compatibility_sweep as sweep,task_instances
+    monkeypatch.setattr(task_instances,'inspect',_fake_inspection)
+    monkeypatch.setattr(sweep.shutil,'disk_usage',lambda _:type('Disk',(),{'free':0})())
+    def forbidden(*args):raise AssertionError('Freeze must not be called')
+    monkeypatch.setattr(task_instances,'prepare',forbidden)
+    report=sweep.run_native(_selection('one'),tmp_path/'out',prepare=True)
+    assert report['held']==1;assert report['results'][0]['stages']['preparation_preflight']['reason_code']=='insufficient_disk_space'
+    assert report['observed_stage_pair_coverage']['unmocked_preparation']['attempted_pairs']==0
+
+
+def test_mixed_outcome_pairs_and_invalid_input_are_visible(tmp_path,monkeypatch):
+    from . import task_compatibility_sweep as sweep,task_instances
+    def inspect(instance):
+        if instance['value']=='bad':raise ValueError('Fixture failure')
+        return _fake_inspection(instance)
+    monkeypatch.setattr(task_instances,'inspect',inspect)
+    report=sweep.run_native(_selection('good','bad'),tmp_path/'out')
+    coverage=report['observed_stage_pair_coverage']['native_inspection'];assert coverage['passed_pairs']==coverage['mixed_outcome_pairs']==coverage['pairs_with_failure']==1
+    with pytest.raises(ValueError,match='Malformed'):sweep.run_native({'schema':sweep.VERSION,'selected':[{'id':'bad'}]},tmp_path/'invalid')
+    assert not (tmp_path/'invalid').exists()
+
+
+def test_non_object_instances_fail_before_selection():
+    with pytest.raises(ValueError,match='object'):select_cases([{'id':'x','factors':{},'instance':[]}])

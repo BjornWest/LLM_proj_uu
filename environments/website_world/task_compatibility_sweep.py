@@ -1,6 +1,6 @@
 """Deterministic configuration coverage and ordinary saved-task preparation.
 
-Candidate pools are explicit, finite supported configurations. Covered pairs
+Candidate pools are explicit, finite declared configurations. Covered pairs
 are measured against that pool, never against every possible task/world.
 """
 from concurrent.futures import ThreadPoolExecutor
@@ -48,6 +48,7 @@ def select_cases(candidates, *, limit=200, seed=0, triples=()):
             raise ValueError('Each candidate needs id, factors and instance')
         if type(row['id']) is not str or not row['id'] or row['id'] in ids:
             raise ValueError('Candidate IDs must be unique nonempty strings')
+        if type(row['instance']) is not dict:raise ValueError('Candidate instance must be an object')
         ids.add(row['id']);_json(row['instance']);interactions(row['factors'])
         # Wording-only copies must not inflate native configuration diversity.
         instance = {k:v for k,v in row['instance'].items() if k != 'user_message'}
@@ -86,7 +87,7 @@ def select_cases(candidates, *, limit=200, seed=0, triples=()):
     return {'schema':VERSION, 'seed':seed, 'requested_limit':limit,
             'candidate_pool_sha256':sha256(_json(candidates).encode()).hexdigest(),
             'candidate_count':len(candidates), 'selected':deepcopy([candidates[i] for i in chosen]),
-            'coverage':{'scope':'explicit_supported_candidate_pool',
+            'coverage':{'scope':'explicit_declared_candidate_pool',
                         'applicable_pairs':len(all_pairs),'covered_pairs':len(covered_pairs),
                         'uncovered_pairs':encode(all_pairs-covered_pairs),
                         'targeted_triples':len(all_triples),'covered_triples':len(covered_triples),
@@ -145,40 +146,61 @@ def run_native(selection, output, *, workers=2, prepare=False, share_assets=Fals
         raise ValueError('Use1-4 workers and explicit preparation Boolean')
     if selection.get('schema')!=VERSION or not isinstance(selection.get('selected'),list):
         raise ValueError('Use a selected compatibility case set')
+    # Validate before any worker/output side effect; labels do not authenticate parameters.
+    for row in selection['selected']:
+        if type(row) is not dict or set(row)!={'id','factors','instance'} or type(row['instance']) is not dict or type(row['id']) is not str:
+            raise ValueError('Malformed selected configuration')
+        interactions(row['factors']);_json(row['instance'])
     output=Path(output).resolve();output.mkdir(parents=True,exist_ok=False)
     (output/'selection.json').write_text(json.dumps(selection,indent=2,ensure_ascii=False,allow_nan=False)+'\n')
 
+    def finish(result,directory):
+        result['duration_seconds']=round(time.monotonic()-result.pop('started_monotonic'),3)
+        try:(directory/'result.json').write_text(json.dumps(result,indent=2,ensure_ascii=False,allow_nan=False)+'\n')
+        except OSError as error:
+            result['status']='requires_triage'
+            result['artifact_write_error']={'class':type(error).__name__,'message':str(error)}
+        return result
+
     def one(index,row):
         # Opaque candidate labels never become filesystem paths.
-        directory=output/f'{index:04d}';directory.mkdir()
-        (directory/'instance.json').write_text(json.dumps(row['instance'],indent=2,ensure_ascii=False,allow_nan=False)+'\n')
+        directory=output/f'{index:04d}'
         result={'id':row['id'],'factors':deepcopy(row['factors']),'stages':{},
                 'browser':'not_run','model_calls':0,'started_monotonic':time.monotonic()}
         stage='native_inspection'
         try:
+            directory.mkdir()
+            (directory/'instance.json').write_text(json.dumps(row['instance'],indent=2,ensure_ascii=False,allow_nan=False)+'\n')
+            result['stages'][stage]={'status':'running','invoked':True}
             native=task_instances.inspect(row['instance'])
-            result['stages'][stage]={'status':'passed','task_id':native['task']['task_id'],
+            result['stages'][stage]={'status':'passed','invoked':True,'task_id':native['task']['task_id'],
                                      'metrics':native['metrics']}
             for name in ('task','reference','setup'):
                 (directory/(name+'.json')).write_text(json.dumps(native[name],indent=2,ensure_ascii=False,allow_nan=False)+'\n')
             if prepare:
-                stage='unmocked_preparation'
+                stage='preparation_preflight'
                 if shutil.disk_usage(output).free < 1024*1024*1024:
-                    raise OSError('Less than1GiB free: ordinary preparation held to protect retained evidence')
+                    result['stages'][stage]={'status':'held','reason_code':'insufficient_disk_space','minimum_free_bytes':1024**3,'preparation_invoked':False}
+                    result['status']='held'
+                    return finish(result,directory)
+                result['stages'][stage]={'status':'passed'}
+                stage='unmocked_preparation'
+                result['stages'][stage]={'status':'running','invoked':True}
                 receipt=task_instances.prepare(row['instance'],directory/'prepared')
-                result['stages'][stage]={'status':'passed','receipt':receipt}
+                result['stages'][stage]={'status':'passed','invoked':True,'receipt':receipt}
                 if share_assets:
+                    stage='immutable_compaction'
                     result['shared_immutable_assets']=compact_prepared(directory/'prepared',output/'immutable-files')
+                    result['stages'][stage]={'status':'passed'}
             result['status']='passed'
         except Exception as error:
             # A ValueError may be unsupported notation, no saved witness, or
             # infrastructure binding drift. Do not guess from English text.
             result['status']='requires_triage'
-            result['stages'][stage]={'status':'error','exception_class':type(error).__name__,
+            invoked=result['stages'].get(stage,{}).get('invoked',False)
+            result['stages'][stage]={'status':'error','invoked':invoked,'exception_class':type(error).__name__,
                                      'message':str(error)}
-        result['duration_seconds']=round(time.monotonic()-result.pop('started_monotonic'),3)
-        (directory/'result.json').write_text(json.dumps(result,indent=2,ensure_ascii=False,allow_nan=False)+'\n')
-        return result
+        return finish(result,directory)
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures=[pool.submit(one,i,row) for i,row in enumerate(selection['selected'])]
@@ -186,16 +208,21 @@ def run_native(selection, output, *, workers=2, prepare=False, share_assets=Fals
     report={'schema':VERSION,'selection_sha256':sha256(_json(selection).encode()).hexdigest(),
             'configuration_count':len(results),'passed':sum(x['status']=='passed' for x in results),
             'requires_triage':sum(x['status']=='requires_triage' for x in results),
+            'held':sum(x['status']=='held' for x in results),'factors_verified_against_instance':False,
             'results':results,'design_coverage':selection['coverage'],'browsers':0,'models':0,
             'limitations':['Native/preparation acceptance does not establish browser/automatic-grade/HTTP acceptance.',
                            'Coverage is measured against the finite declared candidate pool only.']}
-    attempted=set().union(*(interactions(row['factors']) for row in results))
-    native_passed=set().union(*(interactions(row['factors']) for row in results
-                               if row['stages'].get('native_inspection',{}).get('status')=='passed'))
-    prepared=set().union(*(interactions(row['factors']) for row in results
-                          if row['stages'].get('unmocked_preparation',{}).get('status')=='passed'))
-    report['observed_stage_pair_coverage']={
-        'native_inspection':{'attempted_pairs':len(attempted),'passed_pairs':len(native_passed)},
-        'unmocked_preparation':{'attempted_pairs':len(attempted) if prepare else 0,'passed_pairs':len(prepared)}}
-    (output/'report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False,allow_nan=False)+'\n')
+    encode=lambda values:[[list(pair) for pair in x] for x in sorted(values)]
+    coverage={}
+    for stage in ('native_inspection','unmocked_preparation'):
+        invoked=[r for r in results if r['stages'].get(stage,{}).get('invoked')]
+        attempted=set().union(*(interactions(r['factors']) for r in invoked))
+        passed=set().union(*(interactions(r['factors']) for r in invoked if r['stages'][stage]['status']=='passed'))
+        failed=set().union(*(interactions(r['factors']) for r in invoked if r['stages'][stage]['status']=='error'))
+        coverage[stage]={'attempted_pairs':len(attempted),'passed_pairs':len(passed),
+            'pairs_with_failure':len(failed),'mixed_outcome_pairs':len(passed&failed),
+            'failure_pairs':encode(failed),'meaning':'passed_pairs means at least one case passed, not every case sharing that pair'}
+    report['observed_stage_pair_coverage']=coverage
+    try:(output/'report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False,allow_nan=False)+'\n')
+    except OSError as error:report['report_write_error']={'class':type(error).__name__,'message':str(error)}
     return report
