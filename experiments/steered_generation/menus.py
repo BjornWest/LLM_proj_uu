@@ -63,31 +63,42 @@ def needed(clause):
 def site(world, retailer_id, clause, api):
     """The oracle's modules, the recipe's count weights and what of the world a retailer's menu is read from."""
     clause = resolve(clause)
+    carriers = {row["carrier_id"] for row in world["address_context"]["carriers"]}
+    if set(needed(clause)) - carriers or set(clause.get("carriers", {}).get("exclude", [])) - carriers:
+        raise ValueError("Unknown carrier")
+    found = oracle(world, retailer_id, clause.get("delivery_options", {}), api)
+    found.clause, found.scope = clause, clause.get("destination_type", "home")
+    return found
+
+
+def oracle(world, retailer_id, stated, api):
+    """The same for a recipe's delivery settings alone, for home delivery."""
     website = import_module(api.basic.__package__ + ".delivery_options")
     # A recipe's own settings; version 2 is the only one a menu can be read for, so it is what is asked for.
-    stated = clause.get("delivery_options", {})
-    if type(stated.get("enabled", True)) is not bool or not stated.get("enabled", True) or stated.get("admission_plan", VERSION) != VERSION:
+    if (type(stated) is not dict or type(stated.get("enabled", True)) is not bool or not stated.get("enabled", True) or
+            stated.get("admission_plan", VERSION) != VERSION):
         raise ValueError("Shown options are read for delivery options enabled under admission plan version 2")
     settings = website.options({**stated, "enabled": True, "admission_plan": VERSION})
     admission = import_module(api.commerce.__package__ + ".delivery_admission")
     if website.producer_plan_version(settings) != VERSION or VERSION not in admission.PLAN_VERSIONS:
         raise ValueError("The commerce oracle does not have admission plan version 2")
     backend = admission._backend(world)
-    carriers = {row["carrier_id"] for row in world["address_context"]["carriers"]}
-    if set(needed(clause)) - carriers or set(clause.get("carriers", {}).get("exclude", [])) - carriers:
-        raise ValueError("Unknown carrier")
     retailer = next((row for row in world["retailers"] if row["retailer_id"] == retailer_id), None)
     if retailer is None:
         raise ValueError("Unknown retailer")
     if type(world.get("seed")) is not int or world["seed"] < 0:
         raise ValueError("The world does not record the seed its delivery menus are drawn on")
-    return SimpleNamespace(clause=clause, world=world, retailer=retailer, retailer_id=retailer_id, admission=admission,
+    return SimpleNamespace(clause=None, world=world, retailer=retailer, retailer_id=retailer_id, admission=admission,
                            backend=backend, settings=settings, weights=admission._weights(website.producer_weights(settings)),
-                           destination=world["user_location"], scope=clause.get("destination_type", "home"))
+                           destination=world["user_location"], scope="home")
 
 
-def priced(place, world, retailer, policy, admitted):
-    """The admitted carrier routes in scope with the oracle's tariff for an ordinary parcel any source can ship."""
+def priced(place, world, retailer, policy, admitted, detail=False):
+    """The admitted carrier routes in scope with the oracle's tariff for an ordinary parcel any source can ship.
+
+    With `detail`, each row also carries the oracle's candidates, one per
+    source that could ship the parcel.
+    """
     product = {"facts": {"shipping_class": "regular"}}
     offer = {"stock_by_source": {source["source_id"]: 1 for source in retailer["source_locations"]},
              "supplier_order": {"enabled": False, "wait_days": None}}
@@ -102,11 +113,12 @@ def priced(place, world, retailer, policy, admitted):
             raise AssertionError("An admitted route that no source can ship on")
         rows.append({"route_key": key, "carrier_id": choice["carrier_id"], "tier": choice["tier"],
                      "destination_type": choice["destination_type"], "point_id": choice["point_id"],
-                     "charge_minor": min(row["raw_shipping_minor"] for row in found)})
+                     "charge_minor": min(row["raw_shipping_minor"] for row in found),
+                     **({"candidates": found} if detail else {})})
     return sorted(rows, key=lambda row: (row["charge_minor"], row["route_key"]))
 
 
-def shown(place, contracts):
+def shown(place, contracts, detail=False):
     """A retailer's shown carrier routes if these were its contracts; None where the recipe's counts have no support.
 
     The world is viewed with this one retailer, its contracts replaced and
@@ -124,7 +136,35 @@ def shown(place, contracts):
         if str(error) != UNSUPPORTED:
             raise
         return None
-    return priced(place, view, retailer, policy, set(row["admitted_route_keys"]))
+    return priced(place, view, retailer, policy, set(row["admitted_route_keys"]), detail)
+
+
+def delivery(place):
+    """What home delivery of one unit adds to a price at the retailer, as the oracle charges it; None where it shows no
+    home route.
+
+    Returns `charge(price)`: the cheapest shown home route's tariff, with the
+    ordinary, distance and geographic parts waived where the retailer offers
+    free shipping from a subtotal the price reaches and the parcel does not
+    cross a border. That is one number per route only where every source that
+    can ship charges the same on it and the warehouse, which a supplier order
+    ships from, is one of them; a retailer where that is not so is refused.
+    """
+    rows = shown(place, place.retailer["contracts"], detail=True)
+    if not rows:
+        return None
+    sources = place.retailer["source_locations"]
+    shipping = [source["source_id"] for source in sources if source["shipping_enabled"]]
+    routes = []
+    for row in rows:
+        parts = {(found["raw_shipping_minor"], found["raw_shipping_minor"] if found["foreign"] else
+                  found["tariff_components"]["express_minor"]) for found in row["candidates"]}
+        if (len(parts) != 1 or not sources[0]["shipping_enabled"] or
+                sorted(found["source_id"] for found in row["candidates"]) != sorted(shipping)):
+            raise ValueError("Not modelled: a retailer whose delivery or its charge depends on which location ships")
+        routes.append(parts.pop())
+    threshold = place.retailer["free_shipping_threshold_minor"]
+    return lambda price: min(waived if threshold is not None and price >= threshold else full for full, waived in routes)
 
 
 def official(world, place):

@@ -43,6 +43,10 @@ def resolve(requirement):
             type(requirement["policy"]) is not dict or WINNER & set(requirement["cheapest"]) or
             "concept_id" not in requirement["cheapest"] or {"schema", "retailer_id"} & set(requirement["policy"])):
         raise ValueError("Declare a ranking without a winner (a concept and what competes) and a policy without a retailer")
+    if "delivered" in requirement["cheapest"] and (policies.CONTRACTS & set(requirement["policy"]) or
+                                                   "free_shipping" in requirement):
+        raise ValueError("Not modelled: a ranking by delivered totals with a statement about the winner's contracts or "
+                         "threshold, which those totals are read from")
     # The ranking's and the policy's own words, checked on any winner's and any retailer's name.
     cheapest.resolve(ranking(requirement, ("any", "any")))
     policies.resolve(policy(requirement, "any"))
