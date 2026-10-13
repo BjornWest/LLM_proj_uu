@@ -138,6 +138,7 @@ class CapacityParent:
         self.stop_cause = None
         self.secondary_exits = deque(maxlen=2048)
         self.shutdown_requested = {}
+        self.draining = set()
         self.controller, self.deadline, self.clock = controller, deadline, clock
         self.connections = dict(connections)
         self.active, self.finished, self.threads = set(), set(), {}
@@ -199,6 +200,9 @@ class CapacityParent:
                             or type(value['sequence']) is not int
                             or value['sequence'] != sequence + 1):
                         raise CapacityChannelError('Invalid phase/sequence')
+                    with self.lock:
+                        if self.suite_stop_event.is_set():
+                            raise CapacitySuiteStopped('Suite stopped before generation acquisition')
                     sequence = value['sequence']
                     request_id = f'{case}:{value["phase"]}:{sequence}'
                     remaining = self.deadline - self.clock()
@@ -217,6 +221,8 @@ class CapacityParent:
                             return
                         last_fresh = None
                         while not monitoring_done.is_set() and not stop.is_set():
+                            if self.suite_stop_event.is_set():
+                                stop.set();return
                             try:
                                 events = poll.poll(25)
                                 if any(fd == wake_read.fileno() for fd, _ in events):
@@ -250,6 +256,8 @@ class CapacityParent:
                             if monitor_errors:
                                 raise CapacityChannelError('Capacity watcher failed: '+str(monitor_errors[0])) from exc
                             row = self.controller.status()['episodes'][case]
+                            if self.suite_stop_event.is_set():
+                                raise CapacitySuiteStopped('Suite stopped during generation acquisition') from exc
                             if (isinstance(exc, self.turn_cancelled_type)
                                     and row['dispatch_retired'] and not row['cancelled']):
                                 raise CapacityDispatchRetired('Episode dispatch retired') from exc
@@ -267,27 +275,37 @@ class CapacityParent:
                             self.controller.release_turn(case, request_id)
                         raise CapacityChannelError('Capacity watcher failed: '+
                             (str(monitor_errors[0]) if monitor_errors else 'did not stop'))
-                    row = self.controller.status()['episodes'][case]
-                    if stop.is_set() or row['dispatch_retired'] or row['cancelled']:
-                        # Permit has not been sent, so no HTTP request can exist.
-                        self.controller.release_turn(case, request_id)
-                        if row['dispatch_retired'] and not row['cancelled']:
-                            raise CapacityDispatchRetired('Episode dispatch retired before permit')
-                        raise CapacityChannelError('Child disconnected/cancelled before permit')
-                    # If this send fails, do not release possibly-sent HTTP work.
-                    _send(connection, {'type': 'permit', 'request_id': request_id,
-                        'acquire_wait_seconds':acquire_wait_seconds})
+                    with self.lock:
+                        row = self.controller.status()['episodes'][case]
+                        if self.suite_stop_event.is_set() or stop.is_set() or row['dispatch_retired'] or row['cancelled']:
+                            # Permit has not been sent, so no HTTP work exists.
+                            self.controller.release_turn(case, request_id)
+                            if self.suite_stop_event.is_set():
+                                raise CapacitySuiteStopped('Suite stopped before generation permit')
+                            if row['dispatch_retired'] and not row['cancelled']:
+                                raise CapacityDispatchRetired('Episode dispatch retired before permit')
+                            raise CapacityChannelError('Child disconnected/cancelled before permit')
+                        # Serialize the last check and send with cohort abort.
+                        # Failed sends still retain possibly-sent HTTP ownership.
+                        _send(connection, {'type': 'permit', 'request_id': request_id,
+                            'acquire_wait_seconds':acquire_wait_seconds})
                 elif value.get('type') == 'release':
                     if set(value) != {'type', 'request_id'} or type(value['request_id']) is not str:
                         raise CapacityChannelError('Invalid release frame')
-                    self.controller.release_turn(case, value['request_id'])
-                    _send(connection, {'type': 'released', 'request_id': value['request_id']})
+                    # Serialize exact release + acknowledgement with abort's
+                    # decision to close an idle channel. Otherwise cancellation
+                    # can observe request_id=None and destroy its pending ack.
+                    with self.lock:
+                        self.controller.release_turn(case, value['request_id'])
+                        connection.settimeout(5)
+                        _send(connection, {'type': 'released', 'request_id': value['request_id']})
                 else:
                     raise CapacityChannelError('Unknown capacity operation')
         except Exception as exc:
             failed = True
             row = self.controller.status()['episodes'].get(case, {})
-            reason = ('explicit_cancellation' if row.get('cancelled') else
+            reason = ('cohort_abort' if isinstance(exc, CapacitySuiteStopped) else
+                'explicit_cancellation' if row.get('cancelled') else
                 'dispatch_retirement' if isinstance(exc, CapacityDispatchRetired) else
                 'rental_deadline' if isinstance(exc, (TimeoutError, CapacityTransportTimeout))
                     and self.clock() >= self.deadline else 'channel_failure')
@@ -323,7 +341,8 @@ class CapacityParent:
                     if not failed and row['request_id'] is not None:
                         with self.lock:
                             self.errors[case] = dict(type='CapacityChannelError',
-                                message=('Parent stopped channel with an in-flight request' if requested
+                                message=('Capacity cleanup channel ended with an in-flight request' if case in self.draining
+                                    else 'Parent stopped channel with an in-flight request' if requested
                                     else 'Child disconnected with an in-flight request'),
                                 reason=requested if requested in ('explicit_cancellation','cohort_abort','parent_close')
                                     else 'cohort_abort' if requested else 'inflight_disconnect')
@@ -350,7 +369,9 @@ class CapacityParent:
             self.controller.retire_dispatch(case)
 
     def _shutdown(self, case, *, reason='parent_shutdown'):
-        with self.lock:self.shutdown_requested.setdefault(case, reason)
+        with self.lock:
+            self.shutdown_requested.setdefault(case, reason)
+            self.draining.discard(case)
         self.stops[case].set()
         try:
             self.connections[case].shutdown(socket.SHUT_RDWR)
@@ -373,6 +394,16 @@ class CapacityParent:
             if registered:
                 self._cancel_registered(case)
                 self.controller.retire_dispatch(case)
+                if cohort_abort and not self.closed and self.controller.status()['episodes'][case]['request_id'] is not None:
+                    # Keep the sent request accounted for, and preserve its
+                    # release/ack path while buffered HTTP cleanup completes.
+                    # Retirement/cancellation reject further acquisition. The
+                    # outer child/relay watchdog bounds this drain; close()
+                    # still contains a stuck peer without releasing its permit.
+                    self.shutdown_requested.setdefault(case, 'cohort_abort')
+                    self.draining.add(case)
+                    self.stops[case].set()
+                    return
         self._shutdown(case, reason='cohort_abort' if cohort_abort else 'explicit_cancellation')
 
     def finish_after_cleanup(self, case, *, verify_cleanup, record_terminal, timeout=5):

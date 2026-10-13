@@ -574,10 +574,109 @@ class CapacityRPCTests(unittest.TestCase):
             for c in clients:parent.activate(c)
             permit=clients['run:b']._exchange({'type':'acquire','phase':'policy','sequence':1})
             parent.abort_after_failure('run:a',RuntimeError('Root failure'),infrastructure=True)
+            self.assertNotIn('run:b',parent.ended)
+            self.assertIn('run:b',parent.draining)
+            self.assertEqual(controller.status()['episodes']['run:b']['request_id'],permit['request_id'])
+            # Forced containment after the outer cleanup watchdog is still
+            # diagnosed as parent shutdown, never as a peer disconnect.
+            parent._shutdown('run:b',reason='cohort_abort')
             wait_for(self,lambda:'run:b'in parent.ended)
             self.assertEqual(parent.errors['run:b']['reason'],'cohort_abort')
             self.assertIn('Parent stopped channel',parent.errors['run:b']['message'])
             self.assertEqual(controller.status()['episodes']['run:b']['request_id'],permit['request_id'])
+
+    def test_abort_cannot_close_channel_between_exact_release_and_ack(self):
+        from unittest.mock import patch
+        with setup(generation_cap=2)as(controller,parent,clients):
+            for case in clients:parent.activate(case)
+            entered=threading.Event();resume=threading.Event();aborted=threading.Event();errors=[]
+            original=rpc._send
+            def send(connection,value):
+                if value.get('type')=='released':entered.set();resume.wait(3)
+                return original(connection,value)
+            def complete():
+                try:
+                    with clients['run:b'].turn('formatter'):pass
+                except BaseException as exc:errors.append(exc)
+            def abort():
+                try:parent.abort_after_failure('run:a',RuntimeError('grader failure'),infrastructure=True)
+                except BaseException as exc:errors.append(exc)
+                finally:aborted.set()
+            with patch.object(rpc,'_send',send):
+                worker=threading.Thread(target=complete);worker.start()
+                stopping=threading.Thread(target=abort)
+                try:
+                    self.assertTrue(entered.wait(2));stopping.start()
+                    self.assertFalse(aborted.wait(.05));resume.set();worker.join(3);stopping.join(3)
+                    self.assertFalse(worker.is_alive());self.assertFalse(stopping.is_alive());self.assertEqual(errors,[])
+                    self.assertIsNone(clients['run:b'].infrastructure_error)
+                    self.assertIsNone(controller.status()['episodes']['run:b']['request_id'])
+                finally:
+                    resume.set();worker.join(3)
+                    if stopping.ident is not None:stopping.join(3)
+
+    def test_permit_send_is_serialized_with_abort(self):
+        from unittest.mock import patch
+        with setup(generation_cap=2)as(controller,parent,clients):
+            for case in clients:parent.activate(case)
+            entered=threading.Event();resume=threading.Event();sent=threading.Event();aborted=threading.Event();errors=[]
+            original=rpc._send
+            def send(connection,value):
+                if value.get('type')=='permit':entered.set();resume.wait(3)
+                result=original(connection,value)
+                if value.get('type')=='permit':sent.set()
+                return result
+            def receive():
+                try:clients['run:b']._exchange({'type':'acquire','phase':'formatter','sequence':1})
+                except BaseException as exc:errors.append(exc)
+            def abort():
+                try:parent.abort_after_failure('run:a',RuntimeError('native failure'),infrastructure=True)
+                except BaseException as exc:errors.append(exc)
+                finally:aborted.set()
+            with patch.object(rpc,'_send',send):
+                worker=threading.Thread(target=receive);worker.start();stopping=threading.Thread(target=abort)
+                try:
+                    self.assertTrue(entered.wait(2));stopping.start();self.assertFalse(aborted.wait(.05))
+                    resume.set();worker.join(3);stopping.join(3);self.assertTrue(sent.is_set());self.assertTrue(aborted.is_set());self.assertEqual(errors,[])
+                    self.assertEqual(controller.status()['episodes']['run:b']['request_id'],'run:b:formatter:1')
+                finally:
+                    resume.set();worker.join(3)
+                    if stopping.ident is not None:stopping.join(3)
+
+    def test_direct_suite_stop_rejects_new_acquisition(self):
+        with setup()as(controller,parent,clients):
+            parent.activate('run:a')
+            with clients['run:a'].turn('policy'):pass
+            parent.suite_stop_event.set()
+            with self.assertRaises(rpc.CapacityParentError)as caught:
+                with clients['run:a'].turn('formatter'):self.fail('Post-stop HTTP started')
+            self.assertEqual(caught.exception.parent_error_type,'CapacitySuiteStopped')
+            self.assertEqual(caught.exception.parent_reason,'cohort_abort')
+            self.assertIsNone(controller.status()['episodes']['run:a']['request_id'])
+
+    def test_direct_suite_stop_wakes_unsent_acquisition(self):
+        with setup()as(controller,parent,clients):
+            parent.activate('run:a');controller.telemetry=None;errors=[]
+            def acquire():
+                try:
+                    with clients['run:a'].turn('formatter'):self.fail('Stopped HTTP started')
+                except BaseException as exc:errors.append(exc)
+            worker=threading.Thread(target=acquire);worker.start()
+            wait_for(self,lambda:controller.status()['episodes']['run:a']['waiting'])
+            parent.suite_stop_event.set();worker.join(3);self.assertFalse(worker.is_alive())
+            self.assertEqual(len(errors),1);self.assertIsInstance(errors[0],rpc.CapacityParentError)
+            self.assertEqual(errors[0].parent_error_type,'CapacitySuiteStopped')
+            row=controller.status()['episodes']['run:a'];self.assertIsNone(row['request_id']);self.assertFalse(row['waiting'])
+
+    def test_close_does_not_reenter_abort_drain(self):
+        with setup()as(controller,parent,clients):
+            for case in clients:parent.activate(case)
+            clients['run:b']._exchange({'type':'acquire','phase':'formatter','sequence':1})
+            parent.abort_after_failure('run:a',RuntimeError('root'),infrastructure=True)
+            self.assertIn('run:b',parent.draining);parent.close()
+            self.assertEqual(parent.draining,set())
+            self.assertIsNotNone(controller.status()['episodes']['run:b']['request_id'])
+            self.assertFalse(controller.status()['episodes']['run:b']['done'])
 
     def test_abort_does_not_cancel_a_sibling_already_in_final_verification(self):
         with setup()as(controller,parent,_):

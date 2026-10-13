@@ -211,3 +211,16 @@ child capacity RPC. Policy and formatter remain supplied scripted responses.
 `scripted-capacity-fixture.json` records that no serving readiness, Qwen counter
 parity or provider inference was established. This branch cannot run for a model
 episode; real mode still requires `ServingAdmission` and its current source proof.
+
+## Formatter cleanup during a cohort abort
+
+A cohort stop retires/cancels dispatch admission but keeps an already-sent
+request's release/ack channel open. The private relay drains an established
+connection for `shutdown_grace_seconds` (default30, validated1..120), bounded
+also by the allocation deadline. No new request may acquire a permit.
+The caller still verifies process exit, wrapper/HTTP cleanup and persisted
+terminal evidence before finishing the controller row. An expired drain, peer
+death or missing acknowledgement retains ownership; abort alone never frees a
+sent request. Explicit cancellation and final host close still force transport
+containment and do not claim verified HTTP cleanup. This is prospective source
+behavior; the original Verda B02 failure and all grades remain unchanged.

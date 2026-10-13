@@ -261,6 +261,9 @@ class CapacityHost:
         self.listeners, self.tokens, self.relays = {}, {}, {}
         self.controller=self.parent=self.observer=self.poller=self.journal=self.observer_rpc=self.limits_rpc=None
         self.deadline = deadline
+        self.cleanup_grace = source.get('shutdown_grace_seconds',30)
+        if type(self.cleanup_grace) is not int or not 1 <= self.cleanup_grace <= 120:
+            raise ValueError('Capacity relay cleanup grace must be1..120 seconds')
         try:
             for ident in case_ids:self.pairs[ident]=socket.socketpair()
             limits = source.get('runtime_limits')
@@ -326,10 +329,17 @@ class CapacityHost:
                 if not hmac.compare_digest(raw.rstrip(b'\n').decode(),self.tokens[ident]):
                     raise ValueError('Foreign capacity capability')
                 remote.sendall(b'OK\n');remote.setblocking(False);local.setblocking(False)
+                drain_deadline = None
                 with selectors.DefaultSelector() as selector:
                     selector.register(remote,selectors.EVENT_READ,local)
                     selector.register(local,selectors.EVENT_READ,remote)
-                    while not self.stop.is_set() and time.monotonic()<self.deadline:
+                    while True:
+                        now=time.monotonic()
+                        if self.stop.is_set() and drain_deadline is None:
+                            drain_deadline=now+self.cleanup_grace
+                        if now >= self.deadline or (drain_deadline is not None and now >= drain_deadline):return
+                        # A stop blocks new admission, but an established peer
+                        # must still deliver its final exact release and ack.
                         for key,_ in selector.select(.2):
                             try:data=key.fileobj.recv(65536)
                             except BlockingIOError:continue
