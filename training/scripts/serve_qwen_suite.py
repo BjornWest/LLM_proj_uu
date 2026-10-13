@@ -125,6 +125,7 @@ def environment(cuda_home, cache_root, inherited):
                HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', WANDB_MODE='disabled',
                PYTHONDONTWRITEBYTECODE='1', PYTHONUNBUFFERED='1',
                PYTHONNOUSERSITE='1', PYTHONSAFEPATH='1', OMP_NUM_THREADS='1',
+               SPT_NOENV='1',  # Keep /proc environment observable after vLLM title changes.
                TOKENIZERS_PARALLELISM='false',
                VLLM_CACHE_ROOT=str(cache_root / 'vllm'),
                TRITON_CACHE_DIR=str(cache_root / 'triton'))

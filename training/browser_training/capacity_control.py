@@ -8,7 +8,7 @@ freshness, native grading, policy leases and rental deadlines remain external.
 
 from collections import deque
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 import http.client
 import math
 import re
@@ -302,8 +302,14 @@ class EpisodeCapacityController:
     request: victims are selected from our registered live episodes instead.
     This is reactive flow control, not a prediction/reservation of prefix bytes.
     """
-    def __init__(self, config=ParkingConfig(), *, clock=time.monotonic):
+    def __init__(self, config=ParkingConfig(), *, clock=time.monotonic, limits_ceiling=None):
         config.validate()
+        initial = {k: getattr(config, k) for k in ("max_active_episodes", "max_generation_requests")}
+        self.limits_ceiling = dict(initial if limits_ceiling is None else limits_ceiling)
+        if (set(self.limits_ceiling) != set(initial) or any(type(v) is not int or v < initial[k]
+                for k, v in self.limits_ceiling.items())):
+            raise ValueError("Explicit ceilings must cover initial positive limits")
+        self.limits_revision = 0
         self.config, self.clock = config, clock
         self.condition = threading.Condition()
         self.rows = {}
@@ -318,6 +324,42 @@ class EpisodeCapacityController:
         self.sequence += 1
         self.events.append(dict(sequence=self.sequence, time=self.clock(), kind=kind,
                                 episode_id=episode, **details))
+
+    def limits(self):
+        with self.condition:
+            return dict(revision=self.limits_revision, ceilings=dict(self.limits_ceiling),
+                max_active_episodes=self.config.max_active_episodes,
+                max_generation_requests=self.config.max_generation_requests,
+                active_episodes=sum(not r["done"] for r in self.rows.values()),
+                generation_requests=sum(r["request_id"] is not None for r in self.rows.values()))
+
+    def update_limits(self, *, max_active_episodes, max_generation_requests, expected_revision):
+        """Change admission targets atomically; existing episodes/turns drain.
+
+        Ceilings are supplied by the owning caller from its fixed browser/server
+        resources. A revision prevents two API callers overwriting each other.
+        This changes no policy, prefix, parking state or in-flight request.
+        """
+        updates = dict(max_active_episodes=max_active_episodes,
+                       max_generation_requests=max_generation_requests)
+        if type(expected_revision) is not int or expected_revision < 0:
+            raise ValueError("Expected a nonnegative exact revision")
+        if any(type(value) is not int or not 1 <= value <= self.limits_ceiling[key]
+               for key, value in updates.items()):
+            raise ValueError("Requested limits exceed fixed resource ceilings")
+        with self.condition:
+            if self.closed:
+                raise TurnCancelled("Controller closed")
+            if expected_revision != self.limits_revision:
+                raise ValueError("Limits revision changed; reload before updating")
+            previous = {k: getattr(self.config, k) for k in updates}
+            self.config = replace(self.config, **updates)
+            self.config.validate()
+            self.limits_revision += 1
+            self._emit("limits_changed", previous=previous, limits=updates,
+                       revision=self.limits_revision)
+            self.condition.notify_all()
+            return self.limits()
 
     def register_episode(self, episode_id, *, priority=0):
         if not isinstance(episode_id, str) or not episode_id or type(priority) is not int:
