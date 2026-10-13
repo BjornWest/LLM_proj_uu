@@ -344,6 +344,6 @@ The shared tokenizer and Chromium service start from the first case in this
 attempt's `start_order`, so a retained older case cannot supply an incompatible
 pool manifest for corrected pending cases. All pending clients still need the
 same installed pool adapter/shutdown/asset qualification. `pool_memory_mib`
-(default3072, range1024–8192) and `pool_tasks` (default512, range128–1024) are
+(default3072, range1024–8192) and `pool_tasks` (default512, range128–512) are
 finite per-service ceilings, not reservations. Bind these settings in actual
 native/browser/HTTP acceptance and report measured concurrency and memory.

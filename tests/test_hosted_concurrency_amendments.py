@@ -41,8 +41,8 @@ class ConcurrencyAmendmentTests(unittest.TestCase):
         with self.assertRaises(ValueError):caller.pool_source_case({'cases':cases,'start_order':[]})
         with self.assertRaises(ValueError):caller.pool_source_case({'cases':cases+cases,'start_order':['pending']})
         self.assertEqual(caller.pool_resource_options({}),(3072,512))
-        self.assertEqual(caller.pool_resource_options({'pool_memory_mib':6144,'pool_tasks':1024}),(6144,1024))
-        for key,value in [('pool_memory_mib',True),('pool_memory_mib',8193),('pool_tasks',None),('pool_tasks',1025)]:
+        self.assertEqual(caller.pool_resource_options({'pool_memory_mib':6144,'pool_tasks':512}),(6144,512))
+        for key,value in [('pool_memory_mib',True),('pool_memory_mib',8193),('pool_tasks',None),('pool_tasks',513)]:
             with self.subTest(key=key),self.assertRaises(ValueError):caller.pool_resource_options({key:value})
 
     def test_amendment_keeps_measured_native_failure_in_discovered_history(self):

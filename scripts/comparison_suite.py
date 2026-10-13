@@ -369,7 +369,7 @@ def pool_source_case(spec):
 
 def pool_resource_options(spec):
  memory=spec.get('pool_memory_mib',3072);tasks=spec.get('pool_tasks',512)
- if type(memory)is not int or not 1024<=memory<=8192 or type(tasks)is not int or not 128<=tasks<=1024:
+ if type(memory)is not int or not 1024<=memory<=8192 or type(tasks)is not int or not 128<=tasks<=512:
   raise ValueError('Finite explicit shared-pool resource limits required')
  return memory,tasks
 
