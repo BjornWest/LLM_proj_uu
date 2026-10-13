@@ -265,6 +265,23 @@ class SteeringTests(Menus):
         with self.assertRaises(blocks.Coupled):
             combined.prepare(self.natural, {"schema": combined.VERSION, "all": [seller, policy]}, self.api, Random(0))
 
+    def test_the_runner_samples_shown_options(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from experiments.steered_generation import run
+        args = SimpleNamespace(samples=2, producer_redraws=2, validate_trials=800)
+        case = {"samples": [], "requirement_sha256": "x"}
+        with TemporaryDirectory() as folder:
+            run.policy_case(args, self.session, self.natural, self.opened, self.api,
+                            self.need(shown={"cheapest_carrier": self.carriers[2]}), case, lambda index: Path(folder) / str(index))
+        self.assertEqual((case["status"], len(case["samples"])), ("sampled", 2))
+        self.assertTrue(all(menus.cheapest(row["shown"]) == self.carriers[2] for row in case["samples"]))
+        self.assertEqual(case["producer_redraws"]["identical_to_reading"], 2)
+        missing = {"samples": [], "requirement_sha256": "x"}
+        run.policy_case(args, self.session, self.natural, self.opened, self.api,
+                        self.need("small", shown={"carriers": {"include": self.carriers[:4]}}), missing, None)
+        self.assertEqual(missing["status"], "zero_probability_given_upstream")
+
     def unwaived(self, seller, rated, plain):
         """The same with no free shipping at the winner: what the menu costs is what every one of its offers is quoted."""
         seller = {**seller, "free_shipping": False}

@@ -1149,6 +1149,17 @@ world of "A medium world" (21 retailers, 90 products), four seconds a sample:
   delivery metrics follow (attempts on the promised day 84% to 66% where
   punctuality turns weak).
 
+- With shown options (`case-shown`; admission plan version 2): "the retailer
+  with the cheapest available walking shoe shows the carrier the seed rates
+  highest as its cheapest home-delivery option, offers no free shipping, and
+  that carrier is rated at most 3.6". In the seed's own world no retailer
+  shows that carrier cheapest. Probability about 0.046 (an estimate; a
+  minute to model, once) times 0.012; 5.4 seconds a sample. In 16 samples
+  six retailers win; in the four worlds whose quotes were read, the admitted
+  oracle quotes that carrier as the cheapest home option for every one of
+  the winner's offers (36 to 60 each), and the carrier's average is 3.44 to
+  3.59.
+
 ## Requirement candidates for a native task
 
 `variants.of(world, task, api)` takes a native task specification (the

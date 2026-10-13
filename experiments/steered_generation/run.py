@@ -33,7 +33,7 @@ from . import (blocks, carriers, cheapest, combined, listed, policies, price_bou
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
               "listed.py", "shortlist.py", "threshold.py", "reviews.py", "programs.py", "pages.py", "carriers.py", "shipments.py",
-              "policies.py", "sellers.py", "ratings.py", "combined.py", "variants.py", "run.py"),
+              "policies.py", "menus.py", "sellers.py", "ratings.py", "combined.py", "variants.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -422,6 +422,7 @@ def policy_case(args, session, natural, opened, api, requirement, case, folder):
         files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
         case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
                                 "contracts": found["contracts"], "warehouse_dispatch_days": found["warehouse_dispatch_days"],
+                                **({"shown": found["shown"]} if "shown" in found else {}),
                                 "streams_steered": record["streams_steered"], "files": files})
     if args.producer_redraws:
         producer_redraws(args, session, natural, [policies.trial(natural, requirement, api)], case)
