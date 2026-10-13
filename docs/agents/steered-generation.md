@@ -1082,13 +1082,14 @@ total are those of the accepted leaves, and the runner compares no
 distribution of winning totals there. Several designated retailers, or
 offers listed below the winner, are refused there.
 
-On the medium world, for size-42 walking shoes: by listed price six
+On the medium world, for size-42 walking shoes: by listed price five
 retailers are about equally likely to have the cheapest (0.13 each);
 delivered, one with free delivery at these prices has it with probability
 0.64, two others with 0.15 and 0.14, and one that ships across a border for
-224 to 249 kronor practically never. Steered to the first, the lowest listed
-price among available offers is at another retailer in seven of eight
-samples (`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
+224 to 249 kronor practically never. Steered to the first, an available
+offer at another retailer is listed strictly cheaper in five of eight
+samples and at the same price in two more
+(`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
 
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
 total, home delivery; a cap, a deadline, other methods or a comparison site
@@ -1105,6 +1106,45 @@ The check is the native task's reference on the steered world (through
 the admitted oracle's quotes for every competing offer: who can be
 delivered and each total are the block's, on the natural world, with a
 threshold lowered until it waives, and on steered worlds.
+
+### The cheapest delivered offer comes with this carrier
+
+Requirement (`steered-cheapest-delivered-carrier-v1`, `couriers.py`): a
+ranking by delivered totals with one designated retailer and product, and a
+carrier. It holds when that offer alone is the cheapest delivered home and
+the retailer's cheapest shown home option, which that total is made with, is
+the carrier's.
+
+```json
+{"schema": "steered-cheapest-delivered-carrier-v1", "carrier_id": "carrier-03",
+ "cheapest": {"concept_id": "footwear.walking_shoes",
+              "predicates": [{"field": "sku.size_eu", "operator": "eq", "value": 42}],
+              "delivered": {}, "retailer_ids": ["footwear-01"],
+              "product_id": "footwear-brand-12/footwear.walking_shoes/10"}}
+```
+
+The ranking reads the winner's contracts, so the winner's contracts and the
+concept's stock and prices are one block. They are drawn independently,
+which gives a sample by acceptance: contracts from their distribution given
+that they show the carrier cheapest; stock and prices from the ranking's
+block between bounds no contracts can leave (the designated pair charged
+nothing for delivery, the retailer's other products the most any contract
+can charge, `menus.ceiling`); a pair of draws is accepted when the
+designated offer is cheapest delivered on the charges the drawn contracts
+make. The requirement implies both conditions, so accepted pairs are samples
+given it. The probability is the two conditions' probabilities times the
+accepted share of 200 pairs: an estimate, labelled as one. On the pilot
+world: 0.047 for the pair most likely to be cheapest delivered and a carrier
+it does not contract with naturally (0.045 under 3,000 other seeds); ten
+seconds to model, one second a sample.
+
+The check asks the plans a site is built from for the winner's shown
+options and the native delivery task for its reference: the designated
+offer wins, and every winning option is the carrier's. Combined with the
+thirteenth requirement on the same carrier this is "the cheapest delivered
+offer comes with a badly rated carrier". It reads every other ranked
+retailer's contracts and threshold and the winner's threshold, so none of
+those can be redrawn beside it.
 
 ## The twelfth requirement: who is cheapest, with that retailer's policy
 
@@ -2160,10 +2200,11 @@ carries review and description text that the checks also digest.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
   against a basket's subtotal, and so can its contracts and, under admission
   plan version 2, the delivery options it shows and which carrier's is
-  cheapest, and who is cheapest delivered for one unit sent home with the
-  contracts as the seed drew them. Not modelled: who is cheapest delivered
-  together with redrawn contracts or thresholds (the two are one block
-  then); delivery to a collection point, by a deadline or fastest first;
+  cheapest, who is cheapest delivered for one unit sent home, and that
+  together with the carrier the winner delivers with. Not modelled: who is
+  cheapest delivered together with other statements about contracts or
+  with thresholds; delivery to a collection point, by a deadline or fastest
+  first;
   the order-set task, whose optimum is over baskets. Under plan version 1,
   which existing recipes use, a retailer's shown routes are redrawn by any
   steered change (`delivery_admission.py` draws on the finished world's

@@ -606,8 +606,13 @@ def reading_of(requirement):
                        if key not in ("schema", "product_id", "retailer_ids", "listed_below")}, sort_keys=True)
 
 
-def frame(world, requirement, api):
+def frame(world, requirement, api, charges=None):
     """What every requirement with one reading shares on one world.
+
+    `charges` replaces, for a ranking by delivered totals, the delivery charge
+    of the retailers it names (see `couriers.py`, which redraws a retailer's
+    contracts beside the ranking); their pairs then compete whether or not
+    the retailer shows a home route as its contracts are.
 
     The scope, the block's pairs and, filled in as they are first needed, the
     spread of each pair when none of its offers is named as listed below the
@@ -617,11 +622,15 @@ def frame(world, requirement, api):
     """
     stated(requirement)
     found = scope(world, requirement, api)
+    if charges:
+        found.delivered = {**found.delivered, **charges}
+        found.pairs = found.pairs | {(r["retailer_id"], o["product_id"]) for r in world["retailers"]
+                                     if r["retailer_id"] in charges for o in r["offers"] if o["sku_id"] in found.skus}
     return SimpleNamespace(world=world, reading=reading_of(requirement), scope=found,
                            places=places(world, found, api), plain={})
 
 
-def model(world, requirement, api, shared=None):
+def model(world, requirement, api, shared=None, estimate=True):
     """The concept's stock-and-price block and the probability of the requirement in it.
 
     For a winning price w, the term is the probability that every designated
@@ -646,7 +655,9 @@ def model(world, requirement, api, shared=None):
     the latter that also satisfy the former are samples given the
     requirement (`prepare` draws until one does), and the probability is the
     modelled one times the share of `PROPOSALS` such samples that do: an
-    estimate, with its standard error in `error`.
+    estimate, with its standard error in `error`. Without `estimate` the
+    bounded block is returned as it is, for a caller that accepts its samples
+    on a condition of its own.
     """
     if shared is not None and (shared.world is not world or shared.reading != reading_of(resolve(requirement))):
         raise ValueError("A shared frame serves one world and one reading")
@@ -701,7 +712,9 @@ def model(world, requirement, api, shared=None):
                             shares={price: exp(value - log_probability) for price, value in log_terms.items()},
                             below=below, config=config, native_round=native_round, scope=block_scope,
                             bounded=bounded, estimated=bounded, accepted=None, error=0.0)
-    if bounded:
+    if bounded and not estimate:
+        block.shares = None
+    elif bounded:
         key = world["world_id"], json.dumps(requirement, sort_keys=True)
         if key not in ESTIMATES:
             # The same draws for the same world and requirement, in this process and the next.

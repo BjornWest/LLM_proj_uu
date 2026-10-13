@@ -27,13 +27,13 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import (blocks, carriers, cheapest, combined, listed, policies, price_bounds, prices, ratings, reviews, sellers,
-               shipments, shortlist, stock, streams, threshold, variants)
+from . import (blocks, carriers, cheapest, combined, couriers, listed, policies, price_bounds, prices, ratings,
+               reviews, sellers, shipments, shortlist, stock, streams, threshold, variants)
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
               "listed.py", "shortlist.py", "threshold.py", "reviews.py", "programs.py", "pages.py", "carriers.py", "shipments.py",
-              "policies.py", "menus.py", "sellers.py", "ratings.py", "combined.py", "variants.py", "run.py"),
+              "policies.py", "menus.py", "sellers.py", "couriers.py", "ratings.py", "combined.py", "variants.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -443,6 +443,36 @@ def policy_case(args, session, natural, opened, api, requirement, case, folder):
         frequency_check(case, block.probability, hits, args.validate_trials, block.error)
 
 
+def courier_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        block = couriers.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status=absent(error), reason=error.reason, detail=str(error))
+        return
+    case.update(status="sampled", probability_given_upstream=block.probability,
+                log_probability_given_upstream=block.log_probability, probability_is_estimated=True,
+                probability_standard_error=block.error, proposals=couriers.PROPOSALS, proposals_accepted=block.accepted,
+                contracts_probability=block.contracts.probability, bounded_ranking_probability=block.block.probability)
+    for index in range(args.samples):
+        clock = time.monotonic()
+        world, found, record = couriers.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        seconds = time.monotonic() - clock
+        # The native reference's own winner rows: the carrier and the total.
+        pinned.ensure(all(row["delivery"]["carrier_id"] == requirement["carrier_id"] and
+                          row["option"]["total_minor"] == record["winning_total_minor"] for row in found["reference"]["winners"]),
+                      "The native reference disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "task.private.json": found["task"],
+                                      "reference.private.json": found["reference"], "steering.json": record})
+        case["samples"].append({"folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+                                "total_minor": found["total_minor"], "contracts": found["contracts"],
+                                "streams_steered": record["streams_steered"], "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [couriers.trial(natural, requirement, api)], case)
+    if args.validate_trials:
+        hits = couriers.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        frequency_check(case, block.probability, hits, args.validate_trials, block.error)
+
+
 def stars_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = ratings.model(natural, requirement, api)
@@ -607,6 +637,7 @@ CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_c
          policies.VERSION: ("shipping_policy", policy_case),
          sellers.VERSION: ("cheapest_seller_policy", seller_case),
          ratings.VERSION: ("carrier_stars", stars_case),
+         couriers.VERSION: ("cheapest_delivered_carrier", courier_case),
          combined.VERSION: ("combined", combined_case)}
 
 
