@@ -27,11 +27,21 @@ stars given the total, and redraws each stream until it gives what was
 picked. A low rating therefore comes mostly from a carrier that serves
 badly, to the extent the producer ties the two, and only then from harsher
 reviews of what happened.
+
+A requirement may add what the carrier's comments say about one aspect
+(`topic`, in the ninth requirement's words: a verdict or counts of positive
+and negative comments, in a shipping class or a range of dates). The two
+are statements about the same reviews, so they are one block here: samples
+of the block given the stars and levels are drawn until the comments are as
+stated, and the probability is the stars' own times the share of a fixed
+number of such samples that qualify, an estimate.
 """
+from datetime import datetime
 from functools import lru_cache
 from itertools import product
 import json
 from math import exp, lgamma, log
+from random import Random
 import sys
 from types import SimpleNamespace
 
@@ -44,6 +54,9 @@ from .reviews import NEGATIVE, POSITIVE, TRIES
 
 VERSION = "steered-carrier-stars-v1"
 STARS = (1, 2, 3, 4, 5)
+# With a topic: how many samples of the block estimate the share whose comments are as stated, and the estimates
+# made in this process.
+PROPOSALS, ESTIMATES = 200, {}
 # The producer's own figures for the stars, which it does not keep in its configuration: how far the share of a
 # history that went well moves the chance of a star, how concentrated a review's own leaning is, and the weight of
 # timeliness among the groups of observations. The reading of a redrawn stream runs the producer's own lines.
@@ -52,7 +65,13 @@ FLOOR, SPAN, CONCENTRATION, TIMELINESS = .1, .8, 1.5, 2
 
 def resolve(requirement):
     stated = {"average_stars", "levels"}
-    if (type(requirement) is not dict or not {"schema", "carrier_id"} <= set(requirement) <= {"schema", "carrier_id"} | stated or
+    if type(requirement) is dict and "topic" in requirement:
+        topic = requirement["topic"]
+        if type(topic) is not dict or {"schema", "carrier_id"} & set(topic) or type(requirement.get("carrier_id")) is not str:
+            raise ValueError("A topic is the carrier-review requirement's statement, without its schema and carrier")
+        carriers.resolve(spoken(requirement))
+        requirement = {key: value for key, value in requirement.items() if key != "topic"} | {"topic": topic}
+    if (type(requirement) is not dict or not {"schema", "carrier_id"} <= set(requirement) <= {"schema", "carrier_id", "topic"} | stated or
             requirement["schema"] != VERSION or not stated & set(requirement) or
             type(requirement["carrier_id"]) is not str or not requirement["carrier_id"]):
         raise ValueError("Declare a carrier and its average stars, the levels of its service, or both")
@@ -65,6 +84,11 @@ def resolve(requirement):
     if type(levels) is not dict or not levels or any(type(value) is not str for value in levels.values()):
         raise ValueError("Levels are stated per aspect, one level each")
     return json.loads(json.dumps(requirement))
+
+
+def spoken(requirement):
+    """The carrier-review requirement a topic states."""
+    return {"schema": carriers.VERSION, "carrier_id": requirement["carrier_id"], **requirement["topic"]}
 
 
 def footprint(world, requirement, api):
@@ -94,8 +118,13 @@ def site(world, requirement, api):
     for aspect, level in requirement.get("levels", {}).items():
         if aspect not in aspects or level not in table:
             raise ValueError(f"Unknown aspect or level: {aspect} {level}")
+    scope = None
+    if "topic" in requirement:
+        # The native task's own reading of the aspect, the shipping class and the dates.
+        below = carriers.site(world, spoken(requirement), api)
+        scope = below.native.resolve(carriers.task(world, below.requirement))
     return SimpleNamespace(
-        requirement=requirement, carrier_id=carrier, seed=corpus["seed"], producer=producer, base=base,
+        requirement=requirement, carrier_id=carrier, seed=corpus["seed"], producer=producer, base=base, scope=scope,
         text=corpus["parameters"]["text_probability"], count=corpus["parameters"]["shipments_per_carrier"],
         policy=next(row for row in corpus["public"]["carriers"] if row["carrier_id"] == carrier),
         rates=experience["success_probabilities_by_aspect_level"], table=table, aspects=aspects, natural=natural,
@@ -187,7 +216,13 @@ def chances(place, history):
 
 
 def rated(place, index, history, seed):
-    """A shipment's stars as the producer draws its review with the stream under a seed: its own lines.
+    """A shipment's stars as the producer draws its review with the stream under a seed."""
+    return reviewed(place, index, history, seed)[0]
+
+
+def reviewed(place, index, history, seed):
+    """A shipment's stars and the aspects its comment mentions, as the producer draws its review with the stream
+    under a seed: its own lines.
 
     The comment's observations as `carriers.drawn` reads them, one draw for
     the wording of each statement, then the producer's `stars` and the hold.
@@ -203,7 +238,25 @@ def rated(place, index, history, seed):
         for _ in chosen:
             stream.random()
     signs = {found["sentiment"] for found in chosen}
-    return held(place.producer.stars(history["observations"], stream), POSITIVE in signs, NEGATIVE in signs)
+    return (held(place.producer.stars(history["observations"], stream), POSITIVE in signs, NEGATIVE in signs),
+            [found["aspect"] for found in chosen])
+
+
+def said(place, happened, mentions):
+    """Whether the comments on the topic's aspect, in its scope, are as the topic states them.
+
+    A review counts when its shipment's history has an observation of the
+    aspect and its comment mentions it; it takes the observation's side.
+    """
+    topic, seen = spoken(place.requirement), dict.fromkeys(carriers.SIGNS, 0)
+    for history, mentioned in zip(happened, mentions):
+        day = datetime.fromisoformat(history["receipt_at"]).date().isoformat()
+        sign = next((found["sentiment"] for found in history["observations"] if found["aspect"] == topic["aspect"]), None)
+        if (sign is not None and topic["aspect"] in mentioned and
+                place.scope["shipping_class"] in ("all", history["shipping_class"]) and
+                place.scope.get("date_from", "0001-01-01") <= day <= place.scope.get("date_to", "9999-12-31")):
+            seen[sign] += 1
+    return carriers.holds(topic, *(seen[sign] for sign in carriers.SIGNS))
 
 
 def level(place, aspect, seed):
@@ -253,7 +306,26 @@ def model(world, requirement, api):
     if not found:
         raise ZeroMass("no_outcome", "No levels and stars of this carrier satisfy the requirement in this world")
     total = min(0.0, joined([row.value for row in found]))
-    return SimpleNamespace(site=place, alternatives=found, log_probability=total, probability=exp(total))
+    block = SimpleNamespace(site=place, alternatives=found, log_probability=total, probability=exp(total),
+                            estimated="topic" in requirement, accepted=None, error=0.0)
+    if block.estimated:
+        key = world["world_id"], json.dumps(requirement, sort_keys=True)
+        if key not in ESTIMATES:
+            # The same draws for the same world and requirement, in this process and the next.
+            rng = Random(api.native.digest({"world_id": world["world_id"], "requirement": requirement}))
+            ESTIMATES[key] = 0
+            for _ in range(PROPOSALS):
+                drawn = draw(block, rng)
+                ESTIMATES[key] += said(place, drawn.histories, drawn.mentions)
+        block.accepted = ESTIMATES[key]
+        if not block.accepted:
+            # Not a proof that it cannot occur: callers report it as not found.
+            raise ZeroMass("not_found", f"None of {PROPOSALS} samples of the carrier's reviews has the comments as stated")
+        share = block.accepted / PROPOSALS
+        block.log_probability += log(share)
+        block.probability *= share
+        block.error = block.probability * ((1 - share) / (share * PROPOSALS)) ** .5
+    return block
 
 
 def written(world, place):
@@ -275,12 +347,14 @@ def check(world, requirement, api):
     if not holds(place.requirement, levels, stars):
         raise Unmet("The carrier's levels and average stars are not as required")
     return {"carrier_id": place.carrier_id, "aspect_levels": levels, "average_stars": summary["average_stars"],
-            "rating_counts": summary["rating_counts"]}
+            "rating_counts": summary["rating_counts"],
+            # The comments by the native carrier-review task's own reference.
+            **({"topic": carriers.check(world, spoken(place.requirement), api)} if "topic" in place.requirement else {})}
 
 
-def prepare(natural, requirement, api, rng):
-    """Sample the block on the natural world; the step replays it and reads the result."""
-    block = model(natural, requirement, api)
+def draw(block, rng):
+    """One sample of the block given the stars and levels: the levels, the histories under them, every review's stars,
+    the seed of every stream that gives them, and what each review's comment mentions."""
     place = block.site
     chosen = pick_log(rng, block.alternatives, [row.value for row in block.alternatives])
     left, stars = pick_log(rng, list(chosen.totals), list(chosen.totals.values())), []
@@ -303,13 +377,32 @@ def prepare(natural, requirement, api, rng):
         redraw(place.quality[aspect], lambda seed: level(place, aspect, seed), chosen.levels[aspect])
     for index, history in enumerate(chosen.histories):
         redraw(place.review(index), lambda seed: rated(place, index, history, seed), stars[index])
+    return SimpleNamespace(levels=chosen.levels, histories=chosen.histories, stars=stars, seeds=seeds, tries=tries,
+                           mentions=[reviewed(place, index, history, seeds[place.review(index)])[1]
+                                     for index, history in enumerate(chosen.histories)])
+
+
+def prepare(natural, requirement, api, rng):
+    """Sample the block on the natural world; the step replays it and reads the result."""
+    block = model(natural, requirement, api)
+    place = block.site
+    for samples in range(1, (TRIES if block.estimated else 1) + 1):
+        chosen = draw(block, rng)
+        if not block.estimated or said(place, chosen.histories, chosen.mentions):
+            break
+    else:
+        raise NumericalLimit("Reviews whose comments are as stated are too rare to reach")
+    stars, seeds, tries = chosen.stars, chosen.seeds, chosen.tries
     before = written(natural, place)
 
     def record(world):
         if written(world, place) != (chosen.levels, stars):
             raise streams.PlanMismatch(f"{place.carrier_id}: producer recorded other levels or stars than planned")
-        return {"method": "one_of_level_choices_then_exact_total_then_per_review_rejection",
+        return {"method": "one_of_level_choices_then_exact_total_then_per_review_rejection" + (
+                    "_then_rejection_on_comments" if block.estimated else ""),
                 "requirement": place.requirement, "natural_world_id": natural["world_id"],
+                **({"probability_is_estimated": True, "probability_standard_error": block.error, "proposals": PROPOSALS,
+                    "proposals_accepted": block.accepted, "block_samples_for_this_sample": samples} if block.estimated else {}),
                 "probability_given_upstream": block.probability, "log_probability_given_upstream": block.log_probability,
                 "level_choices_modelled": len(block.alternatives), "shipments": place.count, "stream_redraws": tries,
                 "natural": {"aspect_levels": before[0], "average_stars": average(sum(before[1]), len(before[1]))},
@@ -325,7 +418,8 @@ def prepare(natural, requirement, api, rng):
                                       "probability as the importance weight across seeds."}
 
     return Step(script={key: streams.Reseeded(seed) for key, seed in seeds.items()}, probability=block.probability,
-                log_probability=block.log_probability, **vars(footprint(natural, requirement, api)), record=record,
+                log_probability=block.log_probability, error=block.error, estimated=block.estimated,
+                **vars(footprint(natural, requirement, api)), record=record,
                 check=lambda world: check(world, requirement, api))
 
 
@@ -342,10 +436,16 @@ def trial(natural, requirement, api):
         levels = {aspect: level(place, aspect, seed) for aspect in place.aspects}
         return levels, [rated(place, index, history, seed) for index, history in enumerate(histories(place, levels))]
 
+    def met(seed):
+        levels = {aspect: level(place, aspect, seed) for aspect in place.aspects}
+        happened = histories(place, levels)
+        found = [reviewed(place, index, history, seed) for index, history in enumerate(happened)]
+        return holds(place.requirement, levels, [stars for stars, _ in found]) and (
+            "topic" not in place.requirement or said(place, happened, [mentioned for _, mentioned in found]))
+
     return SimpleNamespace(
         keys=set(place.quality.values()) | {place.review(index) for index in range(place.count)},
-        **vars(footprint(natural, requirement, api)), reading=reading,
-        holds=lambda seed: holds(place.requirement, *reading(seed)),
+        **vars(footprint(natural, requirement, api)), reading=reading, holds=met,
         recorded=lambda world: written(world, place),
         satisfied=lambda world: satisfied(world, requirement, api))
 

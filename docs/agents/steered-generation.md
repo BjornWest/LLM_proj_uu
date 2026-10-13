@@ -1251,6 +1251,24 @@ a retailer that ships with this carrier only, and this carrier is rated at
 most 3.9" is two independent blocks. It does not combine with the ninth or
 the tenth requirement on the same carrier, whose reviews it redraws.
 
+What the same carrier's comments say can be stated inside it instead, as a
+`topic` in the ninth requirement's words:
+
+```json
+{"schema": "steered-carrier-stars-v1", "carrier_id": "carrier-03",
+ "average_stars": {"max": 3.8},
+ "topic": {"aspect": "punctuality", "verdict": "more_negative"}}
+```
+
+Samples of the block given the stars and levels are drawn until the comments
+are as stated, so the sample is from the block's distribution given all of
+it; the probability is the stars' own times the share of 200 such samples
+that qualify, an estimate and labelled as one. On the pilot world "rated at
+most 3.8 and more negative than positive about punctuality" has probability
+0.017 (0.16 for the stars alone; 0.021 under 3,000 other seeds), and the
+samples come with weak punctuality. The check adds the native
+carrier-review task's reference.
+
 Limits. The history streams are not redrawn for the stars: the sample and its
 probability are given those streams, and what happened to each shipment is
 what they give under the sampled levels. The levels are private
