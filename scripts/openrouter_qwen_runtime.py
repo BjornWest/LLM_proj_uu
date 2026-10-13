@@ -17,7 +17,17 @@ HOSTED_REQUEST_MAX_SECONDS = 180
 def validate_limits(spec):
     if type(spec.get('formatter_quote_pair_schema', False)) is not bool:
         raise ValueError('Explicit boolean formatter quote-pair schema option required')
-    if ('max_steps' not in spec or 'episode_timeout' not in spec
+    finite = spec.get('hosted_limit_profile') == 'finite-task-limits-v1'
+    if spec.get('hosted_limit_profile') not in (None, 'finite-task-limits-v1'):
+        raise ValueError('Unknown hosted limit profile')
+    if finite:
+        if (type(spec.get('max_steps')) is not int or not 1 <= spec['max_steps'] <= 200
+                or type(spec.get('max_input_tokens')) is not int
+                or not 1 <= spec['max_input_tokens'] <= INPUT_LIMIT
+                or spec.get('episode_timeout', 'missing') is not None
+                or spec.get('server_context_tokens') != CONTEXT):
+            raise ValueError('Explicit finite task/input limits and native context required')
+    elif ('max_steps' not in spec or 'episode_timeout' not in spec
             or spec['max_steps'] is not None or spec['episode_timeout'] is not None
             or spec.get('max_input_tokens') != INPUT_LIMIT
             or spec.get('server_context_tokens') != CONTEXT):
@@ -32,7 +42,12 @@ def validate_limits(spec):
     if not spec.get('shared_tokenizer') or not spec.get('shared_chromium'):
         raise ValueError('Hosted Qwen requires the qualified shared harness')
     for case in spec['cases']:
-        if (case.get('policy_model') != MODEL or case.get('max_input_tokens') != INPUT_LIMIT
+        limit = case.get('max_input_tokens')
+        steps = case.get('max_steps')
+        if finite and (type(limit) is not int or not 1 <= limit <= spec['max_input_tokens']
+                or type(steps) is not int or not 1 <= steps <= spec['max_steps']):
+            raise ValueError('Finite per-case input/turn limits required')
+        if (case.get('policy_model') != MODEL or (not finite and limit != INPUT_LIMIT)
                 or case.get('id') != 'qwen-'+case.get('task_id', '')):
             raise ValueError('Exact hosted Qwen model, task identity and input limit required')
 
@@ -168,7 +183,7 @@ class HostedQwenBackend:
 
     def __init__(self, raw, counter, *, phase, maximum, deadline, timeout,
                  directory=None, meter=lambda row: None, clock=time.time,
-                 quote_pair_schema=False):
+                 quote_pair_schema=False, input_limit=INPUT_LIMIT):
         if raw.model != MODEL or raw.base_url != 'https://openrouter.ai/api/v1':
             raise ValueError('Exact OpenRouter Qwen backend required')
         if phase not in ('policy', 'formatter'):
@@ -180,6 +195,9 @@ class HostedQwenBackend:
                 or type(deadline) not in (int, float) or not math.isfinite(deadline)
                 or deadline <= clock()):
             raise ValueError('Bounded output/request and future suite deadline required')
+        if type(input_limit) is not int or not 1 <= input_limit <= INPUT_LIMIT:
+            raise ValueError('Hosted input limit must be an integer within 150000')
+        self.input_limit = input_limit
         self.raw, self.counter = raw, counter
         self.phase, self.maximum = phase, maximum
         self.deadline, self.timeout, self.clock = deadline, timeout, clock
@@ -246,8 +264,8 @@ class HostedQwenBackend:
                 or schema_tokens < 0):
             raise ValueError('Invalid model-matched complete-input estimate')
         tokens += schema_tokens
-        if tokens > INPUT_LIMIT or tokens >= CONTEXT:
-            raise ValueError('Hosted complete input exceeds 150000/context; no dispatch')
+        if tokens > self.input_limit or tokens >= CONTEXT:
+            raise ValueError(f'Hosted complete input exceeds {self.input_limit}/context; no dispatch')
         remaining = self.deadline-self.clock()
         if remaining <= 0:
             raise TimeoutError('Suite deadline elapsed; no dispatch')

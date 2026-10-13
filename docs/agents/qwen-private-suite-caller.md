@@ -383,3 +383,21 @@ Shared services verify that all pending cases bind the same pool client, broker,
 BrowserGym adapter/shutdown and runner bytes before registering the attempt.
 Retained outcomes keep their historical sources and are excluded from this
 prospective service compatibility check.
+
+
+## Finite hosted task instances
+
+The opt-in `hosted_limit_profile: finite-task-limits-v1` accepts an exact pinned
+request with per-case `max_steps` and `maximum_complete_input_tokens`. The suite
+maxima bound each case; both policy and schema formatter enforce the case input
+ceiling. It retains the native 262144-token context, 180-second hosted request
+watchdog, one formatter dispatch and no automatic retries. Older hosted suites
+retain their 150000-input/no-turn-limit contract.
+
+A `hosted-finite-task-authorization-v1` binds the complete request, model,
+concurrency and ordered prepared instances. `finite-hosted-native-controls-v1`
+may reference independent scripted native controls from the identical prepared
+recipes and source root. These controls retain their original producer, result,
+canonical grade, public task, metadata and actual HTTP evidence; they are never
+relabelled as executions of the hosted caller. Source, counter, hosted transport,
+recording and configuration qualification remain separate requirements.
