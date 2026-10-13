@@ -20,3 +20,17 @@ This source correction is prospective. Frozen runs, raw click-stall evidence and
 existing provider/task/world bindings remain unchanged. Model-free synthetic
 cancellation tests establish the adapter boundary; actual pooled browser and
 provider adoption require separate qualification.
+
+
+Qualified native resource teardown and pooled close dispatch separate budgets
+for task teardown, task/chat contexts and owned client connections. Each new
+resource gets a fresh deadline; one expired context budget must not starve a
+later connection close. Pooled recording wrappers still execute around their
+original close. The phase hook is scoped to that environment/PoolEpisode and
+restored on exit. Nested lease closes dispatch individual resources instead of
+sharing an enclosing five-second composite budget. Recording transfers within
+one context still share that context's budget; any failure remains explicit.
+The pool release acknowledgement is not proof that contexts, recordings or
+native teardown succeeded. Unsupported custom closes retain their explicit
+composite budget and independent owned-connection fallback. Version/connection
+qualification failures remain fail-closed; parent containment is required.

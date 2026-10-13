@@ -118,3 +118,64 @@ def test_caller_cancellation_restores_owned_connections():
                 raise asyncio.CancelledError()
         assert (task.wrap_api_call,chat.wrap_api_call)==originals
     asyncio.run(run())
+
+
+@pytest.mark.parametrize('fail_context',[False,True])
+def test_pooled_resources_get_fresh_budgets_preserve_wrapper_and_attempt_connections(fail_context):
+    from intent_browser.browser_shutdown import cleanup_phase_dispatch,phase_managed_close
+    from intent_browser.shared_browsergym import SharedBrowserEnv,PoolEpisode,SharedChat,_BrowserLease
+    import time
+    events=[];released=[];originals=[]
+    episode=PoolEpisode.__new__(PoolEpisode);episode.closed=False;episode.leases=[]
+    episode.client=SimpleNamespace(request=lambda op,payload:released.append(payload['lease_id']))
+    def resource(role,kind,conn):
+        def close():
+            events.append(role+'_'+kind)
+            async def run():
+                conn._loop=asyncio.get_running_loop()
+                async def rpc():
+                    if fail_context and kind=='context':await asyncio.Event().wait()
+                    else:await asyncio.sleep(.006)
+                await conn.wrap_api_call(rpc)
+            asyncio.run(run())
+        return SimpleNamespace(_impl_obj=SimpleNamespace(_connection=conn),close=close)
+    def lease(role):
+        conn=SimpleNamespace(_callbacks={},_loop=None)
+        async def original(cb,*a,**kw):return await cb()
+        conn.wrap_api_call=original;originals.append((conn,original))
+        result=_BrowserLease.__new__(_BrowserLease);result.episode=episode
+        result.context=resource(role,'context',conn);result.browser=resource(role,'browser',conn)
+        result.closed=False;result.record={'lease_id':role,'owner':'owner','release_token':'token'}
+        return result
+    task,chat=lease('task'),lease('chat')
+    env=SharedBrowserEnv.__new__(SharedBrowserEnv);env.pool_episode=episode
+    env.task=SimpleNamespace(teardown=lambda:events.append('task_teardown'))
+    env.page=None;env.context=task.context;env.browser=task
+    env.chat=SharedChat.__new__(SharedChat);env.chat.pool_episode=episode
+    env.chat.context=chat.context;env.chat.browser=chat
+    # Keep the capture/recording close wrapper in the path.
+    native_close=env.close
+    def wrapped_close():
+        events.append('wrapper_enter')
+        try:return native_close()
+        finally:events.append('wrapper_exit')
+    env.close=wrapped_close
+    failures=[]
+    def phase(name,callback,seconds=2):
+        if phase_managed_close(callback):return callback()
+        try:
+            with cleanup_rpc_budget(env,None,seconds=.02,phase=name):return callback()
+        except Exception as error:
+            failures.append((name,type(error).__name__));raise
+    started=time.monotonic()
+    with cleanup_phase_dispatch(env,phase):
+        if fail_context:
+            with pytest.raises(Exception,match='Shared environment close failed'):env.close()
+        else:env.close()
+    assert events[0]=='wrapper_enter' and events[-1]=='wrapper_exit'
+    assert 'task_browser' in events and 'chat_browser' in events
+    assert set(released)=={'task','chat'}
+    assert time.monotonic()-started>.02  # Total exceeds a composite deadline.
+    assert bool(failures)==fail_context
+    assert all(conn.wrap_api_call is original for conn,original in originals)
+    assert '_cleanup_phase' not in vars(env) and '_cleanup_phase' not in vars(episode)

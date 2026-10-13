@@ -162,12 +162,13 @@ class _BrowserLease:
     def close(self):
         if self.closed: return
         errors = []
-        try:
-            if self.context is not None: self.context.close()
-        except Exception as error: errors.append(error)
-        try:
-            if self.browser is not None: self.browser.close()
-        except Exception as error: errors.append(error)
+        phase = getattr(self.episode, '_cleanup_phase', None)
+        if phase is None: phase = lambda name, fn, **kwargs: fn()
+        for name, resource, seconds in (('lease_context_close', self.context, 5),
+                                        ('lease_browser_close', self.browser, 2)):
+            if resource is not None:
+                try: phase(name, resource.close, seconds=seconds)
+                except Exception as error: errors.append(error)
         try:
             self.episode.client.request('release', {'lease_id': self.record['lease_id'],
                 'owner': self.episode.owner, 'release_token': self.record['release_token']})
@@ -230,9 +231,12 @@ class SharedChat(Chat):
 
     def close(self):
         errors = []
-        for resource in (getattr(self, 'context', None), getattr(self, 'browser', None)):
+        phase = getattr(self.pool_episode, '_cleanup_phase', None)
+        if phase is None: phase = lambda name, fn, **kwargs: fn()
+        for name, resource, seconds in (('chat_context_close', getattr(self, 'context', None), 5),
+                                        ('chat_browser_close', getattr(self, 'browser', None), 2)):
             if resource is not None:
-                try: resource.close()
+                try: phase(name, resource.close, seconds=seconds)
                 except Exception as error: errors.append(error)
         if errors: raise PoolError('Chat context/connection cleanup failed: '+
             '; '.join(type(error).__name__+': '+str(error) for error in errors)) from errors[0]
@@ -279,7 +283,9 @@ class SharedBrowserEnv(BrowserEnv):
         from .browser_shutdown import _close_qualified_resources
         if not qualified_shared_environment(self):
             raise ValueError('Resource shutdown requires native BrowserGym close')
-        failures = _close_qualified_resources(self, lambda name, fn, **kwargs: fn())
+        phase = getattr(self, '_cleanup_phase', None)
+        if phase is None: phase = lambda name, fn, **kwargs: fn()
+        failures = _close_qualified_resources(self, phase)
         if failures: raise PoolError('Shared environment close failed: '+repr(failures))
         self.page = None
 

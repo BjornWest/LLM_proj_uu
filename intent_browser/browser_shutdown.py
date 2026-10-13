@@ -82,3 +82,34 @@ def cleanup_rpc_budget(env, trace, *, seconds, phase, required=False):
             budget.phase = 'teardown_' + phase
             stack.enter_context(budget.rpc_deadline())
         yield len(carriers)
+
+
+@contextmanager
+def cleanup_phase_dispatch(env, phase):
+    """Pass phase budgets through the owned pooled close, preserving wrappers."""
+    from .shared_browsergym import qualified_shared_environment
+    base = getattr(env, 'unwrapped', env)
+    if not qualified_shared_environment(base):
+        yield
+        return
+    missing = object()
+    targets = (base, base.pool_episode)
+    previous = [vars(target).get('_cleanup_phase', missing) for target in targets]
+    try:
+        for target in targets: target._cleanup_phase = phase
+        yield
+    finally:
+        for target, prior in zip(targets, previous):
+            if prior is missing: del target._cleanup_phase
+            else: target._cleanup_phase = prior
+
+
+def phase_managed_close(callback):
+    # Exact owned lease methods dispatch concrete RPCs under fresh budgets.
+    # Wrapping their entire multi-resource close would consume those budgets.
+    from .shared_browsergym import _BrowserLease, SharedChat
+    owner = getattr(callback, '__self__', None)
+    return (type(owner) in (_BrowserLease, SharedChat)
+            and getattr(callback, '__func__', None) is type(owner).close
+            and callable(getattr(owner.episode if type(owner) is _BrowserLease
+                                 else owner.pool_episode, '_cleanup_phase', None)))

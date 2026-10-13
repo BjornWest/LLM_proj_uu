@@ -1517,7 +1517,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 started=time.monotonic();failure=None;connection_count=0
                 trace.event('cleanup_phase_started',phase=name)
                 try:
-                    from .browser_shutdown import cleanup_rpc_budget
+                    from .browser_shutdown import cleanup_rpc_budget,phase_managed_close
+                    if phase_managed_close(callback): return callback()
                     with cleanup_rpc_budget(env,trace,seconds=seconds,phase=name,
                                             required=human_browser is not None) as connection_count:
                         return callback()
@@ -1554,29 +1555,34 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     trace.event('observation_pipeline_cleanup_failed',error=f'{type(exc).__name__}: {exc}')
             if screenshot_capture_original is not None:
                 base_env._get_obs=screenshot_capture_original
-            try:
-                from .browser_shutdown import supported,close_resources
-                if human_browser is not None and human_browser.stable_frames and supported(env):
-                    failures=close_resources(env,cleanup_phase)
-                    if failures:raise RuntimeError('; '.join(f"{f['phase']}: {f['error']}" for f in failures))
-                else:cleanup_phase('browsergym_close',env.close,seconds=5.0)
-            except Exception as exc:
-                error = error or f"Close failed: {exc}"
-                evaluation_data["technical_error"] = error
-                evaluation_data["safe_success"] = None
-                write_json(trace.directory / "evaluation.json", evaluation_data)
-                # A failed task/chat/context cleanup must not leave the owned
-                # Chromium alive merely because the remaining close was skipped.
-                browser=getattr(env.unwrapped,'browser',None)
-                if human_browser is not None and browser is not None:
-                    try:cleanup_phase('browser_close_fallback',browser.close)
-                    except Exception as close_exc:
-                        trace.event('browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
-                chat=getattr(env.unwrapped,'chat',None)
-                if human_browser is not None and chat is not None and getattr(chat,'browser',None) is not None:
-                    try:cleanup_phase('chat_browser_close_fallback',chat.browser.close)
-                    except Exception as close_exc:
-                        trace.event('chat_browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
+            from .browser_shutdown import cleanup_phase_dispatch
+            with cleanup_phase_dispatch(env,cleanup_phase):
+                try:
+                    from .browser_shutdown import supported,close_resources
+                    from .shared_browsergym import qualified_shared_environment
+                    if qualified_shared_environment(base_env):
+                        env.close()  # The original pooled close (including recording wrappers) dispatches phases.
+                    elif supported(env):
+                        failures=close_resources(env,cleanup_phase)
+                        if failures:raise RuntimeError('; '.join(f"{f['phase']}: {f['error']}" for f in failures))
+                    else:cleanup_phase('browsergym_close',env.close,seconds=5.0)
+                except Exception as exc:
+                    error = error or f"Close failed: {exc}"
+                    evaluation_data["technical_error"] = error
+                    evaluation_data["safe_success"] = None
+                    write_json(trace.directory / "evaluation.json", evaluation_data)
+                    # A failed task/chat/context cleanup must not leave the owned
+                    # Chromium alive merely because the remaining close was skipped.
+                    browser=getattr(env.unwrapped,'browser',None)
+                    if browser is not None:
+                        try:cleanup_phase('browser_close_fallback',browser.close)
+                        except Exception as close_exc:
+                            trace.event('browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
+                    chat=getattr(env.unwrapped,'chat',None)
+                    if chat is not None and getattr(chat,'browser',None) is not None:
+                        try:cleanup_phase('chat_browser_close_fallback',chat.browser.close)
+                        except Exception as close_exc:
+                            trace.event('chat_browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
             from .shared_browsergym import qualified_shared_environment
             if qualified_shared_environment(base_env):
                 trace.metadata['shared_chromium'] = base_env.pool_episode.metadata()
