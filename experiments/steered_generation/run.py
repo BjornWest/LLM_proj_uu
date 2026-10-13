@@ -692,14 +692,18 @@ def main():
     task = None
     if args.task:
         task_raw = args.task.read_bytes()
-        found = variants.of(natural, json.loads(task_raw), api)
+        # With names, only those candidates are listed, which can save modelling the others.
+        found = variants.of(natural, json.loads(task_raw), api, args.candidate)
+        wanted = [row["name"] for row in found] if args.candidate is None else args.candidate
+        if set(wanted) - {row["name"] for row in found} or len(set(wanted)) != len(wanted):
+            every = variants.of(natural, json.loads(task_raw), api)
+            if not every:
+                raise ValueError("No candidates for this task on this world")
+            raise ValueError("Unknown or repeated candidate; this task has on this world: " +
+                             ", ".join(row["name"] for row in every))
         if not found:
             # Nothing to run is not a run that passed.
             raise ValueError("No candidates for this task on this world")
-        wanted = [row["name"] for row in found] if args.candidate is None else args.candidate
-        if set(wanted) - {row["name"] for row in found} or len(set(wanted)) != len(wanted):
-            raise ValueError("Unknown or repeated candidate; this task has on this world: " +
-                             ", ".join(row["name"] for row in found))
     output.mkdir(parents=True, exist_ok=False)
     if args.task:
         (output / "candidates").mkdir()

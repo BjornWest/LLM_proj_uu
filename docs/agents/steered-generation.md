@@ -1432,11 +1432,17 @@ python3 scripts/run_bounded_job.py -- python -B -m experiments.steered_generatio
     --samples 2 --validate-trials 2000 --producer-redraws 2 --output FOLDER
 ```
 
-It writes every candidate of the task under `FOLDER/candidates/`, runs the
-named ones (all of them without `--candidate`; an unknown name is an error
-that lists the names, and a task with no candidate on the world is an error
-too, both before anything is written), and records the task's digest and the candidates with
-their probabilities in the receipt. Each sample folder holds the steered
+It writes the candidates under `FOLDER/candidates/` and runs them: every
+candidate of the task without `--candidate`, the named ones with it (an
+unknown name is an error that lists the task's names, and a task with no
+candidate on the world is an error too, both before anything is written).
+The receipt records the task's digest and those candidates with their
+probabilities. Naming candidates can save time, since the others are then
+not modelled where that can be avoided: `variants.of(..., only=NAMES)`
+lists a delivery task's `answer_carrier_rated_lowest` alone from the native
+task's reading, without the model of every pair that the task's other
+candidates need (most of an hour on the medium world where charges depend
+on the location, against seconds). Each sample folder holds the steered
 world, what the check read off it and the steering record. Tried on two
 suite tasks (`suite/variants/one-command/`): H10's review task with
 `verdict_tie` took 8 s in all, B16's carrier task with

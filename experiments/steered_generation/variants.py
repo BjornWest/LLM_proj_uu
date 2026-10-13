@@ -46,6 +46,7 @@ RESOLVED = {"cheapest_matching_with_memory": ".memory_offer_task",
 # Every field of a task that this module reads or knowingly leaves alone, by kind. A task with any other field
 # is refused: a native field that changes the answer (a price cap, say) must not be dropped in translation.
 DELIVERY, ORDERS = "matching_single_item_delivery", "cheapest_matching_order_set"
+KEPT = "answer_carrier_rated_lowest"
 FIELDS = {**{kind: {"kind", "concept_id", *fields} for kind, fields in WINNERS.items()},
           # One unit delivered at the lowest total, or by a deadline or earliest first (then only the answer's
           # carriers are steered); a comparison site or physical stock is not carried. The recipe's delivery
@@ -156,7 +157,7 @@ def answer_rated(world, used, api):
     if len(rows) < len(used):
         return []
     needs = sorted((row[1] for row in rows), key=lambda need: need["carrier_id"])
-    return [entry("answer_carrier_rated_lowest", "the answer as this world has it, with every carrier it is delivered "
+    return [entry(KEPT, "the answer as this world has it, with every carrier it is delivered "
                   "with rated lower than all the other carriers",
                   (sum(row[0] for row in rows), needs[0] if len(needs) == 1 else {"schema": combined.VERSION, "all": needs}))]
 
@@ -370,12 +371,21 @@ def carrier_verdicts(world, task, api):
     return found
 
 
-def of(world, task, api):
+def of(world, task, api, only=None):
     """Scenarios of a native task on a world, as requirement candidates.
 
     An unsupported kind is a ValueError, and so is a task with a field this
-    module does not carry into the requirement.
+    module does not carry into the requirement. `only` names the candidates
+    wanted: the others are left out, and are not modelled where that can be
+    avoided (a delivery task's kept answer alone comes without the model of
+    every pair of the concept that the task's other candidates need).
     """
+    found = scenarios(world, task, api, only is not None and set(only) == {KEPT})
+    return found if only is None else [row for row in found if row["name"] in only]
+
+
+def scenarios(world, task, api, kept=False):
+    """Every candidate of a task, or with `kept` at least the kept answer of a delivery task."""
     kind = task.get("kind") if type(task) is dict else None
     if kind in FIELDS and set(task) - FIELDS[kind]:
         raise ValueError("Steering cannot state this field of the task: " + ", ".join(sorted(set(task) - FIELDS[kind])))
@@ -404,7 +414,7 @@ def of(world, task, api):
         delivered = {**{key: task[key] for key in ("delivery_options", "max_total_minor") if key in task}, **kinds}
         asked = {key: task[key] for key in ("objective", "arrival_deadline")
                  if key in task and (key, task[key]) != ("objective", "cheapest_total")}
-        if asked:
+        if asked or kept:
             # The block ranks by the total alone. Under another ranking or a deadline the answer is read and kept.
             scope = cheapest.scope(world, {"concept_id": task["concept_id"], "predicates": task.get("predicates"),
                                            "delivered": delivered}, api)

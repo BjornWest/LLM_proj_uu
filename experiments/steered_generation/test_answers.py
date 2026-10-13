@@ -122,6 +122,14 @@ class AnswerTests(Answers):
         # Under a ranking the block does not model, the kept answer is the only candidate.
         for task in tasks[1:]:
             self.assertEqual([row["name"] for row in variants.of(self.natural, task, self.api)], [NAME])
+        # Asked for alone it is the same candidate, listed without modelling the others; other names filter.
+        every = variants.of(self.natural, ITEM, self.api)
+        with patch.object(cheapest, "frame", side_effect=AssertionError("the block was modelled")):
+            self.assertEqual(variants.of(self.natural, ITEM, self.api, only=[NAME]), every[-1:])
+        self.assertEqual(variants.of(self.natural, ITEM, self.api, only=["likeliest_winner", NAME]), [every[0], every[-1]])
+        self.assertEqual(variants.of(self.natural, ITEM, self.api, only=["no_such_candidate"]), [])
+        self.assertEqual(variants.of(self.natural, ITEM, self.api, only=[]), [])
+        self.assertEqual(variants.of(self.natural, ORDERS, self.api, only=["likeliest_winner"]), [])
         # A deadline nothing meets leaves no answer to keep.
         self.assertEqual(variants.of(self.natural, {**ITEM, "arrival_deadline": "2020-01-01"}, self.api), [])
         self.assertEqual(variants.of(self.natural, {**ITEM, "objective": "fastest_then_cheapest", "max_total_minor": 0},
