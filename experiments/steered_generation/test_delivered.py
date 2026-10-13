@@ -282,6 +282,39 @@ class SteeringTests(Delivered):
                 cheapest.model(self.natural, {**capped, "delivered": {"max_total_minor": bad}}, self.api)
             self.assertNotIsInstance(caught.exception, prices.ZeroMass)
 
+    def test_a_cap_through_the_seller_requirement(self):
+        """Astra v35: the seller requirement's own reading of who wins must honour the cap, as its model and check do."""
+        natural = self.frame.scope.reference(self.natural)[1]["optimal_score"][0]
+        ranking = {key: value for key, value in self.base.items() if key != "schema"}
+        seller = lambda cap: {"schema": sellers.VERSION, "policy": {"dispatch_days": {"min": 1}},
+                              "cheapest": {**ranking, "delivered": {"max_total_minor": cap}}}
+        need, trials = seller(natural - 1), 500
+        block = sellers.model(self.natural, need, self.api)
+        open_block = sellers.model(self.natural, {**need, "cheapest": ranking}, self.api)
+        self.assertLess(block.probability, open_block.probability)
+        hits, chance = sum(sellers.empirical(self.natural, need, self.api, trials, 10 ** 6).values()), block.probability
+        self.assertLess(abs(hits / trials - chance), 4.5 * (chance * (1 - chance) / trials + block.error ** 2) ** .5 + 1e-9)
+        reading = sellers.trial(self.natural, need, self.api)
+        scope = cheapest.frame(self.natural, sellers.ranking(need), self.api).scope
+        above = 0
+        for seed in range(10 ** 6, 10 ** 6 + 60):
+            best, _ = cheapest.lowest(reading.reading(seed)[0], scope)
+            if best and min(best.values()) > natural - 1:
+                above += 1
+                self.assertIsNone(reading.winner(seed))
+                self.assertFalse(reading.holds(seed))
+        self.assertGreater(above, 3)
+        for seed in (10 ** 6, 10 ** 6 + 9, 904):
+            found = blocks.redraw(self.session, self.natural, [reading], seed)
+            self.assertEqual((found.identical, found.agreed), ([True], [True]))
+        world, found, record = sellers.steer(self.session, self.natural, self.opened, need, self.api, Random(1))
+        self.assertLessEqual(found["cheapest"]["reference"]["optimal_score"][0], natural - 1)
+        # No total is at or under zero: no mass, and no redraw holds.
+        with self.assertRaises(prices.ZeroMass):
+            sellers.model(self.natural, seller(0), self.api)
+        nothing = sellers.trial(self.natural, seller(0), self.api)
+        self.assertFalse(any(nothing.holds(seed) for seed in range(10 ** 6, 10 ** 6 + 100)))
+
     def test_what_it_reads_cannot_be_redrawn_beside_it(self):
         pair = max(self.chances, key=self.chances.get)
         need, carrier = self.need(pair), self.natural["address_context"]["carriers"][0]["carrier_id"]

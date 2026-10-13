@@ -146,12 +146,18 @@ def model(world, requirement, api):
 def leader(world, requirement, shared):
     """The retailer and product that alone have the cheapest available offer of the ranking in a world, or None."""
     return alone(cheapest.lowest(cheapest.recorded(world, requirement["cheapest"]["concept_id"], set(shared.places)),
-                                 shared.scope)[0])
+                                 shared.scope)[0], shared.scope)
 
 
-def alone(best):
-    """The one pair with the lowest rank among pairs' best available ranks, or None."""
-    winners = [pair for pair, rank in (best or {}).items() if rank == min(best.values())]
+def alone(best, scope):
+    """The one pair with the lowest rank among pairs' best available ranks, or None.
+
+    None too where a delivery task's cap is below that rank: the task then
+    counts no offer at all, as `cheapest.judged` has it.
+    """
+    if not best or scope.cap is not None and min(best.values()) > scope.cap:
+        return None
+    winners = [pair for pair, rank in best.items() if rank == min(best.values())]
     return winners[0] if len(winners) == 1 else None
 
 
@@ -239,7 +245,7 @@ def trial(natural, requirement, api):
         } if "free_shipping" in requirement else {}
     parts = [*policed.values(), *waived.values()]
 
-    winner = lambda seed: alone(cheapest.lowest(reading(seed), shared.scope)[0])
+    winner = lambda seed: alone(cheapest.lowest(reading(seed), shared.scope)[0], shared.scope)
 
     def holds(seed):
         pair = winner(seed)
