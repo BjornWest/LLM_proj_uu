@@ -964,9 +964,59 @@ sampling defaults and the delivery plan are not the files' is refused.
 
 Limits. Fees are the contract's own standard numbers: what a shopper is
 quoted adds the tier's difference, distance and the free-shipping threshold
-(`basket_quote`), and which options a site shows is decided after the world
-is finished (see "What is not done"). A branch's dispatch days and whether a
-carrier takes bulky parcels are the seed's.
+(`basket_quote`). A branch's dispatch days and whether a carrier takes bulky
+parcels are the seed's.
+
+### What the retailer shows of its delivery options
+
+A site built with delivery options on does not show every route a retailer's
+contracts allow: the commerce oracle admits a menu per retailer
+(`delivery_admission`). Under its plan version 1 the menu is drawn on the
+finished world's id, so it is redrawn by any steering and cannot be stated
+in advance. Plan version 2 (opt-in: a recipe's `delivery_options` with
+`"admission_plan": "retailer-delivery-admission-plan-v2"`) draws on the
+seed, the retailer and that retailer's routes, so in a given world a
+retailer's menu is a fixed function of its contracts. `menus.py` reads it,
+with the oracle's own lines on a view of the world in which the retailer's
+contracts are replaced: the admitted carrier routes to the customer's
+address, each with the oracle's tariff for an ordinary parcel before any
+free-shipping waiver.
+
+The policy requirement takes a `shown` clause, for version 2 only:
+
+```json
+{"schema": "steered-retailer-shipping-v1", "retailer_id": "footwear-04",
+ "shown": {"cheapest_carrier": "carrier-03",
+           "carriers": {"exclude": ["carrier-01"]},
+           "destination_type": "home"}}
+```
+
+`carriers` are those that must and must not be among the shown routes;
+`cheapest_carrier` has a shown route strictly cheaper than every other
+carrier's; `destination_type` is `home` (the default) or `any`, which adds
+collection points (pickup at the retailer's own branches is no carrier's);
+`delivery_options` are the recipe's settings where they are not the
+defaults, since the number of shown routes is drawn from its count weights.
+
+A menu has no closed form, so this part is sampled by drawing: contracts
+come from their exact distribution given what the requirement states of them
+and the carriers the menu needs (a shown carrier is a contracted one), until
+the menu they give is as required. The sample is from the block's
+distribution given the whole requirement. The probability is the exact one
+of the contract statements times the share of 400 such draws that qualify:
+an estimate, recorded as one (`probability_is_estimated`, with the counts),
+the same for the same world and requirement. A requirement none of the 400
+draws meets is reported as not found, which is not a proof that it cannot
+occur. On the pilot world a draw takes eight milliseconds, and "carrier X is
+the cheapest shown for home delivery" has probability 0.12 to 0.14 at a
+medium retailer.
+
+A steered world is checked through the plans a site is built from
+(`basket_quote.make_plan`, `delivery_admission.make_plan` with the recipe's
+weights and version 2), which must give the menu read from the contracts. The
+tests also ask the admitted oracle for quotes of the retailer's real offers:
+wherever nothing is waived, the carriers of the home options and the
+cheapest among them are the clause's.
 
 ## The twelfth requirement: who is cheapest, with that retailer's policy
 
@@ -998,6 +1048,23 @@ requirement. The check finds the winner in the saved leaves, then asks the
 native oracle and the recorded contracts. As a part of several requirements
 it declares everything it could decide: the ranking's stock and prices and
 the policy of every retailer in it.
+
+The policy may be about shown options, and the requirement may add
+`"free_shipping": false`: the winner offers no free-shipping threshold, so
+what its options cost is what a customer pays. That is a third block of the
+alternative (the seventh requirement's, with no threshold). Together with
+the thirteenth requirement this is "the shop with the best offer delivers
+cheapest with a carrier that is badly rated":
+
+```json
+{"schema": "steered-requirements-v1", "all": [
+  {"schema": "steered-cheapest-seller-policy-v1",
+   "cheapest": {"concept_id": "footwear.walking_shoes"},
+   "policy": {"shown": {"cheapest_carrier": "carrier-06"}},
+   "free_shipping": false},
+  {"schema": "steered-carrier-stars-v1", "carrier_id": "carrier-06",
+   "average_stars": {"max": 3.6}}]}
+```
 
 ## The thirteenth requirement: a carrier's stars and how well it serves
 
@@ -1990,16 +2057,14 @@ carries review and description text that the checks also digest.
   services are the seed's. Which reviews a review
   site shows, and which products a comparison site lists, are the seed's.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
-  against a basket's subtotal, and so can its contracts: which carriers and
-  tiers it has and their standard fees. The delivered total of an order (the
-  single-item delivery and order-set tasks) is not modelled: it adds tier
-  differences, distance and the threshold to those fees, over every retailer
-  that lists the product. One obstacle is outside this code: with
-  delivery options enabled, which routes a retailer admits is decided by a
-  hash that includes the finished world's identity
-  (`delivery_admission.py`), so any steered change reshuffles the admitted
-  routes afterwards; an exact conditional sample of a delivered total needs
-  that keyed on something upstream of stock, prices and fees.
+  against a basket's subtotal, and so can its contracts and, under admission
+  plan version 2, the delivery options it shows and which carrier's is
+  cheapest. The delivered total of an order compared across retailers (the
+  single-item delivery and order-set tasks: the lowest price plus delivery
+  over every retailer that lists the product) is not modelled. Under plan
+  version 1, which existing recipes use, a retailer's shown routes are
+  redrawn by any steered change (`delivery_admission.py` draws on the
+  finished world's id), so nothing about them can be stated there.
 - **No publication.** Steered worlds are native worlds only:
   `browser_runtime_ready` is false. `unified_generation.generate` accepts a
   `world_factory`, which is where a steered world would enter so that

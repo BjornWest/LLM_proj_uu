@@ -259,10 +259,44 @@ class SteeringTests(Menus):
             self.assertTrue(all(cheapest == carrier for cheapest, _ in quoted(world, winner)))
             self.assertTrue(sellers.satisfied(world, seller, self.api) and ratings.satisfied(world, rated, self.api))
         self.assertGreater(len(winners), 1)
+        self.unwaived(seller, rated, block)
         policy = {"schema": policies.VERSION, "retailer_id": sorted({pair[0] for pair, _ in block.alternatives})[0],
                   "shown": {"cheapest_carrier": carrier}}
         with self.assertRaises(blocks.Coupled):
             combined.prepare(self.natural, {"schema": combined.VERSION, "all": [seller, policy]}, self.api, Random(0))
+
+    def unwaived(self, seller, rated, plain):
+        """The same with no free shipping at the winner: what the menu costs is what every one of its offers is quoted."""
+        seller = {**seller, "free_shipping": False}
+        block = sellers.model(self.natural, seller, self.api)
+        self.assertLess(block.probability, plain.probability)
+        offered = lambda world, rid: next(r for r in world["retailers"] if r["retailer_id"] == rid)["free_shipping_threshold_minor"]
+        natural = {pair[0]: offered(self.natural, pair[0]) for pair, _ in block.alternatives}
+        self.assertTrue(any(value is not None for value in natural.values()))
+        trials = 1500
+        seen = sum(sellers.empirical(self.natural, seller, self.api, trials, 10 ** 6).values())
+        share = block.probability
+        self.assertLess(abs(seen / trials - share), 4.5 * (share * (1 - share) / trials) ** .5 + .25 * share)
+        for seed in range(4):
+            world, found, record = combined.steer(self.session, self.natural, self.opened,
+                                                  {"schema": combined.VERSION, "all": [seller, rated]}, self.api, Random(seed))
+            winner = found[0]["retailer_id"]
+            self.assertIsNone(offered(world, winner))
+            self.assertIsNone(found[0]["free_shipping"]["advertised_threshold_minor"])
+            quotes = quoted(world, winner)
+            # Nothing is waived, so every deliverable offer of the winner is among the quotes read.
+            self.assertTrue(quotes and all(cheapest == seller["policy"]["shown"]["cheapest_carrier"] for cheapest, _ in quotes))
+            for retailer in world["retailers"]:
+                if retailer["retailer_id"] != winner:
+                    self.assertEqual(retailer["free_shipping_threshold_minor"], offered(self.natural, retailer["retailer_id"]))
+        reading = sellers.trial(self.natural, seller, self.api)
+        for seed in range(900, 903):
+            found = blocks.redraw(self.session, self.natural, [reading], seed)
+            self.assertEqual((found.identical, found.agreed), ([True], [True]))
+            self.assertEqual(found.satisfied, reading.holds(seed))
+        for bad in (True, None, "none", 0):
+            with self.assertRaises(ValueError):
+                sellers.model(self.natural, {**seller, "free_shipping": bad}, self.api)
 
 
 if __name__ == "__main__":

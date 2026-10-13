@@ -16,12 +16,17 @@ to its probability and then samples its two blocks. No retailer's policy is
 kept or rejected for being what the seed made it: the winner's is drawn as
 required and every other retailer's is the seed's own, which is their
 distribution given the requirement.
+
+A requirement may add that the winner offers no free shipping
+(`"free_shipping": false`), so that what its delivery options cost is what
+the customer pays: the winner's free-shipping threshold is then a third
+block of the alternative, and every other retailer's is the seed's own.
 """
 import json
 from math import exp, fsum, log
 from types import SimpleNamespace
 
-from . import blocks, cheapest, policies
+from . import blocks, cheapest, policies, threshold
 from .blocks import Step, Unmet
 from .cheapest import pick_log
 from .prices import ZeroMass
@@ -32,7 +37,8 @@ WINNER = {"schema", "product_id", "retailer_ids", "listed_below"}
 
 
 def resolve(requirement):
-    if (type(requirement) is not dict or set(requirement) != {"schema", "cheapest", "policy"} or
+    if (type(requirement) is not dict or set(requirement) - {"free_shipping"} != {"schema", "cheapest", "policy"} or
+            requirement.get("free_shipping", False) is not False or
             requirement["schema"] != VERSION or type(requirement["cheapest"]) is not dict or
             type(requirement["policy"]) is not dict or WINNER & set(requirement["cheapest"]) or
             "concept_id" not in requirement["cheapest"] or {"schema", "retailer_id"} & set(requirement["policy"])):
@@ -53,6 +59,13 @@ def policy(requirement, retailer):
     return {"schema": policies.VERSION, "retailer_id": retailer, **requirement["policy"]}
 
 
+def unwaived(world, requirement, pair):
+    """The free-shipping requirement that a retailer offers no threshold, stated on an offer of the winning product."""
+    retailer = next(row for row in world["retailers"] if row["retailer_id"] == pair[0])
+    return {"schema": threshold.VERSION, "retailer_id": pair[0], "quantity": 1, "subtotal_test": threshold.TESTS[0],
+            "sku_id": next(offer["sku_id"] for offer in retailer["offers"] if offer["product_id"] == pair[1])}
+
+
 def footprint(world, requirement, api):
     """What the block can decide: the ranking's stock and prices, and the policy of every retailer in it."""
     requirement = resolve(requirement)
@@ -61,6 +74,8 @@ def footprint(world, requirement, api):
     shared = cheapest.frame(world, ranking(requirement), api)
     about = {name for name, fields in (("contracts", policies.CONTRACTS), ("dispatch", {"dispatch_days"}))
              if fields & set(requirement["policy"])}
+    if "free_shipping" in requirement:
+        about.add("threshold")
     return SimpleNamespace(writes={(kind, *pair) for pair in shared.places for kind in ("stock", "price")} |
                            {(name, retailer, "") for retailer, _ in shared.places for name in about}, reads=set())
 
@@ -74,7 +89,9 @@ def model(world, requirement, api):
     for pair in sorted(shared.places):
         if pair[0] not in suited:
             try:
-                suited[pair[0]] = policies.model(world, policy(requirement, pair[0]), api).probability
+                suited[pair[0]] = policies.model(world, policy(requirement, pair[0]), api).probability * (
+                    threshold.model(world, unwaived(world, requirement, pair), api).probability
+                    if "free_shipping" in requirement else 1.0)
             except ZeroMass:
                 suited[pair[0]] = 0.0
         if not suited[pair[0]]:
@@ -112,7 +129,9 @@ def check(world, requirement, api):
         raise Unmet("No retailer's product alone is the cheapest available offer")
     return {"retailer_id": pair[0], "product_id": pair[1],
             "cheapest": cheapest.check(world, ranking(requirement, pair), api),
-            "policy": policies.check(world, policy(requirement, pair[0]), api)}
+            "policy": policies.check(world, policy(requirement, pair[0]), api),
+            **({"free_shipping": threshold.check(world, unwaived(world, requirement, pair), api)}
+               if "free_shipping" in requirement else {})}
 
 
 def prepare(natural, requirement, api, rng):
@@ -121,8 +140,10 @@ def prepare(natural, requirement, api, rng):
     pair = pick_log(rng, [pair for pair, _ in block.alternatives], [value for _, value in block.alternatives])
     steps = [cheapest.prepare(natural, ranking(block.requirement, pair), api, rng),
              policies.prepare(natural, policy(block.requirement, pair[0]), api, rng)]
+    if "free_shipping" in block.requirement:
+        steps.append(threshold.prepare(natural, unwaived(natural, block.requirement, pair), api, rng))
     blocks.independent(steps)
-    writes = steps[0].writes | steps[1].writes
+    writes = set().union(*(step.writes for step in steps))
 
     def record(world):
         rows = [step.record(world) for step in steps]
@@ -135,7 +156,8 @@ def prepare(natural, requirement, api, rng):
                 "distribution_claim": "The requirement is one of several alternatives that exclude one another: a "
                                       "retailer's product alone is the cheapest available offer and that retailer's "
                                       "shipping policy is as stated. One is picked in proportion to its probability "
-                                      "and its two blocks (the ranking's stock and prices; that retailer's policy) "
+                                      "and its blocks (the ranking's stock and prices; that retailer's policy; its "
+                                      "free-shipping threshold where the requirement states there is none) "
                                       "are sampled given it. Every other retailer's policy is the seed's own. Use "
                                       "the probability, which is the alternatives' sum, as the importance weight "
                                       "across seeds."}
@@ -146,7 +168,7 @@ def prepare(natural, requirement, api, rng):
             raise AssertionError("Another retailer's product is the cheapest available offer than the one sampled")
         return found
 
-    return Step(script={**steps[0].script, **steps[1].script}, probability=block.probability,
+    return Step(script={key: entry for step in steps for key, entry in step.script.items()}, probability=block.probability,
                 log_probability=block.log_probability, writes=writes,
                 reads=footprint(natural, requirement, api).writes - writes, record=record, check=checked)
 
@@ -164,19 +186,26 @@ def trial(natural, requirement, api):
     reading, keys = cheapest.reader(natural, shared.places, api)
     retailers = sorted({retailer for retailer, _ in shared.places})
     policed = {retailer: policies.trial(natural, policy(requirement, retailer), api) for retailer in retailers}
+    # Where the winner must offer no free shipping: every ranked retailer's threshold draws, read on one of its pairs.
+    waived = {retailer: threshold.trial(natural, unwaived(natural, requirement, next(
+        pair for pair in sorted(shared.places) if pair[0] == retailer)), api) for retailer in retailers
+        } if "free_shipping" in requirement else {}
+    parts = [*policed.values(), *waived.values()]
 
     winner = lambda seed: alone(cheapest.lowest(reading(seed), shared.scope)[0])
 
     def holds(seed):
         pair = winner(seed)
-        return pair is not None and policed[pair[0]].holds(seed)
+        return pair is not None and policed[pair[0]].holds(seed) and (not waived or waived[pair[0]].holds(seed))
 
     return SimpleNamespace(
-        keys=set(keys).union(*(found.keys for found in policed.values())), **vars(footprint(natural, requirement, api)),
-        reading=lambda seed: (reading(seed), {retailer: found.reading(seed) for retailer, found in policed.items()}),
+        keys=set(keys).union(*(found.keys for found in parts)), **vars(footprint(natural, requirement, api)),
+        reading=lambda seed: (reading(seed), *({retailer: found.reading(seed) for retailer, found in group.items()}
+                                               for group in (policed, waived))),
         winner=winner, holds=holds,
         recorded=lambda world: (cheapest.recorded(world, requirement["cheapest"]["concept_id"], set(shared.places)),
-                                {retailer: found.recorded(world) for retailer, found in policed.items()}),
+                                *({retailer: found.recorded(world) for retailer, found in group.items()}
+                                  for group in (policed, waived))),
         satisfied=lambda world: satisfied(world, requirement, api))
 
 
