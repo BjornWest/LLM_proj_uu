@@ -249,6 +249,39 @@ class SteeringTests(Delivered):
         charge = self.frame.scope.delivered[below["retailer_id"]].lowest
         self.assertLess(offer["price_minor"] + charge(offer["price_minor"]), min(total for total, _, _ in quoted.values()))
 
+    def test_a_cap_on_the_total(self):
+        """A delivery task with a cap counts no offer above it: the winner's total is under the cap."""
+        pair = max(self.chances, key=self.chances.get)
+        open_block = cheapest.model(self.natural, self.need(pair), self.api, self.frame)
+        totals_possible = sorted(open_block.log_terms)
+        cap = totals_possible[len(totals_possible) // 2]
+        capped = {**self.need(pair), "delivered": {"max_total_minor": cap}}
+        block = cheapest.model(self.natural, capped, self.api)
+        self.assertEqual(sorted(block.log_terms), [total for total in totals_possible if total <= cap])
+        self.assertLess(block.probability, open_block.probability)
+        self.assertAlmostEqual(block.probability, sum(share for total, share in open_block.shares.items() if total <= cap) *
+                               open_block.probability, places=12)
+        found, trials = cheapest.trial(self.natural, capped, self.api), 800
+        hits, chance = sum(found.holds(seed) for seed in range(10 ** 6, 10 ** 6 + trials)), block.probability
+        self.assertLess(abs(hits / trials - chance), 4 * (chance * (1 - chance) / trials) ** .5 + 1e-9)
+        for seed in range(4):
+            world, seen, record = cheapest.steer(self.session, self.natural, self.opened, capped, self.api, Random(seed))
+            self.assertEqual(seen["task"]["max_total_minor"], cap)
+            self.assertLessEqual(seen["reference"]["optimal_score"][0], cap)
+            self.assertEqual({(row["retailer_id"], row["product_id"]) for row in seen["reference"]["winners"]}, {pair})
+            self.assertTrue(all(row["option"]["total_minor"] <= cap for row in seen["reference"]["candidates"]))
+        # A cap under every total the pair can have leaves nothing; and the candidates tool carries a task's cap.
+        with self.assertRaises(prices.ZeroMass):
+            cheapest.model(self.natural, {**capped, "delivered": {"max_total_minor": totals_possible[0] - 1}}, self.api)
+        task = {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE, "max_total_minor": cap}
+        listed = variants.of(self.natural, task, self.api)
+        self.assertTrue(listed and all(row["requirement"].get("delivered", row["requirement"].get("cheapest", {}).get("delivered"))[
+            "max_total_minor"] == cap for row in listed))
+        for bad in ("900", 900.0, -1, True):
+            with self.assertRaises(ValueError) as caught:
+                cheapest.model(self.natural, {**capped, "delivered": {"max_total_minor": bad}}, self.api)
+            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+
     def test_what_it_reads_cannot_be_redrawn_beside_it(self):
         pair = max(self.chances, key=self.chances.get)
         need, carrier = self.need(pair), self.natural["address_context"]["carriers"][0]["carrier_id"]
@@ -327,7 +360,8 @@ class SteeringTests(Delivered):
         self.assertEqual(counted[0]["requirement"]["delivered"], {"delivery_options": {"count_weights": {"1": 1}}})
         for other in ({"objective": "fastest_then_cheapest"}, {"delivery_types": ["home", "retailer_branch"]},
                       {"delivery_types": []}, {"delivery_types": {"parcel_locker": False}}, {"delivery_types": None},
-                      {"delivery_types": ["home", 1]}, {"delivery_types": ["home", "home"]}, {"max_total_minor": 90000}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
+                      {"delivery_types": ["home", 1]}, {"delivery_types": ["home", "home"]}, {"max_total_minor": 900.5},
+                      {"max_total_minor": -1}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
                       {"availability": "positive_stock"},
                       {"delivery_options": {"admission_plan": "retailer-delivery-admission-plan-v1"}}):
             with self.subTest(other=other), self.assertRaises(ValueError):

@@ -105,11 +105,13 @@ def stated(requirement):
     if "delivered" in requirement:
         delivered = requirement["delivered"]
         kinds = delivered.get("delivery_types", ["home"]) if type(delivered) is dict else None
-        if (type(delivered) is not dict or set(delivered) - {"delivery_options", "delivery_types"} or
+        if (type(delivered) is not dict or set(delivered) - {"delivery_options", "delivery_types", "max_total_minor"} or
                 type(delivered.get("delivery_options", {})) is not dict or type(kinds) is not list or not kinds or
                 any(type(kind) is not str for kind in kinds) or len(set(kinds)) != len(kinds) or set(kinds) - set(menus.TYPES)):
             raise ValueError("Delivered totals take a site recipe's delivery options and the kinds of destination that "
                              "count (home, parcel_locker, staffed_counter; home alone unless stated)")
+        if "max_total_minor" in delivered and (type(delivered["max_total_minor"]) is not int or delivered["max_total_minor"] < 0):
+            raise ValueError("A cap on the delivered total is a whole non-negative amount in minor units")
         if ranking or availability != PURCHASABLE or "comparison_site_id" in requirement or "predicates" not in requirement:
             raise ValueError("Delivered totals are read for predicates, purchasable offers and every shop, ranked by "
                              "the total alone")
@@ -153,13 +155,15 @@ def listed(world, requirement, package):
 
 
 def reading(skus, pairs, sources, supplier, reference, key=None, barred=(), settled=None, delivered=None, reads=(),
-            stranded=()):
+            stranded=(), cap=None):
     """One native task's reading of a requirement; see `scope`."""
     return SimpleNamespace(
         skus=set(skus) - set(barred), pairs=pairs, sources=sources, supplier=supplier, reference=reference,
         key=key or (lambda sku_id, price: price), barred=frozenset(barred), delivered=delivered, reads=set(reads),
         # Retailers a recipe's delivery counts cannot serve: no site is built from such a world (see `model`).
         stranded=list(stranded),
+        # The most a delivered total may be for its offer to count, where the task states a cap; a winner is under it.
+        cap=cap,
         settled=settled or (lambda found: found if found["status"] == "match" else None))
 
 
@@ -211,7 +215,8 @@ def delivering(world, requirement, api, skus, declared, feature):
     charges = {rid: menus.delivery(place) for rid, place in places.items()}
     delivered = {rid: charge for rid, charge in charges.items() if charge is not None}
     spec = {"kind": native.KIND, "concept_id": requirement["concept_id"], "predicates": requirement["predicates"],
-            "delivery_types": kinds}
+            "delivery_types": kinds, **{key: requirement["delivered"][key] for key in ("max_total_minor",)
+                                         if key in requirement["delivered"]}}
 
     def reference(found):
         settings = next(iter(places.values())).settings if places else website.options({"enabled": True})
@@ -232,7 +237,7 @@ def delivering(world, requirement, api, skus, declared, feature):
         skus, {(r["retailer_id"], o["product_id"]) for r in world["retailers"] if r["retailer_id"] in delivered
                for o in r["offers"] if o["sku_id"] in skus},
         {r["retailer_id"]: {s["source_id"] for s in r["source_locations"] if s["shipping_enabled"]} for r in world["retailers"]},
-        True, reference, delivered=delivered,
+        True, reference, delivered=delivered, cap=requirement["delivered"].get("max_total_minor"),
         stranded=menus.stranded(next(iter(places.values()))) if places else [],
         # With counts that start above one route, every retailer's contracts decide whether a site is built at all.
         reads={(kind, rid, "") for rid in listing for kind in ("contracts", "threshold")} | {
@@ -701,6 +706,10 @@ def model(world, requirement, api, shared=None, estimate=True):
             spread[pair] = shared.plain[pair]
     log_terms = {}
     for price in sorted(set.intersection(*({o.rank for o in spread[pair].outcomes} for pair in designated)) - {None}):
+        # A capped task counts no offer above its cap. Between charge bounds the designated pair's rank is the
+        # least its total can be, so a total under the cap is a rank under it.
+        if block_scope.cap is not None and price > block_scope.cap:
+            continue
         masses = []
         for pair, found in spread.items():
             masses.append(found.mass(price, pair in designated))
@@ -1044,6 +1053,8 @@ def judged(found, requirement, limits=None):
     if not best:
         return None
     winning = min(best.values())
+    if limits is not None and limits.cap is not None and winning > limits.cap:
+        return None
     if {pair for pair, rank in best.items() if rank == winning} != {
             (rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}:
         return None
