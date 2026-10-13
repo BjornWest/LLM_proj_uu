@@ -15,7 +15,7 @@ from . import basic_offer_task
 from .adapter import digest
 from .canonical_claims import VERSION as CANONICAL_VERSION, variant_schema, validate_variant_claims
 
-VERSION = 'website-listed-offer-grading-v4'
+VERSION = 'website-listed-offer-grading-v5'
 
 
 def _text(value):

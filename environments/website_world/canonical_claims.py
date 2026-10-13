@@ -7,7 +7,7 @@ from jsonschema import Draft202012Validator
 from experiments.answer_grading.extraction import claim, obj, _quote
 from .catalog_predicates import _same
 
-VERSION = 'website-canonical-claim-domains-v1'
+VERSION = 'website-canonical-claim-domains-v2'
 MAX_INTEGER_MENU = 128
 UNMATCHED = '__unmatched_option__'
 
@@ -70,6 +70,40 @@ def canonical_claim(values, *, separate_status=False):
     return result
 
 
+def numeric_literal_claim(definition, *, retail_axis=False):
+    """Extractor formatting guidance; meaning and units are extractor-owned."""
+    result = claim()
+    typ, unit = definition.get('type'), definition.get('unit')
+    if typ not in ('integer', 'number'):
+        return result
+    if retail_axis:
+        # Fractional retail tokens still need a separate numeric identity
+        # contract; keep that existing literal fallback unchanged.
+        if typ != 'integer' or type(unit) is not str or not unit.strip():
+            return result
+        description = (
+            'The public field declaration uses unit '+repr(unit)+'. '
+            'First interpret the unit actually stated in the answer. Only for '
+            'an unambiguous equivalent unit (for example grams and g), copy the '
+            'explicit numeric token alone as a string, without its unit suffix. '
+            'For a different stated unit, preserve the stated value with its '
+            'unit; do not convert or misrepresent it as the declared unit. '
+            'If no unit is stated, copy the numeric token as stated, without '
+            'inventing a unit. Never infer a missing unit from the field declaration.')
+    else:
+        description = (
+            'Copy the explicitly stated numeric token alone as a string, without '
+            'a unit suffix or presentation label. Record the actually stated '
+            'unit separately in the unit claim, including a wrong unit; never '
+            'fill a missing unit from the declaration.')
+    description += (
+        ' Preserve the exact answer quote, which may include the unit. Do not '
+        'compute, convert units, guess a value or fill it from the request, '
+        'default, URL or reference.')
+    result['properties']['value']['description'] = description
+    return result
+
+
 def variant_schema(items, fields):
     """Union full public declarations without inspecting SKU/candidate values."""
     declarations = []
@@ -85,6 +119,9 @@ def variant_schema(items, fields):
         if domains and all(d is not None for d in domains):
             values = list(dict.fromkeys(v for domain in domains for v in domain))
             properties[field] = canonical_claim(values)
+        elif (definitions and all(d.get('type') == 'integer'
+                and d.get('unit') == definitions[0].get('unit') for d in definitions)):
+            properties[field] = numeric_literal_claim(definitions[0], retail_axis=True)
         else:
             properties[field] = claim()
     return obj(properties)

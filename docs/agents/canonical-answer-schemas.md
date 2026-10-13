@@ -40,8 +40,8 @@ not counts of unique features or publicly displayed rows.
 
 - 1,687 enum and 1,937 boolean declarations.
 - 3,556 finite fact domains and 73 compiled finite retail axes (including 5 bounded
-  integer menus). Three further pack-count declarations carry units and retain
-  literal validation under the conservative measurement rule. Public eligibility/task
+  integer menus). Three further pack-count declarations carry units; their claims
+  remain strings with numeric-token guidance described below. Public eligibility/task
   scope still controls extraction.
 - 88 retail axes remain declared as strings; some have finite menus established
   elsewhere in sampling steps. This pass does not infer graph value domains.
@@ -66,3 +66,22 @@ prospective checks and must compose the exact shared `semantic_fields` dependenc
 
 Detailed source pins and the full130 audit are under
 `.local/coordination/canonical-answer-schemas-20261012/`.
+
+
+Numeric description follow-up (canonical helper v2): unit-bearing integer retail
+axes retain string/null claims, with explicit extractor guidance to separate a
+stated numeric token only for a semantically equivalent unit. Fractional retail
+axes retain their previous literal contract. Numeric model facts already carry
+separate unit claims; their descriptions keep numeric tokens and actual units
+separate. The validator checks schema, authentic quotes and existing literal
+grounding; it does not independently reinterpret units. An extractor that emits
+a wrong bare number or wrong unit can therefore misgrade an answer. This is the
+deliberate extractor-owned meaning boundary, not a claim of verified semantic
+accuracy. Evaluation must qualify actual saved-answer extraction (including
+wrong-unit controls) separately before broader runtime adoption. No historical
+claims are stripped, converted, repaired or regraded by this source change.
+
+Fact-cell units remain literal strings: `grams` and `g` do not yet share a
+canonical unit vocabulary. Numeric formatting guidance does not close that
+separate unit-alias gap. Unitless numeric values retain the explicitly stated
+bare token, and the extractor must not invent a unit.
