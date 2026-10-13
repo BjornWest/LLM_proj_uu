@@ -1082,13 +1082,14 @@ total are those of the accepted leaves, and the runner compares no
 distribution of winning totals there. Several designated retailers, or
 offers listed below the winner, are refused there.
 
-On the medium world, for size-42 walking shoes: by listed price six
+On the medium world, for size-42 walking shoes: by listed price five
 retailers are about equally likely to have the cheapest (0.13 each);
 delivered, one with free delivery at these prices has it with probability
 0.64, two others with 0.15 and 0.14, and one that ships across a border for
-224 to 249 kronor practically never. Steered to the first, the lowest listed
-price among available offers is at another retailer in seven of eight
-samples (`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
+224 to 249 kronor practically never. Steered to the first, an available
+offer at another retailer is listed strictly cheaper in five of eight
+samples and at the same price in two more
+(`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
 
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
 total, home delivery; a cap, a deadline, other methods or a comparison site
