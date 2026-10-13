@@ -24,15 +24,19 @@ TERMINAL_INSTRUCTION = (
 
 def run(output, run_directory, *, policy_session, metadata, runner_options,
         viewer_projection, quota_guard=None, runner=None):
-    """One finite policy lease, one native state grade, no answer extraction.
+    """One policy lease, one native state grade, no answer extraction.
 
     This scores address fields only and never requires a complete effect envelope.
     Exact source/instance/scripted-grade/viewer acceptance and finite resources remain required.
     """
     from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
-    if type(runner_options) is not dict or any(type(runner_options.get(key)) is not int
-            or runner_options[key] <= 0 for key in ('max_steps', 'max_input_tokens')):
-        raise ValueError('Declare finite positive turn and context bounds')
+    if (type(runner_options) is not dict
+            or type(runner_options.get('max_input_tokens')) is not int
+            or runner_options['max_input_tokens'] <= 0
+            or 'max_steps' not in runner_options
+            or (runner_options['max_steps'] is not None and
+                (type(runner_options['max_steps']) is not int or runner_options['max_steps'] <= 0))):
+        raise ValueError('Declare max_steps as None or a positive integer and a positive input token limit')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
         'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
         'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}

@@ -474,16 +474,20 @@ class CartEpisode(generation.GeneratedEpisode):
 
 def run(output, run_directory, *, policy_session, metadata, runner_options,
         viewer_projection, quota_guard, runner=None):
-    """One finite lease; raw captures seal after close and grade once automatically."""
+    """One policy lease; raw captures seal after close and grade once automatically."""
     from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
     from intent_browser.connected_world_task import checked_files, policy_goal
     from intent_browser.evaluation import Evaluation
     from intent_browser.runner import run_episode
     if not all(callable(f) for f in (policy_session, viewer_projection, quota_guard)):
         raise ValueError('Require policy, quota and actual HTTP viewer callbacks')
-    if (type(runner_options) is not dict or any(type(runner_options.get(k)) is not int
-            or runner_options[k] <= 0 for k in ('max_steps', 'max_input_tokens'))):
-        raise ValueError('Declare finite positive turn/context limits')
+    if (type(runner_options) is not dict
+            or type(runner_options.get('max_input_tokens')) is not int
+            or runner_options['max_input_tokens'] <= 0
+            or 'max_steps' not in runner_options
+            or (runner_options['max_steps'] is not None and
+                (type(runner_options['max_steps']) is not int or runner_options['max_steps'] <= 0))):
+        raise ValueError('Declare max_steps as None or a positive integer and a positive input token limit')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
         'site_discovery', 'observation_pipeline', 'automatic_grading', 'allow_ungraded', 'ungraded_reason',
         'terminal_response_instruction', 'agent_runtime', 'agent_actor'}

@@ -125,7 +125,7 @@ class AtomicLifecycleControls(_ResetControls):
         return {'grade':{'structured_claims_correct':True,'limitations':['Synthetic gate/native fixture'],
             'native_report':{'verdict':'pass','scoring_scope':'observed_atomic_state'}}}
 
-    def execute(self):
+    def execute(self, *, max_steps=1):
         with patch.dict('sys.modules',{'agent_trace.adapters.browsergym':self.viewer_module}), \
              patch.object(consumer.shared,'load',return_value={'files':{
                  str(p.relative_to(self.recipe)):sha256(p.read_bytes()).hexdigest()
@@ -134,9 +134,18 @@ class AtomicLifecycleControls(_ResetControls):
              patch.object(finalization,'extract_saved_deferred',side_effect=self.deferred), \
              patch.object(finalization,'publish_finalized_answer',side_effect=self.publish):
             return consumer.run(self.recipe,self.folder/'run',policy_session=self.session,
-                metadata={'tags':['scripted']},runner_options={'max_steps':1,'max_input_tokens':1000},
+                metadata={'tags':['scripted']},runner_options={'max_steps':max_steps,'max_input_tokens':1000},
                 viewer_projection=self.viewer,quota_guard=lambda:self.events.append('quota'),
                 extraction_backend_factory=lambda _:None,runner=self.runner,authority_approval=self.authority)
+
+    def test_atomic_none_reaches_runner_and_grades_once(self):
+        result = self.execute(max_steps=None)
+        self.assertEqual(result['status'], 'graded_and_projected')
+        self.assertIsNone(self.dispatched_options['max_steps'])
+        plan = json.loads((self.folder/'run/execution-plan.private.json').read_text())
+        self.assertIsNone(plan['runner_options']['max_steps'])
+        self.assertEqual(self.events, ['quota', 'policy-open', 'policy-return', 'policy-close',
+            'runtime-close', 'grade', 'publish', 'viewer'])
 
     def test_no_whole_run_authority_reuse(self):
         self.authority={'old':True}
