@@ -24,6 +24,12 @@ from qualify_qwen_wire import source_runtime, gpu_check, GEOMETRY, MODEL, REVISI
 def load(row): return json.loads(read_pin(row))
 
 
+def installed_patch_sources(source):
+    files = {'scheduler': source/'distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py',
+             'parser': source/'tool_parsers/utils.py'}
+    return {key: sha256(path.read_bytes()).hexdigest() for key, path in files.items()}
+
+
 def resolved_backends(text):
     """Parse decisions actually emitted by pinned vLLM0.28, never argv defaults."""
     patterns = {
@@ -118,8 +124,7 @@ def measure(context, runtime):
         'template_sha256': sha256(template.encode()).hexdigest(),
         'processor_sha256': runtime['digest']({'class':type(image).__name__, 'config':image.to_dict()}, sorted_keys=True)}
     source = Path(distribution('vllm').locate_file('vllm'))
-    patch_files = {'scheduler': source/'v1/core/sched/scheduler.py', 'parser':source/'tool_parsers/utils.py'}
-    patches = {k:sha256(path.read_bytes()).hexdigest() for k,path in patch_files.items()}
+    patches = installed_patch_sources(source)
     if (patches['scheduler'] != '599a1613fb6088a28c14b7fb2119b7eabfe5ed5e4085b1c6fd5f4a4c8a23f3ec'
             or patches['parser'] != '93f9b8ec0097f5b4d416e9106442900727a3aa7ca48930469fca88a1fd33c064'):
         raise ValueError('Installed patches differ from reviewed source')

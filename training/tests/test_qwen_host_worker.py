@@ -25,6 +25,21 @@ Using backend AttentionBackendEnum.FLASH_ATTN for vit attention'''
 
 
 class HostTests(unittest.TestCase):
+    def test_patch_measurement_hashes_offloading_scheduler_not_engine_scheduler(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            contents = {
+                'v1/core/sched/scheduler.py': b'ordinary engine scheduler; not the backport',
+                'distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py': b'CPU offloading backport',
+                'tool_parsers/utils.py': b'native parser patch',
+            }
+            for name, value in contents.items():
+                target = root/name; target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(value)
+            actual = M.installed_patch_sources(root)
+            self.assertEqual(actual['scheduler'], sha256(b'CPU offloading backport').hexdigest())
+            self.assertEqual(actual['parser'], sha256(b'native parser patch').hexdigest())
+            self.assertNotEqual(actual['scheduler'], sha256(contents['v1/core/sched/scheduler.py']).hexdigest())
+
     def test_actual_backend_log_missing_or_conflicting_decisions_fail(self):
         backends,vision=M.resolved_backends(LOG)
         self.assertEqual(backends['prefill'],'FLASHINFER');self.assertEqual(vision,'FLASH_ATTN')

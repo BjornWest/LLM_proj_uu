@@ -106,7 +106,7 @@ admin=(sudo -n)
 if [[ $(id -u) == 0 ]]; then admin=(); fi
 run "${admin[@]}" env DEBIAN_FRONTEND=noninteractive apt-get update
 run "${admin[@]}" env DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y --no-install-recommends \
-  python3-venv build-essential git libgomp1 ca-certificates curl dbus-user-session \
+  python3-venv build-essential ninja-build git libgomp1 ca-certificates curl dbus-user-session \
   fonts-liberation fonts-noto-color-emoji libfontconfig1 libfreetype6 \
   libasound2t64 libatk-bridge2.0-0t64 libatk1.0-0t64 libatspi2.0-0t64 \
   libcairo2 libcups2t64 libdbus-1-3 libdrm2 libgbm1 libglib2.0-0t64 \
