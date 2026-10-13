@@ -1133,10 +1133,11 @@ samples and at the same price in two more
 (`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
 
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
-total; a deadline or a comparison site
-are refused; its delivery methods and its cap are carried) into the candidates of the other winner tasks, with the
+total; a comparison site is refused; its delivery methods and its cap are
+carried) into the candidates of the other winner tasks, with the
 recipe's `delivery_options` beside the task where they are not the
-defaults. Where a charge depends on the location the candidate with an
+defaults. With an arrival deadline or earliest arrival first, which the
+block does not rank by, only the last candidate below is listed. Where a charge depends on the location the candidate with an
 offer listed below the winner is left out (two candidates, not three), each
 candidate is marked as an estimate, and modelling every pair of a medium
 world takes 200 samples of the block apiece (19 seconds there), so it is
@@ -1146,6 +1147,28 @@ with the carrier the world rates lowest as the one its total is made with
 (the requirement of the next section; the carrier's stars are left as the
 seed has them, and can be lowered by combining it with the thirteenth
 requirement).
+
+The last candidate, `answer_carrier_rated_lowest`, goes the other way: the
+answer stays as the world has it, and every carrier it is delivered with is
+rated below all the other carriers (the thirteenth requirement with
+`average_stars` at most one hundredth under the lowest of the others; one
+requirement per carrier, combined when the winning options come with more
+than one). Who wins is read, not steered. The native task reads its answer
+off the world under whatever it ranks by, and no delivery task reads a
+carrier's reviews, which are all that is redrawn. So the one candidate
+serves the lowest total, earliest arrival first, an arrival deadline, a
+cap, collection points, several winning options, and charges that depend on
+the location that ships, where the block's own candidates are fewer or
+none. It is also the one candidate of the order-set task
+(`cheapest_matching_order_set`), whose cheapest sets of orders the native
+solver finds: the carriers are those of every set that shares the lowest
+total. The task carries the recipe's `delivery_options` (admission plan
+version 2, as above) and `checkout_domain` beside its requirements and
+domain; a search the solver does not finish, or more tied sets than it
+lists, is refused. An answer of which any delivery has no carrier (a pickup
+at a branch) or a carrier the world does not rate has no such candidate. What this does not do is choose the answer: "the
+cheapest option misses the deadline by a day" or "the fastest is a named
+retailer" would need the arrival dates in a block, which is not built.
 
 The check is the native task's reference on the steered world (through
 `prepared_quote` with the plans a site is built from). The tests also read
@@ -1370,6 +1393,8 @@ the block model gives each:
 | `cheapest_matching_with_permitted_relaxations` | `criteria_set_0`, `criteria_set_1`, ...: that set is the first with an available match |
 | `shortlist_matching_models` with an integer `limit` | `natural_shortlist`; `tie_at_cutoff`; `another_shortlist`, the last two the likeliest among the first limit + 3 models of the natural ranking, not among all models |
 | `comparison_cheapest_exact_sku_stock` (with the bound `sku_id`) | the retailer shown cheapest holds the variant, has it only on supplier order, or has it unavailable |
+| `matching_single_item_delivery` | for the cheapest total: the three winner candidates above (two where a charge depends on the location), `cheapest_delivered_with_lowest_rated_carrier`, and `answer_carrier_rated_lowest` (the answer as the world has it, its carriers rated below all the others); with `arrival_deadline` or `objective: fastest_then_cheapest`: `answer_carrier_rated_lowest` alone |
+| `cheapest_matching_order_set` (with `delivery_options` and `checkout_domain` beside it) | `answer_carrier_rated_lowest` |
 | `audit_free_shipping_claim` | no threshold; meets; below; just below; just meets |
 | `summarize_product_reviews` (topic counts over a product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed`; against the stars, `high_stars_verdict_more_negative` (mean rating of 4 or more) and `low_stars_verdict_more_positive` (2 or less); and the first page against the whole, `first_page_more_positive_verdict_more_negative` and `first_page_more_negative_verdict_more_positive` (four comments to a page, highest ratings first, as in the suite's instance; the task does not say how its site pages) |
 | `summarize_carrier_reviews` (topic counts) | the same four verdicts in the task's scope, without those the shipments' histories rule out; for `handoff` and `punctuality` also `redrawn_shipments_verdict_...`, the four verdicts with the carrier's shipments redrawn |
@@ -1408,11 +1433,17 @@ python3 scripts/run_bounded_job.py -- python -B -m experiments.steered_generatio
     --samples 2 --validate-trials 2000 --producer-redraws 2 --output FOLDER
 ```
 
-It writes every candidate of the task under `FOLDER/candidates/`, runs the
-named ones (all of them without `--candidate`; an unknown name is an error
-that lists the names, and a task with no candidate on the world is an error
-too, both before anything is written), and records the task's digest and the candidates with
-their probabilities in the receipt. Each sample folder holds the steered
+It writes the candidates under `FOLDER/candidates/` and runs them: every
+candidate of the task without `--candidate`, the named ones with it (an
+unknown name is an error that lists the task's names, and a task with no
+candidate on the world is an error too, both before anything is written).
+The receipt records the task's digest and those candidates with their
+probabilities. Naming candidates can save time, since the others are then
+not modelled where that can be avoided: `variants.of(..., only=NAMES)`
+lists a delivery task's `answer_carrier_rated_lowest` alone from the native
+task's reading, without the model of every pair that the task's other
+candidates need (most of an hour on the medium world where charges depend
+on the location, against seconds). Each sample folder holds the steered
 world, what the check read off it and the steering record. Tried on two
 suite tasks (`suite/variants/one-command/`): H10's review task with
 `verdict_tie` took 8 s in all, B16's carrier task with
@@ -1917,6 +1948,37 @@ B08 are read through the feature task their native modules resolve them to.
 What is steered is the world's stock and prices; a task's memories, prompts
 and start state are not part of this.
 
+### A delivery task's answer kept, its carriers rated lowest
+
+`answer_carrier_rated_lowest` on the medium world (21 retailers, 90
+products), for size-42 walking shoes; outputs under
+`.local/coordination/world-requirement-construction-20261010/steering/answers-r20/`.
+Pinned runs: `cheapest-kept` at `a811938` (the cheapest total, asked for
+with `--candidate` alone) and `fastest`, `deadline-anywhere` (arrival by
+2 October at home or a collection point) and `order-set` (a shoe and a
+sandal) at `7dad7b4`. Each lists the candidate in about three seconds after
+the natural pass, samples four worlds at two seconds apiece, and its
+probability, 0.0093 as the product of two carriers' (0.095 and 0.098), is
+within four standard errors of 1,500 other seeds (17 hits); the whole
+`cheapest-kept` run took 178 s, 157 of them the natural pass. On this world
+one retailer has the answer under every one of these rankings, so the four
+tasks rate the same two carriers.
+
+Side by side (`side-by-side.py`, `side-by-side.json`; the working tree at
+`7dad7b4`, not pinned), three samples each for earliest arrival first, a
+deadline of 1 October, earliest arrival at home or a collection point, and
+the order set. The seed rates the answer's carriers 4.34 and 3.94 among
+eight from 3.78 to 4.59. In every sample the native task reads the same
+answer as on the natural world (the same offers, options and totals; for
+the order set the same twelve tied sets of orders at 700 kronor), the two
+carriers' averages are 3.44 to 3.75, the other six are the seed's, and
+retailers, products and addresses are unchanged.
+
+The small test worlds have what this one lacks: answers that differ between
+the rankings, and charges that depend on the location that ships
+(`test_answers.py`, where the answer is read again after steering by a
+ranking written out in the test).
+
 These are dev-producer worlds from the suite's inputs, not the suite's frozen
 worlds, and nothing here is published or bound to a task instance.
 
@@ -2308,9 +2370,10 @@ carries review and description text that the checks also digest.
   cheapest, who is cheapest delivered for one unit sent home, and that
   together with the carrier the winner delivers with. Not modelled: who is
   cheapest delivered together with other statements about contracts or
-  with thresholds; delivery to a collection point, by a deadline or fastest
-  first;
-  the order-set task, whose optimum is over baskets. Under plan version 1,
+  with thresholds; who wins by a deadline or fastest first, and which
+  baskets are the order-set task's optimum. For those the answer can be
+  kept as the world has it and its carriers rated lowest
+  (`answer_carrier_rated_lowest`), not chosen. Under plan version 1,
   which existing recipes use, a retailer's shown routes are redrawn by any
   steered change (`delivery_admission.py` draws on the finished world's
   id), so nothing about them can be stated there.

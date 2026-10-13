@@ -218,7 +218,8 @@ def delivering(world, requirement, api, skus, declared, feature):
             "delivery_types": kinds, **{key: requirement["delivered"][key] for key in ("max_total_minor",)
                                          if key in requirement["delivered"]}}
 
-    def reference(found):
+    def reference(found, **asked):
+        # `asked` is what the native task reads and the block does not rank by: an objective, an arrival deadline.
         settings = next(iter(places.values())).settings if places else website.options({"enabled": True})
         plan = baskets.make_plan(found)
         try:
@@ -229,7 +230,7 @@ def delivering(world, requirement, api, skus, declared, feature):
                 raise
             raise Unmet("The recipe's delivery counts have no support for a retailer of this world") from error
         context = quotes.prepare(found, plan=plan, admission_plan=sidecar)
-        task = native.make(found, spec, inventory=declared, quote_context=context)
+        task = native.make(found, {**spec, **asked}, inventory=declared, quote_context=context)
         return task, native.reference(found, task, inventory=declared, quote_context=context)
 
     products = {s["sku_id"]: p["public"]["product_id"] for p in world["products"] for s in p["public"]["skus"]}

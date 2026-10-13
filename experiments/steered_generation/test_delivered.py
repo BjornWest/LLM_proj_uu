@@ -274,7 +274,7 @@ class SteeringTests(Delivered):
         with self.assertRaises(prices.ZeroMass):
             cheapest.model(self.natural, {**capped, "delivered": {"max_total_minor": totals_possible[0] - 1}}, self.api)
         task = {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE, "max_total_minor": cap}
-        listed = variants.of(self.natural, task, self.api)
+        listed = [row for row in variants.of(self.natural, task, self.api) if row["name"] != "answer_carrier_rated_lowest"]
         self.assertTrue(listed and all(row["requirement"].get("delivered", row["requirement"].get("cheapest", {}).get("delivered"))[
             "max_total_minor"] == cap for row in listed))
         for bad in ("900", 900.0, -1, True):
@@ -362,7 +362,8 @@ class SteeringTests(Delivered):
         task = {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE}
         found = variants.of(self.natural, task, self.api)
         self.assertEqual([row["name"] for row in found], ["likeliest_winner", "better_offer_unavailable", "unlikely_winner",
-                                                          "cheapest_delivered_with_lowest_rated_carrier"])
+                                                          "cheapest_delivered_with_lowest_rated_carrier",
+                                                          "answer_carrier_rated_lowest"])
         listed = variants.of(self.natural, {"kind": "cheapest_matching_available", "concept_id": SHOES, "predicates": SIZE}, self.api)
         self.assertNotEqual([row["log_probability"] for row in found[:3]], [row["log_probability"] for row in listed])
         for index, row in enumerate(found[:3]):
@@ -391,10 +392,12 @@ class SteeringTests(Delivered):
         self.assertEqual(same, found)
         counted = variants.of(self.natural, {**task, "delivery_options": {"count_weights": {"1": 1}}}, self.api)
         self.assertEqual(counted[0]["requirement"]["delivered"], {"delivery_options": {"count_weights": {"1": 1}}})
-        for other in ({"objective": "fastest_then_cheapest"}, {"delivery_types": ["home", "retailer_branch"]},
+        for other in ({"objective": "slowest"}, {"destination": "work"}, {"delivery_types": ["home", "retailer_branch"]},
                       {"delivery_types": []}, {"delivery_types": {"parcel_locker": False}}, {"delivery_types": None},
                       {"delivery_types": ["home", 1]}, {"delivery_types": ["home", "home"]}, {"max_total_minor": 900.5},
-                      {"max_total_minor": -1}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
+                      {"max_total_minor": -1}, {"arrival_deadline": "20 October"}, {"comparison_site_id": "comparison-00"},
+                      {"objective": "fastest_then_cheapest", "delivery_types": ["retailer_branch"]},
+                      {"arrival_deadline": "2026-10-20", "max_total_minor": -1},
                       {"availability": "positive_stock"},
                       {"delivery_options": {"admission_plan": "retailer-delivery-admission-plan-v1"}}):
             with self.subTest(other=other), self.assertRaises(ValueError):
@@ -538,8 +541,12 @@ class ByLocation(Delivered):
         # The candidates of the delivery task: the two this world's ranking can carry, marked as estimates.
         found = variants.of(self.natural, {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE}, self.api)
         self.assertEqual([row["name"] for row in found][:2], ["likeliest_winner", "unlikely_winner"])
-        self.assertLessEqual({row["name"] for row in found[2:]}, {"cheapest_delivered_with_lowest_rated_carrier"})
-        self.assertTrue(all(row["probability_is_estimated"] and row["probability_standard_error"] >= 0 for row in found))
+        self.assertLessEqual({row["name"] for row in found[2:]}, {"cheapest_delivered_with_lowest_rated_carrier",
+                                                                  "answer_carrier_rated_lowest"})
+        # The last reads the answer and redraws carriers' reviews alone: no estimate of the ranking enters it.
+        self.assertEqual(found[-1]["name"], "answer_carrier_rated_lowest")
+        self.assertNotIn("probability_is_estimated", found[-1])
+        self.assertTrue(all(row["probability_is_estimated"] and row["probability_standard_error"] >= 0 for row in found[:-1]))
         self.assertNotIn("probability_is_estimated", variants.of(
             self.natural, {"kind": "cheapest_matching_available", "concept_id": SHOES, "predicates": SIZE}, self.api)[0])
 

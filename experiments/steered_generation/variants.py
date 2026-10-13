@@ -5,7 +5,8 @@ request: its kind, concept, predicates and so on), `of` lists scenarios of
 that task as requirement files for the runner: the likeliest outcome, a hard
 variant (a better offer that does not count is listed ahead of the winner, a
 tie at a shortlist's cutoff, a relaxation that has to be used, a basket that
-just misses free shipping), and an unlikely outcome; for a review summary,
+just misses free shipping, the answer's carrier rated lowest), and an
+unlikely outcome; for a review summary,
 each verdict the count can come to. For the memory and
 clarification tasks the native module first resolves the remembered or hidden
 requirement into the predicates of the feature task that decides the answer. Each comes with the
@@ -25,8 +26,8 @@ import json
 from math import log
 from pathlib import Path
 
-from . import (blocks, carriers, cheapest, combined, couriers, listed, prices, reviews, shipments, shortlist, stock, streams,
-               threshold)
+from . import (blocks, carriers, cheapest, combined, couriers, listed, menus, prices, ratings, reviews, shipments, shortlist,
+               stock, streams, threshold)
 
 # Native task kinds read by the cheapest-available block, with the fields of the task that state the reading.
 # A comparison site goes with the surrounding-site controls the world is published with (`surrounding`).
@@ -44,12 +45,16 @@ RESOLVED = {"cheapest_matching_with_memory": ".memory_offer_task",
             "cheapest_matching_after_clarification": ".hidden_offer_task"}
 # Every field of a task that this module reads or knowingly leaves alone, by kind. A task with any other field
 # is refused: a native field that changes the answer (a price cap, say) must not be dropped in translation.
-DELIVERY = "matching_single_item_delivery"
+DELIVERY, ORDERS = "matching_single_item_delivery", "cheapest_matching_order_set"
+KEPT = "answer_carrier_rated_lowest"
 FIELDS = {**{kind: {"kind", "concept_id", *fields} for kind, fields in WINNERS.items()},
-          # One unit delivered home at the lowest total; a cap, a deadline, other delivery methods or a comparison
-          # site are not carried. The recipe's delivery settings come beside the task, not in it.
+          # One unit delivered at the lowest total, or by a deadline or earliest first (then only the answer's
+          # carriers are steered); a comparison site or physical stock is not carried. The recipe's delivery
+          # settings come beside the task, not in it.
           DELIVERY: {"kind", "concept_id", "predicates", "objective", "destination", "delivery_types", "delivery_options",
-                     "max_total_minor"},
+                     "max_total_minor", "arrival_deadline"},
+          # The cheapest set of orders for several things: its answer is read and its carriers steered, no more.
+          ORDERS: {"kind", "requirements", "domain", "delivery_options", "checkout_domain"},
           "cheapest_matching_with_memory": {"kind", "concept_id", "recipient", "predicates", "memory_records",
                                             "availability", *SITE},
           "cheapest_matching_after_clarification": {"kind", "concept_id", "predicates", "hidden_requirement",
@@ -124,7 +129,80 @@ def winners(world, task, api, extra=None):
             found.append(entry("cheapest_delivered_with_lowest_rated_carrier", "the same winner, whose cheapest delivery "
                                "option, the one its total is made with, is the carrier this world rates lowest",
                                with_carrier[0]))
+    if scope.delivered is not None:
+        found += answer_rated(world, delivering(world, scope, {}, api), api)
     return found
+
+
+def answer_rated(world, used, api):
+    """The task's answer as this world has it, with the carriers it comes with rated below every other carrier.
+
+    Who wins is read, not steered: a native delivery task reads its answer
+    off the world under whatever it ranks by (the lowest total, the earliest
+    arrival, a deadline, the cheapest set of orders), and none of them reads
+    a carrier's reviews, which are all that is redrawn. So this one candidate
+    serves every ranking the native tasks have, several winning options, and
+    charges that depend on the location that ships. `used` are the carriers
+    of the answer's deliveries, None for one without a carrier (a pickup at
+    a branch). Such a delivery, or a carrier the world does not rate, leaves
+    no candidate: part of the answer would come with no carrier rated low.
+    """
+    stars = {row["carrier_id"]: row["summary"]["average_stars"] for row in world["carrier_evidence"]["public"]["carriers"]}
+    used = set(used)
+    others = [value for carrier, value in stars.items() if carrier not in used]
+    # A summary publishes its average to two decimals.
+    limit = round(min(others) - .01, 2) if others else 0
+    if not used or not used <= set(stars) or limit < 1:
+        return []
+    used = sorted(used)
+    rows = ranked(world, [{"schema": ratings.VERSION, "carrier_id": carrier, "average_stars": {"max": limit}}
+                          for carrier in used], api, ratings)
+    if len(rows) < len(used):
+        return []
+    needs = sorted((row[1] for row in rows), key=lambda need: need["carrier_id"])
+    return [entry(KEPT, "the answer as this world has it, with every carrier it is delivered "
+                  "with rated lower than all the other carriers",
+                  (sum(row[0] for row in rows), needs[0] if len(needs) == 1 else {"schema": combined.VERSION, "all": needs}))]
+
+
+def delivering(world, scope, asked, api):
+    """The carriers of the single-item delivery task's winning options, under the ranking the task asks for."""
+    return [row["delivery"].get("carrier_id") for row in scope.reference(world, **asked)[1]["winners"]]
+
+
+def order_set(world, task, api):
+    """The order-set task: the cheapest sets of orders as this world has them, by the native task's own solver.
+
+    Read for a site recipe's delivery options under admission plan version 2
+    and its checkout limits, which come with the task as `delivery_options`
+    and `checkout_domain`. Every set of orders that shares the lowest total
+    counts, so the carriers are those of all of them.
+    """
+    native, checkout, website = (importlib.import_module(api.basic.__package__ + name) for name in (
+        ".catalog_basket_task", ".catalog_checkout_domain", ".delivery_options"))
+    baskets, admission = (importlib.import_module(api.commerce.__package__ + name) for name in (
+        ".basket_quote", ".delivery_admission"))
+    if not world["retailers"]:
+        return []
+    settings = menus.oracle(world, world["retailers"][0]["retailer_id"], task.get("delivery_options", {}), api).settings
+    domain = checkout.make(world, task.get("checkout_domain"))
+    bound = native.make(world, {key: task[key] for key in ("kind", "requirements", "domain") if key in task},
+                        checkout_domain=domain)
+    plan = baskets.make_plan(world)
+    try:
+        sidecar = admission.make_plan(world, plan, seed=world["seed"], plan_version=menus.VERSION,
+                                      count_weights=website.producer_weights(settings))
+    except ValueError as error:
+        if str(error) != menus.UNSUPPORTED:
+            raise
+        raise blocks.Unmet("The recipe's delivery counts have no support for a retailer of this world") from error
+    result = native.reference(world, bound, plan=plan, checkout_domain=domain, admission_plan=sidecar)["result"]
+    if result["status"] == "infeasible":
+        return []
+    if result["status"] != "optimal" or not result["complete"] or result["ties_truncated"]:
+        raise ValueError("The native solver did not settle every cheapest set of orders for this task")
+    return answer_rated(world, [shipment["delivery"].get("carrier_id") for found in result["solutions"]
+                                for order in found["orders"] for shipment in order["quote"]["shipments"]], api)
 
 
 def relaxations(world, task, api):
@@ -296,16 +374,26 @@ def carrier_verdicts(world, task, api):
     return found
 
 
-def of(world, task, api):
+def of(world, task, api, only=None):
     """Scenarios of a native task on a world, as requirement candidates.
 
     An unsupported kind is a ValueError, and so is a task with a field this
-    module does not carry into the requirement.
+    module does not carry into the requirement. `only` names the candidates
+    wanted: the others are left out, and are not modelled where that can be
+    avoided (a delivery task's kept answer alone comes without the model of
+    every pair of the concept that the task's other candidates need).
     """
+    found = scenarios(world, task, api, only is not None and set(only) == {KEPT})
+    return found if only is None else [row for row in found if row["name"] in only]
+
+
+def scenarios(world, task, api, kept=False):
+    """Every candidate of a task, or with `kept` at least the kept answer of a delivery task."""
     kind = task.get("kind") if type(task) is dict else None
     if kind in FIELDS and set(task) - FIELDS[kind]:
         raise ValueError("Steering cannot state this field of the task: " + ", ".join(sorted(set(task) - FIELDS[kind])))
-    needed = {OTHERS[1]: ("sku_id", "comparison_site_id"), OTHERS[2]: (), OTHERS[4]: ("aspect",)}.get(kind, ("concept_id",))
+    needed = {OTHERS[1]: ("sku_id", "comparison_site_id"), OTHERS[2]: (), OTHERS[4]: ("aspect",), ORDERS: ()}.get(
+        kind, ("concept_id",))
     if kind in FIELDS and any(type(task.get(key)) is not str or not task[key] for key in needed):
         raise ValueError("The task must name its " + " and ".join(needed))
     if kind == "cheapest_matching_with_permitted_relaxations":
@@ -319,17 +407,25 @@ def of(world, task, api):
         return winners(world, {**selection, "kind": "cheapest_matching_available",
                                **{key: task[key] for key in ("surrounding",) if key in task}}, api)
     if kind == DELIVERY:
-        if task.get("objective", "cheapest_total") != "cheapest_total" or task.get("destination", "user_home") != "user_home":
-            raise ValueError("Steering reads this task for the cheapest total delivered for the customer's home address")
+        if task.get("destination", "user_home") != "user_home":
+            raise ValueError("Steering reads this task for the customer's home address")
         # Home delivery alone is the task's default and is left unstated, as the native task leaves it.
         stated = task.get("delivery_types", ["home"])
         if type(stated) is not list or not stated or any(type(kind) is not str for kind in stated) or len(set(stated)) != len(stated):
             raise ValueError("A delivery task's methods are a nonempty list of distinct names")
         kinds = {} if stated == ["home"] else {"delivery_types": sorted(stated)}
+        delivered = {**{key: task[key] for key in ("delivery_options", "max_total_minor") if key in task}, **kinds}
+        asked = {key: task[key] for key in ("objective", "arrival_deadline")
+                 if key in task and (key, task[key]) != ("objective", "cheapest_total")}
+        if asked or kept:
+            # The block ranks by the total alone. Under another ranking or a deadline the answer is read and kept.
+            scope = cheapest.scope(world, {"concept_id": task["concept_id"], "predicates": task.get("predicates"),
+                                           "delivered": delivered}, api)
+            return answer_rated(world, delivering(world, scope, asked, api), api)
         return winners(world, {"kind": "cheapest_matching_available", "concept_id": task["concept_id"],
-                               "predicates": task.get("predicates")}, api,
-                       extra={"delivered": {**{key: task[key] for key in ("delivery_options", "max_total_minor") if key in task},
-                                            **kinds}})
+                               "predicates": task.get("predicates")}, api, extra={"delivered": delivered})
+    if kind == ORDERS:
+        return order_set(world, task, api)
     if kind in WINNERS:
         return winners(world, task, api)
     if kind not in OTHERS:
