@@ -1165,7 +1165,8 @@ solver finds: the carriers are those of every set that shares the lowest
 total. The task carries the recipe's `delivery_options` (admission plan
 version 2, as above) and `checkout_domain` beside its requirements and
 domain; a search the solver does not finish, or more tied sets than it
-lists, is refused. What this does not do is choose the answer: "the
+lists, is refused. An answer of which any delivery has no carrier (a pickup
+at a branch) or a carrier the world does not rate has no such candidate. What this does not do is choose the answer: "the
 cheapest option misses the deadline by a day" or "the fastest is a named
 retailer" would need the arrival dates in a block, which is not built.
 

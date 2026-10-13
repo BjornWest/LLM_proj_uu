@@ -143,15 +143,18 @@ def answer_rated(world, used, api):
     a carrier's reviews, which are all that is redrawn. So this one candidate
     serves every ranking the native tasks have, several winning options, and
     charges that depend on the location that ships. `used` are the carriers
-    of the answer's deliveries, None for one without a carrier.
+    of the answer's deliveries, None for one without a carrier (a pickup at
+    a branch). Such a delivery, or a carrier the world does not rate, leaves
+    no candidate: part of the answer would come with no carrier rated low.
     """
     stars = {row["carrier_id"]: row["summary"]["average_stars"] for row in world["carrier_evidence"]["public"]["carriers"]}
-    used = sorted({carrier for carrier in used if carrier is not None})
+    used = set(used)
     others = [value for carrier, value in stars.items() if carrier not in used]
     # A summary publishes its average to two decimals.
     limit = round(min(others) - .01, 2) if others else 0
-    if not used or not set(used) <= set(stars) or limit < 1:
+    if not used or not used <= set(stars) or limit < 1:
         return []
+    used = sorted(used)
     rows = ranked(world, [{"schema": ratings.VERSION, "carrier_id": carrier, "average_stars": {"max": limit}}
                           for carrier in used], api, ratings)
     if len(rows) < len(used):

@@ -5,6 +5,7 @@ Run from the repository root:
 Each candidate is steered through the real producer; the answer is then read
 again by the native task and the carriers' stars off the published summaries.
 """
+from copy import deepcopy
 from random import Random
 from unittest.mock import patch
 
@@ -63,7 +64,7 @@ class Answers(Delivered):
         result = catalog_basket_task.reference(world, bound, plan=plan, checkout_domain=domain, admission_plan=sidecar)["result"]
         self.assertEqual((result["status"], result["complete"], result["ties_truncated"]), ("optimal", True, False))
         rows = [(result["total_minor"], [(order["retailer_id"], order["lines"], order["quote"]["selection"],
-                                          [shipment["delivery"]["carrier_id"] for shipment in order["quote"]["shipments"]])
+                                          [shipment["delivery"].get("carrier_id") for shipment in order["quote"]["shipments"]])
                                          for order in found["orders"]]) for found in result["solutions"]]
         return rows, {carrier for _, found in rows for order in found for carrier in order[3]}
 
@@ -145,8 +146,20 @@ class AnswerTests(Answers):
         # No feasible set of orders: nothing to keep.
         self.assertEqual(variants.of(self.natural, {**ORDERS, "domain": {
             **ORDERS["domain"], "deadline": "2020-01-01", "allow_extras": False}}, self.api), [])
-        # A search the solver did not finish, or more tied sets than it lists, is not an answer to keep.
+        # Picked up at a branch, the cheapest orders have no carrier; so has one shipment of an answer when the
+        # solver's result is changed to say so. Neither leaves a candidate.
+        collected = {**ORDERS, "domain": {**ORDERS["domain"], "allowed_destination_types": ["retailer_branch"]}}
+        self.assertEqual(self.orders(self.natural, collected)[1], {None})
+        self.assertEqual(variants.of(self.natural, collected, self.api), [])
         settled = catalog_basket_task.reference
+
+        def partly(*args, **more):
+            found = deepcopy(settled(*args, **more))
+            found["result"]["solutions"][-1]["orders"][-1]["quote"]["shipments"][-1]["delivery"]["carrier_id"] = None
+            return found
+        with patch.object(catalog_basket_task, "reference", partly):
+            self.assertEqual(variants.of(self.natural, ORDERS, self.api), [])
+        # A search the solver did not finish, or more tied sets than it lists, is not an answer to keep.
         for unsettled in ({"status": "inconclusive", "complete": False}, {"ties_truncated": True}):
             def reference(*args, **more):
                 found = settled(*args, **more)
@@ -167,6 +180,10 @@ class AnswerTests(Answers):
         self.assertEqual(variants.answer_rated(self.natural, [None], self.api), [])
         self.assertEqual(variants.answer_rated(self.natural, every, self.api), [])
         self.assertEqual(variants.answer_rated(self.natural, ["carrier-99"], self.api), [])
+        # Part of the answer without a carrier, or with one the world does not rate, beside one that could be rated.
+        self.assertEqual(variants.answer_rated(self.natural, [None, every[0]], self.api), [])
+        self.assertEqual(variants.answer_rated(self.natural, [every[0], "carrier-99"], self.api), [])
+        self.assertEqual(len(variants.answer_rated(self.natural, [every[0], every[0]], self.api)), 1)
         # A carrier that cannot fall under the others: with every other carrier at one star there is no room below.
         world = {**self.natural, "carrier_evidence": {**self.natural["carrier_evidence"], "public": {
             **self.natural["carrier_evidence"]["public"], "carriers": [
