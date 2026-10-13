@@ -138,6 +138,32 @@ class UniformCharges(Couriers):
             shown.append(couriers.charged(found, contracts).delivered[pair[0]].lowest(1))
         self.assertLess(sum(row["charge"] for row in mine) / len(mine), sum(shown) / len(shown))
 
+    def test_the_bounds_hold_for_any_contracts(self):
+        """The block is drawn with the winner charged nothing and its other products the ceiling; whatever contracts
+        are drawn, what they charge lies between, at every price and for every location, waived or not."""
+        need = self.need(self.likely[0])
+        whole = couriers.model(self.natural, need, self.api)
+        found, retailer = whole.site, self.likely[0][0]
+        bounds = found.shared.scope.delivered[retailer]
+        self.assertEqual((bounds.lowest(1), bounds.lowest(10 ** 7), bounds.highest(1), bounds.highest(10 ** 7), bounds.uniform),
+                         (0, 0, found.ceiling, found.ceiling, False))
+        self.assertTrue(whole.block.bounded)
+        designated = whole.block.places[self.likely[0]]
+        self.assertEqual(designated.best("sku", 50000), 50000)
+        self.assertEqual(designated.rank("sku", 50000), 50000 + found.ceiling)
+        rng, seen = Random(9), set()
+        free = policies.model(self.natural, {"schema": policies.VERSION, "retailer_id": retailer, "carrier_count": {"min": 0}}, self.api)
+        for block in (whole.contracts, free):
+            for _ in range(400):
+                charge = menus.delivery(found.place.menu, policies.draw(block, rng)[1])
+                if charge is not None:
+                    seen.add(charge.highest(1))
+                    self.assertTrue(0 <= charge.lowest(1) <= charge.highest(1) <= found.ceiling)
+                    self.assertLessEqual(charge.highest(10 ** 7), found.ceiling)
+        # The ceiling is reached within a few thousand of what contracts do charge, not far above it.
+        self.assertGreater(len(seen), 5)
+        self.assertGreater(max(seen), found.ceiling - 5000)
+
     def test_what_it_reads_and_combines_with(self):
         need = self.need(self.likely[0])
         winner = self.likely[0][0]
