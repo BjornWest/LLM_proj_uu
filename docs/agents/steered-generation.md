@@ -1060,20 +1060,23 @@ The block declares that it reads the contracts and the threshold of every
 retailer that lists a competing offer; a requirement that redraws either
 cannot be combined with it, and the twelfth requirement refuses a ranking by
 delivered totals together with a statement about the winner's contracts or
-threshold. Refused as not modelled: a retailer where what delivery costs, or
-whether it is possible, depends on which of its locations holds the stock;
+threshold. Refused as not modelled: a retailer where whether an offer can be
+delivered depends on which of its locations holds it (a location that ships
+without a route, a warehouse that does not ship; none on the worlds here);
 rankings other than the total; physical stock only; a comparison site.
 
-The first of these decides where this can be used today. On the pilot world
-(11 retailers) every retailer charges the same from each location that
-ships. On the medium world five of 21 do not: the large retailers have
-locations in several cities, and a parcel from a far one pays 25 kronor
-more for distance, so an offer's total depends on where its stock is. A
-ranking that includes such a retailer is refused there. Modelling it needs
-ranks per offer and distance class in the fourth block's chain of
-unavailable offers (a count of offers that must hold nothing per class of
-location, and the supplier order at the warehouse's class only when no
-location that ships holds the offer); that is not built.
+A retailer with locations in several cities charges more for distance from
+a far one (25 kronor on the worlds here), so an offer's total depends on
+where its stock is; five of the medium world's 21 retailers are so. The
+fourth block's product over pairs has no place for that. For one designated
+pair the block is then modelled between bounds: that pair charged the least
+it can be and every other pair the most. If the pair is cheapest on the
+charges as they are, it is cheapest between the bounds too, so samples of
+the bounded block that also hold on the charges as they are (read from where
+each offer's stock is) are samples given the requirement; `prepare` draws
+until one does. The probability is the bounded block's own times the share
+of 200 such samples that hold: an estimate, labelled as one. Several
+designated retailers, or offers listed below the winner, are refused there.
 
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
 total, home delivery; a cap, a deadline, other methods or a comparison site

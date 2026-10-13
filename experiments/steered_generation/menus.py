@@ -173,28 +173,44 @@ def delivery(place):
     """What home delivery of one unit adds to a price at the retailer, as the oracle charges it; None where it shows no
     home route.
 
-    Returns `charge(price)`: the cheapest shown home route's tariff, with the
-    ordinary, distance and geographic parts waived where the retailer offers
-    free shipping from a subtotal the price reaches and the parcel does not
-    cross a border. That is one number per route only where every source that
-    can ship charges the same on it and the warehouse, which a supplier order
-    ships from, is one of them; a retailer where that is not so is refused.
+    Per shown home route the oracle ships from the location, among those that
+    hold the offer and ship, with the lowest tariff, and the offer's charge is
+    the lowest over the routes; the ordinary, distance and geographic parts
+    are waived where the retailer offers free shipping from a subtotal the
+    price reaches and the parcel does not cross a border. A supplier order
+    ships from the warehouse. `at(price, held)` is that charge for the
+    locations that hold the offer; `lowest(price)` and `highest(price)` bound
+    it over every set of locations, and `uniform` says they are equal, so
+    that the charge does not depend on where the stock is. Refused: a
+    retailer where whether an offer can be delivered depends on which
+    location holds it (a location that ships without a route, a warehouse
+    that does not ship).
     """
     rows = shown(place, place.retailer["contracts"], detail=True)
     if not rows:
         return None
     sources = place.retailer["source_locations"]
-    shipping = [source["source_id"] for source in sources if source["shipping_enabled"]]
+    shipping = sorted(source["source_id"] for source in sources if source["shipping_enabled"])
     routes = []
     for row in rows:
-        parts = {(found["raw_shipping_minor"], found["raw_shipping_minor"] if found["foreign"] else
-                  found["tariff_components"]["express_minor"]) for found in row["candidates"]}
-        if (len(parts) != 1 or not sources[0]["shipping_enabled"] or
-                sorted(found["source_id"] for found in row["candidates"]) != sorted(shipping)):
-            raise ValueError("Not modelled: a retailer whose delivery or its charge depends on which location ships")
-        routes.append(parts.pop())
+        route = {found["source_id"]: (found["raw_shipping_minor"], found["raw_shipping_minor"] if found["foreign"] else
+                                      found["tariff_components"]["express_minor"]) for found in row["candidates"]}
+        if not sources[0]["shipping_enabled"] or sorted(route) != shipping:
+            raise ValueError("Not modelled: a retailer where whether an offer can be delivered depends on which location holds it")
+        if any(a[0] == b[0] and a != b for a in route.values() for b in route.values()):
+            raise ValueError("Not modelled: locations with one tariff of which only some are waived")
+        routes.append(route)
     threshold = place.retailer["free_shipping_threshold_minor"]
-    return lambda price: min(waived if threshold is not None and price >= threshold else full for full, waived in routes)
+
+    def at(price, held):
+        waived = threshold is not None and price >= threshold
+        # The oracle's dispatch: per route the location with the lowest tariff before any waiver.
+        return min(route[min(held, key=lambda name: route[name][0])][waived] for route in routes)
+
+    subsets = [[name for index, name in enumerate(shipping) if mask >> index & 1] for mask in range(1, 2 ** len(shipping))]
+    bounds = lambda pick: (lambda price: pick(at(price, held) for held in subsets))
+    return SimpleNamespace(at=at, lowest=bounds(min), highest=bounds(max), warehouse=sources[0]["source_id"],
+                           uniform=all(len(set(route.values())) == 1 for route in routes))
 
 
 def official(world, place):

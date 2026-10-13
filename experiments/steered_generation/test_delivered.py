@@ -49,11 +49,13 @@ def totals(world, skus, options=None):
 
 
 class Delivered(unittest.TestCase):
+    inputs = INPUTS
+
     @classmethod
     def setUpClass(cls):
         cls.api = SimpleNamespace(basic=basic_offer_task, native=native, population=population,
                                   commerce=commerce, package_export=package_export)
-        cls.session = streams.Session(cls.api, INPUTS)
+        cls.session = streams.Session(cls.api, cls.inputs)
         cls.natural, cls.opened = cls.session.generate()
         cls.frozen = deepcopy(cls.natural)
         cls.base = {"schema": cheapest.VERSION, "concept_id": SHOES, "predicates": SIZE, "delivered": {}}
@@ -99,7 +101,9 @@ class ReadingTests(Delivered):
             rows = menus.shown(place, place.retailer["contracts"])
             self.assertEqual(bool(rows), rid in scope.delivered)
             if rows:
-                self.assertEqual(scope.delivered[rid](1), rows[0]["charge_minor"])
+                self.assertTrue(scope.delivered[rid].uniform)
+                self.assertEqual(scope.delivered[rid].lowest(1), scope.delivered[rid].highest(1))
+                self.assertEqual(scope.delivered[rid].lowest(1), rows[0]["charge_minor"])
         self.assertEqual(self.frame.scope.reads, {(kind, rid, "") for rid in listing for kind in ("contracts", "threshold")})
 
     def test_a_reached_threshold_waives_as_the_oracle_does(self):
@@ -111,7 +115,7 @@ class ReadingTests(Delivered):
             frame = cheapest.frame(world, self.base, self.api)
             if retailer["retailer_id"] not in frame.scope.delivered:
                 continue
-            charge, before = frame.scope.delivered[retailer["retailer_id"]], self.frame.scope.delivered[retailer["retailer_id"]]
+            charge, before = (found.scope.delivered[retailer["retailer_id"]].lowest for found in (frame, self.frame))
             self.assertLessEqual(charge(20000), before(20000))
             self.assertEqual(charge(19999), before(19999))
             for (rid, sku), (total, _, price) in totals(world, frame.scope.skus).items():
@@ -128,7 +132,7 @@ class ReadingTests(Delivered):
             world = deepcopy(self.natural)
             patched = next(r for r in world["retailers"] if r["retailer_id"] == retailer["retailer_id"])
             patched["free_shipping_threshold_minor"] = offers[0]["price_minor"]
-            charge = cheapest.frame(world, self.base, self.api).scope.delivered[retailer["retailer_id"]]
+            charge = cheapest.frame(world, self.base, self.api).scope.delivered[retailer["retailer_id"]].lowest
             quoted = totals(world, {offers[0]["sku_id"]})
             if (retailer["retailer_id"], offers[0]["sku_id"]) in quoted:
                 at += 1
@@ -241,7 +245,7 @@ class SteeringTests(Delivered):
         self.assertNotIn((below["retailer_id"], below["sku_id"]), quoted)
         offer = next(o for r in world["retailers"] if r["retailer_id"] == below["retailer_id"] for o in r["offers"]
                      if o["sku_id"] == below["sku_id"])
-        charge = self.frame.scope.delivered[below["retailer_id"]]
+        charge = self.frame.scope.delivered[below["retailer_id"]].lowest
         self.assertLess(offer["price_minor"] + charge(offer["price_minor"]), min(total for total, _, _ in quoted.values()))
 
     def test_what_it_reads_cannot_be_redrawn_beside_it(self):
@@ -289,6 +293,111 @@ class SteeringTests(Delivered):
                 variants.of(self.natural, {**task, **other}, self.api)
         with self.assertRaises(ValueError):
             variants.of(self.natural, {key: value for key, value in task.items() if key != "predicates"}, self.api)
+
+
+class ByLocation(Delivered):
+    """A world where two retailers charge more from a far location: totals depend on where the stock is."""
+    inputs = {**INPUTS, "seed": 7}
+
+    def split(self):
+        return sorted(rid for rid, found in self.frame.scope.delivered.items() if not found.uniform)
+
+    def test_charges_by_location_are_the_oracles_and_lie_between_the_bounds(self):
+        scope, split = self.frame.scope, self.split()
+        self.assertGreaterEqual(len(split), 2)
+        classes = set()
+        reading, _ = cheapest.reader(self.natural, self.frame.places, self.api)
+        keys = cheapest.trial(self.natural, self.need(max(self.chances, key=self.chances.get)), self.api).keys
+        worlds = [self.natural] + [self.session.generate({key: streams.Reseeded(seed) for key in keys})[0]
+                                   for seed in range(950, 954)]
+        for world in worlds:
+            self.agree(world)
+        for seed in range(2000, 2200):
+            best, compared = cheapest.lowest(reading(seed), scope)
+            leaves = reading(seed)["offers"]
+            for (rid, sku), rank in compared.items():
+                price = next(row["price_minor"] for row in leaves.values() if (row["retailer_id"], row["sku_id"]) == (rid, sku))
+                low, high = (cheapest.ranks(scope, rid, best=flag)(sku, price) for flag in (True, False))
+                self.assertTrue(low <= rank <= high)
+                if rid in split:
+                    classes.add((rid, rank == low, rank == high))
+        # Both classes occur at both retailers.
+        self.assertLessEqual({(rid, near, not near) for rid in split for near in (True, False)}, classes)
+
+    def test_probabilities_are_estimates_that_match_other_seeds(self):
+        trials, split = 1500, self.split()
+        winners = [max((pair for pair in self.chances if pair[0] == rid), key=self.chances.get) for rid in split]
+        winners.append(max((pair for pair in self.chances if pair[0] not in split), key=self.chances.get))
+        for pair in winners:
+            with self.subTest(pair=pair):
+                block = cheapest.model(self.natural, self.need(pair), self.api, self.frame)
+                self.assertTrue(block.bounded and 0 < block.accepted <= cheapest.PROPOSALS)
+                self.assertGreater(block.error, 0) if block.accepted < cheapest.PROPOSALS else self.assertEqual(block.error, 0)
+                found = cheapest.trial(self.natural, self.need(pair), self.api)
+                hits, chance = sum(found.holds(seed) for seed in range(10 ** 6, 10 ** 6 + trials)), block.probability
+                self.assertLess(abs(hits / trials - chance), 4.5 * (chance * (1 - chance) / trials + block.error ** 2) ** .5 + 1e-9)
+                self.assertEqual(cheapest.model(self.natural, self.need(pair), self.api).probability, chance)
+
+    def test_samples_hold_on_the_charges_as_they_are_and_match_rejection_sampling(self):
+        pair = max((found for found in self.chances if found[0] in self.split()), key=self.chances.get)
+        need, scope = self.need(pair), self.frame.scope
+        found = cheapest.trial(self.natural, need, self.api)
+        accepted = [leaves for leaves in (found.reading(seed) for seed in range(10 ** 6, 10 ** 6 + 5000))
+                    if cheapest.judged(leaves, need, scope) is not None]
+        self.assertGreater(len(accepted), 250)
+        block, rng, planned = cheapest.model(self.natural, need, self.api), Random(8), []
+        while len(planned) < 300:
+            draws = cheapest.sample(block, rng)[1]
+            if cheapest.true(block, draws):
+                planned.append(cheapest.planned(block, draws))
+        low = lambda row: cheapest.ranks(scope, row["retailer_id"], best=True)(row["sku_id"], row["price_minor"])
+
+        def features(leaves):
+            best, compared = cheapest.lowest(leaves, scope)
+            mine = [row for row in leaves["offers"].values() if (row["retailer_id"], row["product_id"]) == pair
+                    and (row["retailer_id"], row["sku_id"]) in compared and compared[(row["retailer_id"], row["sku_id"])] == best[pair]]
+            return {"total": best[pair], "runner_up": sorted(best.values())[1] - best[pair] if len(best) > 1 else 0,
+                    "pairs_available": len(best), "winner_from_near": any(low(row) == best[pair] for row in mine),
+                    "winner_by_supplier": any(row["supplier_order"] for row in mine)}
+
+        mine, theirs = [features(leaves) for leaves in planned], [features(leaves) for leaves in accepted]
+        self.assertTrue(0 < sum(row["winner_from_near"] for row in theirs) < len(theirs))
+        for name in mine[0]:
+            with self.subTest(feature=name):
+                a, b = [float(row[name]) for row in mine], [float(row[name]) for row in theirs]
+                error = lambda values: (sum((v - sum(values) / len(values)) ** 2 for v in values) / len(values) ** 2) ** .5
+                self.assertLess(abs(sum(a) / len(a) - sum(b) / len(b)), 4.5 * (error(a) ** 2 + error(b) ** 2) ** .5 + 1e-9)
+
+    def test_steered_worlds_are_confirmed_by_the_native_task(self):
+        split = self.split()
+        for index, pair in enumerate([max((found for found in self.chances if found[0] == rid), key=self.chances.get)
+                                      for rid in split] + [min(self.chances, key=lambda found: (found[0] in split, -self.chances[found]))]):
+            with self.subTest(pair=pair):
+                world, found, record = cheapest.steer(self.session, self.natural, self.opened, self.need(pair), self.api,
+                                                      Random(index))
+                self.assertEqual({(row["retailer_id"], row["product_id"]) for row in found["reference"]["winners"]}, {pair})
+                by_pair = self.agree(world)
+                self.assertEqual([other for other in by_pair if by_pair[other] == min(by_pair.values())], [pair])
+                self.assertTrue(record["probability_is_estimated"])
+                self.assertGreaterEqual(record["block_samples_for_this_sample"], 1)
+                self.assertEqual(record["proposals"], cheapest.PROPOSALS)
+        reading = cheapest.trial(self.natural, self.need(pair), self.api)
+        for seed in range(900, 903):
+            found = blocks.redraw(self.session, self.natural, [reading], seed)
+            self.assertEqual((found.identical, found.agreed), ([True], [True]))
+            self.assertEqual(found.satisfied, reading.holds(seed))
+
+    def test_what_the_bounds_cannot_carry_is_refused(self):
+        pairs = sorted(self.chances, key=self.chances.get, reverse=True)
+        two = next((a, b) for a in pairs for b in pairs if a[0] != b[0] and a[1] == b[1])
+        with self.assertRaises(ValueError) as caught:
+            cheapest.model(self.natural, {**self.need(two[0]), "retailer_ids": [two[0][0], two[1][0]]}, self.api)
+        self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        other = next(place for found, place in sorted(self.frame.places.items()) if found[0] != pairs[0][0] and place.competing)
+        with self.assertRaises(ValueError) as caught:
+            cheapest.model(self.natural, self.need(pairs[0], listed_below=[
+                {"retailer_id": other.pair[0], "sku_id": other.competing[0]["sku_id"]}]), self.api)
+        self.assertNotIsInstance(caught.exception, prices.ZeroMass)
 
 
 if __name__ == "__main__":
