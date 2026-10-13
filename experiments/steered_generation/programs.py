@@ -19,6 +19,17 @@ draw that the program reads only through `>=` thresholds (found on the
 expressions as the program parses them). A loop is followed where it only
 derives and collects values.
 
+A review site's first page lists written comments, and a review has a
+comment when any pool at all holds for it. So a requirement on a first page
+also needs the probability that a review that says nothing about the topic
+says something else, which depends on every pool's draws. Walking them all
+together would cost the product of their numbers. Instead the other pools
+are grouped by the aspect they report, and a step goes to the common part
+when the topic or the rating depends on it or two groups do; what is left
+of a group's steps is its own. Given how the common part falls, the groups'
+own draws are independent, so the chance that none of them says anything is
+a product, each factor a short walk of one group's own steps (`kinds`).
+
 The producer may wrap a package's review program in checks that refuse
 anything but a whole sample. The reading here runs on a plain copy made from
 the wrapped program's own document, which draws from the same streams; a
@@ -28,7 +39,7 @@ following the steps here from a review's recorded draws gives another rating
 or says another thing than the review does.
 """
 import ast
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 from importlib import import_module
 import json
@@ -36,7 +47,7 @@ from math import erfc, fsum, prod, sqrt
 import sys
 from types import SimpleNamespace
 
-from . import reviews, streams
+from . import pages, reviews, streams
 
 # What is read is the distribution each draw is written as. The program realises a draw from 53-bit uniform
 # numbers in floating point, which follows that distribution closely for numbers of ordinary size and departs from
@@ -52,6 +63,9 @@ from . import reviews, streams
 SMALL, LARGE, FINE, SHAPES, WEIGHTS, RARE = 1e-150, 1e150, 1e-6, (.04, 1e6), (1e-100, 1e100), 1e-9
 # Review programs rebuilt from a world, by the producer module, the world's seed and the product.
 BUILT = {}
+# The most steps taken in following one product's pools for a first page, over every way its draws can fall;
+# beyond it the program is refused. A tablet takes under three hundred thousand, in some twenty seconds.
+WAYS = 4 * 10 ** 6
 
 
 def unmodelled(what):
@@ -176,8 +190,35 @@ def program(world, item, api):
     return BUILT[key]
 
 
+def conditions(twin, pools):
+    """The paths some pools' conditions read."""
+    return set().union(*(twin.expression(pool["when"]).references for pool in pools if "when" in pool))
+
+
+def needs(twin, paths):
+    """The steps some paths depend on, directly or through other steps, in the program's order."""
+    steps, needed = [], set(paths)
+    for step in reversed(twin.document.get("steps", [])):
+        if any(touches(target, path) for target in written_by(step) for path in needed):
+            if any("for_each" in row or "sample" in row for row in inner(step)):
+                raise unmodelled("a loop that draws, or holds another loop")
+            if any("emit" in row and ("when" in row or "applicable_when" in twin.fields[row["target"]])
+                   for row in (inner(step) or [step])):
+                raise unmodelled("a collected value under a condition of its own")
+            steps.append(step)
+            needed |= read_by(twin, step)
+    steps.reverse()
+    return steps
+
+
 def site(world, item, api, native, **common):
-    """Where one product's review draws sit, and what its review program reads them with."""
+    """Where one product's review draws sit, and what its review program reads them with.
+
+    For a requirement on a first page the block is the draws of every pool,
+    not the topic's alone: `steps` are those common to the topic, the rating
+    or two groups of other pools, and `groups` the other pools with the steps
+    only they depend on.
+    """
     found, topic = program(world, item, api), common["requirement"]["topic"]
     twin, pools = found.twin, {reviews.POSITIVE: [], reviews.NEGATIVE: []}
     for pool in twin.document.get("language", []):
@@ -189,25 +230,32 @@ def site(world, item, api, native, **common):
             if meaning.get("polarity") not in pools:
                 raise unmodelled("a statement about the topic that is neither for nor against")
             pools[meaning["polarity"]].append(pool)
-    read = set().union(*(twin.expression(pool["when"]).references for rows in pools.values() for pool in rows
-                         if "when" in pool))
     # The review's stars are the one rating draw's, whatever else reads them.
     rating = [step for step in twin.document.get("steps", []) if step.get("sample") == "rating"]
     if len(rating) != 1 or rating[0]["target"] not in ("review.rating", "review.stars") or "{" in rating[0].get("stream", ""):
         raise unmodelled("a review whose stars are not one rating draw")
-    steps, needed = [], read | {rating[0]["target"]}
-    for step in reversed(twin.document.get("steps", [])):
-        if any(touches(target, path) for target in written_by(step) for path in needed):
-            if any("for_each" in row or "sample" in row for row in inner(step)):
-                raise unmodelled("a loop that draws, or holds another loop")
-            if any("emit" in row and ("when" in row or "applicable_when" in twin.fields[row["target"]])
-                   for row in (inner(step) or [step])):
-                raise unmodelled("a collected value under a condition of its own")
-            steps.append(step)
-            needed |= read_by(twin, step)
-    steps.reverse()
+    order = {id(step): position for position, step in enumerate(twin.document.get("steps", []))}
+    stated = [pool for rows in pools.values() for pool in rows]
+    shared = {id(step): step for step in needs(twin, conditions(twin, stated) | {rating[0]["target"]})}
+    paged, groups = reviews.PAGE in common["requirement"], []
+    if paged:
+        # Every other pool, by the aspect it reports (one without an aspect by itself), with the steps it depends on.
+        others = {}
+        for pool in twin.document.get("language", []):
+            if not any(pool is own for own in stated):
+                meaning = pool.get("meaning")
+                aspect = meaning.get("aspect") if type(meaning) is dict else None
+                others.setdefault(("aspect", aspect) if type(aspect) is str else ("pool", pool["id"]), []).append(pool)
+        own = {name: needs(twin, conditions(twin, rows)) for name, rows in others.items()}
+        # A step two groups depend on is common to them, and so is all it depends on: both groups depend on that too.
+        times = Counter(id(step) for rows in own.values() for step in rows)
+        shared.update((id(step), step) for rows in own.values() for step in rows if times[id(step)] > 1)
+        groups = [(rows, [step for step in own[name] if id(step) not in shared]) for name, rows in others.items()]
+        stated = stated + [pool for rows in others.values() for pool in rows]
+    steps = sorted(shared.values(), key=lambda step: order[id(step)])
+    every = sorted([*steps, *(step for _, rows in groups for step in rows)], key=lambda step: order[id(step)])
     bounds, block, drawn = {}, set(), []
-    for step in steps:
+    for step in every:
         if "sample" not in step:
             continue
         name = step.get("stream", step["id"])
@@ -222,8 +270,8 @@ def site(world, item, api, native, **common):
             block.add(name)
         if step["sample"] == "normal":
             # Every mention of the draw, in what the other steps and the statements evaluate, is a threshold.
-            texts = [text for other in steps if other is not step for text in expressions(twin, other)] + [
-                pool["when"] for rows in pools.values() for pool in rows if "when" in pool]
+            texts = [text for other in every if other is not step for text in expressions(twin, other)] + [
+                pool["when"] for pool in stated if "when" in pool]
             cuts = [thresholds(twin, text, step["target"]) for text in texts]
             if None in cuts or not any(cuts):
                 raise unmodelled("a continuous draw read other than through thresholds it must reach")
@@ -233,13 +281,14 @@ def site(world, item, api, native, **common):
             bounds[step["id"]] = sorted({cut for found in cuts for cut in found})
     # Whether the rating can be redrawn on its own: no other draw sets its parameters.
     above, staged = read_by(twin, rating[0]), True
-    for step in reversed(steps[:steps.index(rating[0])]):
+    for step in reversed(every[:every.index(rating[0])]):
         if any(touches(target, path) for target in written_by(step) for path in above):
             above, staged = above | read_by(twin, step), staged and "sample" not in step
     return SimpleNamespace(
         **common, reader=sys.modules[__name__], program=found, pools=pools, steps=steps, bounds=bounds,
+        paged=paged, groups=groups, every=every, language=list(twin.document.get("language", [])),
         block=frozenset(block), drawn=frozenset(drawn), rating=rating[0], staged=staged,
-        emits=sorted({row["target"] for step in steps for row in (inner(step) or [step]) if "emit" in row}),
+        emits=sorted({row["target"] for step in every for row in (inner(step) or [step]) if "emit" in row}),
         seeds=[streams.program_review_seed(common["seed"], index) for index in range(common["count"])])
 
 
@@ -408,11 +457,14 @@ def told(place, entities):
     return next((side for side, holds in sides.items() if holds), reviews.REST)
 
 
-def follow(place, choose, visit):
+def follow(place, choose, visit, steps=None, most=None):
     """Run the steps the reading needs from the product's entities, once for every way the draws can fall.
 
     `choose` gives a draw's outcomes with their probabilities; `visit` gets
-    the entities and the probability at the end of each way. The order and the handling of a step
+    the entities and the probability at the end of each way, and a function
+    that goes on from there through further steps, calling what it is given
+    with the probability of each way those can fall. With `most` given, a
+    walk of more steps than that in all is refused. The order and the handling of a step
     are `sample`'s: a step whose condition fails is not applicable, a loop
     runs its steps for each value under the group's bindings, and collected
     rows add to their list. A package gives every path one producing step, so
@@ -452,11 +504,16 @@ def follow(place, choose, visit):
                 else:
                     holder[names[-1]] = deepcopy(start[row["target"]])
 
-    def walk(position, mass):
-        if position == len(place.steps):
-            visit(context, mass)
+    taken = [0]
+
+    def walk(steps, position, mass, end):
+        if position == len(steps):
+            end(mass)
             return
-        step, ahead = place.steps[position], position + 1
+        taken[0] += 1
+        if most is not None and taken[0] > most:
+            raise unmodelled("a review program with more ways for its draws to fall than this reading walks")
+        step, ahead = steps[position], position + 1
         if "for_each" in step:
             renew(step)
             if "when" not in step or twin._eval(step["when"], context):
@@ -470,23 +527,24 @@ def follow(place, choose, visit):
                     for row in step["steps"]:
                         settle(row)
                 context["group"] = saved
-            walk(ahead, mass)
+            walk(steps, ahead, mass, end)
         elif "sample" not in step:
             renew(step)
             settle(step)
-            walk(ahead, mass)
+            walk(steps, ahead, mass, end)
         else:
             target, definition = step["target"], twin.fields[step["target"]]
             conditions = [text for text in (definition.get("applicable_when"), step.get("when")) if text is not None]
             if conditions and not all(twin._eval(text, context) for text in conditions):
                 module.set_path(context, target, module.NOT_APPLICABLE)
-                walk(ahead, mass)
+                walk(steps, ahead, mass, end)
                 return
             for value, share in choose(step, context):
                 module.set_path(context, target, value)
-                walk(ahead, mass * share)
+                walk(steps, ahead, mass * share, end)
 
-    walk(0, 1.0)
+    walk(place.steps if steps is None else steps, 0, 1.0,
+         lambda mass: visit(context, mass, lambda further, end: walk(further, 0, 1.0, end)))
 
 
 def cells(place):
@@ -495,17 +553,17 @@ def cells(place):
     Follows the steps the rating and the topic's statements depend on,
     branching on every outcome of a draw.
     """
+    if place.paged:
+        # The four kinds of a first page, with the last two together.
+        found = kinds(place)
+        return reviews.whole({(rating, side): found[rating, side] if side != reviews.REST else fsum(
+            (found[rating, pages.OTHER], found[rating, pages.SILENT]))
+            for rating in range(1, 6) for side in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST)})
     name = json.dumps(place.requirement["topic"], sort_keys=True)
     if name in place.program.cells:
         return dict(place.program.cells[name])
-    twin, module, found = place.program.twin, place.program.module, defaultdict(list)
-
-    def choose(step, context):
-        if step["sample"] != "normal":
-            return outcomes(place, step, context)
-        return bands(twin.resolve(step, context), place.bounds[step["id"]])
-
-    follow(place, choose, lambda context, mass: found[
+    module, found = place.program.module, defaultdict(list)
+    follow(place, lambda step, context: drawable(place, step, context), lambda context, mass, further: found[
         module.get_path(context, place.rating["target"]), told(place, context)].append(mass))
     if not set(rating for rating, _ in found) <= set(range(1, 6)):
         raise unmodelled("a review without a star rating from one to five")
@@ -515,26 +573,81 @@ def cells(place):
     return dict(place.program.cells[name])
 
 
+def drawable(place, step, context):
+    """A resolved draw's outcomes with their probabilities, a normal draw's by the thresholds it reaches."""
+    if step["sample"] != "normal":
+        return outcomes(place, step, context)
+    return bands(place.program.twin.resolve(step, context), place.bounds[step["id"]])
+
+
+def speaks(place, pools, context):
+    """Whether one of some pools holds for a review with these entities, as the producer asks of each."""
+    return any("when" not in pool or place.program.twin._eval(pool["when"], context) for pool in pools)
+
+
+def kinds(place):
+    """The probability that one review has each star rating and is a positive, a negative or another comment, or silent.
+
+    The common steps are followed as for the classes. Where the review then
+    says nothing about the topic, each group of other pools is followed on
+    from there through the steps only it depends on, for the chance that one
+    of its pools holds. Those steps' draws are no other group's, and all they
+    read is common or their own, so the groups speak independently given the
+    common part: the review has another comment when a first group speaks and
+    none before it does.
+    """
+    if not place.paged:
+        raise unmodelled("a review's kinds without a first page stated")
+    name = "kinds " + json.dumps(place.requirement["topic"], sort_keys=True)
+    if name in place.program.cells:
+        return dict(place.program.cells[name])
+    module, found = place.program.module, defaultdict(list)
+
+    def end(context, mass, further):
+        rating, side = module.get_path(context, place.rating["target"]), told(place, context)
+        if side != reviews.REST:
+            found[rating, side].append(mass)
+            return
+        quiet, loud = 1.0, []
+        for pools, steps in place.groups:
+            said = {True: [], False: []}
+
+            further(steps, lambda share: said[speaks(place, pools, context)].append(share))
+            loud.append(quiet * fsum(said[True]))
+            quiet *= fsum(said[False])
+            if not quiet:
+                break
+        found[rating, pages.OTHER].append(mass * fsum(loud))
+        found[rating, pages.SILENT].append(mass * quiet)
+
+    follow(place, lambda step, context: drawable(place, step, context), end, most=WAYS)
+    if not set(rating for rating, _ in found) <= set(range(1, 6)):
+        raise unmodelled("a review without a star rating from one to five")
+    place.program.cells[name] = reviews.whole({
+        (rating, side): fsum(found.get((rating, side), [])) for rating in range(1, 6)
+        for side in (reviews.POSITIVE, reviews.NEGATIVE, pages.OTHER, pages.SILENT)})
+    return dict(place.program.cells[name])
+
+
+def kind(place, found):
+    """A review as a review site's page has it: positive, negative, another comment, or silent."""
+    return found[1] if found[1] != reviews.REST else pages.OTHER if found[3] else pages.SILENT
+
+
 def replayed(place, found):
-    """What following the steps from a review's recorded block draws says of it: the topic's class and the rating."""
+    """What following the steps from a review's recorded block draws says of it: the topic's class, the rating
+    and, for a first page, whether it has a comment."""
     recorded, module, seen = {name: json.loads(outcome) for name, outcome in found[0]}, place.program.module, []
 
-    follow(place, lambda step, context: [(recorded[step["id"]], 1.0)], lambda context, mass: seen.append(
-        (told(place, context), module.get_path(context, place.rating["target"]))))
+    follow(place, lambda step, context: [(recorded[step["id"]], 1.0)], lambda context, mass, further: seen.append(
+        (told(place, context), module.get_path(context, place.rating["target"]),
+         *([speaks(place, place.language, context)] if place.paged else []))), place.every)
     return seen[0]
 
 
 def shares(place):
     """The probability that one review is positive, negative or neither about the topic."""
     return reviews.marginal(cells(place))
-
-
-def kinds(place):
-    """Whether a review has a comment at all depends on every topic's statements; that is not read here yet."""
-    raise unmodelled("the first page of a concept whose reviews a review program writes")
-
-
-kind = kinds
 
 
 def draws(place, trace):
@@ -547,7 +660,8 @@ def redrawn(place, index, fresh=None, stars=None):
     """One review as the program draws it with its block streams opened under a fresh seed, or as the seed draws it.
 
     The rating's stream opens under `stars` where that is given. Returns the
-    block's draws, what the review says about the topic and its star rating.
+    block's draws, what the review says about the topic and its star rating;
+    for a first page, also whether it has a comment (some pool holds for it).
     """
     twin, own = place.program.twin, place.seeds[index]
     natural, rating = type(twin).rng, rating_key(place, index)[-1]
@@ -563,7 +677,8 @@ def redrawn(place, index, fresh=None, stars=None):
     finally:
         del twin.rng
     return (draws(place, json.loads(json.dumps(review["trace"]))), told(place, review["entities"]),
-            place.program.module.get_path(review["entities"], place.rating["target"]))
+            place.program.module.get_path(review["entities"], place.rating["target"]),
+            *([speaks(place, place.language, review["entities"])] if place.paged else []))
 
 
 def said(place, found):
@@ -582,7 +697,8 @@ def written(world, place):
     for row in item["reviews"]:
         stated = {statement["meaning_id"] for statement in row["statements"]}
         rows.append((draws(place, row["private_trace"]),
-                     next((side for side, own in names.items() if own & stated), reviews.REST), row["rating"]))
+                     next((side for side, own in names.items() if own & stated), reviews.REST), row["rating"],
+                     *([bool(row["statements"])] if place.paged else [])))
     return rows
 
 
@@ -593,3 +709,7 @@ def reads(world, place):
         raise ValueError("The product's recorded reviews are not what its review program draws under the world's seed")
     if any(replayed(place, row) != row[1:] for row in rows):
         raise ValueError("Following the review program's steps from a review's recorded draws gives another review")
+    item = next(p for p in world["products"] if p["public"]["product_id"] == place.product_id)
+    # A review site lists the reviews that have a text; here a review has a comment when it states something.
+    if place.paged and any(bool(row["text"]) != bool(row["statements"]) for row in item["reviews"]):
+        raise ValueError("Not modelled: a review whose text is not there exactly when it states something")

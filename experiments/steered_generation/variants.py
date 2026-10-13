@@ -250,7 +250,7 @@ def review_verdicts(world, task, api):
         except blocks.NumericalLimit:
             pass
     # The first page against the whole, as a review site lists comments four to a page with the highest ratings
-    # first (the suite's instance of it); only where the block reads the concept's reviews for pages.
+    # first (the suite's instance of it); left out where a review program is one the block does not read for pages.
     for shown, verdict in (("more_positive", "more_negative"), ("more_negative", "more_positive")):
         need = {**base, "verdict": verdict, "first_page": {"size": 4, "order": "highest", "verdict": shown}}
         try:
