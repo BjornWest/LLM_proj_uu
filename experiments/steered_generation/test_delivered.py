@@ -326,7 +326,8 @@ class SteeringTests(Delivered):
         counted = variants.of(self.natural, {**task, "delivery_options": {"count_weights": {"1": 1}}}, self.api)
         self.assertEqual(counted[0]["requirement"]["delivered"], {"delivery_options": {"count_weights": {"1": 1}}})
         for other in ({"objective": "fastest_then_cheapest"}, {"delivery_types": ["home", "retailer_branch"]},
-                      {"delivery_types": []}, {"max_total_minor": 90000}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
+                      {"delivery_types": []}, {"delivery_types": {"parcel_locker": False}}, {"delivery_types": None},
+                      {"delivery_types": ["home", 1]}, {"delivery_types": ["home", "home"]}, {"max_total_minor": 90000}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
                       {"availability": "positive_stock"},
                       {"delivery_options": {"admission_plan": "retailer-delivery-admission-plan-v1"}}):
             with self.subTest(other=other), self.assertRaises(ValueError):
@@ -506,6 +507,22 @@ class ToAnyDestination(Delivered):
         task, reference = self.frame.scope.reference(self.natural)
         self.assertEqual(task["delivery_types"], sorted(self.delivered["delivery_types"]))
         self.assertEqual(reference["optimal_score"], [min(by_pair.values())])
+
+    def test_retailers_that_deliver_to_points_only_compete(self):
+        """Astra v34: with no carrier delivering to the door, retailers compete through collection points alone."""
+        world = deepcopy(self.natural)
+        for carrier in world["address_context"]["carriers"]:
+            carrier["home_delivery"] = False
+        points = cheapest.frame(world, self.base, self.api)
+        home = cheapest.frame(world, {**self.base, "delivered": {}}, self.api)
+        self.assertFalse(home.scope.delivered)
+        only = set(points.scope.delivered) - set(home.scope.delivered)
+        self.assertGreater(len(only), 3)
+        best, compared = cheapest.lowest(cheapest.recorded(world, SHOES, set(points.places)), points.scope)
+        quoted = totals(world, points.scope.skus, kinds=self.delivered["delivery_types"])
+        self.assertGreater(len(quoted), 10)
+        self.assertEqual({key: total for key, (total, _, _) in quoted.items()}, {key: compared[key] for key in quoted})
+        self.assertEqual({pair[0] for pair in best}, {rid for rid, _ in quoted})
 
     def test_probabilities_and_steered_worlds(self):
         likely = sorted(self.chances, key=self.chances.get, reverse=True)[:2]

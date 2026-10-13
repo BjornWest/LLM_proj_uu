@@ -321,7 +321,10 @@ def of(world, task, api):
         if task.get("objective", "cheapest_total") != "cheapest_total" or task.get("destination", "user_home") != "user_home":
             raise ValueError("Steering reads this task for the cheapest total delivered for the customer's home address")
         # Home delivery alone is the task's default and is left unstated, as the native task leaves it.
-        kinds = {} if sorted(task.get("delivery_types", ["home"])) == ["home"] else {"delivery_types": sorted(task["delivery_types"])}
+        stated = task.get("delivery_types", ["home"])
+        if type(stated) is not list or not stated or any(type(kind) is not str for kind in stated) or len(set(stated)) != len(stated):
+            raise ValueError("A delivery task's methods are a nonempty list of distinct names")
+        kinds = {} if stated == ["home"] else {"delivery_types": sorted(stated)}
         return winners(world, {"kind": "cheapest_matching_available", "concept_id": task["concept_id"],
                                "predicates": task.get("predicates")}, api,
                        extra={"delivered": {**{key: task[key] for key in ("delivery_options",) if key in task}, **kinds}})
