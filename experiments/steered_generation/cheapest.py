@@ -700,7 +700,7 @@ def model(world, requirement, api, shared=None):
                             log_terms=log_terms, log_probability=log_probability, probability=exp(log_probability),
                             shares={price: exp(value - log_probability) for price, value in log_terms.items()},
                             below=below, config=config, native_round=native_round, scope=block_scope,
-                            bounded=bounded, accepted=None, error=0.0)
+                            bounded=bounded, estimated=bounded, accepted=None, error=0.0)
     if bounded:
         key = world["world_id"], json.dumps(requirement, sort_keys=True)
         if key not in ESTIMATES:
@@ -716,6 +716,8 @@ def model(world, requirement, api, shared=None):
         block.log_probability += log(share)
         block.probability *= share
         block.error = block.probability * ((1 - share) / (share * PROPOSALS)) ** .5
+        # The winning ranks above are the bounded block's; given the requirement they are not modelled.
+        block.shares = None
     return block
 
 
@@ -923,6 +925,12 @@ def prepare(natural, requirement, api, rng):
             break
     else:
         raise NumericalLimit("Samples that hold on the delivery charges as they are are too rare to reach")
+    if block.bounded:
+        # The ranks sampled are the bounded block's; what is recorded is what the accepted leaves give.
+        best, _ = lowest(planned(block, draws), block.scope)
+        winning = min(best.values())
+        for pair, drawn in draws.items():
+            drawn.cheapest_available = best.get(pair)
     concept_id = block.requirement["concept_id"]
 
     def record(world):

@@ -97,7 +97,7 @@ def model(world, requirement, api):
     requirement = resolve(requirement)
     footprint(world, requirement, api)
     shared = cheapest.frame(world, ranking(requirement), api)
-    suited, found, errors, estimates, missed, wins = {}, [], {}, {}, [], {}
+    suited, found, errors, estimates, missed, spread, sampled, unsettled = {}, [], {}, {}, [], [], {}, []
     for pair in sorted(shared.places):
         if pair[0] not in suited:
             try:
@@ -115,23 +115,32 @@ def model(world, requirement, api):
             continue
         try:
             block = cheapest.model(world, ranking(requirement, pair), api, shared)
-        except ZeroMass:
+        except ZeroMass as error:
+            if error.reason == "not_found":
+                unsettled.append(list(pair))
             continue
         won = getattr(block, "log_probability", None) or log(block.probability)
-        wins[pair[0]] = wins.get(pair[0], 0.0) + exp(won)
+        if block.estimated:
+            sampled["/".join(pair)] = [block.accepted, cheapest.PROPOSALS]
+        # The alternative is a product of the two; either factor may be an estimate with its own error.
+        spread.append((pair[0], exp(won), block.error))
         found.append((pair, won + log(suited[pair[0]])))
-    if not found and missed:
+    if not found and (missed or unsettled):
         # A bounded search that found nothing is not a proof that nothing is there.
-        raise ZeroMass("not_found", f"For no retailer that can have the cheapest available offer did any of "
-                                    f"{policies.PROPOSALS} draws of its contracts show what is required")
+        raise ZeroMass("not_found", "For no retailer was an alternative found within the bounded searches of its "
+                                    "contracts or of the ranking")
     if not found:
         raise ZeroMass("no_outcome", "No retailer can both have the cheapest available offer and this policy in this world")
     top = max(value for _, value in found)
     total = min(0.0, top + log(fsum(exp(value - top) for _, value in found)))
-    # Where a retailer's policy share is an estimate, so are its alternatives' weights and the sum.
+    # A retailer's policy share enters all its alternatives together; a ranking's estimate its own alternative.
+    wins = {retailer: fsum(win for name, win, _ in spread if name == retailer) for retailer in {name for name, _, _ in spread}}
+    error = fsum([(wins[retailer] * errors[retailer]) ** 2 for retailer in wins] +
+                 [(suited[retailer] * part) ** 2 for retailer, _, part in spread]) ** .5
     return SimpleNamespace(requirement=requirement, shared=shared, alternatives=found, log_terms=dict(found),
                            log_probability=total, probability=exp(total), estimates=estimates, not_found=missed,
-                           error=fsum((wins[retailer] * errors[retailer]) ** 2 for retailer in wins) ** .5)
+                           ranking_estimates=sampled, rankings_not_found=unsettled, error=error,
+                           estimated=bool(estimates or missed or sampled or unsettled))
 
 
 def leader(world, requirement, shared):
@@ -177,7 +186,9 @@ def prepare(natural, requirement, api, rng):
                 "log_probability_given_upstream": block.log_probability, "alternatives": len(block.alternatives),
                 **({"probability_is_estimated": True, "probability_standard_error": block.error,
                     "policy_draws_accepted_by_retailer": block.estimates,
-                    "retailers_not_found_in_bounded_search": block.not_found} if block.estimates or block.not_found else {}),
+                    "retailers_not_found_in_bounded_search": block.not_found,
+                    "ranking_samples_accepted_by_pair": block.ranking_estimates,
+                    "rankings_not_found_in_bounded_search": block.rankings_not_found} if block.estimated else {}),
                 "chosen": {"retailer_id": pair[0], "product_id": pair[1],
                            "log_probability_given_upstream": block.log_terms[pair]},
                 "blocks": rows,
@@ -187,9 +198,11 @@ def prepare(natural, requirement, api, rng):
                                       "and its blocks (the ranking's stock and prices; that retailer's policy; its "
                                       "free-shipping threshold where the requirement states there is none) "
                                       "are sampled given it. Every other retailer's policy is the seed's own. "
-                                      "Where a policy is about shown delivery options its share is an estimate from "
-                                      "a fixed number of draws, so the pick among alternatives and the probability "
-                                      "are approximate, and a retailer for which no draw qualified is left out. Use "
+                                      "Where a policy is about shown delivery options, or a ranking by delivered "
+                                      "totals has a charge that depends on the location, its share is an estimate "
+                                      "from a fixed number of draws, so the pick among alternatives and the "
+                                      "probability are approximate, and an alternative for which no draw qualified "
+                                      "is left out. Use "
                                       "the probability, which is the alternatives' sum, as the importance weight "
                                       "across seeds."}
 
@@ -201,7 +214,7 @@ def prepare(natural, requirement, api, rng):
 
     return Step(script={key: entry for step in steps for key, entry in step.script.items()}, probability=block.probability,
                 log_probability=block.log_probability, error=block.error,
-                estimated=bool(block.estimates or block.not_found), writes=writes,
+                estimated=block.estimated, writes=writes,
                 # The alternatives not picked stay as the seed made them, and so must all that any alternative reads.
                 reads=(declared.writes | declared.reads).union(*(step.reads for step in steps)) - writes,
                 record=record, check=checked)

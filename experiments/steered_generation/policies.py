@@ -250,6 +250,7 @@ def model(world, requirement, api):
         if not days:
             raise ZeroMass("no_outcome", "No dispatch time of this retailer's warehouse satisfies the requirement")
     block = SimpleNamespace(site=place, outcomes=outcomes, days=days, rows=rows, accepted=None, error=0.0,
+                            estimated=place.menu is not None,
                             probability=(fsum(found[0] for found in outcomes) if outcomes else 1.0) *
                                         (fsum(days.values()) if days else 1.0))
     if place.menu is not None:

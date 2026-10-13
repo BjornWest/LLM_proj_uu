@@ -226,7 +226,7 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
     case.update(status="sampled", probability_given_upstream=block.probability or None,
                 log_probability_given_upstream=block.log_probability, model_seconds=time.monotonic() - clock,
                 retailer_products=len(block.places), offers=len(before["offers"]),
-                winning_prices_modelled=len(block.shares),
+                winning_prices_modelled=None if block.shares is None else len(block.shares),
                 **({"probability_is_estimated": True, "probability_standard_error": block.error,
                     "proposals": cheapest.PROPOSALS, "proposals_accepted": block.accepted} if block.bounded else {}),
                 natural_unavailable_offers=sum(not held(row) for row in before["offers"].values()))
@@ -276,11 +276,12 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
         del winning[None]
         hits = sum(winning.values())
         validation = frequency_check(case, block.probability, hits, args.validate_trials, getattr(block, "error", 0.0))
-        # Winning-price distribution given the requirement: model against the reading's redraws.
-        distance = sum(abs(block.shares.get(p, 0) - winning.get(p, 0) / hits)
-                       for p in set(block.shares) | set(winning)) / 2 if hits else None
+        # Winning-price distribution given the requirement: model against the reading's redraws. Between charge
+        # bounds the model has no such distribution (its winning ranks are the bounded block's), so none is compared.
+        distance = None if block.shares is None or not hits else sum(
+            abs(block.shares.get(p, 0) - winning.get(p, 0) / hits) for p in set(block.shares) | set(winning)) / 2
         validation.update(winning_price_total_variation=distance)
-        pinned.ensure(hits < 1000 or distance < 0.1,
+        pinned.ensure(block.shares is None or hits < 1000 or distance < 0.1,
                       "Conditional winning-price distribution disagrees with the producer's draws")
 
 
@@ -293,7 +294,7 @@ def listed_case(args, session, natural, opened, api, requirement, case, folder):
     pairs = set(block.groups)
     case.update(status="sampled", probability_given_upstream=block.probability or None,
                 log_probability_given_upstream=block.log_probability, compared_retailer_products=len(pairs),
-                winning_prices_modelled=len(block.shares), natural_lowest_listed=min(listed.lowest(natural, pairs).values()))
+                winning_prices_modelled=None if block.shares is None else len(block.shares), natural_lowest_listed=min(listed.lowest(natural, pairs).values()))
     for index in range(args.samples):
         clock = time.monotonic()
         try:
@@ -482,7 +483,9 @@ def seller_case(args, session, natural, opened, api, requirement, case, folder):
                 log_probability_given_upstream=block.log_probability, alternatives_modelled=len(block.alternatives),
                 **({"probability_is_estimated": True, "probability_standard_error": block.error,
                     "policy_draws_accepted_by_retailer": block.estimates,
-                    "retailers_not_found_in_bounded_search": block.not_found} if block.estimates or block.not_found else {}))
+                    "retailers_not_found_in_bounded_search": block.not_found,
+                    "ranking_samples_accepted_by_pair": block.ranking_estimates,
+                    "rankings_not_found_in_bounded_search": block.rankings_not_found} if block.estimated else {}))
     for index in range(args.samples):
         clock = time.monotonic()
         world, found, record = sellers.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))

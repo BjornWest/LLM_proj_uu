@@ -407,11 +407,58 @@ class ByLocation(Delivered):
                 self.assertTrue(record["probability_is_estimated"])
                 self.assertGreaterEqual(record["block_samples_for_this_sample"], 1)
                 self.assertEqual(record["proposals"], cheapest.PROPOSALS)
+                # What is recorded is what the accepted world's offers cost, not the ranks the block was sampled on.
+                self.assertEqual([record["winning_price_minor"]], found["reference"]["optimal_score"])
+                for row in record["restocked"]:
+                    self.assertEqual(row["cheapest_available_minor"], by_pair.get((row["retailer_id"], row["product_id"])))
         reading = cheapest.trial(self.natural, self.need(pair), self.api)
         for seed in range(900, 903):
             found = blocks.redraw(self.session, self.natural, [reading], seed)
             self.assertEqual((found.identical, found.agreed), ([True], [True]))
             self.assertEqual(found.satisfied, reading.holds(seed))
+
+    def test_the_runner_the_seller_requirement_and_the_candidates_carry_the_estimate(self):
+        """Astra v28: a winner shipped from a far location through the runner; estimates through the wrappers."""
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from experiments.steered_generation import run
+        split = self.split()
+        pair = max((found for found in self.chances if found[0] in split), key=self.chances.get)
+        args = SimpleNamespace(samples=6, producer_redraws=1, validate_trials=1500)
+        case = {"samples": [], "requirement_sha256": "v28-charge-bound-record"}
+        with TemporaryDirectory() as folder:
+            run.cheapest_case(args, self.session, self.natural, self.opened, self.api, self.need(pair), case,
+                              lambda index: Path(folder) / str(index))
+        self.assertEqual((case["status"], len(case["samples"]), case["probability_is_estimated"]), ("sampled", 6, True))
+        self.assertIsNone(case["winning_prices_modelled"])
+        self.assertIsNone(case["validation"]["winning_price_total_variation"])
+        self.assertTrue(case["validation"]["within_four_standard_errors"])
+        self.assertGreater(len({row["winning_price_minor"] for row in case["samples"]}), 1)
+        # The seller requirement over this ranking: its alternatives' weights are estimates, and it says so.
+        ranking = {key: value for key, value in self.base.items() if key != "schema"}
+        seller = {"schema": sellers.VERSION, "cheapest": ranking, "policy": {"dispatch_days": {"min": 1}}}
+        block = sellers.model(self.natural, seller, self.api)
+        self.assertTrue(block.estimated and block.ranking_estimates and not block.estimates)
+        self.assertGreater(block.error, 0)
+        self.assertLess(block.error, block.probability)
+        step = sellers.prepare(self.natural, seller, self.api, Random(3))
+        self.assertTrue(step.estimated)
+        self.assertEqual(step.error, block.error)
+        world, found, record = sellers.steer(self.session, self.natural, self.opened, seller, self.api, Random(3))
+        self.assertTrue(record["probability_is_estimated"])
+        self.assertEqual(record["ranking_samples_accepted_by_pair"], block.ranking_estimates)
+        case = {"samples": [], "requirement_sha256": "x"}
+        with TemporaryDirectory() as folder:
+            run.seller_case(SimpleNamespace(samples=1, producer_redraws=0, validate_trials=600), self.session, self.natural,
+                            self.opened, self.api, seller, case, lambda index: Path(folder) / str(index))
+        self.assertEqual((case["status"], case["probability_is_estimated"]), ("sampled", True))
+        self.assertEqual(case["probability_standard_error"], block.error)
+        # The candidates of the delivery task: the two this world's ranking can carry, marked as estimates.
+        found = variants.of(self.natural, {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE}, self.api)
+        self.assertEqual([row["name"] for row in found], ["likeliest_winner", "unlikely_winner"])
+        self.assertTrue(all(row["probability_is_estimated"] and row["probability_standard_error"] >= 0 for row in found))
+        self.assertNotIn("probability_is_estimated", variants.of(
+            self.natural, {"kind": "cheapest_matching_available", "concept_id": SHOES, "predicates": SIZE}, self.api)[0])
 
     def test_what_the_bounds_cannot_carry_is_refused(self):
         pairs = sorted(self.chances, key=self.chances.get, reverse=True)

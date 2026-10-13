@@ -1075,14 +1075,30 @@ charges as they are, it is cheapest between the bounds too, so samples of
 the bounded block that also hold on the charges as they are (read from where
 each offer's stock is) are samples given the requirement; `prepare` draws
 until one does. The probability is the bounded block's own times the share
-of 200 such samples that hold: an estimate, labelled as one. Several
-designated retailers, or offers listed below the winner, are refused there.
+of 200 such samples that hold: an estimate, labelled as one, in the block's
+record, in the seller requirement's (whose alternatives then have estimated
+weights) and in the runner. The record's winning total and each pair's best
+total are those of the accepted leaves, and the runner compares no
+distribution of winning totals there. Several designated retailers, or
+offers listed below the winner, are refused there.
+
+On the medium world, for size-42 walking shoes: by listed price six
+retailers are about equally likely to have the cheapest (0.13 each);
+delivered, one with free delivery at these prices has it with probability
+0.64, two others with 0.15 and 0.14, and one that ships across a border for
+224 to 249 kronor practically never. Steered to the first, the lowest listed
+price among available offers is at another retailer in seven of eight
+samples (`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
 
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
 total, home delivery; a cap, a deadline, other methods or a comparison site
-are refused) into the same three candidates as the other winner tasks, with
-the recipe's `delivery_options` beside the task where they are not the
-defaults.
+are refused) into the candidates of the other winner tasks, with the
+recipe's `delivery_options` beside the task where they are not the
+defaults. Where a charge depends on the location the candidate with an
+offer listed below the winner is left out (two candidates, not three), each
+candidate is marked as an estimate, and modelling every pair of a medium
+world takes 200 samples of the block apiece (19 seconds there), so it is
+slow.
 
 The check is the native task's reference on the steered world (through
 `prepared_quote` with the plans a site is built from). The tests also read
