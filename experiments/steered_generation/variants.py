@@ -113,8 +113,8 @@ def winners(world, task, api, extra=None):
     if len(alone) > 2:
         found.append(entry("unlikely_winner", "the retailer and product at the middle of the ranking by probability",
                            alone[len(alone) // 2]))
-    if scope.delivered is not None:
-        # The likeliest winner again, delivered by the carrier this world rates lowest.
+    if scope.delivered is not None and "delivery_types" not in base["delivered"]:
+        # The likeliest winner again, delivered home by the carrier this world rates lowest.
         rated = min(world["carrier_evidence"]["public"]["carriers"],
                     key=lambda row: (row["summary"]["average_stars"], row["carrier_id"]))
         with_carrier = ranked(world, [{"schema": couriers.VERSION, "carrier_id": rated["carrier_id"],
@@ -318,12 +318,13 @@ def of(world, task, api):
         return winners(world, {**selection, "kind": "cheapest_matching_available",
                                **{key: task[key] for key in ("surrounding",) if key in task}}, api)
     if kind == DELIVERY:
-        if (task.get("objective", "cheapest_total") != "cheapest_total" or task.get("destination", "user_home") != "user_home" or
-                task.get("delivery_types", ["home"]) != ["home"]):
-            raise ValueError("Steering reads this task for the cheapest total delivered to the customer's home only")
+        if task.get("objective", "cheapest_total") != "cheapest_total" or task.get("destination", "user_home") != "user_home":
+            raise ValueError("Steering reads this task for the cheapest total delivered for the customer's home address")
+        # Home delivery alone is the task's default and is left unstated, as the native task leaves it.
+        kinds = {} if sorted(task.get("delivery_types", ["home"])) == ["home"] else {"delivery_types": sorted(task["delivery_types"])}
         return winners(world, {"kind": "cheapest_matching_available", "concept_id": task["concept_id"],
                                "predicates": task.get("predicates")}, api,
-                       extra={"delivered": {key: task[key] for key in ("delivery_options",) if key in task}})
+                       extra={"delivered": {**{key: task[key] for key in ("delivery_options",) if key in task}, **kinds}})
     if kind in WINNERS:
         return winners(world, task, api)
     if kind not in OTHERS:

@@ -48,6 +48,8 @@ def resolve(requirement):
     ranked = cheapest.resolve(ranking(requirement))
     if "delivered" not in ranked or len(ranked["retailer_ids"]) != 1 or "listed_below" in ranked:
         raise ValueError("The ranking is by delivered totals, with one designated retailer and no offers listed below it")
+    if ranked["delivered"].get("delivery_types", ["home"]) != ["home"]:
+        raise ValueError("Not modelled: the carrier of the cheapest offer delivered to a collection point")
     return json.loads(json.dumps(requirement))
 
 

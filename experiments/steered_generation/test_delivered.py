@@ -22,8 +22,9 @@ INPUTS = {"seed": 5, "concept_ids": [SHOES, SANDALS], "tasks": [SHOES], "control
 SIZE = [{"field": "sku.size_eu", "operator": "eq", "value": 42}]
 
 
-def totals(world, skus, options=None):
-    """Per offer of the given SKUs, the lowest total the admitted oracle quotes for one unit delivered home.
+def totals(world, skus, options=None, kinds=("home",)):
+    """Per offer of the given SKUs, the lowest total the admitted oracle quotes for one unit delivered home, or to the
+    kinds of destination given.
 
     Written apart from the block: the public plans under admission plan
     version 2 and the oracle's options. Offers without a home option are left out.
@@ -42,14 +43,14 @@ def totals(world, skus, options=None):
                                   plan=plan)
             choices = {row["choice_id"]: row for row in result["delivery_choices"]}
             homes = [option["total_minor"] for option in result["options"]
-                     if choices[option["selection"]["a"]]["destination_type"] == "home"]
+                     if choices[option["selection"]["a"]]["destination_type"] in kinds]
             if homes:
                 found[(retailer["retailer_id"], offer["sku_id"])] = (min(homes), offer["product_id"], offer["price_minor"])
     return found
 
 
 class Delivered(unittest.TestCase):
-    inputs = INPUTS
+    inputs, delivered = INPUTS, {}
 
     @classmethod
     def setUpClass(cls):
@@ -58,7 +59,7 @@ class Delivered(unittest.TestCase):
         cls.session = streams.Session(cls.api, cls.inputs)
         cls.natural, cls.opened = cls.session.generate()
         cls.frozen = deepcopy(cls.natural)
-        cls.base = {"schema": cheapest.VERSION, "concept_id": SHOES, "predicates": SIZE, "delivered": {}}
+        cls.base = {"schema": cheapest.VERSION, "concept_id": SHOES, "predicates": SIZE, "delivered": cls.delivered}
         cls.frame = cheapest.frame(cls.natural, cls.base, cls.api)
         cls.chances = {}
         for pair in sorted(cls.frame.places):
@@ -78,7 +79,7 @@ class Delivered(unittest.TestCase):
         """The scope's reading of a world's leaves against the oracle's quotes: who can be delivered, and each total."""
         scope = self.frame.scope
         best, compared = cheapest.lowest(cheapest.recorded(world, SHOES, set(self.frame.places)), scope)
-        quoted = totals(world, scope.skus)
+        quoted = totals(world, scope.skus, kinds=self.delivered.get("delivery_types", ("home",)))
         by_pair = {}
         for (rid, sku), (total, product, price) in quoted.items():
             self.assertEqual(compared[(rid, sku)], total, (rid, sku, price))
@@ -324,8 +325,8 @@ class SteeringTests(Delivered):
         self.assertEqual(same, found)
         counted = variants.of(self.natural, {**task, "delivery_options": {"count_weights": {"1": 1}}}, self.api)
         self.assertEqual(counted[0]["requirement"]["delivered"], {"delivery_options": {"count_weights": {"1": 1}}})
-        for other in ({"objective": "fastest_then_cheapest"}, {"delivery_types": ["home", "parcel_locker"]},
-                      {"max_total_minor": 90000}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
+        for other in ({"objective": "fastest_then_cheapest"}, {"delivery_types": ["home", "retailer_branch"]},
+                      {"delivery_types": []}, {"max_total_minor": 90000}, {"arrival_deadline": "2026-10-20"}, {"comparison_site_id": "comparison-00"},
                       {"availability": "positive_stock"},
                       {"delivery_options": {"admission_plan": "retailer-delivery-admission-plan-v1"}}):
             with self.subTest(other=other), self.assertRaises(ValueError):
@@ -485,6 +486,70 @@ class ByLocation(Delivered):
             cheapest.model(self.natural, self.need(pairs[0], listed_below=[
                 {"retailer_id": other.pair[0], "sku_id": other.competing[0]["sku_id"]}]), self.api)
         self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+
+
+class ToAnyDestination(Delivered):
+    """Home delivery and collection points both count, as a delivery task can state."""
+    delivered = {"delivery_types": ["home", "parcel_locker", "staffed_counter"]}
+
+    def test_totals_are_the_oracles_and_points_matter(self):
+        by_pair = self.agree(self.natural)
+        home = cheapest.frame(self.natural, {**self.base, "delivered": {}}, self.api)
+        # A collection point is cheaper than the door at some retailer, and some retailer delivers only to points.
+        cheaper = [rid for rid, charge in self.frame.scope.delivered.items()
+                   if rid in home.scope.delivered and charge.lowest(1) < home.scope.delivered[rid].lowest(1)]
+        self.assertTrue(cheaper)
+        self.assertGreaterEqual(set(self.frame.scope.delivered), set(home.scope.delivered))
+        for rid, charge in self.frame.scope.delivered.items():
+            if rid in home.scope.delivered:
+                self.assertLessEqual(charge.lowest(1), home.scope.delivered[rid].lowest(1))
+        task, reference = self.frame.scope.reference(self.natural)
+        self.assertEqual(task["delivery_types"], sorted(self.delivered["delivery_types"]))
+        self.assertEqual(reference["optimal_score"], [min(by_pair.values())])
+
+    def test_probabilities_and_steered_worlds(self):
+        likely = sorted(self.chances, key=self.chances.get, reverse=True)[:2]
+        home = cheapest.frame(self.natural, {**self.base, "delivered": {}}, self.api)
+        different = 0
+        for index, pair in enumerate(likely):
+            with self.subTest(pair=pair):
+                need, chance, trials = self.need(pair), self.chances[pair], 600
+                found = cheapest.trial(self.natural, need, self.api)
+                hits = sum(found.holds(seed) for seed in range(10 ** 6, 10 ** 6 + trials))
+                block = cheapest.model(self.natural, need, self.api, self.frame)
+                self.assertLess(abs(hits / trials - chance), 4.5 * (chance * (1 - chance) / trials + block.error ** 2) ** .5 + 1e-9)
+                world, seen, record = cheapest.steer(self.session, self.natural, self.opened, need, self.api, Random(index))
+                by_pair = self.agree(world)
+                self.assertEqual([other for other in by_pair if by_pair[other] == min(by_pair.values())], [pair])
+                self.assertTrue(all(row["delivery"]["destination_type"] in self.delivered["delivery_types"]
+                                    for row in seen["reference"]["winners"]))
+        # Counting collection points changes who is likely to be cheapest for some pair of the world.
+        for pair, chance in self.chances.items():
+            try:
+                at_home = cheapest.model(self.natural, {**self.need(pair), "delivered": {}}, self.api, home).probability
+            except (prices.ZeroMass, ValueError):
+                at_home = 0.0
+            different += abs(at_home - chance) > 1e-9
+        self.assertTrue(different)
+
+    def test_kinds_are_checked_and_the_carrier_requirement_is_for_the_door(self):
+        from experiments.steered_generation import couriers
+        pair = max(self.chances, key=self.chances.get)
+        for bad in ([], ["home", "home"], ["branch"], "home", ["home", 1]):
+            with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
+                cheapest.model(self.natural, {**self.need(pair), "delivered": {"delivery_types": bad}}, self.api)
+            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        carrier = self.natural["address_context"]["carriers"][0]["carrier_id"]
+        with self.assertRaises(ValueError) as caught:
+            couriers.model(self.natural, {"schema": couriers.VERSION, "carrier_id": carrier, "cheapest": {
+                key: value for key, value in self.need(pair).items() if key != "schema"}}, self.api)
+        self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        task = {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE,
+                "delivery_types": ["parcel_locker", "home", "staffed_counter"]}
+        found = variants.of(self.natural, task, self.api)
+        self.assertEqual(found[0]["requirement"]["delivered"], self.delivered)
+        self.assertNotIn("cheapest_delivered_with_lowest_rated_carrier", [row["name"] for row in found])
+        self.assertEqual(found[0]["requirement"]["retailer_ids"][0], pair[0])
 
 
 if __name__ == "__main__":

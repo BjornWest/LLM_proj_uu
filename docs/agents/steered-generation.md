@@ -1033,7 +1033,13 @@ cheapest among them are the clause's.
 The fourth requirement (who has the cheapest available offer) takes
 `"delivered": {}`: offers are compared on what one unit costs delivered home,
 as the native single-item delivery task compares them
-(`quote_offer_task`, cheapest total, home delivery, no coupon).
+(`quote_offer_task`, cheapest total, home delivery, no coupon). With
+`"delivered": {"delivery_types": ["home", "parcel_locker", "staffed_counter"]}`
+(any of the three, as the task states them) a carrier's collection points
+count too: the charge is the lowest over the shown routes of those kinds,
+and a retailer competes when it shows one. What follows is written for home
+delivery and holds for the kinds stated; the requirement of the next section
+(the carrier of the cheapest delivered offer) is for home delivery only.
 
 ```json
 {"schema": "steered-cheapest-available-v1", "concept_id": "footwear.walking_shoes",
@@ -1092,8 +1098,8 @@ samples and at the same price in two more
 (`steering/walkthrough/case-delivered`; 4.3 seconds a sample).
 
 The candidates tool reads a `matching_single_item_delivery` task (cheapest
-total, home delivery; a cap, a deadline, other methods or a comparison site
-are refused) into the candidates of the other winner tasks, with the
+total; a cap, a deadline or a comparison site
+are refused; its delivery methods are carried) into the candidates of the other winner tasks, with the
 recipe's `delivery_options` beside the task where they are not the
 defaults. Where a charge depends on the location the candidate with an
 offer listed below the winner is left out (two candidates, not three), each
