@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location('qualification', ROOT / 'training/scripts/qwen_suite_qualification.py')
 Q = importlib.util.module_from_spec(SPEC); SPEC.loader.exec_module(Q)
 RUNTIME = Path(os.environ.get('QWEN_TEST_RUNTIME_SOURCE', ROOT / 'scripts/qwen_suite_runtime.py'))
-RUNTIME_SHA = os.environ.get('QWEN_TEST_RUNTIME_SHA256', '4491d896a025b728ea1ab6eca4640b2efc030cc7a33769d4d538f5056c32c7dd')
+RUNTIME_SHA = os.environ.get('QWEN_TEST_RUNTIME_SHA256', 'c0684c3ff0923a5054d5804c85b61d231caf774837963ed94641046351419ff3')
 
 
 class RawHandler(BaseHTTPRequestHandler):
