@@ -95,3 +95,22 @@ def test_closed_alternatives_do_not_become_false_open_container_findings():
     assert not any(f['kind']=='array_items_unconstrained' for f in audit_schema(array)['findings'])
     array={'type':'array','prefixItems':[{'type':'integer'}]}
     assert any(f['kind']=='array_items_unconstrained' for f in audit_schema(array)['findings'])
+
+
+def test_untyped_properties_and_verdict_edge_cases_have_findings():
+    report=audit_schema({'not':{'type':'null'},'properties':{'a':{'type':'string'}}})
+    assert {'open_object','property_optional'}<={f['kind'] for f in report['findings']}
+    from .task_schema_audit import audit_grader
+    class Grader:
+        schema={'type':'object','properties':{},'additionalProperties':False}
+        contract={};extraction_instructions='Fixture'
+    report=audit_grader(Grader(),observations=[{'control':'wrong','grade':{'structured_claims_correct':True,'oracle_grade':None}},
+        {'control':'malformed','expected_verdict':False,'error':{'class':'ValueError'}}])
+    kinds={f['kind'] for f in report['findings']}
+    assert {'native_verdict_mismatch','native_checks_unavailable','malformed_control_rejected_without_task_verdict'}<=kinds
+
+
+def test_canonical_special_values_use_flags_not_domain_choices():
+    schema=value_claim();schema['properties']['value']['enum']=['navy',None]
+    with pytest.raises(ValueError,match='reserved'):
+        audit_schema(schema,expectations=[{'path':'/properties/value','role':'canonical','domain_source':'public_declaration','choices':['navy',None]}])

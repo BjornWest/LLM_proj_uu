@@ -165,7 +165,7 @@ def audit_schema(schema, *, expectations=()):
             finding(path,'unsupported_dynamic_reference','Dynamic reference behavior is not audited.')
         if 'array' in types and not _container_restricted(node,schema,'array'):
             finding(path,'array_items_unconstrained','Array items have no declared wire restriction.')
-        if 'object' in types:
+        if 'object' in types or 'properties' in node:
             if not _container_restricted(node,schema,'object'):
                 finding(path, 'open_object', 'Unexpected fields are not explicitly prohibited.')
             props = node.get('properties',{})
@@ -199,6 +199,7 @@ def audit_schema(schema, *, expectations=()):
             choices = expected.get('choices')
             if type(choices) is not list or not choices:
                 raise ValueError('Canonical audit requires nonempty full choices')
+            if any(v is None or v=='__unmatched_option__' for v in choices):raise ValueError('Canonical choices exclude reserved null/unmatched entries; use explicit flags')
             if len({digest(v) for v in choices})!=len(choices):raise ValueError('Canonical choices must be unique')
             actual = _domain(node,schema)
             if not isinstance(actual, list):
@@ -240,19 +241,26 @@ def audit_grader(grader, *, observations=(), expectations=()):
         if entry.get('control') not in ('correct', 'wrong', 'missing', 'malformed'):
             raise ValueError('Declare correct/wrong/missing/malformed audit control')
         grade = entry.get('grade')
-        checks = {} if not isinstance(grade, dict) else grade.get('oracle_grade', {}).get('requirements', {})
+        oracle=grade.get('oracle_grade') if isinstance(grade,dict) else None
+        checks=oracle.get('requirements',{}) if isinstance(oracle,dict) else {}
+        if isinstance(grade,dict) and 'oracle_grade' in grade and not isinstance(oracle,dict):
+            result['findings'].append({'path':'observations','kind':'native_checks_unavailable','detail':'Oracle check structure is absent or malformed.'})
         if not isinstance(checks, dict):
             raise ValueError('Observed native requirements must be an object')
         verdict=None if not isinstance(grade,dict) else grade.get('structured_claims_correct')
         if type(verdict) is not bool and entry.get('error') is None:
             result['findings'].append({'path':'observations','kind':'native_verdict_missing','detail':'Control returned no Boolean native verdict.'})
-        if 'expected_verdict' in entry and verdict is not entry['expected_verdict']:
+        expected=entry.get('expected_verdict',True if entry['control']=='correct' else False if entry['control'] in ('wrong','missing') else None)
+        if expected is not None and type(expected) is not bool:raise ValueError('Expected native verdict must be Boolean')
+        if entry['control']=='malformed' and entry.get('error') is not None:
+            result['findings'].append({'path':'observations','kind':'malformed_control_rejected_without_task_verdict','detail':'Validator rejection is separate from a native task verdict.'})
+        elif expected is not None and verdict is not expected:
             result['findings'].append({'path':'observations','kind':'native_verdict_mismatch','detail':'Control verdict does not match its explicit expected outcome.'})
         rows.append({'control': entry['control'],
                      'verdict': None if not isinstance(grade, dict) else grade.get('structured_claims_correct'),
                      'native_checks': deepcopy(checks),
                      'error': deepcopy(entry.get('error')),
-                     'expected_verdict': entry.get('expected_verdict'),
+                     'expected_verdict': expected,
                      'mutation': deepcopy(entry.get('mutation'))})
     result['observed_grading'] = rows
     result['limitations'] = [

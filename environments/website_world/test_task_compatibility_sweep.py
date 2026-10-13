@@ -133,3 +133,28 @@ def test_mixed_outcome_pairs_and_invalid_input_are_visible(tmp_path,monkeypatch)
 
 def test_non_object_instances_fail_before_selection():
     with pytest.raises(ValueError,match='object'):select_cases([{'id':'x','factors':{},'instance':[]}])
+
+
+def test_missing_coverage_and_nonserializable_receipt_fail_closed(tmp_path,monkeypatch):
+    from . import task_compatibility_sweep as sweep,task_instances
+    with pytest.raises(ValueError):sweep.run_native([],tmp_path/'bad')
+    bad=_selection('one');bad.pop('coverage')
+    with pytest.raises(ValueError):sweep.run_native(bad,tmp_path/'missing')
+    monkeypatch.setattr(task_instances,'inspect',_fake_inspection)
+    monkeypatch.setattr(sweep.shutil,'disk_usage',lambda _:type('Disk',(),{'free':2*1024**3})())
+    monkeypatch.setattr(task_instances,'prepare',lambda instance,path:{'bad':path})
+    report=sweep.run_native(_selection('one'),tmp_path/'out',prepare=True)
+    row=report['results'][0];assert row['status']=='requires_triage'
+    assert row['stages']['unmocked_preparation']['status']=='passed'
+    assert row['stages']['preparation_receipt']['status']=='error'
+    assert (tmp_path/'out/report.json').is_file()
+
+
+def test_artifact_failure_does_not_replace_native_inspection(tmp_path,monkeypatch):
+    from . import task_compatibility_sweep as sweep,task_instances
+    def inspect(instance):
+        result=_fake_inspection(instance);result['reference']={'bad':float('nan')};return result
+    monkeypatch.setattr(task_instances,'inspect',inspect)
+    report=sweep.run_native(_selection('one'),tmp_path/'out');row=report['results'][0]
+    assert row['stages']['native_inspection']['status']=='passed'
+    assert row['stages']['native_artifacts']['status']=='error'

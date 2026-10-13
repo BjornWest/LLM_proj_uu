@@ -144,8 +144,9 @@ def run_native(selection, output, *, workers=2, prepare=False, share_assets=Fals
     if (type(workers) is not int or not 1<=workers<=4 or type(prepare) is not bool
             or type(share_assets) is not bool or share_assets and not prepare):
         raise ValueError('Use1-4 workers and explicit preparation Boolean')
-    if selection.get('schema')!=VERSION or not isinstance(selection.get('selected'),list):
+    if type(selection) is not dict or selection.get('schema')!=VERSION or not isinstance(selection.get('selected'),list) or type(selection.get('coverage')) is not dict:
         raise ValueError('Use a selected compatibility case set')
+    _json(selection['coverage'])
     # Validate before any worker/output side effect; labels do not authenticate parameters.
     for row in selection['selected']:
         if type(row) is not dict or set(row)!={'id','factors','instance'} or type(row['instance']) is not dict or type(row['id']) is not str:
@@ -173,10 +174,13 @@ def run_native(selection, output, *, workers=2, prepare=False, share_assets=Fals
             (directory/'instance.json').write_text(json.dumps(row['instance'],indent=2,ensure_ascii=False,allow_nan=False)+'\n')
             result['stages'][stage]={'status':'running','invoked':True}
             native=task_instances.inspect(row['instance'])
+            _json(native['task']['task_id']);_json(native['metrics'])
             result['stages'][stage]={'status':'passed','invoked':True,'task_id':native['task']['task_id'],
                                      'metrics':native['metrics']}
+            stage='native_artifacts'
             for name in ('task','reference','setup'):
                 (directory/(name+'.json')).write_text(json.dumps(native[name],indent=2,ensure_ascii=False,allow_nan=False)+'\n')
+            result['stages'][stage]={'status':'passed'}
             if prepare:
                 stage='preparation_preflight'
                 if shutil.disk_usage(output).free < 1024*1024*1024:
@@ -187,7 +191,11 @@ def run_native(selection, output, *, workers=2, prepare=False, share_assets=Fals
                 stage='unmocked_preparation'
                 result['stages'][stage]={'status':'running','invoked':True}
                 receipt=task_instances.prepare(row['instance'],directory/'prepared')
-                result['stages'][stage]={'status':'passed','invoked':True,'receipt':receipt}
+                result['stages'][stage]={'status':'passed','invoked':True}
+                stage='preparation_receipt'
+                _json(receipt)
+                result['stages']['unmocked_preparation']['receipt']=receipt
+                result['stages'][stage]={'status':'passed'}
                 if share_assets:
                     stage='immutable_compaction'
                     result['shared_immutable_assets']=compact_prepared(directory/'prepared',output/'immutable-files')

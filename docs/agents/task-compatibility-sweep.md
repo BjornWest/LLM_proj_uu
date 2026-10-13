@@ -37,7 +37,7 @@ be written through shared links. Corrupt existing entries fail closed.
 
 `task_schema_audit.audit_schema(schema, expectations=...)` validates JSON Schema
 and reports wire types, enums, required fields, closed objects, and nullable
-value/evidence pairs. Expectations use exact schema pointers. A categorical
+value/evidence pairs. Expectations use exact schema pointers. Use `nullable` and `unmatched_option` flags to audit reserved choices; ordinary `choices` excludes both. Missing special-choice flags leave that policy unaudited. A categorical
 expectation requires the complete public declaration domain, never private
 winners or the sampled merchant menu. A missing wire restriction can still be
 enforced by a post-extraction mechanical validator; report that distinction.
@@ -70,7 +70,7 @@ failures; do not substitute the footwear basis. The pool heavily exercises
 interval boundaries/no-match cases. Four additional public interior-size cases
 exercise successful feature/priority recommendations without editing worlds.
 
-The initial audit ran 356 supplied controls on 178 configurations; 106 offer-family negative fixtures were empty selections in no-match worlds. That is retained historical wiring evidence, not broad discrimination coverage. The corrected audit uses concrete real offers for no-match counterexamples, and adds wrong SKU, currency, real nonwinner, aggregate, mean, direction and citation mutations where applicable. Positive priority selection controls use the four interior supplements. Five basic-offer configurations have an additional actual native audit. Capture-dependent families remain separate. No-match negatives may fail on expected status even with concrete rows; do not infer independent eligibility/ranking coverage from that branch. Count fields and many categorical variant choices already have
+The initial audit ran 356 supplied controls on 178 configurations; 106 offer-family negative fixtures were empty selections in no-match worlds. That is retained historical wiring evidence, not broad discrimination coverage. The corrected audit uses concrete real offers for no-match counterexamples, and adds wrong SKU, currency, real nonwinner, aggregate, mean, direction and citation mutations where applicable. Two interior supplements are positive priority selections and two are feature selections. The corrected offer audit has priority24no-match/2match, shortlist57no-match/13match, feature25no-match/6match configurations. Five basic-offer configurations have an additional actual native audit. Capture-dependent families remain separate. No-match negatives may fail on expected status even with concrete rows; do not infer independent eligibility/ranking coverage from that branch. Count fields and many categorical variant choices already have
 wire types/enums. Some numeric variant values and decimal aggregates remain
 strings; decimal validators and literal evidence checks are separate from wire
 types. Nullable pairing findings indicate a validator dependency, not absent
