@@ -1,4 +1,4 @@
-# Qwen serving worker on an SSH VM
+# Qwen serving worker on an SSH host
 
 This source is prepared for the Verda suite. GPU, OS libraries and actual full
 wire acceptance remain runtime checks. Evaluation owns the exact suite caller,
@@ -11,6 +11,24 @@ lifetime, memory/no-swap limits and `KillMode=control-group`; CUDA/compiler
 children remain covered even when they create process sessions. Enable the user
 manager and linger through the approved bootstrap. Serving must remain outside
 the bounded browser job slice; it normally uses a 56 GiB host-memory cap.
+
+An ordinary GPU container uses the explicit `execution_backend:
+container-monitored-v1` and a separately reviewed `container_launcher` path/hash.
+`bootstrap_qwen_container.sh` installs the same locked environments without
+systemd. It requires visible finite cgroup v2 outer memory/task limits, zero
+container swap and at least 1 GiB of shared memory. The launcher applies sampled
+RSS/thread thresholds and subreaper/pidfd process containment. These are not
+per-job kernel memory or task caps; bursts between samples remain possible.
+The independent provider deletion watchdog is still required.
+
+Serving and the qualification adapter each have a distinct guardian, payload
+birth identity and original-rental wall deadline. The worker verifies their
+actual entry/result schema, source hash and identities and requires verified
+exec-gate release and complete cleanup. Internal service-state keys are an
+interface shared with the VM backend, not fabricated systemd observations.
+The source index must additionally cover `qwen_container_services.py`; the
+caller injects the same reviewed launcher separately for browser jobs. Container
+qualification does not establish nested Docker/Python sandbox availability.
 
 Use the reviewed host export, runtime and actual B02 seed, not mutable modules.
 The worker spec has schema `qwen-ssh-serving-worker-v1` and these fields:

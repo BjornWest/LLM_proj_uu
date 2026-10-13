@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Own serving/qualification lifetimes on an already allocated SSH VM.
+"""Own serving/qualification lifetimes on an already allocated SSH host.
 
 Plan is default. No provisioning, downloads, episode dispatch or credentials.
 The reviewed Evaluation caller runs separately on this host after readiness;
@@ -79,12 +79,18 @@ def verify_sources(spec):
     for key in ('rental','runtime','request','runtime_lock'):read_pin(spec[key])
     if spec.get('reuse_capability') is not None:read_pin(spec['reuse_capability'])
     needed=['serve_qwen_suite.py','qualify_qwen_wire.py','measure_qwen_host.py','qwen_suite_qualification.py','qwen_host_worker.py']
+    if spec.get('execution_backend')=='container-monitored-v1':
+        needed.append('qwen_container_services.py')
+        read_pin(spec['container_launcher'])
     if any('training/scripts/'+name not in root['files'] for name in needed):
         raise ValueError('Complete reviewed worker scripts required in host export')
 
 
 def unit_argv(spec, run, remaining):
     """Use systemd control-group cleanup: vLLM/NVCC children may create sessions."""
+    if spec.get('execution_backend')=='container-monitored-v1':
+        from qwen_container_services import launch_argv
+        return launch_argv(spec,run,remaining,'qwen-'+run.name)
     memory=spec['server_memory_mib']
     if type(memory) is not int or not 49152<=memory<=65536:raise ValueError('Explicit serving cap48..64GiB required')
     if not math.isfinite(remaining) or remaining<1:raise TimeoutError('Rental ended')
@@ -149,13 +155,14 @@ def run_command(argv, log, end, *, stopped=lambda:False):
 def artifacts(root):
     """Stable worker evidence only; caller output is finalized by its own owner."""
     rows=[]
+    allowed=('wire','measured','ready','qwen-'+root.name,'qwen-'+root.name+'-qualification')
     paths=list(root.iterdir())
     for child in tuple(paths):
-        if child.name in ('wire','measured','ready') and child.is_dir() and not child.is_symlink():
+        if child.name in allowed and child.is_dir() and not child.is_symlink():
             paths.extend(child.rglob('*'))
     for path in sorted(paths):
         relative=path.relative_to(root)
-        if len(relative.parts)>1 and relative.parts[0] not in ('wire','measured','ready'):
+        if len(relative.parts)>1 and relative.parts[0] not in allowed:
             continue
         if path.is_symlink():raise ValueError('No symlinks in private artifact return')
         if not path.is_file():continue
@@ -172,11 +179,16 @@ def artifacts(root):
         rows.append({'path':str(relative),'sha256':digest.hexdigest(),'bytes':after.st_size})
     return {'schema':'qwen-worker-terminal-artifacts-v1','status':'worker_files_finalized',
         'scope':'Worker files only; caller subtree/final snapshots/grades require separate finalization',
-        'excluded_subtrees':'All except wire/measured/ready, including suite',
+        'excluded_subtrees':'All except wire/measured/ready and two own guardian receipts, including suite',
         'files':rows,'task_success_asserted':False}
 
 
 def execute(spec, units=None, *, clock=time.time, sleep=time.sleep):
+    if spec.get('execution_backend') not in (None,'systemd-v1','container-monitored-v1'):
+        raise ValueError('Unknown serving execution backend')
+    if units is None and spec.get('execution_backend')=='container-monitored-v1':
+        from qwen_container_services import ContainerServices
+        units=ContainerServices(spec)
     units=units or Units();rental=load(spec['rental']);end=rental_values(rental,clock())
     if 'microsoft' in platform.release().lower():raise ValueError('Execute on the approved Linux VM, not WSL')
     verify_sources(spec)
@@ -197,7 +209,8 @@ def execute(spec, units=None, *, clock=time.time, sleep=time.sleep):
     def stop(signum,_):stopped.append(signum)
     for sig in (signal.SIGTERM,signal.SIGINT,signal.SIGHUP):original[sig]=signal.signal(sig,stop)
     result={'status':'failed','run_id':rental['run_id'],'instance_id':rental['instance_id'],
-        'deadline_utc':end,'provider_billing_stopped':False,'task_success_asserted':False}
+        'deadline_utc':end,'provider_billing_stopped':False,'task_success_asserted':False,
+        'execution_backend':spec.get('execution_backend','systemd-v1')}
     try:
         if stopped:raise InterruptedError('Worker stopped before launch')
         if units.state(name).get('LoadState')!='not-found':raise ValueError('Service name already exists')
@@ -250,13 +263,17 @@ def execute(spec, units=None, *, clock=time.time, sleep=time.sleep):
             'capability':measured['capability'],'deployment':measured['deployment'],'launch':launch_pin,
             'raw_base_url':'http://127.0.0.1:8000','qualification_base_url':'http://127.0.0.1:8001','dispatch_approval':approval}
         binding_pin=publish(run/'qualification-binding.json',binding)
-        # Own the small adapter too through a separate deadline-bounded systemd unit.
+        # Own the small adapter through a separate deadline-bounded service.
         adapter=name+'-qualification'
-        command=unit_argv(spec,run,end-clock())
-        command=[x.replace('--unit='+name,'--unit='+adapter).replace('--property=MemoryMax='+str(spec['server_memory_mib']<<20),'--property=MemoryMax='+str(512<<20)).replace(str(run/'vllm.log'),str(run/'qualification.log')) for x in command]
-        index=command.index(spec['rl_python'])
-        command=command[:index]+[spec['browser_python'],'-I','-B',str(Path(spec['host_root'])/'training/scripts/qwen_suite_qualification.py'),
-            '--binding',binding_pin['path'],'--binding-sha256',binding_pin['sha256'],'--output',str(run/'ready')]
+        if spec.get('execution_backend')=='container-monitored-v1':
+            from qwen_container_services import launch_argv
+            command=launch_argv(spec,run,end-clock(),adapter,binding=binding_pin)
+        else:
+            command=unit_argv(spec,run,end-clock())
+            command=[x.replace('--unit='+name,'--unit='+adapter).replace('--property=MemoryMax='+str(spec['server_memory_mib']<<20),'--property=MemoryMax='+str(512<<20)).replace(str(run/'vllm.log'),str(run/'qualification.log')) for x in command]
+            index=command.index(spec['rl_python'])
+            command=command[:index]+[spec['browser_python'],'-I','-B',str(Path(spec['host_root'])/'training/scripts/qwen_suite_qualification.py'),
+                '--binding',binding_pin['path'],'--binding-sha256',binding_pin['sha256'],'--output',str(run/'ready')]
         if units.state(adapter).get('LoadState')!='not-found':raise ValueError('Adapter unit name already exists')
         adapter_started=True
         units.call(command,timeout=min(10,end-clock()))
