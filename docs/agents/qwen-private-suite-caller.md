@@ -18,12 +18,16 @@ configured request timeout and remaining rental time. The deadline is measured
 again immediately before submission, after parking and count/source checks.
 
 The default `bounded_request` policy retains the previous maximum 600-second
-HTTPX timeout. Neither policy measures active decode or guarantees cache
+HTTPX timeout and request payload. Both policies now emit a
+`private_http_wait_policy` meter row; expiry before submission fails without
+installing a request hook or sending bytes. Neither policy measures active decode or guarantees cache
 retention. HTTPX read timeouts apply between reads; the parent's existing rental
 watchdog remains the total-wall bound and the host-deletion watchdog remains
 independent. A local timeout/close does not prove remote cancellation or justify
 early permit release. New policies need fresh source/config/native acceptance;
-historical releases and their receipts remain unchanged. Private callers declare
+under `rental_bounded`, a connected server that stops progressing can consume
+the rest of the rental unless an operator or the host watchdog intervenes.
+Historical releases and their receipts remain unchanged. Private callers declare
 four distinct member canaries at the front of their finite queue; the old four
 remain valid, while a new reviewed configuration can select a narrower set.
 

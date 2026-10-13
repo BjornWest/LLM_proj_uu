@@ -474,13 +474,6 @@ class QwenBackend:
             (f.policy_guard if self.phase == 'policy' else f.formatter_guard)()
             if self.phase == 'formatter':
                 f.formatter_calls += 1  # A failed paid call cannot be replayed.
-            if hasattr(self.raw,'client'):
-                hooks=self.raw.client.event_hooks
-                originals=list(hooks.get('request',[]))
-                def counted_wire(http_request):
-                    if http_request.content!=encoded(request):raise ValueError('Actual HTTP bytes differ from ordered counted wire; no dispatch')
-                    for callback in originals:callback(http_request)
-                hooks['request']=[counted_wire]
             timeout = f.http_timeout()
             if hasattr(self.raw,'client'):self.raw.client.timeout=timeout
             f.meter({'event':'private_http_wait_policy', 'phase':self.phase,
@@ -490,6 +483,13 @@ class QwenBackend:
                 'write_timeout_seconds':getattr(timeout,'write',timeout),
                 'pool_timeout_seconds':getattr(timeout,'pool',timeout),
                 'scope':'Buffered server waiting/prefill/generation; no request-specific progress attribution. Parent rental watchdog bounds total wall time.'})
+            if hasattr(self.raw,'client'):
+                hooks=self.raw.client.event_hooks
+                originals=list(hooks.get('request',[]))
+                def counted_wire(http_request):
+                    if http_request.content!=encoded(request):raise ValueError('Actual HTTP bytes differ from ordered counted wire; no dispatch')
+                    for callback in originals:callback(http_request)
+                hooks['request']=[counted_wire]
             try:result = self.raw.complete(selected)
             finally:
                 if hasattr(self.raw,'client'):hooks['request']=originals

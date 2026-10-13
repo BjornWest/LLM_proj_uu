@@ -113,6 +113,31 @@ class PrivateTimeoutBoundaryTests(unittest.TestCase):
   self.factory.read_wait_policy='rental_bounded';self.now=self.deadline
   with self.assertRaisesRegex(TimeoutError,'Rental deadline'):self.factory.http_timeout()
   self.assertFalse(self.wires)
+ def test_expiry_at_policy_guard_keeps_original_request_hooks(self):
+  self.factory.read_wait_policy='rental_bounded'
+  self.factory.policy_guard=lambda:setattr(self,'now',self.deadline)
+  original=lambda _:None
+  with self.factory.policy_session(before_dispatch=lambda:None)as b:
+   b.raw.client.event_hooks['request']=[original]
+   with self.assertRaisesRegex(TimeoutError,'Rental deadline'):b.complete([])
+   self.assertEqual(b.raw.client.event_hooks['request'],[original])
+  self.assertFalse(self.wires)
+ def test_expiry_at_formatter_guard_keeps_original_request_hooks(self):
+  with self.factory.policy_session(before_dispatch=lambda:None):pass
+  (self.directory/'extraction').mkdir();(self.directory/'extraction/schema.json').write_text(json.dumps({'type':'object','properties':{},'additionalProperties':False}))
+  self.factory.read_wait_policy='rental_bounded';self.factory.formatter_guard=lambda:setattr(self,'now',self.deadline)
+  b=self.factory.extraction_backend_factory(self.directory/'transport');original=lambda _:None;b.raw.client.event_hooks['request']=[original]
+  with self.assertRaisesRegex(TimeoutError,'Rental deadline'):b.complete([])
+  self.assertEqual(b.raw.client.event_hooks['request'],[original]);self.assertFalse(self.wires);b.close()
+ def test_meter_failure_keeps_original_request_hooks(self):
+  def meter(row):
+   if row['event']=='private_http_wait_policy':raise OSError('meter write failed')
+  self.factory.meter=meter;original=lambda _:None
+  with self.factory.policy_session(before_dispatch=lambda:None)as b:
+   b.raw.client.event_hooks['request']=[original]
+   with self.assertRaisesRegex(OSError,'meter write failed'):b.complete([])
+   self.assertEqual(b.raw.client.event_hooks['request'],[original])
+  self.assertFalse(self.wires)
 
 class CallerReadPolicyTests(unittest.TestCase):
  def setUp(self):
