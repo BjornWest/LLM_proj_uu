@@ -328,3 +328,22 @@ on every claim. Unresolvable field references fail before provider dispatch.
 The request watchdog retains the enclosing suite alarm: an expiring outer alarm
 can interrupt failure recording during suite shutdown; parent terminal evidence
 remains necessary. These limits do not imply provider schema acceptance.
+
+
+### Hosted concurrency amendments and resumed shared services
+
+Keep the original `authorization` file and pin unchanged for a resumed hosted
+cohort. A new user concurrency instruction is recorded in the ordered
+`authorization_amendments` list. Each pinned receipt must bind the original
+file, its preceding amendment (or null), and only `max_active_combined`.
+Other episode, model, input, warming and outcome-retention rules cannot change
+through this channel. The effective cap remains within the finite task count.
+Historical attempt discovery continues using the original cohort pin.
+
+The shared tokenizer and Chromium service start from the first case in this
+attempt's `start_order`, so a retained older case cannot supply an incompatible
+pool manifest for corrected pending cases. All pending clients still need the
+same installed pool adapter/shutdown/asset qualification. `pool_memory_mib`
+(default3072, range1024–8192) and `pool_tasks` (default512, range128–1024) are
+finite per-service ceilings, not reservations. Bind these settings in actual
+native/browser/HTTP acceptance and report measured concurrency and memory.

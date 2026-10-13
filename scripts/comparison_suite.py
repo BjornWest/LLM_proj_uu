@@ -302,6 +302,7 @@ def source_guard(s,c=None):
   if 'source_export' not in s and location.read_bytes()!=subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':'+relative]):raise ValueError('Hosted runtime differs from committed caller')
   hosted_counter_bindings(s,[c]if c is not None else s['cases'])
  if 'authorization' in s:checked(s['authorization'])
+ if hosted_qwen_mode(s):hosted_authorization(s)
  if 'transport' in s:
   for row in s['transport']['files']:checked(row)
   for name in ('node','bridge_worker','pi'):checked(s[name])
@@ -316,6 +317,7 @@ def source_guard(s,c=None):
 
 def check_release(s):
  browser_step_options(s)
+ pool_resource_options(s)
  source_guard(s)
  if qwen_mode(s):return check_qwen_release(s)
  if hosted_qwen_mode(s):return check_hosted_release(s)
@@ -333,6 +335,43 @@ def check_release(s):
  if len(a['cases'])!=len(s['cases']):raise ValueError('Duplicate acceptance case')
  by_id={c['id']:c for c in s['cases']}
  for v in a['cases']:verify_ready_case(s,by_id[v['case']],v)
+
+def hosted_authorization(spec):
+ """Apply pinned concurrency-only amendments without replacing cohort identity."""
+ effective=load(checked(spec['authorization']));previous=None;seen=set()
+ amendments=spec.get('authorization_amendments',[])
+ if type(amendments)is not list:raise ValueError('Pinned authorization amendment list required')
+ for binding in amendments:
+  path=checked(binding)
+  if str(path)in seen:raise ValueError('Duplicate authorization amendment')
+  seen.add(str(path));amendment=load(path)
+  if (amendment.get('schema')!='hosted-qwen-finite-authorization-amendment-v1'
+      or amendment.get('base_authorization')!=spec['authorization']
+      or amendment.get('previous_amendment')!=previous
+      or type(amendment.get('id'))is not str or not amendment['id']
+      or type(amendment.get('changes'))is not dict
+      or set(amendment['changes'])!={'max_active_combined'}):
+   raise ValueError('Invalid concurrency-only authorization amendment chain')
+  cap=amendment['changes']['max_active_combined']
+  if type(cap)is not int or not 1<=cap<=len(effective['case_ids']):
+   raise ValueError('Finite positive amended concurrency required')
+  effective={**effective,'max_active_combined':cap};previous=binding
+ return effective
+
+
+def pool_source_case(spec):
+ order=spec.get('start_order',[])
+ if not order:raise ValueError('Nonempty attempt order required for shared services')
+ matches=[case for case in spec['cases']if case['id']==order[0]]
+ if len(matches)!=1:raise ValueError('First attempt case must resolve uniquely')
+ return matches[0]
+
+
+def pool_resource_options(spec):
+ memory=spec.get('pool_memory_mib',3072);tasks=spec.get('pool_tasks',512)
+ if type(memory)is not int or not 1024<=memory<=8192 or type(tasks)is not int or not 128<=tasks<=1024:
+  raise ValueError('Finite explicit shared-pool resource limits required')
+ return memory,tasks
 
 def hosted_prior_specs(s):
  # This finite hosted cohort keeps approved attempt specs beside its immutable
@@ -425,7 +464,7 @@ def load_json_list(value):
 
 def check_hosted_release(s):
  hosted_runtime(s)['validate_limits'](s)
- authorized=load(checked(s['authorization']));ids=[c['id'] for c in s['cases']]
+ authorized=hosted_authorization(s);ids=[c['id'] for c in s['cases']]
  if (len(ids)!=34 or len(set(ids))!=34 or ids!=authorized['case_ids']
      or authorized.get('dispatch_authorized') is not True
      or authorized.get('policy_model')!='qwen/qwen3.8-27b'
@@ -830,6 +869,7 @@ def supervise(s,scripted=False):
 
 def _supervise(s,scripted=False,stop=None):
  browser_step_options(s)
+ pool_resource_options(s)
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
  if s.get('shared_chromium') and not scripted and not pooled_model_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
  if qwen_mode(s):validate_qwen_limits(s)
@@ -859,7 +899,7 @@ def _supervise(s,scripted=False,stop=None):
    s['suite_deadline_utc']=time.time()+s['suite_timeout']
   assets=[checked(s['tokenizer'])] if pooled_model_mode(s) else [Path(s['counter_assets_root'])/'mimo-v2.6-pro-73875d00/tokenizer.json',checked(s['tokenizer'])]
   manifest=Path(tmp)/'assets.json';save(manifest,[{'path':str(a),'sha256':pin(a)['sha256'],'normalization':'raw'} for a in assets])
-  root=s['cases'][0]['root']
+  root=pool_source_case(s)['root']
   service=subprocess.Popen([s['python'],'-I','-B','-c',"import sys;sys.path.insert(0,sys.argv[1]);from intent_browser.tokenizer_service import main;sys.argv=sys.argv[1:];sys.argv[0]='tokenizer_service';main()",root,'--socket',s['tokenizer_socket'],'--manifest',str(manifest),'--max-clients',str(ceiling+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=(out/'tokenizer-stderr.log').open('x'),text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
   try:
    if hosted_qwen_mode(s):
@@ -879,7 +919,7 @@ def _supervise(s,scripted=False,stop=None):
      if not required<=manifest['source_sha256'].keys():raise ValueError('Recipe omits pooled runtime source pins')
     owner=load(out/'supervisor-start.json')
     s['chromium_descriptor']=str(pool_directory/'descriptor.json')
-    pool_service=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','3072','--tasks','512','--receipt',str(out/'chromium-pool-bounded'),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',str(service_driver),'--source-root',root,'--owner-pid',str(owner['pid']),'--owner-start',owner['process_start'],'--directory',str(pool_directory),'--max-leases',str(2*(ceiling+s['prewarm_count'])),'--per-server',str(ceiling+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=pool_log,text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
+    pool_service=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib',str(pool_resource_options(s)[0]),'--tasks',str(pool_resource_options(s)[1]),'--receipt',str(out/'chromium-pool-bounded'),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',str(service_driver),'--source-root',root,'--owner-pid',str(owner['pid']),'--owner-start',owner['process_start'],'--directory',str(pool_directory),'--max-leases',str(2*(ceiling+s['prewarm_count'])),'--per-server',str(ceiling+s['prewarm_count'])],stdout=subprocess.PIPE,stderr=pool_log,text=True,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
     if not select.select([pool_service.stdout],[],[],45)[0]:raise RuntimeError('Chromium pool service did not become ready')
     descriptor=pool_service.stdout.readline().strip()
     if descriptor!=str(pool_directory/'descriptor.json') or not Path(descriptor).is_file():raise RuntimeError('Chromium pool descriptor differs')
