@@ -7,10 +7,12 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+from jsonschema.exceptions import ValidationError
 
 from .test_atomic_product_tasks import fixture
 from . import atomic_product_publication as publication, atomic_product_task as native
 from . import atomic_product_execution_consumer as consumer
+from .adapter import digest
 
 
 def read_grader(kind, **kw):
@@ -20,6 +22,27 @@ def read_grader(kind, **kw):
 
 
 def entry(value, evidence): return {'value': value, 'evidence': evidence}
+
+
+def descriptive_grader(value, unit=None, qualifier=None):
+    """A native authored fact with actual synthetic state, no expected refill."""
+    world, original_task, _, args, binding, capsule = fixture('read_public_fact')
+    args['catalog']['products'][0]['variants'][0]['details'][0]['facts'].append({
+        'field': 'sku.facts.semantic', 'label': 'Descriptive fact',
+        'value': value, 'unit': unit, 'qualifier': qualifier, 'status': 'known'})
+    spec = {**original_task['spec'], 'fact': {'field': 'sku.facts.semantic'}}
+    task = native.make(world, spec, **args)
+    reference = native.reference(world, task, **args)
+    capsule['task_sha256'] = digest(task)
+    return consumer.AtomicReadGrader(world, task, reference, **args,
+        binding=binding, capsule=capsule, completion=True)
+
+
+def descriptive_claims(value, quote, unit=None, qualifier=None):
+    return {'interpretation': 'extracted', 'issues': [], 'source_urls': [],
+            'value': entry(value, quote),
+            'unit': entry(unit, quote if unit is not None else None),
+            'qualifier': entry(qualifier, quote if qualifier is not None else None)}
 
 
 class AtomicConsumerTests(unittest.TestCase):
@@ -47,7 +70,8 @@ class AtomicConsumerTests(unittest.TestCase):
         self.assertTrue(report['structured_claims_correct'])
         self.assertEqual(report['native_report']['verdict'], 'pass')
         claims['total']['amount'] = '126'
-        with self.assertRaises(ValueError): grader.grade(claims, 'The listed price is 125 SEK.')
+        claims['total']['evidence'] = '126 SEK'
+        self.assertFalse(grader.grade(claims, 'The listed price is 126 SEK.')['structured_claims_correct'])
 
     def test_missing_price_stays_missing(self):
         grader = read_grader('read_listed_price')
@@ -72,59 +96,161 @@ class AtomicConsumerTests(unittest.TestCase):
             self.assertTrue(grader.grade(c, answer)['structured_claims_correct'])
             self.assertIs(type(grader.grade(c, answer)['claims']['value']['value']), type(value))
 
-    def test_fabricated_quote_and_unsupported_boolean_fail(self):
+    def test_fabricated_quote_still_rejects(self):
         grader = read_grader('read_public_fact', fact={'field': 'sku.facts.supplied'})
-        c = {'interpretation': 'extracted', 'issues': [], 'value': entry(False, 'Not provided'),
+        c = {'interpretation': 'extracted', 'issues': [], 'value': entry(False, 'false'),
              'unit': entry(None, None), 'qualifier': entry(None, None)}
-        with self.assertRaises(ValueError): grader.grade(c, 'Not provided')
-        c['value'] = entry(False, 'false')
         with self.assertRaises(ValueError): grader.grade(c, 'I did not find this information.')
 
-    def test_negative_facts_and_arrays_are_supported_without_expected_refill(self):
-        self.assertTrue(consumer._supported(-5, 'Minimum temperature -5 C'))
-        self.assertTrue(consumer._supported(['Wi-Fi', 'USB-C'], 'Wi-Fi; USB-C'))
-        self.assertFalse(consumer._supported(['Wi-Fi', 'GPS'], 'Wi-Fi; USB-C'))
+    def test_scalar_paraphrases_use_extracted_values_then_native_comparison(self):
+        for value, quote in [(False, 'The spare does not come in the box.'),
+                             (True, 'You will find a spare in the box.'),
+                             (-5, 'It works at five degrees below zero.'),
+                             (0, 'There are no spare parts.'),
+                             ('Hand wash', 'Wash it by hand.')]:
+            with self.subTest(value=value):
+                grader = descriptive_grader(value)
+                claims = descriptive_claims(value, quote)
+                before = deepcopy(claims)
+                report = grader.grade(claims, quote)
+                self.assertTrue(report['structured_claims_correct'])
+                self.assertEqual(report['claims']['value'], claims['value'])
+                self.assertEqual(claims, before)
 
-    def test_boolean_and_array_negative_review_controls(self):
-        for answer in ('Spare supplied: true. No other information.',
-                       'It is not false; the spare is supplied.', 'Yes, no problem.'):
-            self.assertFalse(consumer._supported(False, answer), answer)
-        self.assertFalse(consumer._supported(['Wi-Fi', 'USB-C'], 'In this order: USB-C; Wi-Fi.'))
-        self.assertFalse(consumer._supported(['Wi-Fi', 'Wi-Fi'], 'Wi-Fi'))
-        self.assertFalse(consumer._supported([False, True], 'not false; true'))
-        self.assertTrue(consumer._supported([False, True], 'false; true'))
+    def test_wrong_scalar_meaning_fails_native_instead_of_quote_parser(self):
+        grader = descriptive_grader(False)
+        quote = 'A spare is included.'
+        report = grader.grade(descriptive_claims(True, quote), quote)
+        self.assertFalse(report['structured_claims_correct'])
+        self.assertIs(report['claims']['value']['value'], True)
 
-    def test_boolean_negated_inclusion_and_literal_override_are_rejected(self):
-        self.assertFalse(consumer._supported(True, "The spare isn't included."))
-        self.assertFalse(consumer._supported(False, 'Spare supplied: false. Actually, yes, it is included.'))
-        self.assertFalse(consumer._supported(False, 'It is false that the spare is absent: the spare is included.'))
-        self.assertFalse(consumer._supported(True, 'The spare cannot be included.'))
-        self.assertFalse(consumer._supported(True, 'The spare will not be supplied.'))
-        self.assertFalse(consumer._supported(True, "The spare isn't included: true."))
-        self.assertFalse(consumer._supported(True, 'Spare absent: true.'))
-        self.assertFalse(consumer._supported(False, 'The spare is included, so supplied: false.'))
-        self.assertTrue(consumer._supported(False, "The spare isn't included."))
-        self.assertTrue(consumer._supported(False, 'Spare supplied: false.'))
-        self.assertTrue(consumer._supported(True, 'Spare supplied: true.'))
+    def test_arrays_keep_extractor_order_duplicates_and_false_zero_values(self):
+        for values, quote in [(['Wi-Fi', 'USB-C'], 'Wireless networking followed by a type C connector.'),
+                              (['USB-C', 'USB-C'], 'Two type C connections.'),
+                              ([False, True, -5, 0], 'Absent, present, five below zero, then nothing.')]:
+            with self.subTest(values=values):
+                grader = descriptive_grader(values)
+                report = grader.grade(descriptive_claims(values, quote), quote)
+                self.assertTrue(report['structured_claims_correct'])
+                self.assertEqual(report['derivations'][0]['native_claims']['value'], values)
+        grader = descriptive_grader(['Wi-Fi', 'USB-C'])
+        quote = 'Type C first, wireless second.'
+        result = grader.grade(descriptive_claims(['USB-C', 'Wi-Fi'], quote), quote)
+        self.assertFalse(result['structured_claims_correct'])
+        self.assertEqual(result['claims']['value']['value'], ['USB-C', 'Wi-Fi'])
+
+    def test_unit_and_qualification_are_extractor_semantics(self):
+        grader = descriptive_grader(-5, 'C', 'Remove the insole first')
+        quote = 'Five below zero Celsius, after taking out the footbed.'
+        claims = descriptive_claims(-5, quote, 'C', 'Remove the insole first')
+        self.assertTrue(grader.grade(claims, quote)['structured_claims_correct'])
+        claims['qualifier'] = entry(None, None)
+        self.assertFalse(grader.grade(claims, quote)['structured_claims_correct'])
+
+    def test_undeclared_qualifier_keeps_value_separate_from_authentic_label_quote(self):
+        scope = 'Android / 4 GB RAM / 64 GB storage'
+        grader = descriptive_grader(470, 'g', scope)
+        self.assertNotIn('qualifier_declaration', grader.task['public_fact'])
+        quote = 'Reference configuration: '+scope
+        answer = 'Reference weight 470 g. '+quote
+        claims = descriptive_claims(470, 'Reference weight 470 g', 'g', scope)
+        claims['qualifier']['evidence'] = quote
+        report = grader.grade(claims, answer)
+        self.assertTrue(report['structured_claims_correct'])
+        self.assertEqual(report['claims']['qualifier'], entry(scope, quote))
+        for value in ('Other stated configuration', None):
+            changed = deepcopy(claims)
+            changed['qualifier'] = entry(value, quote if value is not None else None)
+            self.assertFalse(grader.grade(changed, answer)['structured_claims_correct'])
+        claims['qualifier']['evidence'] = 'Reference configuration: fabricated'
+        with self.assertRaises(ValueError):
+            grader.grade(claims, answer)
+        self.assertIn('excluding presentation headings', grader.extraction_instructions)
+        self.assertIn('excluding presentation headings', grader.schema['properties']['qualifier']['description'])
+
+    def test_missing_fields_stay_null_and_ambiguity_remains_failure(self):
+        grader = descriptive_grader(False)
+        quote = 'I could not establish this.'
+        report = grader.grade({'interpretation': 'extracted', 'issues': []}, quote)
+        self.assertIsNone(report['claims']['value']['value'])
+        self.assertFalse(report['structured_claims_correct'])
+        claims = descriptive_claims(False, 'The spare is absent.')
+        claims.update(interpretation='ambiguous', issues=['Conflicting declarations'])
+        report = grader.grade(claims, 'The spare is absent.')
+        self.assertFalse(report['structured_claims_correct'])
+        self.assertEqual(report['claims']['issues'], claims['issues'])
+
+    def test_typed_finite_values_exact_quotes_and_literal_urls_remain_required(self):
+        quote = 'The spare is absent.'
+        for value in ('false', 0):
+            with self.subTest(value=value), self.assertRaises(ValidationError):
+                descriptive_grader(False).grade(descriptive_claims(value, quote), quote)
+        for expected in (1.5, [1.5]):
+            for value in (float('nan'), float('inf'), float('-inf')):
+                supplied = [value] if type(expected) is list else value
+                with self.subTest(value=value, expected=expected), self.assertRaisesRegex(ValueError, 'finite'):
+                    descriptive_grader(expected).grade(descriptive_claims(supplied, quote), quote)
+        grader = descriptive_grader(False)
+        for evidence in ('', ' ', 'spare absent', None):
+            with self.subTest(evidence=evidence), self.assertRaises(ValueError):
+                grader.grade(descriptive_claims(False, evidence), quote)
+        claims = descriptive_claims(False, quote)
+        claims['unit'] = entry(None, quote)
+        with self.assertRaisesRegex(ValueError, 'Absent'):
+            grader.grade(claims, quote)
+        claims = descriptive_claims(False, quote)
+        claims['source_urls'] = [{'value': 'https://wrong.test/', 'evidence': quote}]
+        with self.assertRaisesRegex(ValueError, 'URL'):
+            grader.grade(claims, quote)
+
+    @unittest.skipUnless(hasattr(consumer, 'QUALIFIER_VERSION'), 'Frozen line has no qualifier vocabulary API')
+    def test_declared_qualifier_schema_survives_semantic_numeric_admission(self):
+        import pytest
+        from .test_qualifier_domains import reference_fixture, read_claims, ANDROID
+        with tempfile.TemporaryDirectory() as directory, pytest.MonkeyPatch.context() as monkeypatch:
+            *_, grader, _ = reference_fixture(Path(directory), monkeypatch)
+            quote = 'Reference: Android media 11, 4GB RAM, 64GB storage, Wi-Fi only, gray.'
+            claims = read_claims(ANDROID, quote)
+            claims['value'] = entry(470, 'It weighs four hundred and seventy grams.')
+            self.assertTrue(grader.grade(claims, 'It weighs four hundred and seventy grams. Reference weight 470 g. '+quote)['structured_claims_correct'])
+            self.assertIn('ambiguous', grader.extraction_instructions)
+            self.assertEqual(grader.contract['canonical_qualifiers_version'], consumer.QUALIFIER_VERSION)
+
+    @unittest.skipUnless(hasattr(consumer, 'QUALIFIER_VERSION'), 'Frozen line has no qualifier vocabulary API')
+    def test_declared_qualifier_still_rejects_unknown_labels(self):
+        import pytest
+        from .test_qualifier_domains import reference_fixture, read_claims
+        with tempfile.TemporaryDirectory() as directory, pytest.MonkeyPatch.context() as monkeypatch:
+            *_, grader, _ = reference_fixture(Path(directory), monkeypatch)
+            claims = read_claims('unregistered configuration', 'unregistered configuration')
+            with self.assertRaises(ValidationError):
+                grader.grade(claims, 'Reference weight 470 g. unregistered configuration')
 
     def test_actual_shared_extractor_accepts_read_contract_without_provider(self):
-        grader = read_grader('read_listed_price')
-        claims = {'interpretation': 'extracted', 'issues': [], 'source_urls': [],
-                  'total': {'amount': '125.00', 'currency': 'SEK', 'evidence': '125 SEK'}}
         class Backend:
             calls = 0
+            def __init__(self, claims):
+                self.claims = claims
             def complete(self, prompt):
                 self.calls += 1
-                return SimpleNamespace(text=json.dumps(claims), request={'synthetic': True}, raw={
+                return SimpleNamespace(text=json.dumps(self.claims), request={'synthetic': True}, raw={
                     'model': 'synthetic-zero-provider', 'usage': {},
-                    'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(claims)}}]})
-        with tempfile.TemporaryDirectory() as directory:
-            backend = Backend()
-            report = consumer.task_answer.extract_and_grade(grader, {'user_message': 'Read the price'},
-                'The listed price is 125 SEK.', Path(directory)/'extraction', backend)
-            self.assertTrue(report['structured_claims_correct'])
-            self.assertEqual(backend.calls, 1)
-            self.assertEqual(json.loads((Path(directory)/'extraction/response-contract.json').read_text()), grader.contract)
+                    'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(self.claims)}}]})
+        cases = [(read_grader('read_listed_price'),
+                  {'interpretation': 'extracted', 'issues': [], 'source_urls': [],
+                   'total': {'amount': '125.00', 'currency': 'SEK', 'evidence': '125 SEK'}},
+                  'The listed price is 125 SEK.'),
+                 (descriptive_grader(False),
+                  descriptive_claims(False, 'The spare does not come in the box.'),
+                  'The spare does not come in the box.')]
+        for grader, claims, answer in cases:
+            with self.subTest(kind=grader.task['kind']), tempfile.TemporaryDirectory() as directory:
+                backend = Backend(claims)
+                report = consumer.task_answer.extract_and_grade(grader, {'user_message': 'Read this product detail'},
+                    answer, Path(directory)/'extraction', backend)
+                self.assertTrue(report['structured_claims_correct'])
+                self.assertEqual(backend.calls, 1)
+                self.assertEqual(json.loads((Path(directory)/'extraction/response-contract.json').read_text()), grader.contract)
 
     def test_existing_authority_accepts_capture_container_marker_not_task_marker(self):
         from .catalog_cart_authority import ReadOnlyCommitAuthority
