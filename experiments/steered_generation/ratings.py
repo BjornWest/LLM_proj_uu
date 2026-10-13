@@ -411,7 +411,11 @@ def prepare(natural, requirement, api, rng):
                                       "are sampled from their distribution given the requirement: the levels in "
                                       "proportion to their chance times the chance of the required average under "
                                       "them, then the total of stars exactly, then each review by redrawing its "
-                                      "stream until it gives its stars. The shipments' history streams are the "
+                                      "stream until it gives its stars" + (
+                                          "; whole samples so drawn are rejected until the comments are as the topic "
+                                          "states, and the probability is the stars' own times the share of a fixed "
+                                          "number of such samples that qualified, an estimate"
+                                          if block.estimated else "") + ". The shipments' history streams are the "
                                       "seed's own, read under the sampled levels: the sample and its probability "
                                       "are given those streams, which the requirement depends on. Every other draw "
                                       "is the seed's own too, and the requirement depends on none of them. Use the "
