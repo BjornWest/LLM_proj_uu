@@ -294,10 +294,11 @@ class SteeringTests(Delivered):
     def test_the_candidates_of_the_delivery_task(self):
         task = {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE}
         found = variants.of(self.natural, task, self.api)
-        self.assertEqual([row["name"] for row in found], ["likeliest_winner", "better_offer_unavailable", "unlikely_winner"])
+        self.assertEqual([row["name"] for row in found], ["likeliest_winner", "better_offer_unavailable", "unlikely_winner",
+                                                          "cheapest_delivered_with_lowest_rated_carrier"])
         listed = variants.of(self.natural, {"kind": "cheapest_matching_available", "concept_id": SHOES, "predicates": SIZE}, self.api)
-        self.assertNotEqual([row["log_probability"] for row in found], [row["log_probability"] for row in listed])
-        for index, row in enumerate(found):
+        self.assertNotEqual([row["log_probability"] for row in found[:3]], [row["log_probability"] for row in listed])
+        for index, row in enumerate(found[:3]):
             with self.subTest(name=row["name"]):
                 self.assertEqual(row["requirement"]["delivered"], {})
                 world, seen, record = cheapest.steer(self.session, self.natural, self.opened, row["requirement"], self.api,
@@ -306,6 +307,18 @@ class SteeringTests(Delivered):
                 winner = seen["reference"]["winners"][0]
                 self.assertEqual((winner["retailer_id"], winner["product_id"]),
                                  (row["requirement"]["retailer_ids"][0], row["requirement"]["product_id"]))
+        # The fourth: the likeliest winner again, delivered by the carrier the world rates lowest; an estimate.
+        from experiments.steered_generation import couriers
+        last, top = found[3], found[0]["requirement"]
+        stars = {row["carrier_id"]: row["summary"]["average_stars"] for row in self.natural["carrier_evidence"]["public"]["carriers"]}
+        self.assertEqual(last["requirement"]["schema"], couriers.VERSION)
+        self.assertEqual(stars[last["requirement"]["carrier_id"]], min(stars.values()))
+        self.assertEqual(last["requirement"]["cheapest"], {key: value for key, value in top.items() if key != "schema"})
+        self.assertTrue(last["probability_is_estimated"])
+        self.assertLess(last["log_probability"], found[0]["log_probability"])
+        world, seen, record = couriers.steer(self.session, self.natural, self.opened, last["requirement"], self.api, Random(9))
+        self.assertTrue(all(row["delivery"]["carrier_id"] == last["requirement"]["carrier_id"] for row in seen["reference"]["winners"]))
+        self.assertAlmostEqual(record["log_probability_given_upstream"], last["log_probability"], places=9)
         same = variants.of(self.natural, {**task, "objective": "cheapest_total", "delivery_types": ["home"],
                                           "destination": "user_home"}, self.api)
         self.assertEqual(same, found)
@@ -455,7 +468,8 @@ class ByLocation(Delivered):
         self.assertEqual(case["probability_standard_error"], block.error)
         # The candidates of the delivery task: the two this world's ranking can carry, marked as estimates.
         found = variants.of(self.natural, {"kind": "matching_single_item_delivery", "concept_id": SHOES, "predicates": SIZE}, self.api)
-        self.assertEqual([row["name"] for row in found], ["likeliest_winner", "unlikely_winner"])
+        self.assertEqual([row["name"] for row in found][:2], ["likeliest_winner", "unlikely_winner"])
+        self.assertLessEqual({row["name"] for row in found[2:]}, {"cheapest_delivered_with_lowest_rated_carrier"})
         self.assertTrue(all(row["probability_is_estimated"] and row["probability_standard_error"] >= 0 for row in found))
         self.assertNotIn("probability_is_estimated", variants.of(
             self.natural, {"kind": "cheapest_matching_available", "concept_id": SHOES, "predicates": SIZE}, self.api)[0])
