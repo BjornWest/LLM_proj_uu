@@ -231,13 +231,16 @@ def _integer_in_quote(value, evidence, answer):
 def validate_claims(value, answer, *, schema=None, semantic_fields=()):
     """Ground declared top-level claims, including task-specific field names.
 
-    Literal strings and nonnegative numeric counts need matching quoted values.
-    Normalized status keeps its legacy semantic contract; other semantic values
-    (for example booleans or verdicts) still need the task adapter's binding.
-    A trusted adapter may defer value binding for explicit semantic_fields;
-    quote/null/schema/type checks always remain mandatory. The adapter must then
-    bind their meaning (for example a normalized decimal) to the quoted answer.
-    Nested task structures and monetary claims keep their separate validators.
+    Ordinary literal strings and nonnegative counts need matching quoted values.
+    The extractor interprets categorical/Boolean meaning and ambiguity. Booleans
+    already have quote-only binding; declaring them records semantic ownership.
+    For other semantic_fields, shared literal/numeral value binding is skipped.
+    Schema/type/null and exact quote checks always remain mandatory.
+    Adapters must mechanically ground normalized decimals and other literal or
+    numeric fields that bypass shared binding, plus task-specific values.
+    Native graders compare supplied meanings against references. Normalized
+    status retains its legacy contract. Existing shared monetary checks and
+    separate nested/task-specific validators remain in place.
     """
     schema=schema or SCHEMA
     value=normalize_claims(value,schema=schema)
