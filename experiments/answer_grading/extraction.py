@@ -1,6 +1,5 @@
 """Untrusted prose -> grounded claims. No world, oracle, browser, or network access."""
 from copy import deepcopy
-from decimal import Decimal
 import json
 
 from jsonschema import Draft202012Validator
@@ -22,7 +21,7 @@ def claim(kind='string', **extra):
 
 MONEY = obj({'amount': {'type': 'string', 'description': 'Decimal major-currency amount, e.g. 571.25. Do not compute missing totals.'},
              'currency': {'type': 'string', 'enum': ['SEK', 'EUR', 'USD', 'GBP']},
-             'evidence': {'type': 'string', 'description': 'Exact final-answer quote including the amount and currency.'}})
+             'evidence': {'type': 'string', 'description': 'Exact final-answer quote stating amount and currency; interpretation belongs to the extractor.'}})
 # Typed conditions retain explicit answer facts, never inferred eligibility.
 CONDITION = obj({
     'type': {'type':'string','enum':['coupon','membership','minimum_basket','additional_purchase','payment_method','delivery_method','other']},
@@ -76,7 +75,8 @@ Offer evidence may be a string or a nonempty list of EXACT contiguous quotes whe
 the same offer's facts appear in separate bullets or sentences. Each quoted span
 must occur verbatim in the final answer; do not join fragments into a fabricated quote.
 At least one offer quote must contain the claimed amount and currency together;
-each condition value must also occur in an offer quote. Include enough surrounding
+each condition value must also occur in an offer quote. Interpreting quoted amounts
+and currencies is your responsibility; validators do not reparse the quote. Include enough surrounding
 context to associate the passages with the SAME product, store and fulfilment.
 Do not compute a missing price or infer restrictions, expiry, eligibility or qualification.
 Do not borrow prices/conditions from other products, stores or fulfilment choices.
@@ -178,16 +178,6 @@ def strict_loads(text):
 def _quote(evidence, answer):
     if not isinstance(evidence, str) or not evidence.strip() or evidence not in answer:
         raise ValueError('Extraction evidence is not an exact final-answer quote')
-
-
-def _decimal(token):
-    token = token.replace(' ', '').replace('\xa0', '').replace('\u202f', '')
-    if ',' in token and '.' in token:
-        if token.rfind(',') > token.rfind('.'): token = token.replace('.', '').replace(',', '.')
-        else: token = token.replace(',', '')
-    elif ',' in token:
-        token = token.replace(',', '.') if len(token.rsplit(',', 1)[1]) <= 2 else token.replace(',', '')
-    return Decimal(token)
 
 
 def money_minor(value):

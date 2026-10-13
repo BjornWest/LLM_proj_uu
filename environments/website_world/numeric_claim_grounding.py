@@ -4,20 +4,6 @@ from decimal import Decimal, InvalidOperation
 from experiments.answer_grading.extraction import _quote
 
 
-def number_in_quote(expected, evidence, answer):
-    """Compatibility provenance API; supplied numeric meaning is extractor-owned.
-
-    This does not prove the quote states the number. Native outcome comparisons
-    check the supplied value; extraction accuracy is evaluated separately.
-    """
-    _quote(evidence, answer)
-    try:
-        number = Decimal(str(expected))
-    except InvalidOperation:
-        return False
-    return number.is_finite()
-
-
 def validate_mean_claim(claim, answer):
     """Require a finite typed mean and its authentic quote, without prose parsing."""
     if claim['value'] is None:

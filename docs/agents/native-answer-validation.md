@@ -46,14 +46,23 @@ rewrites raw claims or repairs wrong native targets.
 new callers do not use it. It proves a quote exists, not an absence assertion.
 Categorical product-option schema expansion remains deferred.
 
-Atomic public facts use extractor-supplied typed scalar/array values and canonical
-qualifiers. The validator checks schema, null consistency and authentic nonempty
-quotes; the native grader compares the supplied values directly, without stripping
-English reference-configuration labels. Genuine observed state/action objectives
-remain unchanged. The reviewed variant-reset adapter follows the same Boolean
-boundary. Wrong extracted values fail native outcomes; an erroneous extraction
-that coincides with the reference is an extractor-quality issue, not something
-this validator reinterprets.
+The atomic consumer and variant-reset paragraphs below state the prospective
+contract after separately owned Website dependencies are composed. Their source
+cleanup is not included in this native/shared commit; until then those consumers
+may retain the old answer parser. Neither this document nor source review claims
+runtime adoption.
+
+Atomic public facts will use extractor-supplied typed scalar/array values and
+qualifiers. The consumer will check schema, null consistency and authentic
+nonempty quotes. Canonical qualifier menus remain supported; without a menu,
+the extractor interprets the stated configuration/scope rather than retaining a
+presentation heading as part of the qualifier value. The modern native grader
+now compares supplied values directly without stripping English labels; frozen
+native bases already compare directly. The reviewed variant-reset dependency
+uses the same extractor-owned Boolean boundary. Genuine observed state/action
+objectives remain unchanged. Wrong extracted values fail native outcomes; an
+erroneous extraction that coincides with the reference is an extractor-quality
+issue, not something this validator reinterprets.
 
 Regexes used for captured address normalization, native source/corpus syntax,
 identifier/date syntax, runtime rendering and synthetic extractor test generation

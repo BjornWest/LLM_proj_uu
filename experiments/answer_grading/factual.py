@@ -43,7 +43,6 @@ def validate_details(rows, final_answer):
         value = row['value']
         if isinstance(value, dict):
             _quote(value['evidence'], final_answer); money_minor(value)
-            money_minor({**value, 'evidence': quote})
         elif isinstance(value, str) and value not in quote:
             raise ValueError('Detail value absent from evidence')
         elif type(value) in (int, float):

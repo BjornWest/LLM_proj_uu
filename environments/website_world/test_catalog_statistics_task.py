@@ -339,3 +339,11 @@ def test_filtered_citation_preserves_all_models_for_listing_grain_too():
 def test_empty_population_does_not_credit_an_unrelated_filtered_empty_search():
     w,s,t,r,sites=rich_citation_fixture(empty=True);text,c=answer(r,'https://compare.test/search?q=foreign')
     assert not CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('currency',['NOK','kr','sek','CHF','wrong_currency'])
+def test_wrong_schema_valid_currency_is_graded_false_not_an_admission_error(currency):
+    w,s,t,r,sites=fixture();text,c=answer(r)
+    text+=' The stated currency is '+currency+'.'
+    c['currency']={'value':currency,'evidence':text}
+    assert not CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)['structured_claims_correct']

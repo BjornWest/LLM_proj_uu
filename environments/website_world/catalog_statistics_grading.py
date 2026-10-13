@@ -64,8 +64,6 @@ class CatalogStatisticsGrader:
                 try:amount=Decimal(value)
                 except InvalidOperation:raise ValueError('Invalid quoted statistic')
                 if not amount.is_finite():raise ValueError('Nonfinite quoted statistic')
-            elif key=='currency' and value not in ('SEK','EUR','USD','GBP'):
-                raise ValueError('Unsupported extracted currency')
         return c
 
     def grade(self,claims,answer):
