@@ -10,7 +10,7 @@ from collections import Counter
 from copy import deepcopy
 from fractions import Fraction
 from itertools import permutations, product
-from math import exp, prod
+from math import erfc, exp, prod
 from pathlib import Path
 from random import Random
 from tempfile import TemporaryDirectory
@@ -31,6 +31,8 @@ GRIP = {"aspect": "wet_paving_grip", "context": {"activity": "walking", "surface
 VALUE = {"aspect": "value", "context": {"basis": "recorded purchase price"}}
 COMFORT = {"aspect": "walking_comfort", "context": {"source": "first_hand"}}
 HEAT = {"aspect": "footbed_heat", "context": {"body_contact": "footbed"}}
+ROOM = {"aspect": "forefoot_room", "context": {"body_region": "forefoot"}}
+FIT = {"aspect": "size_fit", "context": {"body_region": "foot length"}}
 
 
 class Reviews(unittest.TestCase):
@@ -59,14 +61,26 @@ class Reviews(unittest.TestCase):
                 # Rare counts: a pile of complaints; praise and not one complaint.
                 self.need(negative={"min": 12}), self.need(positive={"min": 6}, negative={"max": 0}),
                 self.need(self.shoes[3], VALUE, verdict="more_positive", positive={"min": 5}),
-                self.need(self.sandals[0], HEAT, verdict="tie", positive={"min": 2, "max": 3})]
+                self.need(self.sandals[0], HEAT, verdict="tie", positive={"min": 2, "max": 3}),
+                # The two topics with more behind the score than the rating: the option and the wearer; the size.
+                self.need(self.widths()[0], ROOM, verdict="more_negative", negative={"min": 5}),
+                self.need(self.fitting("true_to_size"), FIT, positive={"max": 0}, negative={"min": 2}),
+                self.need(self.sandals[1], FIT, verdict="more_negative", min_assessed=2)]
+
+    def widths(self):
+        """The shoes sold in most widths first: there the option bought moves the room at the forefoot most."""
+        return sorted(self.shoes, key=lambda name: -len({sku["width"] for sku in self.item(self.natural, name)["public"]["skus"]}))
+
+    def fitting(self, tendency):
+        return next(name for name in self.shoes if self.item(self.natural, name)["private"]["fit_tendency"] == tendency)
 
     def cases(self):
         """A product and a topic for every adjustment the producer makes to an aspect's centre."""
         cushioned = next(p["public"]["product_id"] for p in self.natural["products"]
                          if p["public"]["concept_id"] == SHOES and p["public"]["facts"]["cushioning"] == "substantial")
         return [(self.shoes[0], GRIP), (self.shoes[1], VALUE), (cushioned, COMFORT), (self.sandals[0], HEAT),
-                (self.sandals[1], {"aspect": "heel_rubbing", "context": {}})]
+                (self.sandals[1], {"aspect": "heel_rubbing", "context": {}}),
+                (self.widths()[0], ROOM), (self.sandals[0], ROOM), (self.fitting("true_to_size"), FIT), (self.sandals[1], FIT)]
 
 
 class ModelTests(Reviews):
@@ -104,7 +118,7 @@ class ModelTests(Reviews):
                               for row in shares}), 3)
 
     def test_stars_and_scores_match_other_seeds(self):
-        for product, topic in self.cases()[:3]:
+        for product, topic in self.cases()[:3] + self.cases()[5:]:
             with self.subTest(product=product, aspect=topic["aspect"]):
                 requirement = self.need(product, topic, verdict="tie")
                 place, reading = reviews.site(self.natural, requirement, self.api), reviews.trial(self.natural, requirement, self.api)
@@ -121,6 +135,50 @@ class ModelTests(Reviews):
                 for rating in model:
                     written = sum(bool(row[2]) for row in rows if row[0] == rating) / seen[rating]
                     self.assertLess(abs(written - .25), 4.5 * (.25 * .75 / seen[rating]) ** .5, rating)
+
+    def test_the_two_topics_with_more_behind_the_score_than_the_rating(self):
+        wide = reviews.site(self.natural, self.need(self.widths()[0], ROOM, verdict="tie"), self.api)
+        skus = self.item(self.natural, self.widths()[0])["public"]["skus"]
+        self.assertGreater(len({sku["width"] for sku in skus}), 1)
+        self.assertAlmostEqual(sum(wide.leans.values()), 1, places=12)
+        # The option bought and the wearer are uniform choices: three wearers to every option.
+        direct = Counter(reviews.WIDTHS.index(sku["width"]) - index for sku in skus for index in range(3))
+        self.assertEqual({lean: round(share * len(skus) * 3) for lean, share in wide.leans.items()}, dict(direct))
+        self.assertEqual([key[2].rsplit("/", 1)[1] for key in reviews.keys(wide, 0)[:4]], ["rating", "sku", "wearer_width", "forefoot_room"])
+        # A wider option than the wearer's own is praised more, by the producer's own draw of both.
+        rows = [(sku["width"], wearer, score) for index in range(40) for seed in range(300)
+                for sku, wearer, score in [self.roomy(wide, index, seed)]]
+        by = lambda lean: [score >= .5 for width, wearer, score in rows
+                           if reviews.WIDTHS.index(width) - reviews.WIDTHS.index(wearer) == lean]
+        shares = {lean: sum(by(lean)) / len(by(lean)) for lean in wide.leans}
+        self.assertEqual(sorted(shares, key=shares.get), sorted(shares))
+        self.assertGreater(shares[max(shares)] - shares[min(shares)], .1)
+        # Whether the size fits does not follow the stars, and does follow the brand's sizing.
+        fits = {}
+        for name in self.shoes + self.sandals:
+            place = reviews.site(self.natural, self.need(name, FIT, verdict="tie"), self.api)
+            self.assertEqual(len({reviews.sided(place, rating) for rating in range(1, 6)}), 1)
+            self.assertAlmostEqual(sum(reviews.sided(place, 3)), 1, places=12)
+            fits[place.tendency] = reviews.favourable(place, 3)
+            self.assertEqual([key[2].rsplit("/", 1)[1] for key in reviews.keys(place, 0)[:3]],
+                             ["rating", "size_adjustment", "size_experience"])
+        self.assertGreater(len(fits), 1)
+        self.assertGreater(fits["true_to_size"], max(share for name, share in fits.items() if name != "true_to_size") + .2)
+        # By the normal distribution written out: at the brand's own offset, half a size either way or none.
+        normal = lambda x: erfc(-x / 2 ** .5) / 2
+        for name, share in fits.items():
+            offset = {"true_to_size": 0, "runs_small": -.5, "runs_large": .5}[name]
+            direct = sum(weight / 10 * (normal((.3 - offset - move) / .2) - normal((-.3 - offset - move) / .2))
+                         for move, weight in ((0, 8), (.5, 1), (-.5, 1)))
+            self.assertAlmostEqual(share, direct, places=12)
+
+    @staticmethod
+    def roomy(place, index, seed):
+        """One review's option, wearer and score for the room at the forefoot, by the producer's own lines."""
+        footwear, key = place.footwear, f"reviews/{place.concept}/{index}"
+        sku = footwear.stream(seed, key + "/sku").choice(place.skus)
+        wearer = footwear.stream(seed, key + "/wearer_width").choice(["narrow", "standard", "wide"])
+        return sku, wearer, reviews.drawn(place, index, seed)[1]
 
     def test_topic_inclusion_matches_enumeration(self):
         weights = {"a": 1.3, "b": 1.0, "c": 1.25, "d": .4, "e": 2.0, "f": 0}
@@ -214,6 +272,12 @@ class StarTests(Reviews):
                 self.need(positive={"min": 2}, mean_rating={"min": round(usual - .1, 2), "max": round(usual + .1, 2)}),
                 self.need(self.sandals[0], HEAT, verdict="more_positive", mean_rating={"max": round(other - .15, 2)})]
 
+    def uneven(self):
+        """The size fits or not apart from the stars; the room at the forefoot follows them and the option bought."""
+        fit, room = self.sandals[1], self.widths()[0]
+        return [self.need(fit, FIT, verdict="more_positive", mean_rating={"max": round(self.typical(fit) - .2, 2)}),
+                self.need(room, ROOM, negative={"min": 2}, mean_rating={"min": round(self.typical(room) + .1, 2)})]
+
     def synthetic(self, count, **stated):
         """A few reviews with arbitrary chances of each rating and class, small enough to enumerate."""
         rng = Random(5)
@@ -225,7 +289,7 @@ class StarTests(Reviews):
         return place, cells, reviews.marginal(cells)
 
     def test_a_reviews_stars_and_class_together_match_other_seeds(self):
-        for product, topic in self.cases()[:3]:
+        for product, topic in self.cases()[:3] + self.cases()[5:8:2]:
             with self.subTest(product=product, aspect=topic["aspect"]):
                 requirement = self.need(product, topic, verdict="tie")
                 place, reading = reviews.site(self.natural, requirement, self.api), reviews.trial(self.natural, requirement, self.api)
@@ -306,7 +370,7 @@ class StarTests(Reviews):
 
     def test_probabilities_match_other_seeds(self):
         trials = 4000
-        for requirement in self.starred():
+        for requirement in self.starred() + self.uneven():
             with self.subTest(requirement=requirement):
                 block = reviews.model(self.natural, requirement, self.api)
                 seen = reviews.empirical(self.natural, requirement, self.api, trials, 10 ** 6)
@@ -366,7 +430,7 @@ class StarTests(Reviews):
             # The rare ones: complaints under a high mean rating, praise under a low one, and a mean alone.
             self.need(verdict="more_negative", mean_rating={"min": 4}),
             self.need(verdict="more_positive", min_assessed=3, mean_rating={"max": 2}),
-            self.need(mean_rating={"min": round(usual + .8, 2)})]
+            self.need(mean_rating={"min": round(usual + .8, 2)})] + self.uneven()
         for index, requirement in enumerate(needs):
             with self.subTest(requirement=requirement):
                 product = requirement["product_id"]
@@ -448,7 +512,7 @@ class FirstPageTests(Reviews):
         return (shown["positive"], shown["negative"]), reference
 
     def test_a_reviews_stars_and_kind_together_match_other_seeds(self):
-        for product, topic in self.cases()[:3]:
+        for product, topic in self.cases()[:3] + self.cases()[5:8:2]:
             with self.subTest(product=product, aspect=topic["aspect"]):
                 requirement = self.need(product, topic, verdict="tie")
                 place, reading = reviews.site(self.natural, requirement, self.api), reviews.trial(self.natural, requirement, self.api)
@@ -587,9 +651,11 @@ class ProducerTests(Reviews):
                                                           inventory=declared)
                 self.assertEqual((reference["subject"]["product_id"], reference["counts"]), (product, counts))
                 self.assertEqual(requirement.get("verdict", reference["verdict"]), reference["verdict"])
-                # Only this product's reviews moved; who bought which option is the seed's own.
+                # Only this product's reviews moved; who bought which option is the seed's own, but for the room
+                # at the forefoot, where the option's width moves the score and is drawn with it.
                 before, after = self.item(self.natural, product), self.item(world, product)
-                self.assertEqual([row["sku_id"] for row in after["reviews"]], [row["sku_id"] for row in before["reviews"]])
+                self.assertEqual([row["sku_id"] for row in after["reviews"]] == [row["sku_id"] for row in before["reviews"]],
+                                 requirement["topic"] is not ROOM)
                 self.assertNotEqual([row["rating"] for row in after["reviews"]], [row["rating"] for row in before["reviews"]])
                 self.assertEqual({k: v for k, v in after.items() if k not in ("reviews", "rating_summary")},
                                  {k: v for k, v in before.items() if k not in ("reviews", "rating_summary")})
@@ -671,7 +737,6 @@ class ProducerTests(Reviews):
                     {**good, "negative": {"min": 3, "max": 2}}, {**good, "min_assessed": 0},
                     {k: v for k, v in good.items() if k != "verdict"}, self.need(positive={"min": 1}, min_assessed=2),
                     {**good, "topic": {"aspect": "wet_paving_grip"}}, {**good, "topic": {**GRIP, "context": {"surface": "ice"}}},
-                    {**good, "topic": {"aspect": "size_fit", "context": {}}}, {**good, "topic": {"aspect": "forefoot_room", "context": {}}},
                     {**good, "topic": {"aspect": "footbed_heat", "context": {}}}, {**good, "sku_id": "x"}, None):
             for call in (reviews.model, reviews.trial, lambda *a: reviews.prepare(*a, Random(0))):
                 with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
@@ -717,7 +782,7 @@ class ProducerTests(Reviews):
                 self.assertLess(row["log_probability"], next(
                     other["log_probability"] for other in plain if other["requirement"]["verdict"] == seen["verdict"]))
         for bad in ({**task, "operation": "rating_summary"}, {**task, "subject_scope": "sku"}, {**task, "product_index": 99},
-                    {**task, "sku_index": 0}, {**task, "topic": {"aspect": "size_fit", "context": {}}},
+                    {**task, "sku_index": 0}, {**task, "topic": {"aspect": "footbed_heat", "context": {}}},
                     {k: v for k, v in task.items() if k != "topic"}, {k: v for k, v in task.items() if k != "concept_id"}):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 variants.of(self.natural, bad, self.api)
