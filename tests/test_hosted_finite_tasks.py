@@ -85,4 +85,18 @@ class FiniteTaskTests(unittest.TestCase):
    for key,name,value in [('canonical','false.json',{'task_completed':False,'technical_error':None}),('public_task','task.json',{'user_message':'other'}),('HTTP','wrong-HTTP.json',{'derived_evaluation':{'binding_status':'verified','structured_claims_correct':False}})]:
     with self.subTest(key=key),self.assertRaises(ValueError):caller.verify_finite_ready_case({},c,{**row,key:write(name,value)})
 
+ def test_missing_optional_pool_asset_requires_full_checked_export(self):
+  with tempfile.TemporaryDirectory()as tmp:
+   p=Path(tmp);names=['intent_browser/chromium_pool.py','intent_browser/assets/chromium_pool.cjs','intent_browser/shared_browsergym.py','intent_browser/browser_shutdown.py','intent_browser/runner.py'];files={}
+   for name in names:
+    f=p/name;f.parent.mkdir(parents=True,exist_ok=True);f.write_text(name);f.chmod(0o644);files[name]={'sha256':caller.pin(f)['sha256'],'bytes':f.stat().st_size,'mode':'100644'}
+   manifest=p/'manifest.json';manifest.write_text(json.dumps({'source_sha256':{n:v['sha256']for n,v in files.items()if not n.endswith('.cjs')}}))
+   index=p/'index.json';index.write_text(json.dumps({'format':'private-frozen-source-capsule-v1','roots':{'test':{'root':str(p),'commit':'test','files':files}}}))
+   c={'id':'qwen-test','root':str(p),'commit':'test','recipe_manifest':caller.pin(manifest),'source_export':{'index':caller.pin(index),'root_id':'test'}}
+   s={'hosted_limit_profile':'finite-task-limits-v1','cases':[c],'start_order':[c['id']],'helpers':caller.pin(ROOT/'scripts/comparison_suite_helpers.py')}
+   caller.check_pool_source_pins(s)
+   with self.assertRaises(ValueError):caller.check_pool_source_pins({**s,'hosted_limit_profile':None})
+   bad=json.loads(manifest.read_text());bad['source_sha256'][names[0]]='0'*64;manifest.write_text(json.dumps(bad));c['recipe_manifest']=caller.pin(manifest)
+   with self.assertRaises(ValueError):caller.check_pool_source_pins(s)
+
 if __name__=='__main__':unittest.main()

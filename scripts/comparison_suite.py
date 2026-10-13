@@ -416,8 +416,16 @@ def check_pool_source_pins(spec):
  expected={name:pin(Path(first['root'])/name)['sha256']for name in required}
  for case in queue_cases(spec).values():
   declared=load(checked(case['recipe_manifest'])).get('source_sha256',{})
-  if any(declared.get(name)!=digest for name,digest in expected.items()):
+  missing={name:digest for name,digest in expected.items() if name not in declared}
+  if any(name in declared and declared[name]!=digest for name,digest in expected.items()):
    raise ValueError('Pending case pooled runtime source pins disagree')
+  if missing:
+   if spec.get('hosted_limit_profile')!='finite-task-limits-v1' or 'source_export' not in case:
+    raise ValueError('Pending case pooled runtime source pins disagree')
+   # New task-instance collectors may omit optional shared-harness modules.
+   # The explicit frozen execution index supplements absences only; a native
+   # declaration is never overwritten and actual bytes/modes remain checked.
+   helper(spec)['verify_source_export'](case['root'],case['commit'],case['source_export'],missing)
   for name,digest in expected.items():checked({'path':str(Path(case['root'])/name),'sha256':digest})
  return expected
 
