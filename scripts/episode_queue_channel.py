@@ -69,6 +69,8 @@ class ChildAdmission:
             raise ValueError('Invalid child admission identity/cancellation class')
         self.connection, self.case_id, self.cancellation_type = connection, case_id, cancellation_type
         self.ready_sent = self.active = False
+        self.step_sequence = 0
+        self.open_step = None
 
     def _reply(self, kind):
         value = _receive(self.connection)
@@ -90,10 +92,33 @@ class ChildAdmission:
         self.active = True
 
     def before_dispatch(self):
-        if not self.active:
-            raise ChannelError('Provider dispatch before native environment activation')
+        if not self.active or self.open_step is not None:
+            raise ChannelError('Provider dispatch before activation or during browser step')
         _send(self.connection, {'case': self.case_id, 'type': 'dispatch'})
         self._reply('allow')
+
+    def _step_reply(self, kind, sequence):
+        value = _receive(self.connection)
+        if value is not None and value.get('case') == self.case_id and value.get('type') == 'cancel' and set(value) == {'case','type','reason'}:
+            raise self.cancellation_type(str(value['reason']))
+        if value != {'case':self.case_id,'type':kind,'sequence':sequence}:
+            raise ChannelError('Closed or mismatched browser-step acknowledgement')
+
+    def step_started(self):
+        if not self.active or self.open_step is not None:
+            raise ChannelError('Browser step before activation or nested step')
+        self.step_sequence += 1
+        self.open_step = self.step_sequence
+        _send(self.connection, {'case':self.case_id,'type':'browser_step_start','sequence':self.open_step})
+        self._step_reply('step_allow',self.open_step)
+
+    def step_finished(self):
+        if self.open_step is None:
+            raise ChannelError('Browser step completion without start')
+        sequence = self.open_step
+        _send(self.connection, {'case':self.case_id,'type':'browser_step_end','sequence':sequence})
+        self._step_reply('step_done',sequence)
+        self.open_step = None
 
 
 def serve_admission(connection, admission, *, expected_run_root):
@@ -107,12 +132,17 @@ def serve_admission(connection, admission, *, expected_run_root):
     root = Path(expected_run_root).resolve()
     ready = None
     dispatches = 0
+    step_sequence = 0
+    open_step = None
     while True:
         value = _receive(connection)
         if value is None:
             if ready is None:
                 raise ChannelError('Child closed before environment readiness')
-            return {'ready': ready, 'guarded_dispatches': dispatches}
+            if open_step is not None:
+                raise ChannelError('Child closed during browser step; effects unknown')
+            return {'ready': ready, 'guarded_dispatches': dispatches,
+                **({'browser_steps':step_sequence} if step_sequence else {})}
         if value.get('case') != admission.case_id:
             raise ChannelError('Foreign case admission frame')
         if value.get('type') == 'ready':
@@ -133,7 +163,26 @@ def serve_admission(connection, admission, *, expected_run_root):
                 _send(connection, {'case': admission.case_id, 'type': 'cancel', 'reason': str(exc)})
                 raise
             _send(connection, {'case': admission.case_id, 'type': 'activate'})
-        elif value == {'case': admission.case_id, 'type': 'dispatch'} and ready is not None:
+        elif value.get('type') in ('browser_step_start','browser_step_end') and ready is not None:
+            if set(value) != {'case','type','sequence'} or type(value['sequence']) is not int:
+                raise ChannelError('Malformed browser-step boundary')
+            sequence = value['sequence']
+            starting = value['type'] == 'browser_step_start'
+            if ((starting and (open_step is not None or sequence != step_sequence+1))
+                    or (not starting and (open_step is None or sequence != open_step))):
+                raise ChannelError('Unpaired browser-step boundary')
+            try:
+                admission.check_active()
+                callback = getattr(admission,'step_started' if starting else 'step_finished',None)
+                if not callable(callback):raise ChannelError('Browser-step watchdog not enabled')
+                callback(sequence)
+            except Exception as exc:
+                _send(connection, {'case': admission.case_id, 'type':'cancel','reason':str(exc)})
+                raise
+            if starting:step_sequence = sequence;open_step = sequence
+            else:open_step = None
+            _send(connection, {'case':admission.case_id,'type':'step_allow' if starting else 'step_done','sequence':sequence})
+        elif value == {'case': admission.case_id, 'type': 'dispatch'} and ready is not None and open_step is None:
             try:
                 admission.check_active()
             except Exception as exc:

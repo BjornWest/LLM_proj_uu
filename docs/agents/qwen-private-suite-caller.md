@@ -289,3 +289,26 @@ and included in the input estimate. This does not enforce quote substring
 authenticity or semantic correctness, replace native grading, or authorize retries.
 Existing frozen callers retain their original schema; provider acceptance of the
 refined schema requires separate real formatter qualification.
+
+
+### Optional whole-browser-step containment
+
+Future callers may set `browser_step_watchdog_seconds` to an integer from 1 to 600
+(default `None`, disabled), and `env_step_telemetry` to an explicit boolean
+(default omitted, preserving the runner's existing choice). This does not change
+model messages, native tool arguments, episode duration or generation deadlines.
+
+The child pairs trusted start/end acknowledgements around the entire `env.step`
+call. The parent uses its own monotonic clock, checks active admission and exact
+sequence, and bounds that call plus the existing cleanup grace. Lookup, action
+execution, callbacks and post-action observation all fall inside this boundary.
+Completion restores the earlier active/rental deadline; a slow model generation
+is covered only by its separate provider watchdog. A step cannot extend the
+active deadline, nest, send a provider request or silently close its channel.
+
+On expiry, only the case-owned bounded launcher is terminated and its channel is
+closed. The shared Chromium service and healthy siblings are preserved. Record
+an infrastructure failure with unknown action effects; never replay the action
+or report that it was not executed. Native cleanup budgets and actual browser,
+grading and viewer acceptance remain separate qualification requirements. CPU
+containment checks alone do not establish healthy pooled leases after a timeout.

@@ -154,6 +154,33 @@ def verify_ready_case(s,c,row):
      or result['result']['viewer_projection'].get('task_completed') is not True):
   raise ValueError('Acceptance does not bind this scripted case/driver/recipe')
 
+def browser_step_options(spec):
+ seconds=spec.get('browser_step_watchdog_seconds')
+ if seconds is not None and (type(seconds) is not int or not 1<=seconds<=600):
+  raise ValueError('Browser-step watchdog must be None or integer1..600 seconds')
+ telemetry=spec.get('env_step_telemetry')
+ if telemetry is not None and type(telemetry) is not bool:
+  raise ValueError('Explicit boolean env_step_telemetry required')
+ return seconds,telemetry
+
+
+def watch_browser_steps(env,admission):
+ """Pair trusted boundaries around env.step without rewriting any action."""
+ original=env.step
+ def step(*args,**kwargs):
+  admission.step_started()
+  try:result=original(*args,**kwargs)
+  except BaseException:
+   # Preserve the native failure, including a signal. Parent containment still
+   # applies if the end acknowledgement is lost during cleanup.
+   try:admission.step_finished()
+   except BaseException:pass
+   raise
+  admission.step_finished()
+  return result
+ env.step=step
+ return env
+
 class CaseWatchdog:
  """Parent-owned wall-clock limits, independent of child's signal handling.
 
@@ -161,10 +188,12 @@ class CaseWatchdog:
  activation starts the agreed episode budget. Expiry stops the owned bounded
  launcher and closes its control socket. Containment is not native cleanup.
  """
- def __init__(self,process,connection_holder,*,startup_seconds,episode_seconds,cleanup_grace_seconds=30,stop_event=None,clock=time.monotonic,rental_deadline=None):
+ def __init__(self,process,connection_holder,*,startup_seconds,episode_seconds,cleanup_grace_seconds=30,stop_event=None,clock=time.monotonic,rental_deadline=None,browser_step_seconds=None):
   for value in (startup_seconds,cleanup_grace_seconds)+(() if episode_seconds is None else (episode_seconds,)):
    if type(value) not in (int,float) or not math.isfinite(value) or value<=0:raise ValueError('Positive finite case watchdog limits required')
   if episode_seconds is None and (type(rental_deadline) not in (int,float) or not math.isfinite(rental_deadline) or rental_deadline<=clock()):raise ValueError('No episode ceiling requires a future finite rental deadline')
+  if browser_step_seconds is not None and (type(browser_step_seconds) not in (int,float) or not math.isfinite(browser_step_seconds) or browser_step_seconds<=0):raise ValueError('Positive finite browser-step deadline required')
+  self.browser_step_seconds=browser_step_seconds;self.open_step=None;self.active_deadline=None;self.step_sequence=0
   self.rental_deadline=rental_deadline
   self.process,self.connections,self.clock=process,connection_holder,clock
   self.episode_seconds=episode_seconds;self.grace=cleanup_grace_seconds;self.suite_stop=stop_event
@@ -180,6 +209,20 @@ class CaseWatchdog:
   with self.lock:
    if self.failure is not None:raise CaseDeadline(str(self.failure))
    self.phase='active';self.deadline=(self.rental_deadline if self.episode_seconds is None else self.clock()+self.episode_seconds)+self.grace
+   self.active_deadline=self.deadline
+ def step_started(self,sequence):
+  with self.lock:
+   if (self.failure is not None or self.phase!='active' or self.open_step is not None
+       or self.browser_step_seconds is None or type(sequence) is not int
+       or sequence!=self.step_sequence+1 or self.clock()>=self.deadline):
+    raise CaseDeadline('Browser-step watchdog unavailable or invalid boundary')
+   self.step_sequence=sequence;self.open_step=sequence;self.phase='browser_step'
+   self.deadline=min(self.active_deadline,self.clock()+self.browser_step_seconds+self.grace)
+ def step_finished(self,sequence):
+  with self.lock:
+   if self.failure is not None or self.phase!='browser_step' or type(sequence) is not int or self.open_step!=sequence or self.clock()>=self.deadline:
+    raise CaseDeadline('Browser-step expired or mismatched; effects unknown')
+   self.open_step=None;self.phase='active';self.deadline=self.active_deadline
  def _run(self):
   while not self.stop.wait(.05):
    with self.lock:
@@ -191,7 +234,8 @@ class CaseWatchdog:
       try:connection.shutdown(socket.SHUT_RDWR)
       except OSError:pass
     if self.deadline is None or self.clock()<self.deadline:continue
-    self.failure={'phase':self.phase,'reason':'independent_case_deadline','observed_monotonic':self.clock()}
+    self.failure={'phase':self.phase,'reason':'independent_case_deadline','observed_monotonic':self.clock(),
+     **({'browser_step_sequence':self.open_step,'effects':'unknown'}if self.open_step is not None else {})}
    try:self.process.terminate() # Popen owns/reaps the launcher PID; it kills its bounded scope.
    except ProcessLookupError:pass
    finally:
@@ -234,6 +278,8 @@ class WatchedAdmission:
  def __getattr__(self,name):return getattr(self.admission,name)
  def environment_ready(self,ready=None):
   self.watchdog.ready();self.admission.environment_ready(ready);self.watchdog.activate()
+ def step_started(self,sequence):self.watchdog.step_started(sequence)
+ def step_finished(self,sequence):self.watchdog.step_finished(sequence)
 def source_guard(s,c=None):
  checked(s['driver']);checked(s['helpers']);checked(s['events_helper'])
  if c is not None:
@@ -262,6 +308,7 @@ def source_guard(s,c=None):
  elif not Path(s['driver']['path']).read_bytes()==subprocess.check_output(['git','-C',s['caller_root'],'show',s['caller_commit']+':scripts/comparison_suite.py']):raise ValueError('Caller differs from committed source')
 
 def check_release(s):
+ browser_step_options(s)
  source_guard(s)
  if qwen_mode(s):return check_qwen_release(s)
  if hosted_qwen_mode(s):return check_hosted_release(s)
@@ -665,7 +712,10 @@ def execute(s,c,scripted=False):
    original=env.reset
    def reset(*a,**k):timings['reset_calls']+=1;return original(*a,**k)
    env.reset=reset
+   if browser_step_options(s)[0] is not None:watch_browser_steps(env,admission)
    return env
+  _,telemetry=browser_step_options(s)
+  if telemetry is not None:kw['env_step_telemetry']=telemetry
   return native_run(make_env,b,metadata,**kw)
  def projection(*,trace,grade):
   if not Path(trace).resolve().is_relative_to(out/'live/runs'):raise ValueError('Trace escaped case')
@@ -772,6 +822,7 @@ def supervise(s,scripted=False):
   for kind,handler in previous.items():signal.signal(kind,handler)
 
 def _supervise(s,scripted=False,stop=None):
+ browser_step_options(s)
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
  if s.get('shared_chromium') and not scripted and not pooled_model_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')
  if qwen_mode(s):validate_qwen_limits(s)
@@ -854,7 +905,7 @@ def _supervise(s,scripted=False,stop=None):
      stdout=(out/(ident+'-stdout.log')).open('x');stderr=(out/(ident+'-stderr.log')).open('x')
      if capacity_host is not None:capacity_host.begin_relay(ident)
      process=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','2048','--tasks','256','--receipt',str(out/(ident+'-bounded')),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',s['driver']['path'],'scripted-case' if scripted else 'case',str(runtime),ident],stdout=stdout,stderr=stderr,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
-     watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop,rental_deadline=time.monotonic()+s['suite_deadline_utc']-time.time() if hosted_qwen_mode(s) else None if serving is None else time.monotonic()+serving.deadline-time.time())
+     watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop,browser_step_seconds=browser_step_options(s)[0],rental_deadline=time.monotonic()+s['suite_deadline_utc']-time.time() if hosted_qwen_mode(s) else None if serving is None else time.monotonic()+serving.deadline-time.time())
      connection,_=listeners[ident].accept();connection.settimeout(s['suite_timeout'])
      connections['connection']=connection
      # Ready receipt precedes gate; activation reply is emitted only under queue's cap.
