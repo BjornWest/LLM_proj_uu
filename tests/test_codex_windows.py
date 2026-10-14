@@ -2,6 +2,7 @@
 import asyncio
 import base64
 import importlib.util
+import io
 import json
 from pathlib import Path
 import tempfile
@@ -359,11 +360,85 @@ class Recovery(unittest.TestCase):
         seen = []
         async def capture(*args, **kwargs):
             seen.append(kwargs['force'])
-        with patch.object(cw, 'capture_all', new=capture):
+        with patch.object(cw, 'capture_all', new=capture), \
+             patch.object(cw, 'ensure_tracker', return_value=True):
             for command in ('save', 'capture'):
                 with patch.object(cw.sys, 'argv', ['codex-windows', command]):
                     self.assertEqual(cw.main(), 0)
         self.assertEqual(seen, [True, False])
+
+    def test_tracker_already_active_does_not_restart_it(self):
+        from subprocess import CompletedProcess
+        with patch.object(cw.subprocess, 'run', return_value=CompletedProcess([], 0, '', '')) as run:
+            self.assertTrue(cw.ensure_tracker())
+        run.assert_called_once_with(['systemctl', '--user', 'is-active', '--quiet',
+            'codex-windows-roster.timer'], timeout=5, capture_output=True, text=True)
+
+    def test_stopped_tracker_is_started_and_verified(self):
+        from subprocess import CompletedProcess
+        results = [CompletedProcess([], code, '', '') for code in (3, 0, 0)]
+        with patch.object(cw.subprocess, 'run', side_effect=results) as run, \
+             patch.object(cw.sys, 'stdout', new_callable=io.StringIO) as stdout:
+            self.assertTrue(cw.ensure_tracker())
+        self.assertEqual([call.args[0][2] for call in run.call_args_list],
+                         ['is-active', 'start', 'is-active'])
+        self.assertIn('Started automatic', stdout.getvalue())
+
+    def test_tracker_start_failure_is_visible_and_nonfatal(self):
+        from subprocess import CompletedProcess
+        with patch.object(cw.subprocess, 'run', side_effect=[
+                CompletedProcess([], 3, '', ''),
+                CompletedProcess([], 1, '', 'Failed to connect to bus')]), \
+             patch.object(cw.sys, 'stderr', new_callable=io.StringIO) as stderr:
+            self.assertFalse(cw.ensure_tracker())
+        self.assertIn('Failed to connect to bus', stderr.getvalue())
+        self.assertIn('recovery will continue', stderr.getvalue())
+
+    def test_tracker_start_success_is_not_assumed_without_verification(self):
+        from subprocess import CompletedProcess
+        with patch.object(cw.subprocess, 'run', side_effect=[
+                CompletedProcess([], code, '', '') for code in (3, 0, 3)]), \
+             patch.object(cw.sys, 'stderr', new_callable=io.StringIO) as stderr:
+            self.assertFalse(cw.ensure_tracker())
+        self.assertIn('did not become active', stderr.getvalue())
+
+    def test_tracker_checks_have_bounded_failures(self):
+        import subprocess
+        for error in (FileNotFoundError('systemctl unavailable'),
+                      subprocess.TimeoutExpired('systemctl', 5)):
+            with self.subTest(error=type(error).__name__), \
+                 patch.object(cw.subprocess, 'run', side_effect=error), \
+                 patch.object(cw.sys, 'stderr', new_callable=io.StringIO) as stderr:
+                self.assertFalse(cw.ensure_tracker())
+                self.assertIn('warning', stderr.getvalue())
+
+    def test_interactive_commands_check_tracker_and_read_only_commands_do_not(self):
+        async def noop(*args, **kwargs):
+            pass
+        cases = [([], True), (['save'], True), (['list'], False),
+                 (['--dry-run'], False), (['capture', '--all'], False),
+                 (['run', '--thread', A], False), (['install'], False),
+                 (['--no-tracker'], False), (['save', '--no-tracker'], False)]
+        for args, expected in cases:
+            with self.subTest(args=args), \
+                 patch.object(cw.sys, 'argv', ['codex-windows', *args]), \
+                 patch.object(cw, 'ensure_tracker', return_value=True) as ensure, \
+                 patch.object(cw, 'restore', new=noop), \
+                 patch.object(cw, 'capture_all', new=noop), \
+                 patch.object(cw, 'run_thread', return_value=0), \
+                 patch.object(cw, 'install'):
+                self.assertEqual(cw.main(), 0)
+                self.assertEqual(ensure.called, expected)
+
+    def test_tracker_failure_does_not_prevent_restore(self):
+        called = []
+        async def restore(*args, **kwargs):
+            called.append(True)
+        with patch.object(cw.sys, 'argv', ['codex-windows']), \
+             patch.object(cw, 'ensure_tracker', return_value=False), \
+             patch.object(cw, 'restore', new=restore):
+            self.assertEqual(cw.main(), 0)
+        self.assertEqual(called, [True])
 
     def test_timer_preserves_known_distribution_when_environment_lacks_it(self):
         with patch.dict(cw.os.environ, {'WSL_DISTRO_NAME': 'Ubuntu'}):

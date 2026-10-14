@@ -17,6 +17,13 @@ model or training jobs. It restores conversations rather than screen positions,
 shell history or arbitrary non-Codex windows. Already-running windows are left
 alone; the command does not rearrange or move existing terminal tabs.
 
+Normal recovery and `save` check that `codex-windows-roster.timer` is active.
+If it is stopped, they start it and verify that it became active. Each service
+command has a five-second timeout. A failed start prints a warning and allows
+window recovery to continue; it does not silently claim tracking is running.
+`list`, `restore --dry-run`, internal tab startup and periodic captures do not
+start the timer. Use `--no-tracker` to skip this check for an invocation.
+
 Inspect the selection without launching anything:
 
 ```bash
@@ -183,10 +190,12 @@ It refuses to overwrite an unrelated existing command/unit. Ensure
 `~/.local/bin` is on the interactive shell PATH. Installation does not change
 Windows startup or power settings.
 
-To disable tracking but retain recovery:
+To disable tracking but retain recovery, stop the timer and skip its automatic
+startup on subsequent recovery/save invocations:
 
 ```bash
 systemctl --user disable --now codex-windows-roster.timer
+codex-windows --no-tracker
 ```
 
 To uninstall, additionally remove the command and those two units, then run

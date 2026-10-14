@@ -601,18 +601,50 @@ def install():
     print('Installed codex-windows and automatic 30-second window roster timer.')
 
 
+def ensure_tracker():
+    """Repair a stopped timer on interactive use, without blocking recovery."""
+    unit = 'codex-windows-roster.timer'
+
+    def control(*args):
+        return subprocess.run(['systemctl', '--user', *args], timeout=5,
+                              capture_output=True, text=True)
+
+    try:
+        if control('is-active', '--quiet', unit).returncode == 0:
+            return True
+        result = control('start', unit)
+        if result.returncode:
+            detail = ' '.join(result.stderr.split())[:300] or 'systemctl start failed'
+            raise RuntimeError(detail)
+        if control('is-active', '--quiet', unit).returncode:
+            raise RuntimeError('timer did not become active after startup')
+    except (OSError, subprocess.SubprocessError, RuntimeError) as error:
+        print(f'codex-windows: warning: automatic window tracking is unavailable ({error}). '
+              'Window recovery will continue. Check systemctl --user status '
+              'codex-windows-roster.timer; use codex-windows install if the units are missing.',
+              file=sys.stderr)
+        return False
+    print('Started automatic Codex window tracking.')
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', nargs='?', default='restore',
                         choices=['restore', 'list', 'save', 'capture', 'run', 'install'])
     parser.add_argument('--cwd', default=os.getcwd(), help='Defaults to your current directory.')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--no-tracker', action='store_true',
+                        help='Skip automatic tracker startup for this invocation.')
     parser.add_argument('--all', action='store_true', help='Capture all currently open workspace groups.')
     parser.add_argument('--threads', nargs='+', help='Explicit root conversation IDs for save only.')
     parser.add_argument('--thread', help=argparse.SUPPRESS)
     args = parser.parse_args()
     cwd = canonical(args.cwd)
     try:
+        if not args.no_tracker and (args.command == 'save' or
+                                     (args.command == 'restore' and not args.dry_run)):
+            ensure_tracker()
         if args.command == 'install':
             install()
         elif args.command == 'run':
