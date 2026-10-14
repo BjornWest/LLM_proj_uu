@@ -80,6 +80,20 @@ def test_saved_publication_consumes_authenticated_snapshot(tmp_path, monkeypatch
     monkeypatch.setattr(publication, 'Execution', lambda **kwargs: SimpleNamespace(freeze=freeze))
     (root/'scripts').mkdir()
     (root/'scripts/trace_grades.py').write_bytes(b'# test-only grade reader')
+    # Preparation pins this data dependency as well as traced Python imports.
+    # Keep the synthetic root complete rather than reading mutable project data.
+    (root/'intent_browser').mkdir()
+    (root/'intent_browser/model_tokenizers.json').write_bytes(b'{}')
+    for relative in ('intent_browser/assets/chat/chat.html',
+                     'intent_browser/assets/chat/LICENSE.browsergym.txt',
+                     'intent_browser/observation_revision.js'):
+        path = root/relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b'test-only data dependency')
+    for version in ('catalogue_v1', 'catalogue_v2'):
+        path = root/'environments/product_world/data/product_feature_policies'/version/'manifest.json'
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({'concepts': {}}))
     setup = {'schema': publication.VERSION, 'task_id': 'count-1', 'memories': [], 'user_message': 'Count?'}
     publication.prepare_saved(snapshot, output, expected_manifest_sha256=expected,
         setup=setup, task_filename='task.json', adapter_file=__file__)

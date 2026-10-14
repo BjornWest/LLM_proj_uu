@@ -66,6 +66,30 @@ def run_case(packet,destination,**kwargs):
         extraction_backend_factory=kwargs.pop('factory',packet.factory),**kwargs)
 
 
+@pytest.mark.parametrize('mode', [None, 'native', 'auto'])
+def test_caller_capture_mode_reaches_runner_with_same_native_grade(packet, tmp_path, mode):
+    if mode is not None:
+        packet.options['observation_pipeline'] = mode
+    calls = []
+    def runner(*args, **kwargs):
+        calls.append(kwargs['observation_pipeline'])
+        return packet.runner(*args, **kwargs)
+    result = run_case(packet, tmp_path/'run', runner=runner)
+    assert calls == [mode or 'native']
+    assert result['answer_grading']['task_completed'] is True
+    assert packet.events.count('policy_open') == packet.events.count('extraction_request') == 1
+
+
+@pytest.mark.parametrize('override', [
+    {'observation_pipeline': 'invalid'}, {'observation_pipeline': 'auto', 'harness_profile': 'different'},
+    {'observation_pipeline': 'auto', 'episode_task': 'different'}])
+def test_capture_override_cannot_replace_native_authority(packet, tmp_path, override):
+    packet.options.update(override)
+    with pytest.raises(ValueError):
+        run_case(packet, tmp_path/'run')
+    assert not packet.events
+
+
 @pytest.mark.parametrize('lazy', [None, False, True])
 def test_closed_policy_once_only_extraction_native_grade_and_preserved_trace(packet,tmp_path,lazy):
     if lazy is not None:

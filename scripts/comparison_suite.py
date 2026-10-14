@@ -70,6 +70,44 @@ def hosted_counter_bindings(s,cases):
  if s['tokenizer']['sha256']!=expected['tokenizer.json']:raise ValueError('Shared AX/input tokenizer must match hosted qualification')
  checked(s['tokenizer'])
 
+def capture_options(spec):
+ mode=spec.get('observation_pipeline','auto')
+ if type(mode) is not str or mode not in ('auto','native'):
+  raise ValueError('Observation pipeline must be auto or native')
+ screens=spec.get('trace_screenshots',False)
+ asynchronous=spec.get('async_recording',True)
+ capture=spec.get('recording_capture','pipeline' if mode=='auto' else 'native')
+ if type(screens) is not bool or type(asynchronous) is not bool or capture not in ('pipeline','native'):
+  raise ValueError('Explicit screenshot/async booleans and recording capture mode required')
+ if mode=='auto' and capture!='pipeline':
+  raise ValueError('Auto observation mode needs pipeline-bound fact recording')
+ return {'observation_pipeline':mode,'trace_screenshots':screens,'async_recording':asynchronous,'recording_capture':capture}
+
+
+def browser_step_context(admission,emit,*,guarded):
+ """Trusted runner hook; no env.step replacement or additional browser reads."""
+ sequence=0
+ @contextmanager
+ def step(step,tool):
+  nonlocal sequence
+  sequence+=1
+  if guarded:admission.step_started()
+  emit('tool_started',sequence=sequence,execution_index=step,tool=tool)
+  original=None
+  try:yield
+  except BaseException as error:
+   original=error;emit('tool_error',sequence=sequence,execution_index=step,tool=tool,stage='tool')
+   raise
+  finally:
+   try:
+    if guarded:admission.step_finished()
+   except BaseException as cleanup:
+    if original is not None:original.add_note('Browser step acknowledgement also failed: '+repr(cleanup))
+    else:raise
+   finally:emit('tool_finished',sequence=sequence,execution_index=step,tool=tool)
+ return step
+
+
 def qwen_modules(s):
  for value in s['qwen_sources'].values():checked(value)
  runtime=runpy.run_path(str(checked(s['qwen_sources']['runtime'])))
@@ -523,6 +561,7 @@ def source_guard(s,c=None):
 def check_release(s):
  private_read_wait_policy(s)
  browser_step_options(s)
+ capture_options(s)
  pool_resource_options(s)
  source_guard(s)
  if qwen_mode(s):return check_qwen_release(s)
@@ -925,7 +964,7 @@ def execute(s,c,scripted=False):
   receipt=load(checked(s['inspection_package']))
   loader=runpy.run_path(str(checked(receipt['loader'])))
   recording,pins=loader['load_recording'](receipt['package_root'],receipt['relative_source_sha256'])
-  native_run=recording.recording_runner(run_episode,enabled=True,expected_sources=pins,report=inspection_out/'recording-status.json')
+  native_run=recording.recording_runner(run_episode,enabled=True,expected_sources=pins,report=inspection_out/'recording-status.json',capture=capture_options(s)['recording_capture'])
  except (TimeoutError,KeyboardInterrupt,SystemExit):
   if recording is not None:recording.release_package()
   raise
@@ -933,7 +972,7 @@ def execute(s,c,scripted=False):
   if recording is not None:recording.release_package();recording=None
   save(inspection_out/'setup-failure.json',{'status':'disabled','reason':str(error),'error_type':type(error).__name__,'native_grade_unchanged':True})
  counts={'policy_requests':0,'formatter_requests':0,'reported_cost_usd':0.0,'responses_without_cost':0}
- profile=None;lease=None;pooled=None;capacity_client=None;factories=None;environment_holder={};pending_snapshot={}
+ profile=None;lease=None;pooled=None;capacity_client=None;factories=None;environment_holder={}
  qwen=None;serving=None
  model=c['policy_model']
  if model=='gpt-6-luna' and not scripted:
@@ -994,7 +1033,8 @@ def execute(s,c,scripted=False):
     shared=SharedTokenizerConfig(s['tokenizer_socket'])
     module=hosted_runtime(s)
     counter=module['MemoizedCounter'](model_matched_input_counter(b,assets_root=s['counter_assets_root'],shared_tokenizer=shared))
-    return module['HostedQwenBackend'](b,counter,phase=phase,maximum=s['max_tokens'],
+    wrapper=module['BackgroundHostedQwenBackend'] if capture_options(s)['observation_pipeline']=='auto' else module['HostedQwenBackend']
+    return wrapper(b,counter,phase=phase,maximum=s['max_tokens'],
      deadline=s['suite_deadline_utc'],timeout=s['request_timeout'],directory=directory,meter=record,
      quote_pair_schema=s.get('formatter_quote_pair_schema',False) if phase=='formatter' else False,
      input_limit=c['max_input_tokens'])
@@ -1072,13 +1112,12 @@ def execute(s,c,scripted=False):
   def make_env(video=None):
    timings['environment_creation_monotonic']=time.monotonic();phase_event('environment_creation_started')
    env=factory(video);environment_holder['env']=env;phase_event('environment_created')
-   if qwen_mode(s):env=record_browser_steps(env,phase_event)
    # Count actual reset on this one instance without altering native class/type guards.
    original=env.reset
    def reset(*a,**k):timings['reset_calls']+=1;return original(*a,**k)
    env.reset=reset
-   if browser_step_options(s)[0] is not None:watch_browser_steps(env,admission)
    return env
+  kw['browser_step_context']=browser_step_context(admission,phase_event,guarded=browser_step_options(s)[0] is not None)
   _,telemetry=browser_step_options(s)
   if telemetry is not None:kw['env_step_telemetry']=telemetry
   return native_run(make_env,b,metadata,**kw)
@@ -1091,16 +1130,8 @@ def execute(s,c,scripted=False):
    save(out/'grade-viewer.json',result);phase_event('grade_projection_finished');return result
   except BaseException:
    phase_event('projection_error',stage='projection');raise
- def browser_snapshot():
-  env=environment_holder['env'];page=env.unwrapped.page
-  if page.is_closed():raise RuntimeError('Browser closed before native dispatch')
-  old_alarm=signal.alarm(max(1,math.ceil(min(5,serving.deadline-time.time()))));started=time.monotonic()
-  try:value=page.evaluate("() => ({url:location.href,text:document.body.innerText,fields:Array.from(document.querySelectorAll('input,select,textarea')).map(e=>[e.tagName,e.name,e.type,e.value,e.checked])})")
-  finally:signal.alarm(max(1,math.ceil(min(serving.deadline-time.time(),max(1,old_alarm-(time.monotonic()-started))))))
-  return sha256(json.dumps(value,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
  @contextmanager
  def qwen_turn(phase):
-  if phase=='policy':pending_snapshot['before']=browser_snapshot()
   phase_event('generation_wait_started',episode_phase=phase)
   try:
    with capacity_client.turn(phase):
@@ -1111,11 +1142,9 @@ def execute(s,c,scripted=False):
     finally:phase_event('generation_operation_finished',episode_phase=phase)
   finally:phase_event('generation_scope_finished',episode_phase=phase)
  def fresh(phase):
-  # Final source/admission guards run once in before(), after count.
-  if phase=='policy':
-   current=browser_snapshot()
-   if current!=pending_snapshot['before']:raise RuntimeError('Browser state changed while parked; stale policy request not dispatched')
-   record({'event':'fresh_after_capacity_wait','phase':phase,'browser_semantic_sha256':current})
+  # Source/session/admission checks remain; browser revision/target validation
+  # belongs to the owner pipeline AFTER completion, never the request worker.
+  record({'event':'non_browser_request_guard','phase':phase})
  def extraction_backend(path):
   phase_event('grading_extraction_started')
   return Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter',directory=path)
@@ -1133,8 +1162,9 @@ def execute(s,c,scripted=False):
    factories=qwen['QwenFactories'](backend_class=ChatCompletionsBackend,admission=serving,
     before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
     max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],
-    read_wait_policy=private_read_wait_policy(s),turn=qwen_turn)
-  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else c['max_steps'] if s.get('hosted_limit_profile')=='finite-task-limits-v1' else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},extraction_backend))
+    read_wait_policy=private_read_wait_policy(s),turn=qwen_turn,
+    background_completion=capture_options(s)['observation_pipeline']=='auto')
+  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else c['max_steps'] if s.get('hosted_limit_profile')=='finite-task-limits-v1' else s['max_steps'],'max_input_tokens':c['max_input_tokens'],**{k:v for k,v in capture_options(s).items() if k!='recording_capture'}},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},extraction_backend))
   if result.get('status')!='graded_and_projected':raise ValueError('Missing automatic grading/HTTP projection: '+str(result))
   # A negative scripted task verdict is a completed control, not a job error.
   if timings['reset_calls']!=1:raise ValueError('Warm activation reset or duplicated environment')
@@ -1207,6 +1237,7 @@ def supervise(s,scripted=False):
 
 def _supervise(s,scripted=False,stop=None):
  browser_step_options(s)
+ capture_options(s)
  pool_resource_options(s)
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
  if s.get('shared_chromium') and not scripted and not pooled_model_mode(s):raise ValueError('Pooled comparison caller is model-free qualification only')

@@ -13,6 +13,7 @@ from . import generation as shared, short_task_setup as setup
 from . import atomic_shop_task as native, atomic_shop_execution as grading
 from . import catalog_cart_execution as capture_api
 from .catalog_cart_authority import ReadOnlyCommitAuthority
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-atomic-address-execution-v1'
 PUBLICATION_VERSION = 'website-atomic-address-publication-v1'
@@ -115,11 +116,12 @@ class AddressEpisode(shared.GeneratedEpisode):
 def run(output, run_directory, *, policy_session, metadata, runner_options,
         authority_approval=None, quota_guard=None, runner=None):
     """One finite caller-owned policy lease, then native grading exactly once."""
+    runner_options = observation_runner_options(runner_options)
     if type(runner_options) is not dict or any(type(runner_options.get(k)) is not int
             or runner_options[k] <= 0 for k in ('max_steps', 'max_input_tokens')):
         raise ValueError('Declare finite positive request and context limits')
     if set(runner_options) & {'env_factory', 'backend', 'metadata', 'output',
-            'episode_task', 'harness_profile', 'site_discovery', 'observation_pipeline'}:
+            'episode_task', 'harness_profile', 'site_discovery'}:
         raise ValueError('Runner options cannot replace native capture bindings')
     if not callable(policy_session) or (quota_guard is not None and not callable(quota_guard)):
         raise ValueError('Policy session and quota guard must be callable')
@@ -142,7 +144,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             trace, summary = runner(episode.task.make_env, backend, metadata,
                 output=destination/'runs', episode_task=episode.task,
                 harness_profile=episode.profile, site_discovery=episode.site_discovery,
-                observation_pipeline='native', **runner_options)
+                **runner_options)
         trace = Path(trace).resolve()
         if not trace.is_relative_to(destination/'runs') or trace == destination/'runs':
             raise ValueError('Returned trace escaped its declared run directory')

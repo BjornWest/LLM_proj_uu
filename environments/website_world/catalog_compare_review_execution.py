@@ -18,6 +18,7 @@ from . import comparison_stock_execution as lifecycle
 from .adapter import digest as publication_digest
 from .catalog_compare_review_grading import CatalogCompareReviewGrader
 from .generation_configs import execution_options
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-catalog-compare-review-execution-v1'
 RECIPE = 'website-catalog-compare-review-publication-v1'
@@ -419,6 +420,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
     A fresh adopted recipe explicitly pins its reviewed missing-output reader.
     The default retains the earlier complete-answer-only path.
     """
+    runner_options = observation_runner_options(runner_options)
     from intent_browser.automatic_grading import AutomaticGrading, finalize_external, canonical_viewer_check
     from intent_browser.evaluation import Evaluation
     from intent_browser.connected_world_task import policy_goal
@@ -441,7 +443,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
                                                for k in ('max_steps', 'max_input_tokens')):
         raise ValueError('Declare finite positive request and context limits')
     if set(runner_options) & {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
-            'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
+            'site_discovery', 'terminal_response_instruction',
             'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}:
         raise ValueError('Runner options cannot replace compound episode or automatic grading bindings')
     runner_options = deepcopy(runner_options)
@@ -623,7 +625,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
                                   'public_task_id': expected_public['task_id']}
                 trace, summary = runner(episode.task.make_env, backend, bound_metadata, output=destination/'runs',
                     episode_task=episode.task, harness_profile=episode.profile, site_discovery=episode.site_discovery,
-                    observation_pipeline='native', terminal_response_instruction=TERMINAL_INSTRUCTION,
+                    terminal_response_instruction=TERMINAL_INSTRUCTION,
                     automatic_grading=contract, **runner_options)
             state['policy_closed'] = True
             trace = Path(trace).resolve()

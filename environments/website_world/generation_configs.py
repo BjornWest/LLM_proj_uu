@@ -46,6 +46,23 @@ def grading_options(value=None):
     return result
 
 
+def observation_runner_options(value):
+    """Copy trusted options, preserving native default for direct old callers.
+
+    New suite callers explicitly pass auto. This selects only reviewed harness
+    defaults; it does not replace task/grader/authority bindings or declare
+    adapter capabilities. Unknown objects and observation modes fail before setup.
+    """
+    if type(value) is not dict:
+        raise ValueError('Runner options must be a dict')
+    options=dict(value)
+    mode=options.get('observation_pipeline','native')
+    if type(mode) is not str or mode not in ('native','auto'):
+        raise ValueError('Observation pipeline must be native or auto')
+    options['observation_pipeline']=mode
+    return options
+
+
 def execution_options(value=None):
     value = {} if value is None else json_value(value)
     if type(value) is not dict or set(value) - {'validation', 'lazy_publication', 'answer_grading'}:

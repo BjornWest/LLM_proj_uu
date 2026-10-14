@@ -17,6 +17,7 @@ from . import variant_reset_publication as publication, short_task_setup as setu
 from .atomic_address_execution import prepared_task
 from .selector_action_capture import SelectorCapture
 from .catalog_cart_authority import ReadOnlyCommitAuthority
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-variant-reset-consumer-v1'
 READ_INSTRUCTIONS = """Extract only the FINAL ANSWER. You are a formatter, not
@@ -198,6 +199,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     public-instance acceptance and a reviewed frozen dependency union still gate
     every episode; this function grants neither a model run nor effect authority.
     """
+    runner_options = observation_runner_options(runner_options)
     import importlib
     from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
     from intent_browser.connected_world_task import policy_goal, TERMINAL_INSTRUCTION
@@ -213,7 +215,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
                 (type(runner_options['max_steps']) is not int or runner_options['max_steps'] <= 0))):
         raise ValueError('Declare max_steps as None or a positive integer and a positive input token limit')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task',
-        'harness_profile', 'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
+        'harness_profile', 'site_discovery', 'terminal_response_instruction',
         'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}
     if set(runner_options) & reserved:
         raise ValueError('Runner options cannot replace native task or prospective grading bindings')
@@ -345,7 +347,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             before_policy()
             with policy_session(before_dispatch=before_policy) as backend:
                 trace,summary = runner(episode.task.make_env,backend,metadata,output=destination/'runs',
-                    episode_task=episode.task,harness_profile=episode.profile,observation_pipeline='native',
+                    episode_task=episode.task,harness_profile=episode.profile,
                     terminal_response_instruction=TERMINAL_INSTRUCTION,automatic_grading=contract,**runner_options)
             state['policy_closed'] = True
             trace = Path(trace).resolve()

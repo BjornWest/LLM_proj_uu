@@ -8,7 +8,7 @@ from contextlib import contextmanager, nullcontext
 from copy import deepcopy
 from hashlib import sha256
 from pathlib import Path
-from threading import get_ident
+from threading import get_ident, Lock
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 import json
@@ -323,7 +323,8 @@ class QwenFactories:
     """Reviewed-B06 session lifecycle, generalized for the finite saved suite."""
     def __init__(self, *, backend_class, admission, before_policy, before_formatter,
                  meter, freshness_guard, max_output_tokens=16384, request_timeout=600,
-                 read_wait_policy='bounded_request', turn=lambda phase: nullcontext()):
+                 read_wait_policy='bounded_request', turn=lambda phase: nullcontext(),
+                 background_completion=False):
         for f in (backend_class, before_policy, before_formatter, meter, turn, freshness_guard):
             if not callable(f):
                 raise ValueError('Explicit factory, guards, turn and meter required')
@@ -333,6 +334,10 @@ class QwenFactories:
             raise ValueError('Request watchdog must be 1..600 seconds')
         if type(read_wait_policy) is not str or read_wait_policy not in ('bounded_request', 'rental_bounded'):
             raise ValueError('Explicit private buffered read policy required')
+        if type(background_completion) is not bool:
+            raise ValueError("Explicit boolean background completion required")
+        self.background_completion=background_completion
+        self.operation_lock=Lock()
         self.backend_class, self.admission = backend_class, admission
         self.policy_guard, self.formatter_guard, self.meter, self.turn = before_policy, before_formatter, meter, turn
         self.freshness_guard = freshness_guard
@@ -356,8 +361,9 @@ class QwenFactories:
         # arrive gradually and renew HTTPX's per-read timer.
         return httpx.Timeout(connect=control, write=control, pool=control, read=remaining)
 
-    def check(self):
-        if get_ident() != self.owner or self.poisoned:
+    def check(self, *, completion=False):
+        allowed=get_ident()==self.owner or completion and self.background_completion
+        if not allowed or self.poisoned:
             raise RuntimeError('Session changed creating thread or failed cleanup')
         self.admission.readiness()
 
@@ -370,7 +376,8 @@ class QwenFactories:
         raw = self.backend_class(self.admission.base, MODEL, None,
             timeout=self.http_timeout(), max_tokens=self.maximum,
             supports_images=True, session_routing=False, request_options={})
-        return QwenBackend(self, raw, phase, directory)
+        wrapper=BackgroundQwenBackend if self.background_completion else QwenBackend
+        return wrapper(self, raw, phase, directory)
 
     @contextmanager
     def policy_session(self, *, before_dispatch):
@@ -410,22 +417,40 @@ class QwenBackend:
         self.request_options = raw.request_options
 
     def configure_tools(self, options):
-        if self.phase != 'policy' or self.closed:
-            raise RuntimeError('Formatter must remain tool-free')
-        self.raw.configure_tools(options)
+        with self._owner_configuration():
+            if self.phase != 'policy' or self.closed:
+                raise RuntimeError('Formatter must remain tool-free')
+            self.raw.configure_tools(options)
 
     def begin_episode(self, episode_id):
-        return self.raw.begin_episode(episode_id)
+        with self._owner_configuration():return self.raw.begin_episode(episode_id)
+
+    @contextmanager
+    def _owner_configuration(self):
+        f=self.factory
+        f.check()
+        if not f.operation_lock.acquire(blocking=False):
+            raise RuntimeError('Qwen request running; configuration rejected')
+        try:yield
+        finally:f.operation_lock.release()
 
     @property
     def last_request(self):
         return self.raw.last_request
 
     def complete(self, messages):
+        f=self.factory
+        f.check(completion=type(self).__dict__.get('supports_background_completion') is True)
+        if not f.operation_lock.acquire(blocking=False):
+            raise RuntimeError('Overlapping Qwen completion; no dispatch')
+        try:return self._complete(messages)
+        finally:f.operation_lock.release()
+
+    def _complete(self, messages):
         if self.closed:
             raise RuntimeError('Closed Qwen backend')
-        f = self.factory
-        f.check()
+        f=self.factory
+        f.check(completion=type(self).__dict__.get('supports_background_completion') is True)
         options = deepcopy(self.raw.request_options)
         if self.phase == 'formatter':
             if f.formatter_calls:
@@ -448,10 +473,11 @@ class QwenBackend:
         selected = deepcopy(messages)
         request = dict(model=MODEL, messages=selected, temperature=0,
                        max_tokens=f.maximum, stream=False, **options)
-        # Permit is acquired before counting/generation. No counter, guard,
-        # history or action thread is silently moved to background execution.
+        # One serialized request owns the permit across counting/generation.
+        # Certified background execution performs no browser reads; the owner
+        # pipeline validates page identity after the response.
         with f.turn(self.phase):
-            f.check()
+            f.check(completion=type(self).__dict__.get('supports_background_completion') is True)
             f.freshness_guard(self.phase)
             first = f.admission.count(request)
             self._receipt(first, request)
@@ -469,7 +495,7 @@ class QwenBackend:
             self.raw.request_options = deepcopy(options)
             f.meter({'event': 'admission', 'phase': self.phase, 'count': final,
                      'max_tokens': request['max_tokens']})
-            f.check()
+            f.check(completion=type(self).__dict__.get('supports_background_completion') is True)
             self.consumer_guard()
             (f.policy_guard if self.phase == 'policy' else f.formatter_guard)()
             if self.phase == 'formatter':
@@ -510,16 +536,33 @@ class QwenBackend:
             raise ValueError('Exact current-session request/identity count receipt required')
 
     def close(self):
-        if self.closed:
-            if not self.closed_successfully:
-                raise RuntimeError('Previous cleanup failure; no retry')
-            return
-        self.closed = True
+        f=self.factory
+        if get_ident()!=f.owner:
+            raise RuntimeError('Only the creating owner may close a Qwen backend')
+        if not f.operation_lock.acquire(blocking=False):
+            raise RuntimeError('Completion still running; cleanup is unverified')
         try:
-            self.raw.close()
-        except BaseException:
-            self.factory.poisoned = True
-            raise
-        self.closed_successfully = True
-        if self.phase == 'formatter':
-            self.factory.formatter_active = False
+            if self.closed:
+                if not self.closed_successfully:raise RuntimeError('Previous cleanup failure; no retry')
+                return
+            self.closed=True
+            try:self.raw.close()
+            except BaseException:
+                f.poisoned=True
+                raise
+            self.closed_successfully=True
+            if self.phase=='formatter':f.formatter_active=False
+        finally:f.operation_lock.release()
+
+
+class BackgroundQwenBackend(QwenBackend):
+    """Explicitly certified serialized completion on the pipeline worker.
+
+    Creation, tools/session setup and close stay on the browser owner. Request
+    guards/counting/HTTP use no page objects. A second completion is rejected;
+    the controller permit and exact ordered wire remain owned until completion.
+    """
+    supports_background_completion = True
+    supports_native_tools = True
+    supports_images = True
+    requires_browser_thread = False

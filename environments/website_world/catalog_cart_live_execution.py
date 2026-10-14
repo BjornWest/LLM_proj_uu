@@ -6,6 +6,7 @@ from pathlib import Path
 from . import catalog_cart_execution as capture_api
 from . import generation as shared
 from .catalog_cart_authority import ReadOnlyCommitAuthority
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-catalog-cart-live-execution-v1'
 PUBLICATION_VERSION = 'website-catalog-cart-live-publication-v1'
@@ -51,12 +52,13 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     Without a source-union approval, the retained helper emits a candidate with
     a null effect envelope. Native grading retains that uncertainty.
     """
+    runner_options = observation_runner_options(runner_options)
     if type(runner_options) is not dict or any(type(runner_options.get(k)) is not int
             or runner_options[k] <= 0 for k in ('max_steps', 'max_input_tokens')):
         raise ValueError('Declare finite positive request and context limits')
     if set(runner_options) & {'env_factory', 'backend', 'metadata', 'output',
                              'episode_task', 'harness_profile', 'site_discovery',
-                             'observation_pipeline'}:
+                             }:
         raise ValueError('Runner options cannot replace capture or episode bindings')
     if not callable(policy_session) or (quota_guard is not None and not callable(quota_guard)):
         raise ValueError('Policy session and dispatch guard must be callable')
@@ -81,7 +83,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             trace, summary = runner(episode.task.make_env, backend, metadata,
                 output=destination/'runs', episode_task=episode.task,
                 harness_profile=episode.profile, site_discovery=episode.site_discovery,
-                observation_pipeline='native', **runner_options)
+                **runner_options)
         # The transport has closed before any capsule sealing or native grading.
         trace = Path(trace).resolve()
         if not trace.is_relative_to(destination/'runs') or trace == destination/'runs':

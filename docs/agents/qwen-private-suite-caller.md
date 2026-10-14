@@ -1,5 +1,42 @@
 # Private Qwen suite caller
 
+## Generated-world capture adoption
+
+New caller configurations default to `observation_pipeline: auto`,
+`trace_screenshots: false`, `async_recording: true`, and
+`recording_capture: pipeline`. Each is independently configurable; auto capture
+requires the pipeline recording provider. Direct saved-case callers retain native
+capture unless they explicitly supply auto. Auto still selects native capture
+when an adapter or backend lacks the reviewed fast-capture declaration. It keeps
+the profile's token-budgeted AX overview, not a shallow fixed node preview.
+
+Bind a fresh pipeline inspection-package receipt, the reviewed runner with
+`browser_step_context`, and fresh case/source/recipe exports before adoption.
+The trusted synchronous hook pairs step acknowledgements and timing around actual
+browser actions without replacing `env.step`. Page revision and target checks
+belong to the pipeline after completion; neither capacity admission nor Qwen's
+request worker reads the page or withholds a request because the page changed.
+Source/session/authority checks, ordered counting, output headroom, controller
+permits and automatic grading remain in their original boundaries.
+
+`QwenFactories(background_completion=True)` uses the explicitly certified
+`BackgroundQwenBackend`; default factories retain the owner-thread-only backend.
+Creating/configuring/closing transports stays on their creating thread, while
+one serialized completion may run on the pipeline worker. Policy and formatter
+remain separate sessions, with at most one formatter dispatch. Hosted auto mode
+uses `BackgroundHostedQwenBackend`, whose total HTTP deadline does not install
+process signals. The old hosted class remains available for explicit native
+capture. A timed-out hosted transport is poisoned, retains a late reply, and
+allows up to two additional seconds of bounded cleanup observation. Close refuses
+to certify cleanup while either request/abort worker remains live or transport
+close failed; the existing caller quarantines that case without resource credit
+or retry. This hosted mechanism does not change private rental-bounded reads.
+
+These changes are prospective. Original frozen callers, world/task inputs,
+recordings and grades remain unchanged. Scripted latency diagnostics explicitly
+use `allow_ungraded` because they measure timing; they cannot replace actual
+automatic native-grade and HTTP projection acceptance for a new release.
+
 Future OpenRouter Qwen releases cap each policy and formatter request at 180
 seconds, including the total-duration watchdog and the HTTP timeout. A timed-out
 request is an infrastructure failure with unknown remote cancellation; it does

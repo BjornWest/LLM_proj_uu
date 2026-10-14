@@ -231,6 +231,9 @@ class HostedQwenBackend:
     def complete(self, messages):
         if threading.current_thread() is not threading.main_thread():
             raise RuntimeError('Hosted request watchdog requires the browser/main thread')
+        return self._complete(messages)
+
+    def _complete(self, messages):
         if self.closed or (self.phase == 'formatter' and self.dispatched):
             raise RuntimeError('Closed or already-dispatched hosted formatter; no retry')
         schema_path = schema_bytes = None
@@ -282,12 +285,114 @@ class HostedQwenBackend:
             with (self.directory/'response-format-schema.json').open('x') as stream:
                 json.dump(schema, stream, ensure_ascii=False, indent=2, allow_nan=False)
         self.dispatched = True
-        with request_watchdog(min(self.timeout, remaining)):
-            completion = self.raw.complete(selected)
+        completion=self._request(selected,min(self.timeout,remaining))
         # Policy usage observation belongs to the runner, once, on this same
         # counter instance. A one-shot formatter has no following request.
         return completion
 
+    def _request(self, messages, seconds):
+        with request_watchdog(seconds):return self.raw.complete(messages)
+
     def close(self):
         self.closed = True
         self.raw.close()
+
+
+class BackgroundHostedQwenBackend(HostedQwenBackend):
+    """Owner-created hosted backend with a thread-safe total request deadline.
+
+    The pipeline completion worker waits on one HTTP operation. On deadline it
+    closes only that transport, with bounded cleanup observation. A transport
+    that cannot stop is poisoned and close refuses to certify its cleanup; the
+    caller must retain/quarantine that case. A late paid reply is retained and
+    never returned for action execution. No signals, browser reads or retries.
+    """
+    supports_background_completion=True
+    supports_native_tools=True
+    supports_images=True
+    requires_browser_thread=False
+
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.owner=threading.get_ident()
+        self.operation_lock=threading.Lock()
+        self.request_thread=self.abort_thread=None
+        self.poisoned=False
+        self.interrupted_completion=None
+        self.abort_error=None
+
+    def complete(self,messages):
+        if self.poisoned:raise RuntimeError('Previous hosted request cleanup uncertain; no retry')
+        if not self.operation_lock.acquire(blocking=False):
+            raise RuntimeError('Overlapping hosted request; no dispatch')
+        try:return self._complete(messages)
+        finally:self.operation_lock.release()
+
+    def _request(self,messages,seconds):
+        # Admission logging/schema writes may consume the remaining suite time.
+        # Recheck immediately before starting HTTP, without reading the browser.
+        seconds=min(seconds,self.deadline-self.clock())
+        if seconds<=0:raise TimeoutError('Suite deadline elapsed; no dispatch')
+        self.raw.client.timeout=seconds
+        cutoff=time.monotonic()+seconds
+        done=threading.Event();outcome={}
+        def call():
+            try:outcome['completion']=self.raw.complete(messages)
+            except BaseException as error:outcome['error']=error
+            finally:
+                outcome['finished_at']=time.monotonic()
+                if self.poisoned and 'completion' in outcome:
+                    self.interrupted_completion=outcome['completion']
+                done.set()
+        self.request_thread=threading.Thread(target=call,name='hosted-qwen-http',daemon=True)
+        self.request_thread.start()
+        timely=done.wait(max(0,cutoff-time.monotonic()))
+        if not timely or outcome.get('finished_at',float('inf'))>cutoff:
+            self.poisoned=True
+            def abort():
+                try:self.raw.close()
+                except BaseException as error:self.abort_error=error
+            self.abort_thread=threading.Thread(target=abort,name='hosted-qwen-abort',daemon=True)
+            self.abort_thread.start()
+            self.abort_thread.join(1)
+            self.request_thread.join(1)
+            if 'completion'in outcome:self.interrupted_completion=outcome['completion']
+            error=HostedRequestDeadline('Hosted total request deadline expired; no retry or action')
+            error.add_note('Transport cleanup remains unverified until request/abort workers stop.')
+            if self.abort_error is not None:error.add_note('Transport close also failed: '+repr(self.abort_error))
+            raise error
+        if 'error'in outcome:raise outcome['error']
+        return outcome['completion']
+
+    def close(self):
+        if threading.get_ident()!=self.owner:
+            raise RuntimeError('Only the creating owner may close a hosted backend')
+        if not self.operation_lock.acquire(blocking=False):
+            raise RuntimeError('Hosted completion still running; cleanup unverified')
+        try:
+            if any(worker is not None and worker.is_alive() for worker in (self.request_thread,self.abort_thread)):
+                raise RuntimeError('Hosted HTTP/abort worker still live; cleanup unverified')
+            if self.abort_error is not None:raise RuntimeError('Hosted transport cleanup failed') from self.abort_error
+            self.raw.close()
+            self.closed=True
+        finally:self.operation_lock.release()
+
+    @contextmanager
+    def _owner_configuration(self):
+        if threading.get_ident()!=self.owner or self.poisoned:
+            raise RuntimeError('Hosted configuration requires its healthy creating owner')
+        if not self.operation_lock.acquire(blocking=False):
+            raise RuntimeError('Hosted request running; configuration rejected')
+        try:yield
+        finally:self.operation_lock.release()
+
+    @HostedQwenBackend.request_options.setter
+    def request_options(self,value):
+        with self._owner_configuration():
+            HostedQwenBackend.request_options.fset(self,value)
+
+    def configure_tools(self,options):
+        with self._owner_configuration():super().configure_tools(options)
+
+    def begin_episode(self,episode_id):
+        with self._owner_configuration():return super().begin_episode(episode_id)

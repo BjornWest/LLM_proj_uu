@@ -9,6 +9,7 @@ from .generation_configs import execution_options, provenance
 from experiments.answer_grading import task_answer
 from experiments.external_agent.subscription_quota import SubscriptionQuotaGuard
 from intent_browser.connected_world_task import checked_files, TERMINAL_INSTRUCTION
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-comparison-stock-execution-v1'
 
@@ -84,6 +85,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     Closing the policy context releases its lease before extraction can open.
     No retries or fallback transport are introduced by this consumer.
     """
+    runner_options = observation_runner_options(runner_options)
     if runner is None:
         from intent_browser.runner import run_episode
         runner = run_episode
@@ -117,7 +119,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
         with policy_session(before_dispatch=quota_guard) as backend:
             trace, summary = runner(episode.task.make_env, backend, metadata,
                 output=destination/'runs', episode_task=episode.task, harness_profile=episode.profile,
-                observation_pipeline='native', terminal_response_instruction=TERMINAL_INSTRUCTION,
+                terminal_response_instruction=TERMINAL_INSTRUCTION,
                 **runner_options)
         shared.save(destination/'policy-result.json', {'trace': str(trace), 'summary': summary})
         checked_files(episode.task.files)

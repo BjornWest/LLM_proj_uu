@@ -15,6 +15,7 @@ from . import simulated_order_task as native, simulated_order_grading as grading
 from . import simulated_order_capture as capture_api
 from .adapter import ROOT, digest
 from .catalog_cart_execution import save_new
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-simulated-order-execution-v1'
 RECIPE = 'website-simulated-order-publication-v1'
@@ -143,12 +144,13 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     This source candidate has no accepted effect-envelope constructor. Exact
     runtime/authority/instance acceptance and spending authorization stay separate.
     """
+    runner_options = observation_runner_options(runner_options)
     from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
     if type(runner_options) is not dict or any(type(runner_options.get(key)) is not int
             or runner_options[key] <= 0 for key in ('max_steps', 'max_input_tokens')):
         raise ValueError('Declare finite positive turn and context bounds')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
-        'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
+        'site_discovery', 'terminal_response_instruction',
         'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}
     if set(runner_options) & reserved:
         raise ValueError('Runner options cannot replace ordering, grading or capture bindings')
@@ -232,7 +234,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             with policy_session(before_dispatch=before_dispatch) as backend:
                 trace, summary = runner(episode.task.make_env, backend, metadata,
                     output=destination/'runs', episode_task=episode.task, harness_profile=episode.profile,
-                    site_discovery=episode.site_discovery, observation_pipeline='native',
+                    site_discovery=episode.site_discovery,
                     terminal_response_instruction=TERMINAL_INSTRUCTION, automatic_grading=contract,
                     **runner_options)
             state['policy_closed'] = True

@@ -11,6 +11,7 @@ from . import catalog_cart_execution as capture_api
 from . import catalog_checkout_details_grading as native
 from . import generation as shared
 from .catalog_cart_authority import ReadOnlyCommitAuthority
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-catalog-checkout-details-execution-v1'
 
@@ -57,12 +58,13 @@ def grade_saved_return(capture, returned_trace, summary, *, world, task,
 def run(output, run_directory, *, policy_session, metadata, runner_options,
         authority_approval=None, quota_guard=None, runner=None):
     """One finite caller-authorized episode; no formatter, retries or redraws."""
+    runner_options = observation_runner_options(runner_options)
     if type(runner_options) is not dict or any(type(runner_options.get(k)) is not int
             or runner_options[k] <= 0 for k in ('max_steps', 'max_input_tokens')):
         raise ValueError('Declare finite positive request and context limits')
     if set(runner_options) & {'env_factory', 'backend', 'metadata', 'output',
                              'episode_task', 'harness_profile', 'site_discovery',
-                             'observation_pipeline'}:
+                             }:
         raise ValueError('Runner options cannot replace capture or episode bindings')
     if quota_guard is not None and not callable(quota_guard):
         raise ValueError('Dispatch guard must be callable')
@@ -83,7 +85,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             trace, summary = runner(episode.task.make_env, backend, metadata,
                 output=destination/'runs', episode_task=episode.task,
                 harness_profile=episode.profile, site_discovery=episode.site_discovery,
-                observation_pipeline='native', **runner_options)
+                **runner_options)
         capture_api.save_new(destination/'policy-result.json', {'trace': str(trace), 'summary': summary})
         checked_files(episode.task.files)
         grade = grade_saved_return(episode.capture, trace, summary, world=episode.runtime.world,

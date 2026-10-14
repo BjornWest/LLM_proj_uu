@@ -12,6 +12,7 @@ from .generation_configs import provenance, grading_options
 from experiments.answer_grading.listed_offer import grade_saved_once, SubscriptionExtractor
 from intent_browser.connected_world_task import checked_files, TERMINAL_INSTRUCTION
 from intent_browser.runner import run_episode
+from .generation_configs import observation_runner_options
 
 VERSION = 'website-listed-answer-execution-v1'
 
@@ -40,6 +41,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     Policy summary/evaluation stay unchanged; derived grade lives in a sidecar.
     Reusing a run directory is rejected before either backend can be opened.
     """
+    runner_options = observation_runner_options(runner_options)
     output, destination = Path(output).resolve(), Path(run_directory).resolve()
     manifest = load(output)
     record = json.loads((output/'execution.private.json').read_text())
@@ -66,8 +68,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
         episode.export_private_runtime(destination/'runtime-binding')
         # An unsupported task is rejected before opening the policy session.
         with policy_session() as backend:
-            invocation = {'observation_pipeline': 'native',
-                          'terminal_response_instruction': TERMINAL_INSTRUCTION, **runner_options}
+            invocation = {'terminal_response_instruction': TERMINAL_INSTRUCTION, **runner_options}
             trace, summary = runner(episode.task.make_env, backend, metadata,
                 output=destination/'runs', episode_task=episode.task, harness_profile=episode.profile,
                 site_discovery=episode.site_discovery, **invocation)
