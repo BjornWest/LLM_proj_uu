@@ -18,6 +18,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / 'training/scripts/qualify_qwen_wire.py'
+RUNTIME = Path(os.environ.get('QWEN_TEST_RUNTIME_SOURCE', ROOT / 'scripts/qwen_suite_runtime.py'))
 spec = importlib.util.spec_from_file_location('wire_probe', SCRIPT)
 Q = importlib.util.module_from_spec(spec); spec.loader.exec_module(Q)
 
@@ -51,8 +52,7 @@ class WireTests(unittest.TestCase):
         self.calls = []; self.records = []
 
     def test_reviewed_runtime_loads_through_measurement_source_gate(self):
-        runtime = ROOT / 'scripts/qwen_suite_runtime.py'
-        loaded = Q.source_runtime(Q.pin(runtime))
+        loaded = Q.source_runtime(Q.pin(RUNTIME))
         self.assertEqual(loaded['MODEL'], Q.MODEL)
         self.assertEqual(loaded['CONTEXT'], Q.CONTEXT)
         self.assertEqual(loaded['projection_sha256'](),
@@ -60,12 +60,12 @@ class WireTests(unittest.TestCase):
         self.assertTrue(callable(loaded['QwenFactories'].http_timeout))
 
     def test_old_runtime_pin_rejected_before_source_read(self):
-        runtime = ROOT / 'scripts/qwen_suite_runtime.py'
-        row = dict(path=str(runtime),
-                   sha256='4491d896a025b728ea1ab6eca4640b2efc030cc7a33769d4d538f5056c32c7dd')
-        with patch.object(Q, 'read_pin', side_effect=AssertionError('Unexpected source read')):
-            with self.assertRaisesRegex(ValueError, 'independently reviewed exact runtime'):
-                Q.source_runtime(row)
+        for digest in ('4491d896a025b728ea1ab6eca4640b2efc030cc7a33769d4d538f5056c32c7dd',
+                       'c0684c3ff0923a5054d5804c85b61d231caf774837963ed94641046351419ff3'):
+            with self.subTest(runtime_sha256=digest), \
+                    patch.object(Q, 'read_pin', side_effect=AssertionError('Unexpected source read')):
+                with self.assertRaisesRegex(ValueError, 'independently reviewed exact runtime'):
+                    Q.source_runtime(dict(path=str(RUNTIME), sha256=digest))
 
     def test_changed_runtime_bytes_rejected_before_execution(self):
         with tempfile.TemporaryDirectory() as temp:

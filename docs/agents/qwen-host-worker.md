@@ -31,6 +31,15 @@ caller injects the same reviewed launcher separately for browser jobs. Container
 qualification does not establish nested Docker/Python sandbox availability.
 
 Use the reviewed host export, runtime and actual B02 seed, not mutable modules.
+The prospective wire qualifier pins Evaluation runtime SHA256
+`35b5d8aa7bcf54f6940e41aa355a3e63288d0b5e51ad7ce4a9b729013d98d563`
+from reviewed `47aa96f`; update the worker's runtime pin and source export together.
+Its ordered counter projection remains
+`e818865d35a1a4cd9c6d3abc1c3fa02786cad1cb8eb89bd57b870f2ae6b8c27e`.
+The unchanged projection alone does not establish background request/cleanup
+acceptance or fresh instance readiness. Keep older frozen qualifiers and receipts
+unchanged. CPU fixtures use this runtime by default; an isolated test tree may set
+`QWEN_TEST_RUNTIME_SOURCE` to the exact external reviewed source.
 The worker spec has schema `qwen-ssh-serving-worker-v1` and these fields:
 
 | Field | Meaning |
@@ -113,11 +122,13 @@ rejected while hashing. Failed service cleanup publishes an explicitly unfinaliz
 empty index, since its log may still be written. The worker index proves bytes,
 not task completion, automatic-grade publication or Events delivery.
 
-Provider credentials remain on the workstation. Keep the reviewed local Verda
-delete watchdog alive from allocation; service expiry or VM `shutdown` does not
-stop billing. After returning evidence, delete the instance and created volumes,
-then confirm deletion. The user's overnight authorization covers at most7EUR
-including storage; do not retain billable volumes beyond that budget.
+Provider credentials remain outside the GPU host. Before another rental, qualify
+independent provider deletion supervision that survives workstation/agent loss;
+the Florida attempt's workstation watchdog did not do this. Service expiry or VM
+`shutdown` does not stop billing. Return artifacts within the finite rental,
+delete the instance and created volumes, then confirm provider absence. Historical
+overnight authorizations are consumed; source preparation grants no new rental,
+storage or model dispatch allowance.
 
 Runtime concurrency control is caller-owned. Construct the controller with
 explicit fixed resource ceilings and use `limits()` followed by
