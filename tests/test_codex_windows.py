@@ -372,7 +372,8 @@ class Recovery(unittest.TestCase):
         with patch.object(cw.subprocess, 'run', return_value=CompletedProcess([], 0, '', '')) as run:
             self.assertTrue(cw.ensure_tracker())
         run.assert_called_once_with(['systemctl', '--user', 'is-active', '--quiet',
-            'codex-windows-roster.timer'], timeout=5, capture_output=True, text=True)
+            'codex-windows-roster.timer'], timeout=5, capture_output=True, text=True,
+            errors='replace')
 
     def test_stopped_tracker_is_started_and_verified(self):
         from subprocess import CompletedProcess
@@ -382,6 +383,8 @@ class Recovery(unittest.TestCase):
             self.assertTrue(cw.ensure_tracker())
         self.assertEqual([call.args[0][2] for call in run.call_args_list],
                          ['is-active', 'start', 'is-active'])
+        self.assertTrue(all(call.kwargs['timeout'] == 5 and
+                            call.kwargs['errors'] == 'replace' for call in run.call_args_list))
         self.assertIn('Started automatic', stdout.getvalue())
 
     def test_tracker_start_failure_is_visible_and_nonfatal(self):
@@ -415,8 +418,9 @@ class Recovery(unittest.TestCase):
     def test_interactive_commands_check_tracker_and_read_only_commands_do_not(self):
         async def noop(*args, **kwargs):
             pass
-        cases = [([], True), (['save'], True), (['list'], False),
-                 (['--dry-run'], False), (['capture', '--all'], False),
+        cases = [([], True), (['restore'], True), (['save'], True), (['list'], False),
+                 (['--dry-run'], False), (['restore', '--dry-run'], False),
+                 (['capture'], False), (['capture', '--all'], False),
                  (['run', '--thread', A], False), (['install'], False),
                  (['--no-tracker'], False), (['save', '--no-tracker'], False)]
         for args, expected in cases:
@@ -431,14 +435,38 @@ class Recovery(unittest.TestCase):
                 self.assertEqual(ensure.called, expected)
 
     def test_tracker_failure_does_not_prevent_restore(self):
+        for command in ('restore', 'save'):
+            called = []
+            async def operation(*args, **kwargs):
+                called.append(True)
+            with self.subTest(command=command), \
+                 patch.object(cw.sys, 'argv', ['codex-windows', command]), \
+                 patch.object(cw, 'ensure_tracker', return_value=False), \
+                 patch.object(cw, 'restore', new=operation), \
+                 patch.object(cw, 'capture_all', new=operation):
+                self.assertEqual(cw.main(), 0)
+            self.assertEqual(called, [True])
+
+    def test_non_utf8_service_diagnostics_do_not_block_recovery(self):
+        # Exercise actual subprocess decoding against a fake executable, never
+        # the machine's systemctl or its live timer.
+        executable = self.root / 'systemctl'
+        executable.write_text('#!' + cw.sys.executable + '\n'
+            'import os,sys\n'
+            'if sys.argv[2]=="is-active": sys.exit(3)\n'
+            'os.write(2,b"invalid diagnostic: \\xff")\n'
+            'sys.exit(1)\n')
+        executable.chmod(0o755)
         called = []
         async def restore(*args, **kwargs):
             called.append(True)
-        with patch.object(cw.sys, 'argv', ['codex-windows']), \
-             patch.object(cw, 'ensure_tracker', return_value=False), \
+        with patch.dict(cw.os.environ, {'PATH': str(self.root)}), \
+             patch.object(cw.sys, 'argv', ['codex-windows']), \
+             patch.object(cw.sys, 'stderr', new_callable=io.StringIO) as stderr, \
              patch.object(cw, 'restore', new=restore):
             self.assertEqual(cw.main(), 0)
         self.assertEqual(called, [True])
+        self.assertIn('invalid diagnostic: \ufffd', stderr.getvalue())
 
     def test_timer_preserves_known_distribution_when_environment_lacks_it(self):
         with patch.dict(cw.os.environ, {'WSL_DISTRO_NAME': 'Ubuntu'}):

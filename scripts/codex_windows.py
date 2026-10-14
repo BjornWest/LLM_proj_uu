@@ -607,7 +607,7 @@ def ensure_tracker():
 
     def control(*args):
         return subprocess.run(['systemctl', '--user', *args], timeout=5,
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, errors='replace')
 
     try:
         if control('is-active', '--quiet', unit).returncode == 0:
