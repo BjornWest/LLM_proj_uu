@@ -9,6 +9,12 @@ requires the pipeline recording provider. Direct saved-case callers retain nativ
 capture unless they explicitly supply auto. Auto still selects native capture
 when an adapter or backend lacks the reviewed fast-capture declaration. It keeps
 the profile's token-budgeted AX overview, not a shallow fixed node preview.
+Unqualified non-Qwen comparison and scripted transports stay on the owner and
+therefore select native capture. Only the separately reviewed Qwen wrappers opt
+into background completion. Native fallback has no new pipeline post-completion
+revision validation; the old request-time page snapshot is removed there too,
+per the no-page-based-request-gating requirement. Record actual selection, and
+qualify certified adapters/fast capture before claiming that new protection.
 
 Bind a fresh pipeline inspection-package receipt, the reviewed runner with
 `browser_step_context`, and fresh case/source/recipe exports before adoption.
@@ -26,11 +32,15 @@ one serialized completion may run on the pipeline worker. Policy and formatter
 remain separate sessions, with at most one formatter dispatch. Hosted auto mode
 uses `BackgroundHostedQwenBackend`, whose total HTTP deadline does not install
 process signals. The old hosted class remains available for explicit native
-capture. A timed-out hosted transport is poisoned, retains a late reply, and
+capture. A timed-out hosted transport is poisoned, retains any available late reply, and
 allows up to two additional seconds of bounded cleanup observation. Close refuses
 to certify cleanup while either request/abort worker remains live or transport
 close failed; the existing caller quarantines that case without resource credit
 or retry. This hosted mechanism does not change private rental-bounded reads.
+A real socket close can discard the response and eventually yield a read error
+instead; it does not prove remote cancellation or complete billing. Late usage
+may reach the append-only HTTP-attempt log after the failure summary is saved.
+Do not treat that summary as settled billing for an interrupted request.
 
 These changes are prospective. Original frozen callers, world/task inputs,
 recordings and grades remain unchanged. Scripted latency diagnostics explicitly

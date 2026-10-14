@@ -84,6 +84,16 @@ def capture_options(spec):
  return {'observation_pipeline':mode,'trace_screenshots':screens,'async_recording':asynchronous,'recording_capture':capture}
 
 
+def owner_completion_backend(backend):
+ """Keep unqualified comparison/scripted transports on the browser owner.
+
+ A generic background flag does not qualify their guards or total deadline.
+ Qwen's reviewed wrappers opt into background completion separately.
+ """
+ backend.requires_browser_thread=True
+ return backend
+
+
 def browser_step_context(admission,emit,*,guarded):
  """Trusted runner hook; no env.step replacement or additional browser reads."""
  sequence=0
@@ -209,7 +219,7 @@ def phase_writer(s,ident,output,filename):
 
 
 def record_browser_steps(env,emit):
- """Observe actual env.step boundaries without adding a tool/episode timeout."""
+ """Legacy unit-test compatibility only; execute uses browser_step_context."""
  original=env.step;sequence=0
  def step(*args,**kwargs):
   nonlocal sequence
@@ -412,7 +422,7 @@ def browser_step_options(spec):
 
 
 def watch_browser_steps(env,admission):
- """Pair trusted boundaries around env.step without rewriting any action."""
+ """Legacy unit-test compatibility only; execute uses browser_step_context."""
  original=env.step
  def step(*args,**kwargs):
   admission.step_started()
@@ -1039,7 +1049,7 @@ def execute(s,c,scripted=False):
      quote_pair_schema=s.get('formatter_quote_pair_schema',False) if phase=='formatter' else False,
      input_limit=c['max_input_tokens'])
    except BaseException:b.close();raise
-  return b
+  return owner_completion_backend(b)
  @contextmanager
  def session(*,before_dispatch):
   if scripted:
@@ -1062,6 +1072,7 @@ def execute(s,c,scripted=False):
     with capacity_client.turn('policy') if capacity_client is not None else nullcontext():
      return response(req)
    b.client=httpx.Client(transport=httpx.MockTransport(dispatched))
+   b=owner_completion_backend(b)
   elif qwen_mode(s):
    with factories.policy_session(before_dispatch=before_dispatch) as b:yield b
    return

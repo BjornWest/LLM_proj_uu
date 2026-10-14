@@ -428,7 +428,10 @@ class QwenBackend:
     @contextmanager
     def _owner_configuration(self):
         f=self.factory
-        f.check()
+        # Ownership fencing is local. Tool/session setup must not add serving
+        # exchanges before warm activation; readiness stays at dispatch.
+        if get_ident()!=f.owner or f.poisoned:
+            raise RuntimeError('Configuration requires its healthy creating owner')
         if not f.operation_lock.acquire(blocking=False):
             raise RuntimeError('Qwen request running; configuration rejected')
         try:yield

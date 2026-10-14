@@ -16,6 +16,8 @@ from .simulated_order_execution import quota_sources
 from .simulated_order_address_execution import AddressOnlyOrderEpisode
 from . import simulated_order_address_grading as grading
 
+from .generation_configs import observation_runner_options
+
 VERSION = 'website-simulated-order-address-runner-v1'
 TERMINAL_INSTRUCTION = (
     'When finished, use send_msg_to_user to give a self-contained answer with '
@@ -29,6 +31,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     This scores address fields only and never requires a complete effect envelope.
     Exact source/instance/scripted-grade/viewer acceptance and finite resources remain required.
     """
+    runner_options = observation_runner_options(runner_options)
     from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
     if (type(runner_options) is not dict
             or type(runner_options.get('max_input_tokens')) is not int
@@ -38,7 +41,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
                 (type(runner_options['max_steps']) is not int or runner_options['max_steps'] <= 0))):
         raise ValueError('Declare max_steps as None or a positive integer and a positive input token limit')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
-        'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
+        'site_discovery', 'terminal_response_instruction',
         'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}
     if set(runner_options) & reserved:
         raise ValueError('Runner options cannot replace ordering, grading or capture bindings')
@@ -134,7 +137,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             with policy_session(before_dispatch=before_dispatch) as backend:
                 trace, summary = runner(episode.task.make_env, backend, metadata,
                     output=destination/'runs', episode_task=episode.task, harness_profile=episode.profile,
-                    site_discovery=episode.site_discovery, observation_pipeline='native',
+                    site_discovery=episode.site_discovery,
                     terminal_response_instruction=TERMINAL_INSTRUCTION, automatic_grading=contract,
                     **runner_options)
             state['policy_closed'] = True

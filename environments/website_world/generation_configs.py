@@ -54,7 +54,7 @@ def observation_runner_options(value):
     adapter capabilities. Unknown objects and observation modes fail before setup.
     """
     if type(value) is not dict:
-        raise ValueError('Runner options must be a dict')
+        raise ValueError('Runner options must be a dict with declared max_steps')
     options=dict(value)
     mode=options.get('observation_pipeline','native')
     if type(mode) is not str or mode not in ('native','auto'):

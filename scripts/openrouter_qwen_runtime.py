@@ -304,8 +304,9 @@ class BackgroundHostedQwenBackend(HostedQwenBackend):
     The pipeline completion worker waits on one HTTP operation. On deadline it
     closes only that transport, with bounded cleanup observation. A transport
     that cannot stop is poisoned and close refuses to certify its cleanup; the
-    caller must retain/quarantine that case. A late paid reply is retained and
-    never returned for action execution. No signals, browser reads or retries.
+    caller must retain/quarantine that case. If a transport returns a late reply,
+    retain it without action execution; a real socket abort can instead lose the
+    reply and end with a read error, leaving remote usage unknown. No retries.
     """
     supports_background_completion=True
     supports_native_tools=True
@@ -319,6 +320,7 @@ class BackgroundHostedQwenBackend(HostedQwenBackend):
         self.request_thread=self.abort_thread=None
         self.poisoned=False
         self.interrupted_completion=None
+        self.interrupted_error=None
         self.abort_error=None
 
     def complete(self,messages):
@@ -343,6 +345,8 @@ class BackgroundHostedQwenBackend(HostedQwenBackend):
                 outcome['finished_at']=time.monotonic()
                 if self.poisoned and 'completion' in outcome:
                     self.interrupted_completion=outcome['completion']
+                if self.poisoned and 'error' in outcome:
+                    self.interrupted_error=outcome['error']
                 done.set()
         self.request_thread=threading.Thread(target=call,name='hosted-qwen-http',daemon=True)
         self.request_thread.start()

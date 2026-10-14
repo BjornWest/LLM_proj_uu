@@ -14,6 +14,18 @@ OPTIONS=runpy.run_path(str(ROOT/'environments/website_world/generation_configs.p
 from intent_browser.backend import ChatCompletionsBackend
 
 class CaptureOptionsTests(unittest.TestCase):
+ def test_unqualified_comparison_and_scripted_backends_cannot_select_background(self):
+  from intent_browser.runtime_defaults import select_observation_pipeline
+  profile=SimpleNamespace(tools=SimpleNamespace(human_handover_tools=False,open_internet=False,
+   parse_completion=lambda *_:None),agent_limits=None,ax_config=SimpleNamespace(incremental=True))
+  task=SimpleNamespace(supports_observation_pipeline='native_full_only',supports_agent_fast_capture=True,
+   supports_dynamic_preview=True,supports_targeted_observations=True)
+  for model in ('scripted','xiaomi/mimo-v2.6-pro'):
+   backend=CALLER['owner_completion_backend'](ChatCompletionsBackend('http://offline.invalid/v1',model))
+   try:
+    config,record=select_observation_pipeline('auto',profile=profile,backend=backend,task=task,trace_screenshots=False)
+    self.assertIsNone(config);self.assertEqual(record['reason'],'backend_not_background_certified')
+   finally:backend.close()
  def test_new_default_keeps_budgeted_auto_without_screens_and_async_recording(self):
   self.assertEqual(CALLER['capture_options']({}),{'observation_pipeline':'auto','trace_screenshots':False,
    'async_recording':True,'recording_capture':'pipeline'})
@@ -105,6 +117,12 @@ class PrivateBackgroundTests(unittest.TestCase):
    for operation in (lambda:backend.configure_tools({'tools':[]}),lambda:backend.begin_episode('other')):
     self.assertIsInstance(self.in_thread(operation),RuntimeError)
   self.assertFalse(self.calls)
+ def test_configuring_a_created_backend_adds_no_serving_readiness_calls(self):
+  factory=self.create(True)
+  with factory.policy_session(before_dispatch=lambda:None)as backend:
+   def forbidden():raise AssertionError('Extra serving call during owner configuration')
+   self.admission.readiness=forbidden
+   backend.configure_tools({'tools':[]});backend.begin_episode('CPU-only')
  def test_overlapping_completion_and_early_close_do_not_release_ownership(self):
   self.block=(threading.Event(),threading.Event());errors=[]
   with self.create(True).policy_session(before_dispatch=lambda:None)as backend:

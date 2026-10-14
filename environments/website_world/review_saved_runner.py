@@ -16,6 +16,8 @@ from .catalog_review_execution import PublishedReviewSummaryGrader
 from .catalog_compare_review_execution import (check_policy_outcome,
     check_saved_public_task, extract_saved_deferred, publish_finalized_answer)
 
+from .generation_configs import observation_runner_options
+
 VERSION = 'website-saved-review-automatic-runner-v1'
 
 
@@ -26,6 +28,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     Grading and publication follow policy/Runtime cleanup. All native input and
     actual public request bytes are pinned before policy dispatch.
     """
+    runner_options = observation_runner_options(runner_options)
     from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
     from intent_browser.evaluation import Evaluation
     if not all(callable(f) for f in (policy_session, viewer_projection, quota_guard)):
@@ -40,7 +43,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
                 (type(runner_options['max_steps']) is not int or runner_options['max_steps'] <= 0))):
         raise ValueError('Declare max_steps as None or a positive integer and a positive input token limit')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
-        'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
+        'site_discovery', 'terminal_response_instruction',
         'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}
     if set(runner_options) & reserved:
         raise ValueError('Runner options cannot replace task or automatic-grade bindings')
@@ -165,7 +168,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             with policy_session(before_dispatch=before_dispatch) as backend:
                 trace, summary = runner(episode.task.make_env, backend, metadata,
                     output=destination/'runs', episode_task=episode.task, harness_profile=episode.profile,
-                    site_discovery=episode.site_discovery, observation_pipeline='native',
+                    site_discovery=episode.site_discovery,
                     terminal_response_instruction=TERMINAL_INSTRUCTION,
                     automatic_grading=contract, **runner_options)
             state['policy_closed'] = True

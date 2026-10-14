@@ -20,6 +20,8 @@ from . import catalog_cart_execution as capture_api
 from . import catalog_checkout_details_task as details, catalog_checkout_details_grading as details_grade
 from . import generation, saved_answer_publication as publication
 
+from .generation_configs import observation_runner_options
+
 VERSION = 'website-cart-task-instance-v1'
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -475,6 +477,7 @@ class CartEpisode(generation.GeneratedEpisode):
 def run(output, run_directory, *, policy_session, metadata, runner_options,
         viewer_projection, quota_guard, runner=None):
     """One policy lease; raw captures seal after close and grade once automatically."""
+    runner_options = observation_runner_options(runner_options)
     from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
     from intent_browser.connected_world_task import checked_files, policy_goal
     from intent_browser.evaluation import Evaluation
@@ -489,7 +492,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
                 (type(runner_options['max_steps']) is not int or runner_options['max_steps'] <= 0))):
         raise ValueError('Declare max_steps as None or a positive integer and a positive input token limit')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
-        'site_discovery', 'observation_pipeline', 'automatic_grading', 'allow_ungraded', 'ungraded_reason',
+        'site_discovery', 'automatic_grading', 'allow_ungraded', 'ungraded_reason',
         'terminal_response_instruction', 'agent_runtime', 'agent_actor'}
     if set(runner_options) & reserved:
         raise ValueError('Runner options cannot replace automatic state bindings')
@@ -559,7 +562,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             with policy_session(before_dispatch=before_dispatch) as backend:
                 trace, summary = (runner or run_episode)(episode.task.make_env, backend, metadata,
                     output=destination/'runs', episode_task=episode.task, harness_profile=episode.profile,
-                    site_discovery=episode.site_discovery, observation_pipeline='native', automatic_grading=contract,
+                    site_discovery=episode.site_discovery, automatic_grading=contract,
                     **runner_options)
             state['policy_closed'] = True
             trace = Path(trace).resolve()
