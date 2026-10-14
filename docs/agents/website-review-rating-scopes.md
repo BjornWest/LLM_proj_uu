@@ -45,12 +45,26 @@ Presentation identifiers remain unchanged to preserve deterministic sidecar
 replay. Renderer source hashes distinguish this additive output from old pins;
 the shared identifier alone does not establish equivalent page content.
 
-The old exact-source fact-review overlay is incompatible with the new summary
-seams and SKU grain. Its owner must compose reviewed new pins/registrations before
-recording-enabled adoption. Do not simply replace pins or label option aggregates
-as model facts. The default `native_fact_probe.js` also needs a scoped update:
-its old `.rating-panel` scan silently assigns option aggregates to the product,
-without failing or reporting a diagnostic. Dev/runtime composition is held for
-both consumers. Recording-enabled runs must use the corrected package or turn
-recording off with an explicit saved unsupported reason. No new run is authorized
-here; recording support is not claimed by this source-only change.
+Inspect's reviewed corrections at `06e3152` cover both the exact-source
+fact-review overlay and the default `native_fact_probe.js`. They preserve
+model/SKU identity, include silent ratings and handle rounded and undefined
+means on supported product and option routes. Both fixes are composed with
+Website source `c58beb3`; release record
+`REVIEW-SKU-SOURCE-COMPOSITION-20261014-01` records the passing combined checks.
+The recording hold is released for source composition; Harness integrated the
+composed source into dev at `17a260ff` as source only, with no working activation. Legacy frozen sources and consumers remain
+unchanged. Collection-card aggregate identity remains unmapped with an explicit
+inventory diagnostic. The downstream review feature consumer still reads model
+grain only; SKU predictor support has not been accepted.
+
+No modern copied-overlay caller is wired in this composition. Reviewed wiring
+must bind the three pinned renderer/helper sources and frozen native
+dependencies, including the declared caller-wiring review follow-ups. Inspect's
+separate legacy basket caller is rejected on modern sources;
+`copied_review_classes` refuses a modern pair without its pinned scope source
+whether or not recording is enabled. Live Runtime, BrowserGym compact observations,
+CDP mappings, acknowledged policy delivery, automatic grading and viewer
+qualification remain pending with Evaluation. Regenerate recording package
+pins in the final frozen tree; do not transplant worktree-specific paths or
+update in-flight episodes. This source release authorizes no new run and does
+not establish live recording or model readiness.
