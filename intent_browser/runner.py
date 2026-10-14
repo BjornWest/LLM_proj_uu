@@ -137,9 +137,14 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             raise ValueError('Observation pipeline currently requires incremental native tools without helpers')
         if harness_profile.tools.open_internet and not observation_pipeline.full_capture_only:
             raise ValueError('Open-internet observation integration requires full_capture_only=True')
-        if observation_pipeline.dynamic_preview and (not handover_enabled or
+        if observation_pipeline.agent_custody and handover_enabled:
+            raise ValueError('Agent-only custody cannot be combined with human handover')
+        if observation_pipeline.dynamic_preview and not observation_pipeline.agent_custody and (not handover_enabled or
                 not harness_profile.tools.stable_frame_capture):
             raise ValueError('Dynamic preview requires human-handover profile with stable frame capture')
+        if observation_pipeline.agent_custody and (episode_task is None or
+                getattr(episode_task,'supports_agent_fast_capture',False) is not True):
+            raise ValueError('Task adapter must explicitly adopt agent-custody fast capture')
         if (observation_pipeline.dynamic_preview and episode_task is not None and
                 not getattr(episode_task,'supports_dynamic_preview',False)):
             raise ValueError('Task adapter must explicitly adopt dynamic decision previews')
@@ -205,11 +210,18 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         input_counter = model_matched_input_counter(backend, **counter_options)
     if type(record_fact_provenance) is not bool:
         raise ValueError('record_fact_provenance must be boolean')
+    fact_pipeline_boundary = None
     if record_fact_provenance and fact_capture_observer is not None:
         if fact_source_provider is None or not callable(fact_capture_observer):
             raise ValueError('Fact capture observer requires opt-in fact recording, source provider and callable observer')
         if observation_pipeline is not None:
-            raise ValueError('Fact capture observer currently supports native observations only; deferred pipeline captures require a separate accepted boundary')
+            if not (observation_pipeline.agent_custody and callable(getattr(fact_source_provider,'before_capture',None))
+                    and callable(getattr(fact_source_provider,'after_capture',None))):
+                raise ValueError('Fact capture observer currently supports native observations only; deferred pipeline captures require a separate accepted boundary')
+            # Agent-custody capture brackets the provider probe with its own
+            # public revision check and shares its DOM/AX extraction.
+            fact_capture_observer = None
+            fact_pipeline_boundary = getattr(fact_source_provider,'capture_boundary','agent-custody-unmarked-v1')
     if record_fact_provenance:
         if not harness_profile or not harness_profile.ax_config or not harness_profile.ax_config.incremental or not harness_profile.delivery_tracking:
             raise ValueError('Fact provenance requires incremental AX and policy delivery tracking')
@@ -428,7 +440,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     fact_recorder = None
     if record_fact_provenance:
         from .fact_provenance import FactRecorder
-        fact_recorder = FactRecorder(trace,fact_source_provider,fact_capture_observer)
+        fact_recorder = FactRecorder(trace,fact_source_provider,fact_capture_observer,
+                                     pipeline_boundary=fact_pipeline_boundary)
         fact_recorder.attach(ax_explorer)
         delivery.fact_recorder = fact_recorder
         trace.metadata['fact_recording'] = fact_recorder.describe()
@@ -505,9 +518,28 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 raise ValueError('Disabling automatic screenshots requires native BrowserGym capture or the reviewed observation pipeline')
             screenshot_capture_original=base_env._get_obs
             base_env._get_obs=lambda:capture_json(screenshot_capture_original,screenshots=False)
+        from .human_browser import CONTROL_TOOLS, CONTENT_INDEPENDENT_TOOLS
+        if observation_pipeline is not None and observation_pipeline.agent_custody:
+            # Capture/guard custody only; no policy-visible handover features.
+            from .agent_browser import AgentBrowser
+            human_browser = AgentBrowser(base_env,trace,pipeline,
+                capture_timeout_mode=getattr(harness_profile,'capture_timeout_mode',None) or 'bounded')
+            pipeline.overview_budget = lambda: (ax_explorer._next_overview if getattr(ax_explorer,'_next_overview',None)
+                                                is not None else ax_explorer.config.overview_tokens)
+            if fact_pipeline_boundary is not None and fact_recorder is not None:
+                human_browser.capture_hooks.append(fact_source_provider)
+            def adopt_background(full):
+                # Owner thread, while the request is in flight: index the full
+                # capture (recording its paired facts) and bind the decision
+                # overview to it before policy delivery is acknowledged.
+                ax_explorer.capture(full)
+                if fact_recorder is not None:
+                    fact_recorder.restage_deferred()
+            pipeline.after_background = adopt_background
+            trace.metadata['agent_custody'] = human_browser.describe()
+            write_json(trace.directory / 'metadata.json', trace.metadata)
         if handover_enabled:
-            from .human_browser import HumanBrowser, CONTROL_TOOLS
-            from .human_browser import CONTENT_INDEPENDENT_TOOLS
+            from .human_browser import HumanBrowser
             human_browser = HumanBrowser(base_env,human_handover,trace,pipeline,
                 wait_for_human=harness_profile.tools.human_handover_wait,
                 compact_tabs=harness_profile.tools.compact_tab_context,
@@ -528,8 +560,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         if checkpoint_control is not None and checkpoint_control.record:
             obs = checkpoint_control.restore_browser(env)
         if human_browser is not None:
-            from .human_chat import HumanChat
-            human_chat = HumanChat(base_env.chat,trace)
+            if handover_enabled:
+                from .human_chat import HumanChat
+                human_chat = HumanChat(base_env.chat,trace)
             if human_handover_ui is not None:
                 attachment = human_handover_ui.attach_chat(base_env.chat.page)
                 trace.event('human_chat_controls_attached',
@@ -1197,7 +1230,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         if human_browser is not None and batch_stop is None:
                             human_browser.emit(step=index,phase='post_model')
                             batch_stop=human_browser.guard(tab_ticket)
-                            if human_chat.pending:
+                            if human_chat is not None and human_chat.pending:
                                 batch_stop=batch_stop or 'human_message_pending'
                         initial_document = [] if no_browser or batch_stop else guard_document(env)
                     except DocumentScanInvalidated as exc:
@@ -1274,7 +1307,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                                 member['observation'] = trace.observation(member['execution_index'],obs,
                                     observation_text(obs),phase='batch_guard')
                                 if human_browser is not None:
-                                    if human_chat.pending:
+                                    if human_chat is not None and human_chat.pending:
                                         batch_stop=batch_stop or 'human_message_pending'
                                     if confirmation is not None:
                                         batch_stop=batch_stop or human_browser.confirmation_guard(confirmation,obs)
@@ -1285,7 +1318,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                                             review=human_browser.content_review(tab_ticket,obs,decision,step=index,call_id=call_id)
                                             batch_stop=review['reason'] if review is not None else None
                                             if review is not None:member['policy_feedback']=review
-                                    if human_chat.pending:
+                                    if human_chat is not None and human_chat.pending:
                                         batch_stop=batch_stop or 'human_message_pending'
                                 if batch_stop is None and not no_browser and guard_document(env) != initial_document:
                                     batch_stop = 'document_or_navigation_changed'

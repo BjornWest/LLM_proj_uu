@@ -66,6 +66,7 @@ class HumanBrowser:
         self.observations={};self.capture_sequence=0
         self.confirmations={};self.confirmation_sequence=0
         self.last_action_execution=None
+        self.capture_function=capture_native
         env._activate_page_from_js=self.activation
         env._active_page_check=self.active_check
         env.post_step=self.post_step
@@ -240,7 +241,7 @@ class HumanBrowser:
         error=None
         try:
             with budget.rpc_deadline():
-                if not self.ready:return capture_native(_ObservationView(self.env,self.env.page),budget,
+                if not self.ready:return self.capture_function(_ObservationView(self.env,self.env.page),budget,
                     screenshots=self.pipeline.config.trace_screenshots)
                 return self._capture(budget)
         except Exception as exc:
@@ -313,7 +314,7 @@ class HumanBrowser:
                     frame_before=frame_documents(page);document=main_signature(frame_before)
                 else:document=self.document_identity()
                 stage='native_capture'
-                obs=capture_native(_ObservationView(self.env,page),budget,
+                obs=self.capture_function(_ObservationView(self.env,page),budget,
                     screenshots=self.pipeline.config.trace_screenshots)
                 require_capture_owner()
                 stage='after_native_capture'

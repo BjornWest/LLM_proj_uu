@@ -106,8 +106,9 @@ def case(args):
         launcher=chrome.bind_environment()
     try:
         with launcher,patch.object(DynamicPreview,'capture',capture),patch.object(DynamicPreview,'preview',preview):
-            path,summary=run_episode(factory,backend,{'driver':'dynamic_overlap_regression','paid_model_calls':0},
-                output=out/'runs',max_steps=2 if mode in ('click','late_change','recover_preview') else 1,harness_profile=profile,
+            path,summary=run_episode(factory,backend,{'driver':'dynamic_overlap_regression','paid_model_calls':0,'tags':['scripted']},
+                output=out/'runs',allow_ungraded=True,
+                ungraded_reason='model-free browser capture regression; no task outcome is graded',max_steps=2 if mode in ('click','late_change','recover_preview') else 1,harness_profile=profile,
                 human_handover=controller,observation_pipeline=ObservationPipelineConfig((),full_capture_only=True,
                     dynamic_preview=mode!='disabled',shallow_depth=2))
     finally:

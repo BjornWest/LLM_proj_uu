@@ -135,9 +135,13 @@ class FactRecorder:
     Current capture plus 64 output objects and 256 historical refs are cached.
     Full historical records live in private trace sidecars, not policy messages.
     """
-    def __init__(self, trace, provider=None, capture_observer=None):
+    def __init__(self, trace, provider=None, capture_observer=None, *, pipeline_boundary=None):
         self.trace, self.provider = trace, provider
         self.capture_observer=capture_observer;self.boundary=None
+        self.pipeline_boundary=pipeline_boundary
+        # Decision outputs staged against a capture whose provenance arrives with
+        # the background capture: (value, staged entry, registered sources).
+        self.deferred=[]
         self.env = None; self.step = 0
         self.current = None; self.capture_count = self.output_count = 0
         self.outputs = OrderedDict(); self.content_outputs = {}
@@ -150,7 +154,10 @@ class FactRecorder:
                 'policy_context_added': False, 'extra_ax_captures': False,
                 'coverage': 'Exact emitted AX name/value slices only; unsupported mappings unknown',
                 'source_provider': self.provider is not None,
-                'capture_boundary': 'native-full-v1' if self.capture_observer is not None else None, 'offset_unit':'utf16_code_units', 'output_cache_entries': 64,
+                'capture_boundary': ('native-full-v1' if self.capture_observer is not None else self.pipeline_boundary),
+                **({'decision_outputs': 'staged against the decision AX read, re-bound to the validated background capture before acknowledgment'}
+                   if self.pipeline_boundary else {}),
+                'offset_unit':'utf16_code_units', 'output_cache_entries': 64,
                 'historical_ref_cache_entries': 256}
 
     def observe(self, operation, *args, **kwargs):
@@ -217,7 +224,18 @@ class FactRecorder:
         context = {'snapshot_id': explorer.snapshot, 'step': self.step,
                    'coverage': observation.get('observation_capture', {}).get('coverage', 'full')}
         diagnostics = []; supplied = None
-        if self.provider is not None:
+        deferred = (self.pipeline_boundary is not None and
+                    observation.get('observation_capture', {}).get('version') == 'budgeted-decision-v1')
+        post_action = observation.get('observation_capture', {}).get('version') == 'deferred-post-action-v1'
+        if deferred:
+            # No DOM/probe work before inference: provenance comes from the
+            # background capture of the same page revision.
+            diagnostics.append({'reason': 'deferred_to_background_capture'})
+        elif post_action:
+            # Execution metadata only; the next decision/background capture
+            # observes the resulting page. Nothing was captured to map.
+            diagnostics.append({'reason': 'post_action_capture_deferred'})
+        elif self.provider is not None:
             try:
                 if self.boundary is not None and not self.boundary.confirmed(observation):
                     raise ValueError('Observation lacks its accepted original capture bracket')
@@ -304,10 +322,10 @@ class FactRecorder:
                   'mapping_inventory_complete': (supplied or {}).get('mapping_inventory_complete') is True and not diagnostics}
         write_json(self.trace.directory/artifact, record)
         self.current = {'key': key, 'artifact': artifact, 'fields': fields, 'snapshot': explorer.snapshot,
-                        'diagnostics': diagnostics}
+                        'diagnostics': diagnostics, 'deferred': deferred}
         self.trace.event('fact_capture_recorded', step=self.step, artifact=artifact)
 
-    def stage(self, explorer, value, *, preview=False, search=False, node_page=False):
+    def stage(self, explorer, value, *, preview=False, search=False, node_page=False, artifact=None):
         """Freeze a generated output before later captures or batch execution."""
         projections = []; references = []; diagnostics = []
         body = json.loads(value) if isinstance(value, str) else value
@@ -421,15 +439,37 @@ class FactRecorder:
                         emit(ref,field,len(prefix),len(prefix)+len(piece),('text',),field_a+boundaries[lo]-page_a,
                              transform='json_string',boundaries=json_string_boundaries(piece))
                 else:diagnostics.append({'reason':'token_page_not_exact_character_slice','ref':ref})
-        artifact = f'fact-output-{self.output_count:04d}.json'; self.output_count += 1
+        restaged = artifact is not None
+        if artifact is None:
+            artifact = f'fact-output-{self.output_count:04d}.json'; self.output_count += 1
+        if restaged:diagnostics.append({'reason':'rebound_to_background_capture'})
         record={'schema':VERSION,'offset_unit':'utf16_code_units','id':artifact[:-5],'step':self.step,'text_sha256':digest(text),
                 'capture':self.current['artifact'] if self.current else None,
                 'projections':projections,'references':references,'diagnostics':diagnostics}
         write_json(self.trace.directory/artifact, record)
-        self.outputs[id(value)]=(value,{'record':record,'artifact':artifact,'text':text,'body':deepcopy(body)})
+        entry={'record':record,'artifact':artifact,'text':text,'body':deepcopy(body),
+               'stage_options':{'preview':preview,'search':search,'node_page':node_page}}
+        self.outputs[id(value)]=(value,entry)
         self.outputs.move_to_end(id(value))
         while len(self.outputs)>64:self.outputs.popitem(last=False)
+        if not restaged and self.current is not None and self.current.get('deferred'):
+            self.deferred.append([value,entry,[]])
         return record['id']
+
+    def restage_deferred(self):
+        """Re-bind decision outputs to the current (background) capture.
+
+        Rewrites the same output/policy artifacts before acknowledgment; a capture
+        without provenance leaves them unknown with explicit diagnostics.
+        """
+        pending, self.deferred = self.deferred, []
+        for value, entry, sources in pending:
+            def rebind(value=value, entry=entry, sources=sources):
+                self.stage(self.explorer, value, artifact=entry['artifact'], **entry['stage_options'])
+                updated = self.select(value)
+                for source in sources:
+                    self.register(source, updated)
+            self.observe(rebind)
 
     def select(self, value):
         item=self.outputs.get(id(value))
@@ -442,6 +482,9 @@ class FactRecorder:
 
     def register(self, source, output=None):
         """Bind explicitly selected generation metadata; never infer it from text."""
+        if output is not None:
+            for item in self.deferred:
+                if item[1] is output and source not in item[2]:item[2].append(source)
         record={'schema':VERSION,'offset_unit':'utf16_code_units','content_id':source['id'],'text_sha256':source['sha256'],'output_artifact':None,'projections':[],
                 'references':[],'diagnostics':[]}
         if output is not None:
