@@ -90,8 +90,8 @@ class ContinuousQueueTests(unittest.TestCase):
   self.assertEqual(env.step('ok'),'ok')
   with self.assertRaises(ValueError):env.step('fail')
   self.assertEqual(calls,['ok','fail'])
-  self.assertEqual([r[0] for r in rows],['tool_started','tool_finished']*2)
-  self.assertEqual([r[1]['sequence'] for r in rows],[1,1,2,2])
+  self.assertEqual([r[0] for r in rows],['tool_started','tool_finished','tool_started','tool_error','tool_finished'])
+  self.assertEqual([r[1]['sequence'] for r in rows],[1,1,2,2,2])
 
  def test_phase_io_failure_is_explicit_and_does_not_prevent_cleanup(self):
   with tempfile.TemporaryDirectory() as tmp:
@@ -131,9 +131,12 @@ class CleanFailureTests(OBS['ObserverTests']):
   spec={'runtime_mode':'qwen-private-v1','caller_commit':'tip','driver':{'sha256':'driver'},
    'launcher':{'sha256':'owned'},'rental_deadline_utc':time.time()+20}
   process=SimpleNamespace(poll=lambda:1);services=[SimpleNamespace(poll=lambda:None)]*2
-  with patch.dict(CALLER['finish_case_failure'].__globals__,source_guard=lambda s:None):
-   self.assertTrue(CALLER['finish_case_failure'](spec,'a',ValueError('case formatter error'),out,
-    process,self.host,services,self.stop))
+  class Admission:
+   def quarantine(self,evidence):self.evidence=evidence
+   def recover_quarantine(self,verify_cleanup):return verify_cleanup() is True
+  receipt=CALLER['isolate_case_error'](spec,'a',ValueError('case formatter error'),'formatter',out,
+   process,None,self.host,Admission())
+  self.assertFalse(receipt['quarantined'])
   self.assertFalse(self.stop.is_set());self.assertTrue(self.host.controller.status()['episodes']['a']['done'])
   receipt=json.loads((out/'a-case-failure.json').read_text());self.assertIsNone(receipt['task_verdict'])
   b=self.client('b');self.host.activate('b',priority=1)
@@ -163,5 +166,217 @@ class CleanFailureTests(OBS['ObserverTests']):
   with self.assertRaises(self.mods['rpc'].CapacityChannelError):
    self.host.finish_failed_case('a',verify_cleanup=lambda:False,record_terminal=lambda:True)
   self.assertTrue(self.stop.is_set());self.assertFalse(self.host.controller.status()['episodes']['a']['done'])
+
+class IsolatedCaseTests(unittest.TestCase):
+ def spec(self):return {'runtime_mode':'qwen-private-v1','caller_commit':'tip','driver':{'sha256':'CPU-fixture'},'rental_deadline_utc':time.time()+30}
+
+ def test_each_injected_stage_is_saved_and_the_queue_keeps_running(self):
+  stages=['timeout','tool','setup','readiness','formatter','grader','projection'];proofs=[]
+  for stage in stages:
+   with self.subTest(stage=stage),tempfile.TemporaryDirectory() as tmp:
+    stop=threading.Event();counts={};lock=threading.Lock();later=threading.Event()
+    def one(ident,admission):
+     with lock:counts[ident]=counts.get(ident,0)+1
+     admission.environment_ready()
+     if ident=='bad':
+      error=TimeoutError('CPU injected timeout') if stage=='timeout' else ValueError('CPU injected '+stage)
+      failure=CALLER['isolate_case_error'](self.spec(),ident,error,stage,Path(tmp),None,None,None,admission)
+      self.assertFalse(failure['quarantined'])
+      raise CALLER['CaseInfrastructureError'](stage)
+     if ident=='long':self.assertTrue(later.wait(2))
+     else:later.set()
+     return {'task_completed':False}
+    result=QUEUE['run_ordered_suite']({x:x for x in ['bad','long','next','last']},one,
+     max_concurrent_episodes=2,prewarm_count=0,stop_event=stop,isolate_case_errors=True)
+    self.assertFalse(stop.is_set());self.assertFalse(result['cancelled'])
+    self.assertEqual(result['cases']['bad']['status'],'failed')
+    self.assertTrue(all(result['cases'][x]['status']=='completed' for x in ['long','next','last']))
+    self.assertEqual(counts,{x:1 for x in ['bad','long','next','last']})
+    receipt=json.loads((Path(tmp)/'bad-case-failure.json').read_text())
+    self.assertEqual(receipt['stage'],stage);self.assertIsNone(receipt['task_verdict'])
+    self.assertEqual(max(e['active'] for e in result['events']),2)
+    proofs.append({'injected_stage':stage,'failure':receipt,'queue':result,'attempt_counts':counts,'root_stop':stop.is_set()})
+  if os.environ.get('QWEN_CASE_FAILURE_PROBE_OUTPUT'):
+   with Path(os.environ['QWEN_CASE_FAILURE_PROBE_OUTPUT']).open('x') as stream:
+    json.dump({'schema':'continuous-qwen-case-isolation-CPU-proof-v2','scripted':True,'model_requests':0,'browser_runs':0,'cases':proofs},stream,indent=2)
+
+ def test_quarantine_retains_a_slot_until_proof_and_does_not_replay(self):
+  stop=threading.Event();failed=threading.Event();next_started=threading.Event();recover=threading.Event()
+  admissions={};counts={};answers=[]
+  def one(ident,admission):
+   admissions[ident]=admission;counts[ident]=counts.get(ident,0)+1;admission.environment_ready()
+   if ident=='bad':
+    admission.quarantine({'native_cleanup':'unacknowledged'});failed.set()
+    raise RuntimeError('CPU cleanup failure')
+   if ident=='long':
+    self.assertTrue(failed.wait(2));self.assertTrue(next_started.wait(2));self.assertTrue(recover.wait(2))
+   elif ident=='next':next_started.set()
+   return ident
+  thread=threading.Thread(target=lambda:answers.append(QUEUE['run_ordered_suite'](
+   {x:x for x in ['bad','long','next','last']},one,max_concurrent_episodes=3,prewarm_count=0,
+   stop_event=stop,isolate_case_errors=True)))
+  thread.start()
+  try:
+   self.assertTrue(next_started.wait(2));self.assertFalse(stop.is_set())
+   self.assertFalse(admissions['bad'].recover_quarantine(lambda:False))
+   self.assertTrue(admissions['bad'].recover_quarantine(lambda:True));recover.set()
+  finally:recover.set();thread.join(4)
+  self.assertFalse(thread.is_alive());result=answers[0]
+  self.assertFalse(result['cancelled']);self.assertEqual(counts,{x:1 for x in ['bad','long','next','last']})
+  self.assertEqual(max(e['active'] for e in result['events']),3)
+  self.assertTrue(any(e['quarantined']==1 for e in result['events']))
+  self.assertIsNone(result['cases']['bad']['quarantine'])
+
+ def test_all_slots_quarantined_returns_blocked_without_cancellation_or_hang(self):
+  stop=threading.Event();calls=[]
+  def one(ident,admission):
+   calls.append(ident);admission.environment_ready()
+   admission.quarantine({'cleanup':'unknown'});raise RuntimeError('CPU cleanup failure')
+  result=QUEUE['run_ordered_suite']({x:x for x in ['a','b','c','d']},one,
+   max_concurrent_episodes=2,prewarm_count=0,stop_event=stop,isolate_case_errors=True)
+  self.assertFalse(stop.is_set());self.assertEqual(calls,['a','b'])
+  self.assertEqual([r['status'] for r in result['cases'].values()],['failed','failed','blocked','blocked'])
+  self.assertEqual(max(e['active'] for e in result['events']),2)
+
+ def test_unanticipated_baseexception_is_quarantined_without_job_stop(self):
+  stop=threading.Event();calls=[]
+  def one(ident,admission):
+   calls.append(ident);admission.environment_ready()
+   if ident=='bad':raise SystemExit('CPU injected case exit')
+   return ident
+  result=QUEUE['run_ordered_suite']({x:x for x in ['bad','next','last']},one,
+   max_concurrent_episodes=2,prewarm_count=0,stop_event=stop,isolate_case_errors=True)
+  self.assertFalse(stop.is_set());self.assertEqual(set(calls),{'bad','next','last'})
+  self.assertIsNotNone(result['cases']['bad']['quarantine'])
+  self.assertEqual(result['cases']['last']['status'],'completed')
+
+ def test_warm_failure_cannot_be_reactivated_by_recovery_before_return(self):
+  stop=threading.Event();started=threading.Event();answers=[];release=threading.Event()
+  def one(ident,admission):
+   if ident=='warm':
+    admission.quarantine({'setup':'failed before ready'})
+    self.assertTrue(admission.recover_quarantine(lambda:True))
+    started.set();raise RuntimeError('CPU warm setup failure')
+   admission.environment_ready();self.assertTrue(started.wait(2));release.set();return ident
+  result=QUEUE['run_ordered_suite']({'active':'active','warm':'warm','last':'last'},one,
+   max_concurrent_episodes=1,prewarm_count=1,stop_event=stop,isolate_case_errors=True)
+  self.assertFalse(stop.is_set());self.assertEqual(result['cases']['last']['status'],'completed')
+  self.assertFalse(any(e['event']=='environment_activated' and e['case']=='warm' for e in result['events']))
+  self.assertIsNone(result['cases']['warm']['quarantine'])
+
+ def test_thread_creation_failure_is_per_case_and_later_cases_still_start(self):
+  original=QUEUE['_Queue'].start.__globals__['Thread'];attempts=[]
+  def thread(*args,**kw):
+   ident=kw['name'];attempts.append(ident)
+   if ident=='episode-bad':return SimpleNamespace(start=lambda:(_ for _ in ()).throw(RuntimeError('CPU thread limit')))
+   return original(*args,**kw)
+  def one(ident,admission):admission.environment_ready();return ident
+  stop=threading.Event()
+  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':thread}):
+   result=QUEUE['run_ordered_suite']({'bad':'bad','next':'next'},one,
+    max_concurrent_episodes=1,prewarm_count=0,stop_event=stop,isolate_case_errors=True)
+  self.assertFalse(stop.is_set());self.assertEqual(result['cases']['bad']['status'],'failed')
+  self.assertEqual(result['cases']['next']['status'],'completed');self.assertIsNone(result['cases']['bad']['quarantine'])
+  self.assertEqual(attempts,['episode-bad','episode-next'])
+
+ def test_scripted_job_failure_has_no_authority_over_separate_model_fixture(self):
+  model_stop=threading.Event();script_stop=threading.Event();release=threading.Event();answers=[]
+  def model(ident,admission):admission.environment_ready();release.wait(2);return ident
+  thread=threading.Thread(target=lambda:answers.append(QUEUE['run_ordered_suite'](
+   {'model':'model'},model,max_concurrent_episodes=1,prewarm_count=0,stop_event=model_stop,isolate_case_errors=True)))
+  thread.start()
+  def scripted(ident,admission):admission.environment_ready();raise SystemExit('scripted CPU failure')
+  control=QUEUE['run_ordered_suite']({'control':'control'},scripted,max_concurrent_episodes=1,
+   prewarm_count=0,stop_event=script_stop,isolate_case_errors=True)
+  self.assertFalse(model_stop.is_set());self.assertFalse(script_stop.is_set());release.set();thread.join(3)
+  self.assertEqual(control['cases']['control']['status'],'failed')
+  self.assertEqual(answers[0]['cases']['model']['status'],'completed')
+
+ def test_cleanup_error_is_retained_and_never_claimed_recovered(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   class Admission:
+    def quarantine(self,evidence):self.evidence=evidence
+    def recover_quarantine(self,proof):raise AssertionError('Must not recover')
+   proc=SimpleNamespace(poll=lambda:None,terminate=lambda:(_ for _ in ()).throw(SystemExit('cleanup error')))
+   result=CALLER['isolate_case_error'](self.spec(),'bad',ValueError('tool error'),'tool',Path(tmp),proc,None,None,Admission())
+   self.assertTrue(result['quarantined'])
+   proof=json.loads((Path(tmp)/'bad-case-isolation.json').read_text())
+   self.assertEqual(proof['secondary_errors'][0]['stage'],'process_containment')
+   self.assertFalse(proof['cleanup_verified'])
+
+ def test_readiness_failure_is_local_and_does_not_validate_other_cases(self):
+  spec={**self.spec(),'ready':{'path':'CPU-fixture'}};case={'id':'bad'}
+  with patch.dict(CALLER['check_private_case'].__globals__,{'source_guard':lambda *a:None,
+   'helper':lambda *_:{'recipe_check':lambda c:None},'checked':lambda *_:'unused',
+   'load':lambda *_:{'driver':spec['driver'],'cases':[]}}):
+   with self.assertRaisesRegex(ValueError,'missing'):CALLER['check_private_case'](spec,case)
+   CALLER['check_private_case'](spec,case,scripted=True) # no dependency on another job outcome
+
+class ContinuousEventsTests(unittest.TestCase):
+ def test_summary_separates_task_verdicts_execution_errors_and_blocked(self):
+  rows={}
+  for key,verdict in [('pass','pass'),('fail','fail'),('inconclusive','inconclusive')]:
+   rows[key]={'status':'completed','result':{'payload':{'task_verdict':verdict}}}
+  for key in ('failed','blocked','not_started'):rows[key]={'status':key}
+  self.assertEqual(CALLER['suite_outcome_counts']({'cases':rows}),{'completed':3,'execution_failed':1,
+   'blocked':1,'not_started':1,'task_pass':1,'task_fail':1,'inconclusive':1,'unknown':3})
+
+ @unittest.skipUnless(os.environ.get('EPISODE_EVENTS_SOURCE'),'Pinned external Events fixture not supplied')
+ def test_actual_events_finalize_failed_pending_and_blocked_rows_without_retry(self):
+  from hashlib import sha256
+  path=Path(os.environ['EPISODE_EVENTS_SOURCE'])
+  self.assertEqual(sha256(path.read_bytes()).hexdigest(),'16a2bdd7f53dfef4135b464d062b32116af549c935c9645e9f052c1241ee476a')
+  Events=runpy.run_path(str(path))['Events']
+  with tempfile.TemporaryDirectory() as tmp:
+   out=Path(tmp);events=Events(out/'completion.sqlite');events.register('CPU-scripted',['good','bad','thread-failure','blocked'])
+   events.subscribe('final','CPU-scripted','cpu-fixture-no-delivery',final=True)
+   events.start('CPU-scripted','good');events.finish('CPU-scripted','good','succeeded',{'task_verdict':'fail','scripted':True})
+   events.start('CPU-scripted','bad')
+   result={'cases':{'good':{'status':'completed'},'bad':{'status':'failed','error':{'stage':'grader'},'quarantine':None},
+    'thread-failure':{'status':'failed','error':{'stage':'thread_start'},'quarantine':None},'blocked':{'status':'blocked'}}}
+   (out/'suite-result.json').write_text(json.dumps(result))
+   CALLER['reconcile_queue_events']({'runtime_mode':'qwen-private-v1','suite_id':'CPU-scripted'},result,{'good':{},'bad':{}},events,out)
+   with events.transaction() as db:
+    rows={r['id']:(r['state'],json.loads(r['payload'])) for r in db.execute('SELECT * FROM episodes')}
+   self.assertEqual([rows[x][0] for x in ['good','bad','thread-failure','blocked']],['succeeded','failed','failed','not_started'])
+   self.assertIsNone(rows['bad'][1]['task_verdict']);self.assertIsNone(rows['thread-failure'][1]['task_verdict'])
+   self.assertTrue(rows['blocked'][1]['blocked_by_quarantine'])
+   self.assertEqual(len(events.notices()),1)
+   with self.assertRaises(ValueError):events.start('CPU-scripted','bad') # no browser/model retry authority
+
+class IsolatedRPCFailureTests(OBS['ObserverTests']):
+ def test_bad_cleanup_retains_only_case_and_verified_recovery_clears_it(self):
+  a=self.client('a');b=self.client('b');self.host.activate('a',priority=0);self.host.activate('b',priority=1)
+  a.close()
+  with self.assertRaises(self.mods['rpc'].CapacityChannelError):
+   self.host.finish_isolated_case('a',verify_cleanup=lambda:False,record_terminal=lambda:True)
+  self.assertFalse(self.stop.is_set());self.assertIn('a',self.host.parent.quarantined)
+  self.assertFalse(self.host.controller.status()['episodes']['a']['done'])
+  with b.turn('policy'):pass
+  self.host.finish_isolated_case('a',verify_cleanup=lambda:True,record_terminal=lambda:True)
+  self.assertNotIn('a',self.host.parent.quarantined)
+  self.assertTrue(self.host.controller.status()['episodes']['a']['done'])
+  c=self.client('c');self.host.activate('c',priority=2)
+  with c.turn('policy'):pass
+  for ident,client in [('b',b),('c',c)]:client.close();self.host.finish(ident,verify_cleanup=lambda:True,record_terminal=lambda:True)
+
+ def test_quarantine_preserves_sent_request_without_credit_or_global_stop(self):
+  a=self.client('a');self.host.activate('a',priority=0)
+  entered=threading.Event();release=threading.Event();errors=[]
+  def turn():
+   try:
+    with a.turn('policy'):entered.set();release.wait(3)
+   except BaseException as exc:errors.append(exc)
+  thread=threading.Thread(target=turn);thread.start()
+  try:
+   self.assertTrue(entered.wait(2));before=self.host.controller.status()['episodes']['a']['request_id']
+   self.assertIsNotNone(before);self.host.quarantine_case('a',RuntimeError('uncertain HTTP'))
+   self.assertFalse(self.stop.is_set())
+   self.assertEqual(self.host.controller.status()['episodes']['a']['request_id'],before)
+   self.assertFalse(self.host.controller.status()['episodes']['a']['done'])
+  finally:release.set();thread.join(4);a.close()
+  # Only a trusted final callback proving the exact HTTP drain can clear it.
+  self.host.finish_isolated_case('a',verify_cleanup=lambda:True,record_terminal=lambda:True)
+  self.assertTrue(self.host.controller.status()['episodes']['a']['done'])
 
 if __name__=='__main__':unittest.main()

@@ -81,6 +81,37 @@ class EpisodeAdmission:
         with self._queue.condition:
             self._check_locked()
 
+    def quarantine(self, evidence):
+        """Trusted parent reserves an uncertain case resource, without job stop."""
+        if type(evidence) is not dict or not evidence:
+            raise AdmissionError('Explicit case quarantine evidence required')
+        q = self._queue
+        with q.condition:
+            row = q.rows[self.case_id]
+            if not row['started'] or row.get('quarantine') is not None:
+                raise AdmissionError('Invalid or duplicate case quarantine')
+            row['quarantine'] = dict(evidence)
+            q.emit('case_quarantined', self.case_id)
+            q.condition.notify_all()
+
+    def recover_quarantine(self, verify_cleanup):
+        """No replay; clear only this reservation after caller-owned proof."""
+        if not callable(verify_cleanup):
+            raise AdmissionError('Trusted cleanup verification callback required')
+        if verify_cleanup() is not True:
+            return False
+        q = self._queue
+        with q.condition:
+            row = q.rows[self.case_id]
+            if row.get('quarantine') is None:
+                raise AdmissionError('Case has no quarantine to recover')
+            row['quarantine'] = None
+            q.emit('case_quarantine_recovered', self.case_id)
+            if row['done'] and q.running and not q.finished:
+                q.pump()
+            q.condition.notify_all()
+        return True
+
     def runner_callback(self, cancellation_type):
         """Bind the native cancellation class from the caller's frozen namespace."""
         if (not isinstance(cancellation_type, type)
@@ -163,7 +194,7 @@ class EpisodeQueueHandle:
 
 class _Queue:
     def __init__(self, cases, run_case, settings, stop_event, on_queue_ready=None,
-                 max_concurrent_ceiling=None):
+                 max_concurrent_ceiling=None, isolate_case_errors=False):
         self.order = settings.validate(cases)
         if not callable(run_case):
             raise TypeError('run_case must be callable')
@@ -175,6 +206,9 @@ class _Queue:
             if (type(max_concurrent_ceiling) is not int
                     or max_concurrent_ceiling < settings.max_concurrent_episodes):
                 raise ValueError('Fixed ceiling must be an integer at least the initial target')
+        if type(isolate_case_errors) is not bool:
+            raise ValueError("Explicit boolean case error isolation required")
+        self.isolate_case_errors = isolate_case_errors
         self.cases, self.run_case, self.settings = cases, run_case, settings
         self.condition = Condition(RLock())
         self.on_queue_ready = on_queue_ready
@@ -190,13 +224,15 @@ class _Queue:
         return self.stop_event.is_set()
 
     def counts(self):
-        live = [r for r in self.rows.values() if r['started'] and not r['done']]
+        live = [r for r in self.rows.values() if r['started'] and (not r['done'] or r.get('quarantine') is not None)]
         return sum(r['active'] for r in live), sum(not r['active'] for r in live)
 
     def emit(self, event, ident):
         active, warm = self.counts()
         self.events.append(dict(sequence=len(self.events), event=event, case=ident,
-                                active=active, warming_or_ready=warm))
+                                active=active, warming_or_ready=warm,
+                                executing_active=sum(r['started'] and r['active'] and not r['done'] for r in self.rows.values()),
+                                quarantined=sum(r.get('quarantine') is not None for r in self.rows.values())))
         if self.on_queue_ready is not None:
             self.events[-1].update(target=self.target, ceiling=self.ceiling)
 
@@ -213,7 +249,10 @@ class _Queue:
             # further creation, wake parked workers, and retain the failure.
             row.update(done=True, status='failed',
                        error=dict(type=type(exc).__name__, message=str(exc)))
-            self.stop_event.set()
+            if self.isolate_case_errors:
+                row['quarantine']=None # No worker or case resource was created.
+                row['error']['stage']='worker_creation'
+            else:self.stop_event.set()
             self.emit('worker_start_failed', ident)
             self.condition.notify_all()
             return
@@ -229,7 +268,7 @@ class _Queue:
             if self.counts()[0] >= self.target:
                 break
             row = self.rows[ident]
-            if row['done'] or row['active']:
+            if row['done'] or row['active'] or row.get('quarantine') is not None:
                 continue
             if row['started']:
                 row.update(active=True, status='admitted')
@@ -272,9 +311,13 @@ class _Queue:
         except BaseException as exc:
             # Do not silently strand a lease when a worker receives SystemExit.
             error, status = dict(type=type(exc).__name__, message=str(exc)), 'failed'
-            self.stop_event.set()
+            if not self.isolate_case_errors:self.stop_event.set()
         finally:
             with self.condition:
+                if self.isolate_case_errors and status=='failed' and 'quarantine' not in self.rows[ident]:
+                    # Unexpected callback/finalizer failure has no cleanup proof.
+                    self.rows[ident]['quarantine']={'unverified_callback_failure':error}
+                    self.emit('case_quarantined', ident)
                 self.rows[ident].update(done=True, status=status, result=result, error=error)
                 self.emit('lifecycle_finished', ident)
                 self.pump()
@@ -307,8 +350,9 @@ class _Queue:
                 self.running, self.finished = False, True
                 for ident, row in self.rows.items():
                     if not row['started']:
-                        row.update(done=True, status='not_started')
-                        self.emit('not_started', ident)
+                        blocked=any(r.get('quarantine') is not None for r in self.rows.values()) and not self.stopped()
+                        row.update(done=True, status='blocked' if blocked else 'not_started')
+                        self.emit('blocked_quarantine' if blocked else 'not_started', ident)
                 self.condition.notify_all()
         with self.condition:
             result = dict(cases={i: dict(r) for i, r in self.rows.items()}, events=list(self.events),
@@ -323,7 +367,7 @@ class _Queue:
 
 def run_ordered_suite(cases, run_case, *, max_concurrent_episodes, prewarm_count=1,
                       start_order=None, stop_event=None, on_queue_ready=None,
-                      max_concurrent_ceiling=None):
+                      max_concurrent_ceiling=None, isolate_case_errors=False):
     """Execute each selected case once; cold entries do not call run_case.
 
     cases maps IDs to opaque frozen caller inputs. run_case(value, admission)
@@ -338,4 +382,4 @@ def run_ordered_suite(cases, run_case, *, max_concurrent_episodes, prewarm_count
     """
     settings = QueueSettings(max_concurrent_episodes, prewarm_count, start_order)
     return _Queue(dict(cases), run_case, settings, stop_event,
-                  on_queue_ready, max_concurrent_ceiling).run()
+                  on_queue_ready, max_concurrent_ceiling, isolate_case_errors).run()

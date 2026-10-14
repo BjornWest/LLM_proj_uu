@@ -135,6 +135,7 @@ class CapacityParent:
             raise ValueError('Shared suite stop event must be threading.Event')
         self.suite_stop_event = suite_stop_event if suite_stop_event is not None else threading.Event()
         self.cleanup_failures = {}
+        self.quarantined = {}
         self.stop_cause = None
         self.secondary_exits = deque(maxlen=2048)
         self.shutdown_requested = {}
@@ -331,7 +332,7 @@ class CapacityParent:
                 requested = self.shutdown_requested.get(case)
                 cause = self.stop_cause
                 cleanup_failure = self.cleanup_failures.get(case)
-                protected_root = bool(cleanup_failure or (cause and cause['infrastructure'] and case == cause['case']))
+                protected_root = bool(case in self.quarantined or cleanup_failure or (cause and cause['infrastructure'] and case == cause['case']))
             if registered:
                 self.controller.retire_dispatch(case)
             if registered and not finishing:
@@ -349,7 +350,7 @@ class CapacityParent:
                     self._cancel_registered(case)
                 elif protected_root and not failed and row['request_id'] is not None:
                     with self.lock:
-                        evidence = cleanup_failure or cause
+                        evidence = cleanup_failure or self.quarantined.get(case) or cause
                         self.errors[case] = dict(type=evidence['type'],message=evidence['message'],
                             reason='infrastructure_abort')
             connection.close()
@@ -406,17 +407,19 @@ class CapacityParent:
                     return
         self._shutdown(case, reason='cohort_abort' if cohort_abort else 'explicit_cancellation')
 
-    def finish_after_cleanup(self, case, *, verify_cleanup, record_terminal, timeout=5):
+    def finish_after_cleanup(self, case, *, verify_cleanup, record_terminal, timeout=5, abort_cohort_on_failure=True):
         """Trusted outer boundary after child exit, HTTP abort/drain and grading.
 
         Both callbacks must return literal True. ``record_terminal`` verifies
         persisted grade/projection or explicit infrastructure failure evidence;
         it must not demand a passing task verdict. Failed cleanup retains the
         controller permit and active episode. This is a final verification
-        boundary, not a recoverable probe. Failure aborts the cohort and wakes
-        all local waiters, retaining sent requests until verified cleanup.
-        The queue must share suite_stop_event so failure stops refill too.
+        boundary. The default retains legacy cohort abort. Opt-in isolated
+        failure quarantines only this case, preserving sent requests until
+        trusted cleanup is verified; unrelated actors and refill continue.
         """
+        if type(abort_cohort_on_failure) is not bool:
+            raise ValueError('Explicit final-verification failure scope required')
         if not callable(verify_cleanup) or not callable(record_terminal):
             raise ValueError('Explicit cleanup and terminal evidence callbacks required')
         if not math.isfinite(timeout) or timeout <= 0:
@@ -450,6 +453,7 @@ class CapacityParent:
                         self.controller.release_turn(case, row['request_id'])
                     self.controller.finish_episode(case)
                 self.finished.add(case)
+                self.quarantined.pop(case, None)
         except BaseException as exc:
             # A diagnostic read must never replace the real verification failure
             # or prevent recording its ledger/stop. Retain unknown request IDs.
@@ -463,14 +467,27 @@ class CapacityParent:
                 # for every actor, regardless of the first cohort stop cause.
                 self.cleanup_failures.setdefault(case, dict(type=type(exc).__name__,
                     message=str(exc),stage=stage,request_id=request_id))
-            self.suite_stop_event.set()
-            try:
-                self.abort_after_failure(case, exc, infrastructure=True)
-            except BaseException as secondary:
-                exc.add_note('Abort cleanup also failed: '+type(secondary).__name__)
+            if abort_cohort_on_failure:
+                self.suite_stop_event.set()
+                try:
+                    self.abort_after_failure(case, exc, infrastructure=True)
+                except BaseException as secondary:
+                    exc.add_note('Abort cleanup also failed: '+type(secondary).__name__)
+            else:
+                self.quarantine_after_failure(case, exc)
             raise
         finally:
             with self.lock:self.finishing.discard(case)
+
+    def quarantine_after_failure(self, case, error):
+        """Retire only this actor; keep all uncertain permit/lifecycle ownership."""
+        if case not in self.connections or not isinstance(error, BaseException):
+            raise ValueError('Known case and actual failure required')
+        with self.lock:
+            self.quarantined.setdefault(case, dict(case=case,type=type(error).__name__,
+                message=str(error),observed_monotonic=self.clock()))
+        self._retire_registered(case)
+        self._shutdown(case, reason='case_quarantine')
 
     def abort_after_failure(self, case, error, *, infrastructure):
         """Terminal stop with explicit caller-owned infrastructure classification.

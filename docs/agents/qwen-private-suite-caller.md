@@ -50,9 +50,10 @@ The Training worker uses the dedicated browser Python, with bytecode disabled:
 
 `prepare-qwen` only checks pinned source/recipe inventories and reports preparation;
 it does not import target consumers, contact serving or qualify dispatch.
-`supervise` requires reviewed exact configuration, exact positive scripted case
-acceptance, separate finite episode/rental approval and a fresh live serving
-contract. The worker must run under the existing bounded launcher/cgroup limits.
+`supervise` requires reviewed exact configuration, separate finite episode/rental
+approval and a fresh live serving contract. Each case checks its exact positive
+scripted source/native acceptance before creating a child; a missing binding is
+a per-case readiness failure, rather than a whole-suite completion gate. The worker must run under the existing bounded launcher/cgroup limits.
 Training owns an allocation-anchored host-deletion watchdog. The source capsule
 and environment must be qualified before these are usable host commands.
 
@@ -426,23 +427,46 @@ owns the queue, one capacity controller and one shared metrics poller for the
 whole finite cohort. Existing sticky KV-pressure parking, retirement, acknowledged
 permit release and atomic queue/controller limit CAS remain in force.
 
-A normal negative or inconclusive native task verdict is a measured completion;
-it never aborts other cases. A technical case error can also release its lifecycle
-slot after the child has exited, the exact launcher proves containment, wrapper
-finalizers acknowledge pool and capacity-channel cleanup, and the controller has
-no outstanding request for that case. The failure receipt keeps its task verdict
-null. The parent verifies shared source/service health and fresh telemetry, then
-uses the existing final cleanup boundary to finish that case. It never cancels a
-sent request or grants early capacity credit merely because the child failed.
+A normal negative or inconclusive native task verdict is a measured completion.
+Timeout, tool, setup/readiness, formatter, grading and projection exceptions are
+recorded per case, with their stage, timestamps and partial trace locations. They
+never set the cohort stop flag. Missing grades remain unknown task outcomes.
+Every case is attempted once; progressing to the next case does not retry the
+failed episode. Scripted jobs use their own result scope and stop event, and their
+outcomes have no cancellation or completion authority over model jobs.
 
-The parent waits for natural child cleanup for at most the configured shutdown
-grace, bounded by the remaining rental. Missing cleanup evidence, an uncertain
-request/acknowledgement, source integrity failure, dead shared service, stale
-telemetry, containment failure or rental expiry keeps cohort-level failure
-handling. A complete cohort containing isolated technical errors still exits as
-failed after collecting the other cases; its original case grades remain distinct.
-Zero-provider controls retain their explicit scripted allowance; this allowance
-never becomes a real-model episode ceiling.
+A case error releases its lifecycle slot only after child exit, exact launcher
+containment, acknowledged wrapper/pool/capacity cleanup and no outstanding request.
+Otherwise `EpisodeAdmission.quarantine(evidence)` keeps its active or warm resource
+reservation, while independent work continues in other safe slots. The capacity
+parent's `quarantine_after_failure` retires dispatch without canceling another actor
+or releasing an uncertain permit. Its opt-in `finish_after_cleanup(...,
+abort_cohort_on_failure=False)` retains that case on failed verification. Trusted
+cleanup/terminal callbacks can later complete the capacity row; only then may the
+queue's `recover_quarantine(verify_cleanup)` clear the reservation. Recovery never
+replays an episode, and a completed queue cannot be restarted by recovery. This is
+a trusted parent API; no broker lease disappearance or generic process exit is
+accepted as a native context or remote HTTP cleanup certificate.
+
+Process containment is bounded by the configured cleanup grace and rental deadline.
+A source/ready binding failure before child creation has no case browser/model
+effects and can safely recover that reservation. Choose `shared_service_case_id`
+explicitly when the shared service baseline should differ from the first task;
+its committed source is a common service dependency. Each admitted task separately
+checks agreement with those pinned pool sources. Recipe/source/readiness checks
+for one task are not performed as a whole-suite launch gate.
+
+If every usable slot is quarantined, remaining cases are explicitly blocked with
+unknown verdicts; the finite queue returns rather than claiming cleanup or hanging
+forever. `suite-outcomes.json` separates completed task pass/fail/inconclusive,
+execution failures, blocked and not-started cases. A nonzero CLI status follows
+queue drain and terminal evidence collection. Explicit user cancellation, rental
+expiry and separately evidenced shared-service outages remain job controls.
+Unexpected callback/finalizer exits are conservatively quarantined by the private
+queue's opt-in `isolate_case_errors=True`; the legacy queue default is unchanged.
+Zero-provider controls retain their explicit scripted allowance; it never becomes
+a real-model episode ceiling. Thread-creation failure before a worker exists is
+recorded without an uncertain resource reservation and does not stop this queue.
 
 Trusted phase timestamps are written in `phases/CASE.jsonl` (parent) and
 `CASE/child-phases.jsonl` (child). They include queueing, process launch, environment

@@ -257,6 +257,7 @@ class CapacityHost:
     def __init__(self, *, rpc, control, telemetry, source, output, case_ids, cap,
                  deadline, stop_event, directory, qualification):
         self.rpc, self.stop, self.directory = rpc, stop_event, Path(directory)
+        self.case_isolation = source.get('runtime_mode') == 'qwen-private-v1'
         self.pairs = {}
         self.listeners, self.tokens, self.relays = {}, {}, {}
         self.controller=self.parent=self.observer=self.poller=self.journal=self.observer_rpc=self.limits_rpc=None
@@ -349,7 +350,8 @@ class CapacityHost:
                             try:target.sendall(data)
                             finally:target.setblocking(False)
             except BaseException as e:
-                errors.append(e);self.stop.set()
+                errors.append(e)
+                if not self.case_isolation:self.stop.set()
             finally:
                 if remote:remote.close()
                 local.close()
@@ -387,6 +389,13 @@ class CapacityHost:
                 or self.journal.failure is not None or not self.poller.thread.is_alive()):
             raise RuntimeError('Shared health or exact case request cleanup is unverified')
         self.finish(ident, verify_cleanup=verify_cleanup, record_terminal=record_terminal)
+
+    def quarantine_case(self, ident, error):
+        self.parent.quarantine_after_failure(ident,error)
+
+    def finish_isolated_case(self, ident, *, verify_cleanup, record_terminal):
+        self.parent.finish_after_cleanup(ident,verify_cleanup=verify_cleanup,
+            record_terminal=record_terminal,timeout=5,abort_cohort_on_failure=False)
 
     def failed(self, ident, error, *, infrastructure=True):
         self.parent.abort_after_failure(ident,error,infrastructure=infrastructure)
