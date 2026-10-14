@@ -207,14 +207,24 @@ class AgentBrowser(HumanBrowser):
             return
         page = self.pages[self.active]
         started = time.monotonic()
-        result = settle_call(page, 'wait', [READINESS_QUIET_MS, READINESS_TIMEOUT_MS])
+        from .native_capture import CaptureBudget, CaptureDeadlineExceeded
+        # The page-side wait has its own deadline; bound the RPC as well so a
+        # suspended document cannot hold the episode after an action.
+        budget = CaptureBudget(page, self.trace, seconds=READINESS_TIMEOUT_MS / 1000 + 0.5,
+                               scope='readiness', event_prefix='readiness',
+                               enforce=self.capture_timeout_mode == 'bounded')
+        try:
+            with budget.rpc_deadline():
+                result = settle_call(page, 'wait', [READINESS_QUIET_MS, READINESS_TIMEOUT_MS])
+        except CaptureDeadlineExceeded:
+            result = {'status': 'rpc_timeout', 'reason': 'readiness_rpc_deadline_exceeded'}
         if result is None:
             # New document without the tracker (e.g. error page): short fixed wait.
             time.sleep(0.1)
             result = {'status': 'unknown', 'reason': 'settle_tracker_unavailable', 'fallback_sleep_seconds': 0.1}
         result['seconds'] = time.monotonic() - started
         self.last_readiness = result
-        self.trace.event('observation_readiness', scope='page_settle_v1', **result)
+        self.trace.event('observation_readiness', scope='page_settle_v2', **result)
         if result['status'] not in ('ready', 'unknown') and not self.env.last_action_error:
             self.env.last_action_error = (
                 'Readiness ' + result['status'] + ': the page was still loading or changing after the action. '
@@ -230,6 +240,6 @@ class AgentBrowser(HumanBrowser):
 
     def describe(self):
         return {'version': VERSION, 'custody': 'agent_only', 'policy_tools_added': [],
-                'capture': 'unmarked-ax-v1', 'readiness': 'page-settle-v1' if self.readiness else 'native_dom_wait',
+                'capture': 'unmarked-ax-v1', 'readiness': 'page-settle-v2' if self.readiness else 'native_dom_wait',
                 'readiness_quiet_ms': READINESS_QUIET_MS, 'readiness_timeout_ms': READINESS_TIMEOUT_MS,
                 'pre_observation_delay_seconds': 0}

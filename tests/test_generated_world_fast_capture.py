@@ -194,34 +194,183 @@ def test_dom_bid_map_and_attach_skip_text_nodes():
     assert [n.get('browsergym_id') for n in tree['nodes']] == ['7', None, None]
 
 
-def _decision(pending_tree, full_tree, *, revision=(1, 1), bids=()):
+def _decision(pending_tree, full_tree, *, revision=(1, 1), bids=(), live=None, current_tree=None, monkeypatch=None):
+    """BudgetedDecision with stubbed identity; live settle state and fresh AX read are injectable."""
+    from intent_browser import budgeted_decision
     from intent_browser.budgeted_decision import BudgetedDecision
     decision = BudgetedDecision.__new__(BudgetedDecision)
     identity = {'tab': 't', 'cycle': None, 'document': {'frame_id': 'F'}}
     decision.identity = lambda: identity
+    decision.human = NS(env=NS(page=object()))
     decision.pending = {'identity': identity, 'revision': {'revision': revision[0]}, 'tree': pending_tree,
                         'bids': list(bids)}
     decision.full = {'human_tab_capture': {'document': identity['document']}, 'axtree_object': full_tree,
                      'page_revision': {'revision': revision[1]}}
+    if monkeypatch is not None:
+        state = {'revision': revision[0]} if live is None else live
+        monkeypatch.setattr(budgeted_decision, 'settle_call', lambda page, expression, argument=None: state)
+        monkeypatch.setattr(budgeted_decision, 'extract_json',
+                            lambda extractor, page: current_tree if current_tree is not None else pending_tree)
     return decision
 
 
-def test_validation_accepts_unchanged_revision_and_matching_bids():
+def test_validation_accepts_unchanged_revision_and_matching_bids(monkeypatch):
     tree = {'nodes': [{'nodeId': '1', 'role': {'value': 'link'}, 'backendDOMNodeId': 3, 'browsergym_id': '9'}]}
-    _decision(tree, tree, bids=[(3, 'link', '9')]).validate()
+    decision = _decision(tree, tree, bids=[(3, 'link', '9')], monkeypatch=monkeypatch)
+    decision.validate()
+    assert decision.revision_proven is True
 
 
-def test_validation_rejects_changed_page_and_moved_bid():
+def test_validation_rejects_changed_page_and_moved_bid(monkeypatch):
     from intent_browser.observation_pipeline import ObservationChanged
     before = {'nodes': [{'nodeId': '1', 'role': {'value': 'link'}, 'name': {'value': 'A'}, 'backendDOMNodeId': 3}]}
     after = {'nodes': [{'nodeId': '1', 'role': {'value': 'link'}, 'name': {'value': 'B'}, 'backendDOMNodeId': 3}]}
     with pytest.raises(ObservationChanged):
-        _decision(before, after, revision=(1, 2)).validate()
-    # A revision change with identical AX semantics (e.g. an irrelevant attribute) is accepted.
-    _decision(before, json.loads(json.dumps(before)), revision=(1, 2)).validate()
+        _decision(before, after, revision=(1, 2), live={'revision': 2}, monkeypatch=monkeypatch).validate()
+    # A revision change with identical AX semantics (e.g. an irrelevant attribute)
+    # is accepted for actions, but the revision is not proven for fact binding.
+    same = _decision(before, json.loads(json.dumps(before)), revision=(1, 2), live={'revision': 2},
+                     monkeypatch=monkeypatch)
+    same.validate()
+    assert same.revision_proven is False
     moved = {'nodes': [{'nodeId': '1', 'role': {'value': 'link'}, 'backendDOMNodeId': 3, 'browsergym_id': '10'}]}
     with pytest.raises(ObservationChanged):
-        _decision(moved, moved, bids=[(3, 'link', '9')]).validate()
+        _decision(moved, moved, bids=[(3, 'link', '9')], monkeypatch=monkeypatch).validate()
+
+
+def test_cached_bid_renumbered_by_marking_invalidates_decision(monkeypatch):
+    # Review finding 1: a clone copied the original's cached BID; native marking
+    # keeps it on the first occurrence (the clone) and renumbers the original.
+    from intent_browser.observation_pipeline import ObservationChanged
+    original = {'nodeId': '1', 'backendDOMNodeId': 3, 'role': {'value': 'button'}, 'name': {'value': 'Commit'},
+                'browsergym_id': '9'}
+    clone = {'nodeId': '2', 'backendDOMNodeId': 4, 'role': {'value': 'button'}, 'name': {'value': 'Decoy'},
+             'browsergym_id': '9'}
+    pending = {'nodes': [clone, original]}
+    full = json.loads(json.dumps(pending)); full['nodes'][1]['browsergym_id'] = '10'
+    published = [(n['backendDOMNodeId'], n['role']['value'], n['browsergym_id']) for n in pending['nodes']]
+    with pytest.raises(ObservationChanged):
+        _decision(pending, full, bids=published, monkeypatch=monkeypatch).validate()
+
+
+def test_change_after_background_capture_is_read_at_completion(monkeypatch):
+    # Review finding 2: decision and background agree (revision 1) but the live
+    # page reached revision 2 with a changed price before the response arrived.
+    from intent_browser.observation_pipeline import ObservationChanged
+    tree = {'nodes': [{'nodeId': '1', 'backendDOMNodeId': 3, 'role': {'value': 'button'}, 'name': {'value': 'Buy'},
+                       'browsergym_id': '9'},
+                      {'nodeId': '2', 'backendDOMNodeId': 5, 'role': {'value': 'StaticText'}, 'name': {'value': '480 kr'}}]}
+    late = json.loads(json.dumps(tree)); late['nodes'][1]['name']['value'] = '520 kr'
+    with pytest.raises(ObservationChanged):
+        _decision(tree, json.loads(json.dumps(tree)), live={'revision': 2}, current_tree=late,
+                  bids=[(3, 'button', '9')], monkeypatch=monkeypatch).validate()
+    # Tracker unavailable at completion: a fresh read must still match.
+    unknown = _decision(tree, json.loads(json.dumps(tree)), current_tree=late, monkeypatch=monkeypatch)
+    monkeypatch.setattr('intent_browser.budgeted_decision.settle_call', lambda *a, **k: None)
+    with pytest.raises(ObservationChanged):
+        unknown.validate()
+
+
+def test_invalidated_decision_keeps_fact_mappings_unknown():
+    # Review finding 3: decision outputs are re-bound only after validation proves
+    # the same revision; an invalidated decision is never credited with new facts.
+    from copy import deepcopy
+    import threading
+    from tests import test_fact_provenance as provenance_cases
+    from intent_browser.observation_pipeline import ObservationPipeline
+    case = provenance_cases.ProvenanceTests(); case.setUp()
+    try:
+        x, obs, recorder = case.fixture()
+        recorder.pipeline_boundary = 'test-pipeline'
+        obs['observation_capture'] = {'version': 'budgeted-decision-v1', 'coverage': 'full'}
+        output = x.prepare_observation(obs)
+        ledger, cid = case.policy(recorder, output)
+        full = deepcopy(obs); full.pop('observation_capture')
+        full['axtree_object']['nodes'][0]['name']['value'] = 'Different offer'
+        case.state = 'state-2'
+        decision = _decision(obs['axtree_object'], full['axtree_object'], revision=(1, 2))
+        decision.full.update(full)
+        def changed():
+            from intent_browser.observation_pipeline import ObservationChanged
+            raise ObservationChanged('Page changed during inference; decision context is stale')
+        decision.validate = changed
+        decision.capture = lambda: 'background-artifact'
+        pipeline = ObservationPipeline.__new__(ObservationPipeline)
+        pipeline.dynamic = decision; pipeline.pending = None; pipeline.pool = None
+        pipeline.after_background = x.capture
+        pipeline.after_validation = recorder.finish_decision
+        class Backend:
+            supports_background_completion = True
+            def complete(self, messages):
+                return 'retained-completion'
+        event = {}
+        assert pipeline.complete(Backend(), [], event) == 'retained-completion'
+        pipeline.pool.shutdown()
+        assert event['observation_pipeline']['invalidated'] is True
+        case.receipt(ledger, cid)
+        policy = json.loads((case.path / f'fact-policy-{cid}.json').read_text())
+        assert policy['projections'] == []
+        records = [json.loads(p.read_text()) for p in case.path.glob('fact-output-*.json')]
+        assert any({'reason': 'decision_invalidated_no_rebinding'} in r['diagnostics'] for r in records)
+    finally:
+        case.doCleanups()
+
+
+def test_proven_revision_rebinds_decision_facts():
+    from copy import deepcopy
+    from tests import test_fact_provenance as provenance_cases
+    case = provenance_cases.ProvenanceTests(); case.setUp()
+    try:
+        x, obs, recorder = case.fixture()
+        recorder.pipeline_boundary = 'test-pipeline'
+        decision_obs = deepcopy(obs)
+        decision_obs['observation_capture'] = {'version': 'budgeted-decision-v1', 'coverage': 'full'}
+        output = x.prepare_observation(decision_obs)
+        ledger, cid = case.policy(recorder, output)
+        assert json.loads((case.path / f'fact-policy-{cid}.json').read_text())['projections'] == []
+        x.capture(obs)  # background capture of the same page, with provenance
+        recorder.finish_decision({'valid': True, 'revision_proven': True})
+        case.receipt(ledger, cid)
+        policy = json.loads((case.path / f'fact-policy-{cid}.json').read_text())
+        assert policy['projections']
+    finally:
+        case.doCleanups()
+
+
+def test_page_settle_wait_is_bounded_and_xhr_settles_once(tmp_path):
+    # Review finding 4 and the XHR counter: run the exact script in a Node VM.
+    import shutil, subprocess
+    from pathlib import Path
+    import playwright
+    node = Path(playwright.__file__).parent / 'driver' / 'node'
+    if not node.exists():
+        pytest.skip('bundled node unavailable')
+    script = tmp_path / 'settle.cjs'
+    script.write_text(r"""
+const fs=require('node:fs'), vm=require('node:vm'); const {webcrypto}=require('node:crypto');
+const source=fs.readFileSync(process.argv[2],'utf8');
+function context(raf){
+  class XHR extends EventTarget { send(){ if(this.active) throw new Error('InvalidStateError'); this.active=true; }
+    finish(){ this.active=false; this.dispatchEvent(new Event('loadend')); } }
+  const c=vm.createContext({performance,crypto:webcrypto,document:{},MutationObserver:class{observe(){}},
+    addEventListener(){},HTMLInputElement:class{},HTMLTextAreaElement:class{},HTMLSelectElement:class{},
+    HTMLOptionElement:class{},XMLHttpRequest:XHR,requestAnimationFrame:raf,setTimeout,clearTimeout});
+  vm.runInContext(source,c); return c;
+}
+(async()=>{
+  const stalled=context(()=>{});
+  const first=await Promise.race([stalled.__intentPageSettle.wait(0,40),
+    new Promise(r=>setTimeout(()=>r({status:'hung'}),400))]);
+  const live=context(cb=>setTimeout(cb,1));
+  const ready=await live.__intentPageSettle.wait(5,500);
+  const x=new live.XMLHttpRequest(); x.send(); try{ x.send(); }catch{} x.finish();
+  console.log(JSON.stringify({stalled:first.status, ready:ready.status, pending:live.__intentPageSettle.state().pending}));
+})();
+""")
+    source = Path(__file__).resolve().parents[1] / 'intent_browser' / 'page_settle.js'
+    result = json.loads(subprocess.run([str(node), str(script), str(source)], capture_output=True, text=True,
+                                       timeout=30, check=True).stdout)
+    assert result == {'stalled': 'frame_timeout', 'ready': 'ready', 'pending': 0}
 
 
 # -- fact provenance from the harness DOM snapshot --------------------------------

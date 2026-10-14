@@ -528,14 +528,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                                                 is not None else ax_explorer.config.overview_tokens)
             if fact_pipeline_boundary is not None and fact_recorder is not None:
                 human_browser.capture_hooks.append(fact_source_provider)
-            def adopt_background(full):
-                # Owner thread, while the request is in flight: index the full
-                # capture (recording its paired facts) and bind the decision
-                # overview to it before policy delivery is acknowledged.
-                ax_explorer.capture(full)
-                if fact_recorder is not None:
-                    fact_recorder.restage_deferred()
-            pipeline.after_background = adopt_background
+            # Owner thread, while the request is in flight: index the full
+            # capture (recording its paired facts). Decision fact outputs are
+            # re-bound only after validation proves the same page revision.
+            pipeline.after_background = ax_explorer.capture
+            if fact_recorder is not None:
+                pipeline.after_validation = fact_recorder.finish_decision
             trace.metadata['agent_custody'] = human_browser.describe()
             write_json(trace.directory / 'metadata.json', trace.metadata)
         if handover_enabled:

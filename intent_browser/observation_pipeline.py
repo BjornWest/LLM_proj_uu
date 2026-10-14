@@ -126,6 +126,7 @@ class ObservationPipeline:
         self.dynamic=None
         self.overview_budget=lambda:None
         self.after_background=None
+        self.after_validation=None
         self.defer_next_step=False;self.in_step=False
         self.shell=ReadinessSpec(scope='body',condition={'kind':'count','selector':'body','expected':1})
         def entrypoint(*args,**kwargs):
@@ -307,7 +308,7 @@ class ObservationPipeline:
     def prefetch(self):
         if self.dynamic is not None and self.dynamic.pending is not None:
             artifact=self.dynamic.capture()
-            if self.after_background is not None:self.after_background(self.dynamic.full)
+            if getattr(self,'after_background',None) is not None:self.after_background(self.dynamic.full)
             return artifact
         if self.pending is None:return None
         pending=self.pending
@@ -376,6 +377,11 @@ class ObservationPipeline:
                 if dynamic_pending and not event['observation_pipeline']['background_error']:
                     try:dynamic.validate()
                     except Exception as exc:failed(exc)
+                if dynamic_pending and getattr(self,'after_validation',None) is not None:
+                    # Owner thread, before policy delivery is acknowledged.
+                    self.after_validation({'valid':not event['observation_pipeline']['background_error'],
+                        'revision_proven':bool(getattr(dynamic,'revision_proven',False)),
+                        'error':event['observation_pipeline']['background_error']})
                 return result
             finally:event['observation_pipeline']['barrier_seconds']=time.monotonic()-barrier_started
         fill()

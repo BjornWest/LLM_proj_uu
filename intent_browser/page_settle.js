@@ -48,31 +48,41 @@
   }
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (...args) {
+    let settled = false;
+    const done = () => { if (!settled) { settled = true; pending--; touch(); } };
     pending++; touch();
-    this.addEventListener('loadend', () => { pending--; touch(); }, {once: true});
+    this.addEventListener('loadend', done, {once: true});
     try { return send.apply(this, args); }
-    catch (error) { pending--; touch(); throw error; }
+    catch (error) { this.removeEventListener('loadend', done); done(); throw error; }
   };
-  const frames = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  // Two animation frames, but never past the caller's remaining deadline:
+  // a suspended document or stalled scheduler yields 'frame_timeout'.
+  const frames = remainingMs => new Promise(resolve => {
+    let finished = false;
+    const timer = setTimeout(() => { if (!finished) { finished = true; resolve(false); } }, Math.max(0, remainingMs));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!finished) { finished = true; clearTimeout(timer); resolve(true); }
+    }));
+  });
   globalThis.__intentPageSettle = Object.freeze({
-    version: 'page-settle-v1',
+    version: 'page-settle-v2',
     state: () => ({documentId, revision, pending}),
     beginMarking: () => { marking++; return revision; },
     endMarking: () => { marking = Math.max(0, marking - 1); return revision; },
     async wait(quietMs, timeoutMs) {
       const started = performance.now();
+      const result = status => ({status, waited_ms: performance.now() - started, revision, pending, documentId});
       while (true) {
         const now = performance.now();
+        const remaining = timeoutMs - (now - started);
+        if (remaining <= 0) return result(pending ? 'pending' : 'busy');
         if (pending === 0 && now - lastChange >= quietMs) {
           const before = revision;
-          await frames();
-          if (revision === before && pending === 0)
-            return {status: 'ready', waited_ms: performance.now() - started, revision, pending, documentId};
+          if (!await frames(remaining)) return result('frame_timeout');
+          if (revision === before && pending === 0) return result('ready');
           continue;
         }
-        if (now - started >= timeoutMs)
-          return {status: pending ? 'pending' : 'busy', waited_ms: now - started, revision, pending, documentId};
-        await new Promise(resolve => setTimeout(resolve, Math.min(quietMs, 10)));
+        await new Promise(resolve => setTimeout(resolve, Math.max(0, Math.min(quietMs, 10, remaining))));
       }
     },
   });

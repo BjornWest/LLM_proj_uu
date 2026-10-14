@@ -456,6 +456,30 @@ class FactRecorder:
             self.deferred.append([value,entry,[]])
         return record['id']
 
+    def finish_decision(self, outcome):
+        """Bind decision outputs only to a background capture of the same revision.
+
+        Identical AX text is not proof of identical private provenance, so an
+        invalidated decision or an unproven revision leaves mappings unknown.
+        """
+        if outcome.get('valid') and outcome.get('revision_proven'):
+            return self.restage_deferred()
+        reason = ('decision_invalidated_no_rebinding' if not outcome.get('valid')
+                  else 'decision_background_revision_unproven')
+        return self.drop_deferred(reason)
+
+    def drop_deferred(self, reason):
+        pending, self.deferred = self.deferred, []
+        for value, entry, sources in pending:
+            def annotate(entry=entry):
+                record = entry['record']
+                record['diagnostics'].append({'reason': reason})
+                write_json(self.trace.directory/entry['artifact'], record)
+            self.observe(annotate)
+        if pending:
+            try:self.trace.event('fact_rebinding_skipped', step=self.step, reason=reason, outputs=len(pending))
+            except Exception:pass
+
     def restage_deferred(self):
         """Re-bind decision outputs to the current (background) capture.
 

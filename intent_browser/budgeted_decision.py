@@ -198,9 +198,11 @@ class BudgetedDecision(DynamicPreview):
                 'screenshots': 'not_captured', 'bids': 'known elements plus first-seen overview candidates',
                 'scope': 'Decision context; full capture validates identity before tools execute'})
         self.pending = {'identity': identity, 'revision': after, 'tree': tree,
+                        # Every published BID, cached or newly assigned: native marking may
+                        # renumber a cached BID (e.g. a cloned element copied the attribute).
                         'bids': [(n['backendDOMNodeId'], n.get('role', {}).get('value'), n['browsergym_id'])
-                                 for n in tree['nodes'] if n.get('browsergym_id') is not None
-                                 and n.get('backendDOMNodeId') in assigned]}
+                                 for n in tree['nodes'] if n.get('browsergym_id') is not None]}
+        self.revision_proven = False
         self.trace.event('budgeted_decision_completed', seconds=time.monotonic() - start,
             ax_seconds=ax_seconds, raw_nodes=len(tree['nodes']), bid_candidates=len(candidates),
             bids_assigned=len(assigned), bid_assignment_seconds=assign_seconds, overview_budget=budget,
@@ -245,14 +247,26 @@ class BudgetedDecision(DynamicPreview):
             raise ObservationChanged('No full background observation')
         if self.full['human_tab_capture']['document'] != self.pending['identity']['document']:
             raise ObservationChanged('Background capture changed document')
-        same_revision = (self.pending['revision'] is not None and
-                         self.full.get('page_revision') == self.pending['revision'])
-        if not same_revision and ax_signatures(self.full['axtree_object']) != ax_signatures(self.pending['tree']):
-            raise ObservationChanged('Page changed during inference; decision context is stale')
-        by_backend = {}
+        decision_revision = self.pending['revision']
+        # Completion boundary: read the live page as well, so a change after the
+        # background capture (e.g. a late quote render) is not accepted.
+        live = settle_call(self.human.env.page, 'state')
+        self.revision_proven = (decision_revision is not None and
+                                self.full.get('page_revision') == decision_revision and live == decision_revision)
+        if not self.revision_proven:
+            decision_ax = ax_signatures(self.pending['tree'])
+            if ax_signatures(self.full['axtree_object']) != decision_ax:
+                raise ObservationChanged('Page changed during inference; decision context is stale')
+            if live is None or live != decision_revision:
+                from browsergym.core import observation as core
+                current = extract_json(core.extract_merged_axtree, self.human.env.page)
+                if ax_signatures(current) != decision_ax:
+                    raise ObservationChanged('Page changed after background capture; decision context is stale')
+        by_backend, owners = {}, {}
         for node in self.full['axtree_object']['nodes']:
             if node.get('browsergym_id') is not None:
                 by_backend.setdefault(node.get('backendDOMNodeId'), set()).add(node['browsergym_id'])
+                owners.setdefault(node['browsergym_id'], set()).add(node.get('backendDOMNodeId'))
         for backend, role, bid in self.pending['bids']:
-            if by_backend.get(backend) != {bid}:
+            if by_backend.get(backend) != {bid} or owners.get(bid) != {backend}:
                 raise ObservationChanged('Decision BID no longer names the same full-capture element')
