@@ -429,7 +429,9 @@ permit release and atomic queue/controller limit CAS remain in force.
 
 A normal negative or inconclusive native task verdict is a measured completion.
 Timeout, tool, setup/readiness, formatter, grading and projection exceptions are
-recorded per case, with their stage, timestamps and partial trace locations. They
+recorded per case, with their stage, timestamps and partial trace locations. Thread
+creation and unexpected callback/finalizer errors also record UTC/monotonic times
+at their actual queue error boundary; no occurrence time is inferred. They
 never set the cohort stop flag. Missing grades remain unknown task outcomes.
 Every case is attempted once; progressing to the next case does not retry the
 failed episode. Scripted jobs use their own result scope and stop event, and their

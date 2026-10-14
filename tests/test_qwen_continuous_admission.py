@@ -249,6 +249,9 @@ class IsolatedCaseTests(unittest.TestCase):
   self.assertFalse(stop.is_set());self.assertEqual(set(calls),{'bad','next','last'})
   self.assertIsNotNone(result['cases']['bad']['quarantine'])
   self.assertEqual(result['cases']['last']['status'],'completed')
+  error=result['cases']['bad']['error']
+  self.assertEqual(error['stage'],'callback_or_finalizer');self.assertEqual(error['observed_at'],'queue_error_boundary')
+  self.assertLessEqual(error['epoch'],time.time());self.assertLessEqual(error['monotonic'],time.monotonic())
 
  def test_default_prewarm_drains_when_all_active_slots_are_quarantined(self):
   stop=threading.Event();warm=threading.Event();result=[];calls=[]
@@ -317,6 +320,15 @@ class IsolatedCaseTests(unittest.TestCase):
     prewarm_count=0,stop_event=stop,isolate_case_errors=True)
   self.assertFalse(stop.is_set());self.assertEqual(result['cases']['bad']['status'],'failed')
   self.assertIsNone(result['cases']['bad']['quarantine']);self.assertEqual(result['cases']['next']['status'],'completed')
+  error=result['cases']['bad']['error'];self.assertEqual(error['stage'],'worker_creation')
+  self.assertLessEqual(error['epoch'],time.time());self.assertLessEqual(error['monotonic'],time.monotonic())
+
+ def test_legacy_thread_constructor_failure_still_raises_with_job_stop(self):
+  stop=threading.Event()
+  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':lambda **kw:(_ for _ in ()).throw(RuntimeError('CPU constructor failure'))}):
+   with self.assertRaisesRegex(RuntimeError,'constructor'):
+    QUEUE['run_ordered_suite']({'a':'a'},lambda *_:None,max_concurrent_episodes=1,prewarm_count=0,stop_event=stop)
+  self.assertTrue(stop.is_set())
 
  def test_warm_failure_cannot_be_reactivated_by_recovery_before_return(self):
   stop=threading.Event();started=threading.Event();answers=[];release=threading.Event()

@@ -7,6 +7,7 @@ before every provider dispatch. Neither method creates or resets environments.
 from dataclasses import dataclass
 from math import isfinite
 from threading import Condition, Event, RLock, Thread, get_ident
+import time
 
 
 class QueueCancelled(RuntimeError):
@@ -235,6 +236,13 @@ class _Queue:
         live = [r for r in self.rows.values() if r['started'] and (not r['done'] or r.get('quarantine') is not None)]
         return sum(r['active'] for r in live), sum(not r['active'] for r in live)
 
+    def error_detail(self, error, stage):
+        detail=dict(type=type(error).__name__,message=str(error))
+        if self.isolate_case_errors:
+            detail.update(stage=stage,epoch=time.time(),monotonic=time.monotonic(),
+                          observed_at='queue_error_boundary')
+        return detail
+
     def blocked_by_quarantine(self):
         return (self.isolate_case_errors and self.counts()[0]>=self.target
                 and not any(r["started"] and r["active"] and not r["done"] for r in self.rows.values())
@@ -253,18 +261,20 @@ class _Queue:
         row = self.rows[ident]
         row.update(started=True, active=active, status='admitted' if active else 'warming')
         self.emit('admitted' if active else 'warmup_started', ident)
+        constructed=False
         try:
             thread = Thread(target=self.worker, args=(ident,), name='episode-'+ident)
+            constructed=True
             thread.start()
         except BaseException as exc:
+            if not constructed and not self.isolate_case_errors:raise
             # Thread admission itself can fail (e.g. a PID/resource ceiling).
             # There is then no worker/finally block to release this row. Stop
             # further creation, wake parked workers, and retain the failure.
             row.update(done=True, status='failed',
-                       error=dict(type=type(exc).__name__, message=str(exc)))
+                       error=self.error_detail(exc,'worker_creation'))
             if self.isolate_case_errors:
                 row['quarantine']=None # No worker or case resource was created.
-                row['error']['stage']='worker_creation'
             else:self.stop_event.set()
             self.emit('worker_start_failed', ident)
             self.condition.notify_all()
@@ -316,17 +326,17 @@ class _Queue:
                     else:
                         raise AdmissionError('Caller returned without episode admission')
         except AdmissionBlocked as exc:
-            error,status=dict(type=type(exc).__name__,message=str(exc),stage='blocked_admission'),'blocked'
+            error,status=self.error_detail(exc,'blocked_admission'),'blocked'
         except QueueCancelled as exc:
-            error, status = str(exc), 'cancelled'
+            error, status = self.error_detail(exc,'cancelled_admission') if self.isolate_case_errors else str(exc), 'cancelled'
         except Exception as exc:
-            error = dict(type=type(exc).__name__, message=str(exc))
+            error = self.error_detail(exc,'callback_or_finalizer')
             status = ('blocked' if self.rows[ident].get('blocked_admission') and not self.stopped() else
                       'cancelled' if self.stopped() and admission._native_cancellation is not None
                       and isinstance(exc, admission._native_cancellation) else 'failed')
         except BaseException as exc:
             # Do not silently strand a lease when a worker receives SystemExit.
-            error, status = dict(type=type(exc).__name__, message=str(exc)), 'failed'
+            error, status = self.error_detail(exc,'callback_or_finalizer'), 'failed'
             if not self.isolate_case_errors:self.stop_event.set()
         finally:
             with self.condition:
