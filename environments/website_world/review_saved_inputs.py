@@ -2,6 +2,7 @@
 from hashlib import sha256
 import json
 from pathlib import Path
+from .review_rating_scopes import require_public_rating_scope
 
 REQUIRED = frozenset({'world.private.json', 'task.private.json', 'reference.private.json',
     'presentation.private.json', 'compositions.private.json', 'surrounding.private.json',
@@ -55,6 +56,7 @@ def target_setup(world, task, surrounding, binding, *, review_site_id, start_que
     sites = [s for s in surrounding['sites'] if s['site_id'] == review_site_id]
     if len(sites) != 1 or review_site_id not in covered:
         raise ValueError('Select one existing review site covering the native subject')
+    require_public_rating_scope(task, sites[0])
     if (task['world_id'] != world['world_id'] or surrounding['source_world_id'] != world['world_id']):
         raise ValueError('Saved review world identity changed')
     query = {} if start_query is None else start_query

@@ -5,6 +5,7 @@ from urllib.parse import quote, unquote, urlencode
 
 from environments.connected_shopping.index import STYLE
 from environments.product_world.public_field_rules import is_public_field
+from .review_rating_scopes import sku_rating_summary
 
 REVIEW_STYLE = '''<style>
 body{font:16px/1.6 system-ui,sans-serif;margin:0;color:#21332c;background:#f6f8f5}
@@ -208,9 +209,13 @@ class ReviewPage(Page):
     def configuration(self, sku):
         return {k:v for k,v in sku.items() if k not in ("sku_id","product_id")}
 
-    def summary(self, p, pid=None, query=None):
+    def summary(self, p, pid=None, query=None, *, show_empty=False):
         s = p['rating_summary']
-        if not s['rating_count']:return '<p>No customer ratings are recorded.</p>'
+        if not s['rating_count'] and not show_empty:return '<p>No customer ratings are recorded.</p>'
+        option = p.get('sku_id') is not None
+        heading = 'Option-specific customer rating' if option else 'Model-wide customer rating'
+        caption = ('All recorded ratings for this option, including ratings without comments' if option
+                   else 'All recorded ratings, including ratings without comments (all model options)')
         histogram = ''
         counts = s.get('star_counts')
         if counts is not None:
@@ -218,7 +223,7 @@ class ReviewPage(Page):
                     any(type(n) is not int or n < 0 for n in counts.values()) or
                     sum(counts.values()) != s['rating_count']):
                 raise ValueError('Published rating histogram disagrees with its rating total')
-            histogram = '<table><caption>All recorded ratings, including ratings without comments</caption><thead><tr><th>Rating</th><th>Count</th></tr></thead><tbody>'
+            histogram = '<table><caption>' + e(caption) + '</caption><thead><tr><th>Rating</th><th>Count</th></tr></thead><tbody>'
             for stars in range(5, 0, -1):
                 label = f'{stars} stars'
                 if pid is not None:
@@ -228,10 +233,23 @@ class ReviewPage(Page):
                     label = link(path('reviews', pid) + '?' + urlencode(fields), label)
                 histogram += f'<tr><th scope="row">{label}</th><td>{counts[str(stars)]}</td></tr>'
             histogram += '</tbody></table>'
-        return (f'<section class="rating-panel" aria-label="Customer rating summary"><h2>Customer rating</h2>'
-                f'<p class="rating-value">{s["average_rating"]} / 5</p><p>{s["rating_count"]} ratings; '
+        mean = (str(s.get('mean_rounded', s['average_rating'])) + ' / 5' if s['rating_count']
+                else 'Mean rating undefined (no ratings)')
+        return (f'<section class="rating-panel" aria-label="{e(heading)} summary"><h2>{e(heading)}</h2>'
+                f'<p class="rating-value">{e(mean)}</p><p>{s["rating_count"]} ratings; '
                 f'{s["written_review_count"]} written reviews, {s["rating_only_count"]} ratings without comments.</p>'
                 '<p>The average includes ratings without comments.</p>' + histogram + '</section>')
+
+    def sku_summary(self, pid, sku_id, query=None):
+        p = self.products[pid]
+        summary = sku_rating_summary(p, sku_id)
+        sku = next(s for s in p['skus'] if s['sku_id'] == sku_id)
+        fields = {'sku': sku_id, **({'part': query['part']} if query and query.get('part') else {})}
+        return ('<section aria-label="Option-specific rating summary"><h2>Rating summary for this option</h2>'
+                '<p>Reviewed configuration: ' + e(pretty(self.configuration(sku))) + '</p><p>SKU: '
+                + e(sku_id) + '</p><p>All recorded ratings for this option, including ratings without comments. '
+                'Rating and page filters below apply only to written comments.</p>'
+                + self.summary({'product_id': pid, 'sku_id': sku_id, 'rating_summary': summary}, pid, fields, show_empty=True) + '</section>')
 
     def page(self, route, q):
         if route == '/about' and not q:
@@ -292,5 +310,8 @@ class ReviewPage(Page):
             guidance = ('<aside><h2>Editorial fit guidance</h2><p>' + e(fit_text) + '</p><p>Editorial guidance, separate from customer votes.</p></aside>') if isinstance(fit_text,str) and fit_text.strip() else ''
             attribution = '<p>Customer opinions are shared with participating retailer pages; publication does not add votes.</p>'
             breadcrumb = '<nav aria-label="Review location">' + link('/search', 'All product reviews') + '</nav>'
-            return self.response(p['name'], breadcrumb + self.summary(p, pid, q) + attribution + guidance + sections + offers)
+            model_query = {k: v for k, v in q.items() if k != 'sku'}
+            model = '<section><p>Model-wide rating summary, including every recorded option and ratings without comments.</p>' + self.summary(p, pid, model_query) + '</section>'
+            option = self.sku_summary(pid, q['sku'], q) if q.get('sku') else ''
+            return self.response(p['name'], breadcrumb + model + option + attribution + guidance + sections + offers)
         raise KeyError('Unknown or unpublished review page')

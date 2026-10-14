@@ -19,6 +19,60 @@ function nativeSelectedParts(product, variant) {
   }
   return {text:'Selected: '+labels.join(' · '),parts};
 }
+function nativeReviewSummaryScope(panel, pid, root, href) {
+  const label=panel.getAttribute('aria-label');
+  if(label==='Customer rating summary'||label==='Model-wide customer rating summary') {
+    return pid?{product_id:pid,grain:'model',basis:'all_recorded_ratings_all_options_including_silent'}:null;
+  }
+  if(label!=='Option-specific customer rating summary')return null;
+  const outer=panel.closest('section[aria-label="Option-specific rating summary"]');
+  if(!outer)return null;
+  const labels=[...outer.querySelectorAll(':scope > p')].map(p=>p.textContent)
+    .filter(text=>text.startsWith('SKU: '));
+  if(labels.length!==1||!labels[0].slice(5))return null;
+  const sid=labels[0].slice(5),url=new URL(href);
+  const requested=url.searchParams.getAll('sku');
+  if(requested.length>1||(requested.length===1&&requested[0]!==sid))return null;
+  const route=url.pathname.split('/').filter(Boolean);
+  if(route[0]==='variants') {
+    try {if(route.length!==2||decodeURIComponent(route[1])!==sid)return null;}
+    catch(_){return null;}
+  }
+  // A variant ID is opaque: never guess a product ID by splitting its text.
+  // The option-page producer emits a same-origin review link for that SKU.
+  if(!pid) {
+    const products=new Set();
+    for(const link of root.querySelectorAll('a[href]')) {
+      try {
+        const target=new URL(link.getAttribute('href'),url);
+        if(target.origin!==url.origin||target.searchParams.getAll('sku').length!==1||
+            target.searchParams.get('sku')!==sid)continue;
+        const product=nativeReviewProductId(target.pathname.split('/').filter(Boolean),null);
+        if(product)products.add(product);
+      } catch(_){/* Unsupported public links cannot establish identity. */}
+    }
+    if(products.size!==1)return null;
+    pid=[...products][0];
+  }
+  return {product_id:pid,sku_id:sid,grain:'sku',
+    basis:'all_recorded_ratings_one_option_including_silent'};
+}
+function nativeReviewSummaryValues(panel) {
+  const paragraphs=[...panel.querySelectorAll(':scope > p')];
+  const rows=paragraphs.map(node=>({node,match:node.textContent.match(
+    /^(\d+) ratings; (\d+) written reviews, (\d+) ratings without comments\.$/)})).filter(r=>r.match);
+  if(rows.length!==1)return null;
+  const row=rows[0],counts=row.match.slice(1).map(Number);
+  if(counts.some(n=>!Number.isSafeInteger(n))||counts[1]+counts[2]!==counts[0])return null;
+  const averages=[...panel.querySelectorAll('.rating-value')];
+  if(averages.length!==1)return null;
+  const average=averages[0],text=average.textContent;
+  if(text==='Mean rating undefined (no ratings)')
+    return counts[0]===0?{row,counts,average,value:null,value_status:'undefined_no_ratings'}:null;
+  const mean=text.match(/^(\d+(?:\.\d+)?) \/ 5$/);
+  if(!mean||counts[0]===0||Number(mean[1])<1||Number(mean[1])>5)return null;
+  return {row,counts,average,value:Number(mean[1]),rendered_value:mean[1],value_status:'known'};
+}
 async function nativeFactProbe(config) {
   const root=document.querySelector('#app')||document.querySelector('main')||document.body;
   if(!root)throw new Error('native_root_unavailable');
@@ -175,18 +229,30 @@ async function nativeFactProbe(config) {
         if(match&&rating.textContent.trim().length)add(rating,{...scope,field:'rating',value:Number(match[1])},{...state,...scope});
       }
     }
-    if(pid)for(const panel of root.querySelectorAll('.rating-panel')) {
-      const scope={product_id:pid},average=panel.querySelector('.rating-value');
-      const m=average?.textContent.match(/^(\d+(?:\.\d+)?) \/ 5$/);
-      if(m)add(average,{...scope,field:'average_rating',value:Number(m[1])},state);
-      for(const row of panel.querySelectorAll('p')) {
-        const counts=row.textContent.match(/^(\d+) ratings; (\d+) written reviews, (\d+) ratings without comments\.$/);
-        if(!counts)continue;
-        const names=['rating_count','written_review_count','rating_only_count'];let start=0;
-        for(let i=0;i<names.length;i++) {
-          const pos=row.textContent.indexOf(counts[i+1],start);start=pos+counts[i+1].length;
-          add(row,{...scope,field:names[i],value:Number(counts[i+1])},state,[{part:'value',start:pos,end:start}]);
-        }
+    const panels=[...root.querySelectorAll('.rating-panel')];
+    // Collection cards have no route-level product identity. Report their
+    // unsupported inventory once instead of guessing or repeating diagnostics.
+    if(!pid&&route[0]!=='variants'&&panels.length)
+      diagnostics.push({reason:'native_review_collection_summaries_unmapped',panel_count:panels.length});
+    for(const panel of (!pid&&route[0]!=='variants'?[]:panels)) {
+      const scope=nativeReviewSummaryScope(panel,pid,root,location.href);
+      if(!scope){diagnostics.push({reason:'native_review_summary_scope_unresolved',field:'rating_summary'});continue;}
+      const values=nativeReviewSummaryValues(panel);
+      if(!values){diagnostics.push({reason:'native_review_summary_values_unresolved',...scope});continue;}
+      const scopedState={...state,...scope};
+      if(values.value_status==='undefined_no_ratings')
+        add(values.average,{...scope,field:'average_rating',value:null,value_status:values.value_status},scopedState,
+          [{part:'status',start:0,end:values.average.textContent.length}]);
+      else add(values.average,{...scope,field:'average_rating',value:values.value,
+        rendered_value:values.rendered_value,value_basis:scope.grain==='sku'?'rounded_public_mean':'public_mean'},scopedState,
+          [{part:'value',start:0,end:values.rendered_value.length},
+           {part:'scale',start:values.rendered_value.length+3,end:values.rendered_value.length+4}]);
+      const names=['rating_count','written_review_count','rating_only_count'];let start=0;
+      for(let i=0;i<names.length;i++) {
+        const text=values.row.node.textContent,number=values.row.match[i+1];
+        const pos=text.indexOf(number,start);start=pos+number.length;
+        add(values.row.node,{...scope,field:names[i],value:values.counts[i]},scopedState,
+          [{part:'value',start:pos,end:start}]);
       }
     }
   }

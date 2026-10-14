@@ -8,13 +8,24 @@ import subprocess
 
 import pytest
 
-from training.browser_training.fact_review_overlay import copied_review_classes
+from training.browser_training.fact_review_overlay import (
+    copied_review_classes, LEGACY_RENDERER_PINS, SKU_RENDERER_PINS, SKU_SCOPE_PIN)
 from training.browser_training.fact_render_overlay import ASSET
 from training.browser_training.fact_exposure import utf16_slice
 
 ROOT=Path(__file__).resolve().parents[1]
-APPROVED_PINS={'surrounding_pages':'666a2e3113e2b0d7d28a8c1b46db9b40d40158dfcea475a221b03fc445cc2d8e',
-               'native_review_pages':'961db9223afbdc44c6192a144dfd0a10103066e5448f8762405066ee9dd286fc'}
+APPROVED_PINS=LEGACY_RENDERER_PINS
+LEGACY_COMMIT='609fec8f400e40b47f487795b6494cc4a1cb60a4'
+SKU_COMMIT='7338ce4e51ca1571b76cac8eaef225005e21bc41'
+
+
+def frozen_source(commit,name,expected):
+    import os
+    raw=subprocess.check_output(['git','-C',str(ROOT),'show',
+        commit+':environments/website_world/'+name+'.py'],
+        env={**os.environ,'GIT_OPTIONAL_LOCKS':'0'})
+    assert sha256(raw).hexdigest()==expected
+    return raw.decode()
 
 
 @pytest.fixture(scope='module')
@@ -22,14 +33,13 @@ def copies():
     # These inputs are source-pinned only. Accepted runtime closure is separate.
     sources=[];expected={}
     for name in ['surrounding_pages','native_review_pages']:
-        path=f'environments/website_world/{name}.py'
-        sources.append((ROOT/path).read_text())
+        sources.append(frozen_source(LEGACY_COMMIT,name,APPROVED_PINS[name]))
         expected[name]=APPROVED_PINS[name]
     return (copied_review_classes(*sources,enabled=False),
             copied_review_classes(*sources,enabled=True,expected_sha256=expected),sources,expected)
 
 
-def fixture(cls,layout):
+def fixture(cls,layout,*,empty=False,reviews=None):
     p={'product_id':'p','name':'Test Shirt','family_id':'tops',
        'facts':{'cotton':False,'weight_g':0,'secret':None,'model_price_factor':4},
        'fact_status':{'secret':'unknown'},
@@ -40,6 +50,10 @@ def fixture(cls,layout):
                    'text':f'Exact note {n} 🛍 <raw>' if n<5 else ''} for n in range(7)],
        'rating_summary':{'rating_count':7,'written_review_count':5,'rating_only_count':2,
                          'average_rating':3.86,'star_counts':{'1':0,'2':0,'3':4,'4':0,'5':3}}}
+    if reviews is not None:
+        from environments.product_world.review_population import summarize_ratings
+        p['reviews']=deepcopy(reviews);p['rating_summary']=summarize_ratings(p['reviews'])
+    if empty:p['skus'].append({'sku_id':'empty','product_id':'p','size_label':'XL'})
     site={'id':'review-host','name':'Review Atlas','layout':layout,'families':['tops'],
           'family_labels':{'tops':'Tops'},'review_presentation':{'page_size':2}}
     return cls(site,{'p':p},{},{},None)
@@ -90,11 +104,14 @@ def test_exact_visible_document_and_scoped_bindings(copies,layout,case):
 def test_disabled_copy_is_exact_and_does_not_patch_shared_modules(copies):
     from environments.website_world.native_review_pages import NativeReviewPage
     off,on,sources,pins=copies
-    base=fixture(NativeReviewPage,'lab-directory'); plain=fixture(off['NativeReviewPage'],'lab-directory')
-    assert plain.page('/reviews/p',{})==base.page('/reviews/p',{})
+    original=(ROOT/'environments/website_world/native_review_pages.py').read_text()
+    plain=fixture(off['NativeReviewPage'],'lab-directory')
+    if sha256(original.encode()).hexdigest()==APPROVED_PINS['native_review_pages']:
+        assert plain.page('/reviews/p',{})==fixture(NativeReviewPage,'lab-directory').page('/reviews/p',{})
+    assert NativeReviewPage is not on['NativeReviewPage']
     assert 'data-fact-recording' not in plain.page('/reviews/p',{})[1]
     assert on['receipt']['shared_files_modified'] is False
-    assert (ROOT/'environments/website_world/native_review_pages.py').read_text()==sources[1]
+    assert (ROOT/'environments/website_world/native_review_pages.py').read_text()==original
 
 
 @pytest.mark.parametrize('mutation',['drift','missing_pins'])
@@ -147,7 +164,7 @@ def test_mount_copy_changes_only_its_private_renderer_globals(copies):
     from training.browser_training.fact_review_overlay import copied_review_mount
     from environments.website_world import surrounding
     _,on,_,_=copies
-    source=(ROOT/'environments/website_world/surrounding.py').read_text()
+    source=frozen_source(LEGACY_COMMIT,'surrounding','548968f602a6c2757f22a5c58c53a3c49c02aff516f29c9b5ef0702ccfbe31da')
     private=copied_review_mount(source,on,expected_sha256='548968f602a6c2757f22a5c58c53a3c49c02aff516f29c9b5ef0702ccfbe31da')
     assert private.NativeReviewPage is on['NativeReviewPage']
     assert surrounding.NativeReviewPage is not private.NativeReviewPage
@@ -183,3 +200,329 @@ def test_copied_review_recording_uses_same_origin_asset_under_native_csp(copies)
     subprocess.run(['node','--check','--input-type=commonjs'],input=script,text=True,capture_output=True,check=True)
     assert recorded.page('/__fact-recorder-private.js',{'foreign':'1'})[0]==400
     with pytest.raises(KeyError):fixture(off['NativeReviewPage'],'lab-directory').page('/__fact-recorder-private.js',{})
+
+
+@pytest.fixture(scope='module')
+def sku_copies():
+    sources=[frozen_source(SKU_COMMIT,name,SKU_RENDERER_PINS[name])
+             for name in ('surrounding_pages','native_review_pages')]
+    helper=frozen_source(SKU_COMMIT,'review_rating_scopes',SKU_SCOPE_PIN)
+    pins={**SKU_RENDERER_PINS,'review_rating_scopes':SKU_SCOPE_PIN}
+    off=copied_review_classes(*sources,enabled=False,rating_scope_source=helper)
+    on=copied_review_classes(*sources,enabled=True,expected_sha256=pins,rating_scope_source=helper)
+    return off,on,sources,helper,pins
+
+
+@pytest.mark.parametrize('layout',['lab-directory','editorial-magazine','community-feed'])
+@pytest.mark.parametrize('route',['selected','option','filtered','model'])
+def test_sku_renderer_visible_parity_and_distinct_aggregate_identity(sku_copies,layout,route):
+    off,on,_,_,_=sku_copies
+    baseline=fixture(off['NativeReviewPage'],layout);page=fixture(on['NativeReviewPage'],layout)
+    query={'part':'readers'} if layout=='editorial-magazine' else {}
+    path='/reviews/p'
+    if route=='option':path='/variants/s1';query={}
+    elif route!='model':query['sku']='s1'
+    if route=='filtered':query.update(stars='1',page='9999',sort='lowest')
+    original=deepcopy(page.products)
+    payload,clean=decode(page.page(path,query)[1])
+    assert clean==baseline.page(path,query)[1] and page.products==original
+    assert payload['meta']['response_html_sha256']==sha256(clean.encode()).hexdigest()
+    assert payload['meta']['renderer_source_sha256']==sku_copies[-1]
+    aggregates=[r for r in payload['registrations']
+                if r['occurrence']['binding']['authority']=='renderer_native_review_aggregate']
+    model=[r for r in aggregates if r['occurrence']['binding']['grain']=='model']
+    sku=[r for r in aggregates if r['occurrence']['binding']['grain']=='sku']
+    assert len(model)==(0 if route=='option' else 9)
+    assert len(sku)==(0 if route=='model' else 9)
+    assert all(r['occurrence']['binding']['product_id']=='p' for r in aggregates)
+    assert all(r['occurrence']['binding']['sku_id']=='s1' and
+               r['occurrence']['effective_state']['sku_id']=='s1' and
+               r['occurrence']['binding']['basis']=='all_recorded_ratings_one_option_including_silent'
+               for r in sku)
+    for records,total,written,silent in ((model,7,5,2),(sku,3,2,1)):
+        if not records:continue
+        values={r['occurrence']['binding']['field']:r['occurrence']['binding']['displayed_value']
+                for r in records if r['occurrence']['binding']['field'].endswith('count')}
+        assert values=={'rating_count':total,'written_review_count':written,'rating_only_count':silent}
+        assert sum(r['occurrence']['binding']['displayed_value'] for r in records
+                   if r['occurrence']['binding']['field']=='star_counts')==total
+        for r in records:
+            for part in r['content']['parts']:
+                text=utf16_slice(r['content']['text'],part['start'],part['end'])
+                assert text
+                if part['part'] in ('count','value'):
+                    assert float(text)==r['occurrence']['binding']['displayed_value']
+    if sku:
+        average=next(r for r in sku if r['occurrence']['binding']['field']=='average_rating')
+        assert average['content']['text']=='5.00 / 5'
+        assert average['occurrence']['binding']['rendered_value']=='5.00'
+        counts=[r for r in sku if r['occurrence']['binding']['field'].endswith('count')]
+        assert len({r['anchor'] for r in counts})==1
+        assert 'Option-specific customer rating summary' in clean
+    if model:assert 'Model-wide customer rating summary' in clean
+
+
+@pytest.mark.parametrize('layout',['lab-directory','editorial-magazine','community-feed'])
+def test_empty_sku_mean_is_explicit_undefined_without_numeric_or_scale_parts(sku_copies,layout):
+    off,on,_,_,_=sku_copies
+    base=fixture(off['NativeReviewPage'],layout,empty=True)
+    page=fixture(on['NativeReviewPage'],layout,empty=True)
+    payload,clean=decode(page.page('/variants/empty',{})[1])
+    assert clean==base.page('/variants/empty',{})[1]
+    records=[r for r in payload['registrations'] if r['occurrence']['binding'].get('grain')=='sku']
+    assert len(records)==9
+    avg=next(r for r in records if r['occurrence']['binding']['field']=='average_rating')
+    assert avg['occurrence']['binding']['displayed_value'] is None
+    assert avg['occurrence']['binding']['value_status']=='undefined_no_ratings'
+    assert avg['content']['text']=='Mean rating undefined (no ratings)'
+    assert [p['part'] for p in avg['content']['parts']]==['status']
+    assert all(r['occurrence']['binding']['displayed_value']==0 for r in records if r is not avg)
+
+
+@pytest.mark.parametrize('mutation',['missing_product','wrong_product','unknown_sku','wrong_mean','wrong_count','boolean_count','model_record','no_helper'])
+def test_sku_summary_cannot_relabel_model_values_or_forge_public_scope(sku_copies,mutation):
+    from training.browser_training.fact_review_overlay import review_average
+    page=fixture(sku_copies[1]['NativeReviewPage'],'lab-directory')
+    record={'product_id':'p','sku_id':'s1',
+            'rating_summary':page._fact_sku_rating_summary(page.products['p'],'s1')}
+    if mutation=='missing_product':record.pop('product_id')
+    elif mutation=='wrong_product':record['product_id']='other'
+    elif mutation=='unknown_sku':record['sku_id']='other'
+    elif mutation=='wrong_mean':record['rating_summary']['mean_rounded']='1.00'
+    elif mutation=='wrong_count':record['rating_summary']['rating_count']=7
+    elif mutation=='boolean_count':record['rating_summary']['rating_only_count']=True
+    elif mutation=='model_record':record['rating_summary']=deepcopy(page.products['p']['rating_summary'])
+    else:page._fact_sku_rating_summary=None
+    with pytest.raises(ValueError):review_average(page,record,'p','5.00 / 5')
+
+
+@pytest.mark.parametrize('mutation',['missing_helper','changed_helper','changed_renderer','missing_helper_pin','mixed_pair'])
+def test_modern_recording_requires_exact_full_three_source_closure(sku_copies,copies,mutation):
+    _,_,sources,helper,pins=sku_copies
+    sources=list(sources);pins=dict(pins)
+    if mutation=='missing_helper':helper=None
+    elif mutation=='changed_helper':helper+='\n# changed'
+    elif mutation=='changed_renderer':sources[0]+='\n# changed'
+    elif mutation=='missing_helper_pin':pins.pop('review_rating_scopes')
+    else:sources[1]=copies[2][1]
+    with pytest.raises(ValueError,match='pin|scope source'):
+        copied_review_classes(*sources,enabled=True,expected_sha256=pins,rating_scope_source=helper)
+
+
+@pytest.mark.parametrize('layout',['journal','community'])
+@pytest.mark.parametrize('query',[{}, {'sku':'s1'}, {'sku':'s1','stars':'1'}])
+def test_legacy_layouts_modern_summary_has_exact_parity_and_option_grain(sku_copies,layout,query):
+    off,on,_,_,_=sku_copies
+    base=fixture(off['ReviewPage'],layout);page=fixture(on['ReviewPage'],layout)
+    payload,clean=decode(page.page('/reviews/p',query)[1])
+    assert clean==base.page('/reviews/p',query)[1]
+    records=[r for r in payload['registrations'] if r['occurrence']['binding']['authority']=='renderer_native_review_aggregate']
+    assert len(records)==(18 if query.get('sku') else 9)
+    sku=[r for r in records if r['occurrence']['binding']['grain']=='sku']
+    assert len(sku)==(9 if query.get('sku') else 0)
+    if sku:
+        assert all(r['occurrence']['binding']['sku_id']=='s1' for r in sku)
+        assert next(r['occurrence']['binding']['displayed_value'] for r in sku
+                    if r['occurrence']['binding']['field']=='rating_count')==3
+
+
+@pytest.mark.parametrize('ratings,expected',[
+    ([4,5],'4.50'), ([3,3,4],'3.33'), ([4]*199+[5],'4.01')])
+def test_silent_and_half_up_rounded_mean_parts_match_actual_display(sku_copies,ratings,expected):
+    rows=[{'review_id':f'silent-{n}','product_id':'p','sku_id':'s1','reviewer':'Silent',
+           'rating':stars,'text':''} for n,stars in enumerate(ratings)]
+    # A written vote on another option must affect only the model summary.
+    rows.append({'review_id':'other','product_id':'p','sku_id':'s2','reviewer':'Other',
+                 'rating':1,'text':'Different option'})
+    off,on,_,_,_=sku_copies
+    base=fixture(off['NativeReviewPage'],'lab-directory',reviews=rows)
+    page=fixture(on['NativeReviewPage'],'lab-directory',reviews=rows)
+    payload,clean=decode(page.page('/reviews/p',{'sku':'s1','stars':'1'})[1])
+    assert clean==base.page('/reviews/p',{'sku':'s1','stars':'1'})[1]
+    records=[r for r in payload['registrations'] if r['occurrence']['binding'].get('grain')=='sku']
+    byfield={r['occurrence']['binding']['field']:r for r in records}
+    assert byfield['rating_count']['occurrence']['binding']['displayed_value']==len(ratings)
+    assert byfield['written_review_count']['occurrence']['binding']['displayed_value']==0
+    assert byfield['rating_only_count']['occurrence']['binding']['displayed_value']==len(ratings)
+    avg=byfield['average_rating'];binding=avg['occurrence']['binding']
+    assert avg['content']['text']==expected+' / 5'
+    assert binding['rendered_value']==expected and binding['displayed_value']==float(expected)
+    value=next(p for p in avg['content']['parts'] if p['part']=='value')
+    assert utf16_slice(avg['content']['text'],value['start'],value['end'])==expected
+    assert binding['value_basis']=='rounded_public_mean'
+
+
+@pytest.mark.parametrize('mutation',['duplicate_sku','sku_parent','product_record','rendered_text'])
+def test_public_sku_identity_and_display_are_conjunctively_bound(sku_copies,mutation):
+    from training.browser_training.fact_review_overlay import review_average
+    page=fixture(sku_copies[1]['NativeReviewPage'],'lab-directory')
+    record={'product_id':'p','sku_id':'s1','rating_summary':page._fact_sku_rating_summary(page.products['p'],'s1')}
+    if mutation=='duplicate_sku':page.products['p']['skus'].append(deepcopy(page.products['p']['skus'][0]))
+    elif mutation=='sku_parent':page.products['p']['skus'][0]['product_id']='other'
+    elif mutation=='product_record':record=deepcopy(page.products['p']);record['sku_id']='s1'
+    text='1.00 / 5' if mutation=='rendered_text' else '5.00 / 5'
+    with pytest.raises(ValueError):review_average(page,record,'p',text)
+
+
+def test_new_disabled_renderer_has_no_private_payload_and_keeps_native_modules(sku_copies):
+    import sys
+    original={name:module for name,module in sys.modules.items() if name in (
+        'environments.website_world.native_review_pages',
+        'environments.website_world.surrounding_pages',
+        'environments.website_world.review_rating_scopes')}
+    off,on,_,_,_=sku_copies
+    html=fixture(off['NativeReviewPage'],'lab-directory').page('/reviews/p',{'sku':'s1'})[1]
+    assert 'fact-recording-private-data' not in html and 'data-fr-review' not in html
+    assert on['receipt']['source_sha256']==sku_copies[-1]
+    assert on['receipt']['inventory_complete'] is False and on['receipt']['producer_qualified'] is False
+    assert all(sys.modules[name] is module for name,module in original.items())
+
+
+@pytest.mark.parametrize('part',['readers','specifications'])
+def test_editorial_registrations_refer_only_to_fragments_actually_emitted(sku_copies,part):
+    page=fixture(sku_copies[1]['NativeReviewPage'],'editorial-magazine')
+    html=page.page('/reviews/p',{'part':part,'sku':'s1'})[1]
+    payload,clean=decode(html)
+    anchors=set(re.findall(r' data-fr-review="(review-\d+)"',html))
+    assert payload['registrations']
+    assert all(r['anchor'] in anchors for r in payload['registrations'])
+    if part=='readers':
+        assert not any(r['occurrence']['binding']['authority']=='native_public_field'
+                       for r in payload['registrations'])
+        assert 'id="specifications"' not in clean
+    else:
+        assert not any(r['occurrence']['binding']['authority']=='renderer_native_review_aggregate'
+                       for r in payload['registrations'])
+
+
+def test_legacy_model_object_with_sku_key_retains_original_response_and_registration_grain(copies):
+    off,on,_,_=copies
+    base=fixture(off['NativeReviewPage'],'lab-directory');page=fixture(on['NativeReviewPage'],'lab-directory')
+    for view in (base,page):view.products['p']['sku_id']='unrelated-model-metadata'
+    payload,clean=decode(page.page('/reviews/p',{})[1])
+    assert clean==base.page('/reviews/p',{})[1]
+    assert all(r['occurrence']['binding']['grain']=='model' for r in payload['registrations']
+               if r['occurrence']['binding']['authority']=='renderer_native_review_aggregate')
+
+
+@pytest.mark.parametrize('mutation',['duplicate_sku','missing_sku_product'])
+def test_recording_identity_failure_preserves_native_response_and_reports_no_registrations(sku_copies,mutation):
+    off,on,_,_,_=sku_copies
+    base=fixture(off['NativeReviewPage'],'lab-directory');page=fixture(on['NativeReviewPage'],'lab-directory')
+    for view in (base,page):
+        if mutation=='duplicate_sku':view.products['p']['skus'].append(deepcopy(view.products['p']['skus'][0]))
+        else:view.products['p']['skus'][0].pop('product_id')
+    status,html,mime=page.page('/reviews/p',{'sku':'s1'})
+    payload,clean=decode(html)
+    expected=base.page('/reviews/p',{'sku':'s1'})
+    assert (status,clean,mime)==expected
+    assert not payload['registrations']
+    assert payload['meta']['recording_diagnostics'][0]['reason']=='review_registration_rejected'
+    # Error context is request-local; the next valid render is not disabled.
+    if mutation=='duplicate_sku':page.products['p']['skus'].pop()
+    else:page.products['p']['skus'][0]['product_id']='p'
+    good,_=decode(page.page('/reviews/p',{'sku':'s1'})[1])
+    assert good['registrations'] and 'recording_diagnostics' not in good['meta']
+
+
+def test_modern_rounded_model_mean_binding_matches_public_text_too(sku_copies):
+    off,on,_,_,_=sku_copies
+    base=fixture(off['NativeReviewPage'],'lab-directory');page=fixture(on['NativeReviewPage'],'lab-directory')
+    for view in (base,page):view.products['p']['rating_summary']['mean_rounded']='3.86'
+    payload,clean=decode(page.page('/reviews/p',{})[1])
+    assert clean==base.page('/reviews/p',{})[1]
+    avg=next(r for r in payload['registrations'] if r['occurrence']['binding']['field']=='average_rating')
+    assert avg['content']['text']=='3.86 / 5'
+    assert avg['occurrence']['binding']['displayed_value']==3.86
+    assert avg['occurrence']['binding']['rendered_value']=='3.86'
+
+
+def test_two_pin_modern_caller_and_disabled_without_helper_are_explicitly_rejected(sku_copies):
+    _,_,sources,_,_=sku_copies
+    with pytest.raises(ValueError,match='pinned scope source'):
+        copied_review_classes(*sources,enabled=True,expected_sha256=SKU_RENDERER_PINS)
+    with pytest.raises(ValueError,match='pinned scope source'):
+        copied_review_classes(*sources,enabled=False)
+
+
+def test_rounded_helper_uses_checked_private_population_instead_of_ambient_function(sku_copies,monkeypatch):
+    from environments.product_world import review_population
+    monkeypatch.setattr(review_population,'summarize_ratings',lambda rows:(_ for _ in ()).throw(AssertionError('ambient used')))
+    _,_,sources,helper,pins=sku_copies
+    on=copied_review_classes(*sources,enabled=True,expected_sha256=pins,rating_scope_source=helper)
+    page=fixture(on['NativeReviewPage'],'lab-directory')
+    assert decode(page.page('/reviews/p',{'sku':'s1'})[1])[0]['registrations']
+    assert on['receipt']['native_dependency_sha256']['review_population']
+
+
+def test_sku_projection_extra_keys_are_not_admitted(sku_copies):
+    from training.browser_training.fact_review_overlay import review_average
+    page=fixture(sku_copies[1]['NativeReviewPage'],'lab-directory')
+    record={'product_id':'p','sku_id':'s1','rating_summary':page._fact_sku_rating_summary(page.products['p'],'s1'),'hidden':'extra'}
+    with pytest.raises(ValueError):review_average(page,record,'p','5.00 / 5')
+
+
+@pytest.mark.parametrize('rounded',['n/a',None,'nan','inf','5.01','<invalid>'])
+def test_bad_model_rounded_display_preserves_native_html_and_reports_rejection(sku_copies,rounded):
+    off,on,_,_,_=sku_copies
+    plain=fixture(off['NativeReviewPage'],'lab-directory');recorded=fixture(on['NativeReviewPage'],'lab-directory')
+    for page in (plain,recorded):page.products['p']['rating_summary']['mean_rounded']=rounded
+    native=plain.page('/reviews/p',{});status,html,mime=recorded.page('/reviews/p',{})
+    payload,clean=decode(html)
+    assert (status,clean,mime)==native
+    assert not payload['registrations'] and payload['meta']['recording_diagnostics']
+    assert 'NaN' not in json.dumps(payload)
+
+
+def test_private_review_sink_keeps_rejection_in_normalized_capture_diagnostics():
+    from training.browser_training.fact_review_overlay import private_review_script
+    from training.browser_training.fact_render_capture import normalize
+    script=r'''
+      const failure={reason:'review_registration_rejected',detail:'unsupported identity'};
+      const payload={registrations:[],meta:{recording_diagnostics:[failure]}};
+      const data={textContent:JSON.stringify(payload),remove(){}};
+      const root={nodeType:1,nodeName:'MAIN',nodeValue:null,attributes:[],childNodes:[],
+        outerHTML:'<main id="main"></main>',querySelectorAll:()=>[],contains:()=>false,addEventListener(){}};
+      global.document={getElementById:()=>data,querySelector:()=>root};
+      global.location={href:'https://reviews.example/reviews/p'};
+      global.__recordFactCommit=record=>{global.saved=record;};
+    '''
+    result=subprocess.run(['node','-e',script+private_review_script()+"\nconsole.log(JSON.stringify(global.saved));"],
+                          capture_output=True,text=True,check=True,timeout=10)
+    commit=json.loads(result.stdout)
+    captured=normalize(commit,{},snapshot_id='snapshot',document_id='doc',frame_id='frame')
+    assert captured['diagnostics']==[{'reason':'review_registration_rejected','detail':'unsupported identity'}]
+    assert not captured['occurrences']
+
+
+@pytest.mark.parametrize('origin',[None,'compiled.pyc','missing.py'])
+def test_modern_population_missing_source_has_labelled_setup_failure(sku_copies,monkeypatch,origin):
+    import training.browser_training.fact_review_overlay as overlay
+    from types import SimpleNamespace
+    monkeypatch.setattr(overlay.importlib.util,'find_spec',lambda _:None if origin is None else SimpleNamespace(origin=origin))
+    _,_,sources,helper,pins=sku_copies
+    with pytest.raises(ValueError,match='Review population dependency'):
+        copied_review_classes(*sources,enabled=True,expected_sha256=pins,rating_scope_source=helper)
+
+
+def test_modern_population_drift_fails_closed_before_helper_execution(sku_copies,monkeypatch,tmp_path):
+    import training.browser_training.fact_review_overlay as overlay
+    from types import SimpleNamespace
+    changed=tmp_path/'changed.py';changed.write_text("raise AssertionError('unchecked population executed')\n")
+    monkeypatch.setattr(overlay.importlib.util,'find_spec',lambda _:SimpleNamespace(origin=str(changed)))
+    _,_,sources,helper,pins=sku_copies
+    with pytest.raises(ValueError,match='dependency source pin changed'):
+        copied_review_classes(*sources,enabled=True,expected_sha256=pins,rating_scope_source=helper)
+
+
+def test_verified_corpus_rejection_uses_native_fallback(sku_copies):
+    off,on,_,_,_=sku_copies
+    plain=fixture(off['NativeReviewPage'],'lab-directory');recorded=fixture(on['NativeReviewPage'],'lab-directory')
+    real=recorded._fact_sku_rating_summary
+    def changed_check(product,sid):
+        summary=real(product,sid);summary['rating_count']+=1;return summary
+    recorded._fact_sku_rating_summary=changed_check
+    payload,clean=decode(recorded.page('/reviews/p',{'sku':'s1'})[1])
+    assert clean==plain.page('/reviews/p',{'sku':'s1'})[1]
+    assert not payload['registrations']
+    assert payload['meta']['recording_diagnostics'][0]['detail']=='Review summary differs from the complete public SKU corpus'

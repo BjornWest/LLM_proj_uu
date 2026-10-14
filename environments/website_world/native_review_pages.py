@@ -98,6 +98,7 @@ class NativeReviewPage(ReviewPage):
         return '<article class="entry" id="' + e(row['review_id']) + '" data-review-id="' + e(row['review_id']) + '"><p><strong>' + link(path('members', row['reviewer']), row['reviewer']) + '</strong> reviewed ' + link(path('reviews', pid), p['name']) + '</p><p role="img" aria-label="' + str(row['rating']) + ' out of 5 stars">' + ('★' * row['rating']) + '</p><blockquote>' + e(row['text']) + '</blockquote><details><summary>Reviewed option</summary>' + link(path('variants', row['sku_id']), pretty(self.configuration(sku))) + '</details>' + link(path('reviews', pid) + '/opinions/' + e_quote(row['review_id']), 'Read this reader note') + '</article>'
 
     def model_summary(self, pid, query=None):
+        query = {k: v for k, v in (query or {}).items() if k != 'sku'}
         return '<div class="score-panel"><p>Model-wide rating summary, including every recorded option and ratings without comments.</p>' + self.summary(self.products[pid], pid, query) + '</div>'
 
     def reader_section(self, pid, query):
@@ -116,7 +117,8 @@ class NativeReviewPage(ReviewPage):
             form += '<input type="hidden" name="part" value="readers">'
         form += '<button>Filter reader notes</button></form>'
         chosen, pages = self.paged(path('reviews', pid), query, rows)
-        return '<section id="readers"><h2>Reader opinions</h2>' + form + '<p>' + str(len(rows)) + ' matching written comments</p><div class="feed">' + (''.join(self.opinion(pid, r) for r in chosen) or '<p>No written comments match.</p>') + '</div>' + pages + '</section>'
+        option = self.sku_summary(pid, query['sku'], query) if query.get('sku') else ''
+        return '<section id="readers"><h2>Reader opinions</h2>' + form + option + '<p>' + str(len(rows)) + ' matching written comments</p><div class="feed">' + (''.join(self.opinion(pid, r) for r in chosen) or '<p>No written comments match.</p>') + '</div>' + pages + '</section>'
 
     def model_facts(self, pid):
         values = self.products[pid]['facts']
@@ -222,7 +224,8 @@ class NativeReviewPage(ReviewPage):
         if route.startswith('/variants/'):
             if query:raise ValueError('Unexpected option query')
             pid, sku = self.variants[unquote(route[len('/variants/'):])]
-            return self.response('Product option', '<h1>' + e(self.products[pid]['name']) + ': product option</h1>' + facts(self.configuration(sku)) + link(url(path('reviews', pid), {'sku': sku['sku_id'], **({'part': 'readers'} if self.layout == 'editorial-magazine' else {})}), 'Comments on this option') + self.retailer_links(pid, sku['sku_id']))
+            query = {'part': 'readers'} if self.layout == 'editorial-magazine' else {}
+            return self.response('Product option', '<h1>' + e(self.products[pid]['name']) + ': product option</h1>' + facts(self.configuration(sku)) + self.sku_summary(pid, sku['sku_id'], query) + link(url(path('reviews', pid), {'sku': sku['sku_id'], **query}), 'Comments on this option') + self.retailer_links(pid, sku['sku_id']))
         if route.startswith('/reviews/'):
             rest = route[len('/reviews/'):]
             if '/opinions/' in rest:
