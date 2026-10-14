@@ -45,8 +45,10 @@ conversation content or credentials. Empty logout/reboot samples preserve the
 last nonempty group. Automatic samples remove a conversation only after the same
 smaller group has been observed continuously for two minutes, with no sampling
 gap over 90 seconds or reboot. A missing member must also have been observed
-open in this boot: a manual partial startup or failed restore never quietly
-removes members that have not returned yet. This prevents closing the first tab during
+open in this boot, so starting only some conversations after reboot does not
+erase the rest. An actual relaunch clears earlier live evidence for the members
+it will reopen: a failed launch keeps them until they are observed again.
+This prevents closing the first tab during
 shutdown from immediately replacing the full recovery group. New members are
 recorded immediately. `codex-windows save` confirms the current identified group
 immediately; ambiguous unidentified windows still block that operation. The last
@@ -120,6 +122,10 @@ also rejected before settings changes. Unidentified live windows block a real
 restore to avoid opening a duplicate. Launches are serialized per directory and
 per thread; recent unconfirmed launch claims expire after two minutes. A partial
 startup cannot shrink the saved group during that grace period.
+If a saved conversation has been archived or deleted, restore stops with a
+stale-member error. Open the intended conversations and run `codex-windows save`
+to confirm the replacement group. Duplicate IDs in explicit selection are
+rejected before any roster write.
 
 For a missing window, the helper loads the conversation without starting a turn,
 applies `thread/settings/update`, and verifies permissions through an ordinary

@@ -278,8 +278,13 @@ def record_group(cwd, selected, unresolved, *, force=False, tab_order=None,
                            'Previous roster preserved; use save --threads ID ... to select explicitly.')
     if not selected:
         return None  # Never replace the last group with an empty logout/reboot snapshot.
+    if len({t['id'] for t in selected}) != len(selected):
+        raise RuntimeError('Duplicate conversation IDs; select each thread only once.')
     path = state_path(cwd)
     old = load(path)
+    if (old and not (force or confirm_removals) and
+            len({t['id'] for t in old['threads']}) != len(old['threads'])):
+        raise RuntimeError('Saved roster has duplicate IDs; run codex-windows save to repair it.')
     value = dict(old or {})  # Keep still-live duplicate-launch claims.
     value.update(schema_version=1, cwd=cwd, boot_id=boot_id(), saved_at=time.time(),
                  distro=os.environ.get('WSL_DISTRO_NAME') or (old or {}).get('distro'),
@@ -315,9 +320,14 @@ def record_group(cwd, selected, unresolved, *, force=False, tab_order=None,
                 if tab_order and tab_order.get('source') == 'windows_terminal_uia':
                     value['tab_order'] = {**tab_order, 'source': 'partial_visual_order',
                         'reason': 'Open tabs observed; absent members retain prior slots'}
-    value['selection_source'] = ('explicit_selection' if force else
-        (old or {}).get('selection_source', 'observed_tuis') if value.get('pending_removal')
-        else 'observed_tuis')
+    if force:
+        value['selection_source'] = 'explicit_selection'
+    elif value.get('pending_removal'):
+        legacy = old.get('schema_version') is None and 'restore_until' in old
+        value['selection_source'] = old.get('selection_source',
+            'approximate legacy fallback; membership not verified' if legacy else 'observed_tuis')
+    else:
+        value['selection_source'] = 'observed_tuis'
     if old:
         history = list(old.get('recent_groups', []))
         if {t['id'] for t in old['threads']} != {t['id'] for t in value['threads']}:
@@ -417,6 +427,8 @@ async def prepare_permissions(rpc, thread_id, cwd):
 
 
 async def capture_all(cwd=None, explicit=None, *, force=False):
+    if explicit and len(set(explicit)) != len(explicit):
+        raise RuntimeError('Duplicate conversation IDs; select each thread only once.')
     running, rows = processes(), thread_rows()
     loaded = await loaded_ids() if any(not p['thread_id'] for p in running) else set()
     directories = [cwd] if cwd else sorted({p['cwd'] for p in running})
@@ -480,9 +492,12 @@ async def restore(cwd, dry_run=False):
                   time.strftime('%Y-%m-%d %H:%M', time.localtime(observed)) +
                   '; arrange the tabs and run codex-windows save to refresh it.')
         pending = []
+        if len({t['id'] for t in group['threads']}) != len(group['threads']):
+            raise RuntimeError('Saved roster has duplicate IDs; run codex-windows save to repair it.')
         for position, thread in enumerate(group['threads'], 1):
             if not UUID.fullmatch(thread['id']) or thread['id'] not in rows or rows[thread['id']]['cwd'] != cwd:
-                raise RuntimeError('Invalid/stale thread in saved group; no windows opened.')
+                raise RuntimeError('Invalid/stale thread in saved group; no windows opened. '
+                                   'Run codex-windows save with the intended tabs open to repair it.')
             status = 'already open — skipped' if thread['id'] in attached else 'restore with full access'
             print(f'  {position}. {thread["name"]} [{thread["id"]}] — {status}')
             if thread['id'] not in attached:
@@ -506,6 +521,13 @@ async def restore(cwd, dry_run=False):
         subprocess.run([codex_binary(), 'app-server', 'daemon', 'start'], check=True, timeout=25,
                        stdout=subprocess.DEVNULL)
         group['restore_until'] = time.time() + 120
+        # A previous attachment earlier in this boot cannot stand in for a new
+        # launch. Failed relaunches must stay in the group until seen again.
+        seen = group.get('live_seen', {})
+        prior_live = seen.get('ids', []) if seen.get('boot_id') == boot_id() else []
+        launching_ids = {t['id'] for t in pending}
+        group['live_seen'] = {'boot_id': boot_id(),
+                             'ids': [i for i in prior_live if i not in launching_ids]}
         atomic_json(state_path(cwd), group)
         launching = []
         async with RPC() as rpc:

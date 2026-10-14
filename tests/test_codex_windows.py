@@ -269,6 +269,48 @@ class Recovery(unittest.TestCase):
         self.assertEqual([t['id'] for t in result['threads']], [A, B])
         self.assertEqual(result['pending_removal']['never_seen_this_boot'], [B])
 
+    def test_failed_same_boot_relaunch_requires_fresh_live_observation(self):
+        self.record_at(900, [A, B])  # Both were attached earlier in this boot.
+        from subprocess import CompletedProcess
+        with patch.object(cw, 'processes', return_value=[]), \
+             patch.object(cw, 'thread_rows', return_value=self.rows), \
+             patch.object(cw.shutil, 'which', return_value='/bin/true'), \
+             patch.dict(cw.os.environ, {'WSL_DISTRO_NAME': 'Ubuntu'}), \
+             patch.object(cw.time, 'time', return_value=1000), \
+             patch.object(cw, 'RPC', return_value=FakeRPC(cwd=self.cwd)), \
+             patch.object(cw.subprocess, 'run', side_effect=[
+                 CompletedProcess([], 0), RuntimeError('terminal launch failed')]):
+            with self.assertRaisesRegex(RuntimeError, 'terminal launch failed'):
+                asyncio.run(cw.restore(self.cwd))
+        self.assertEqual(cw.load(cw.state_path(self.cwd))['live_seen']['ids'], [])
+        for t in range(1030, 1630, 30):
+            result = self.record_at(t, [A])
+        self.assertEqual([t['id'] for t in result['threads']], [A, B])
+        self.assertEqual(result['pending_removal']['never_seen_this_boot'], [B])
+
+    def test_partial_capture_preserves_legacy_fallback_uncertainty(self):
+        cw.atomic_json(cw.state_path(self.cwd), {'cwd': self.cwd,
+            'threads': [{'id': A}, {'id': B}], 'restore_until': 0})
+        self.record_at(1000, [A])
+        group, label = cw.resolve_group(self.cwd, self.rows, [], set())
+        self.assertIn('approximate', label)
+        self.assertIn('approximate', group['selection_source'])
+
+    def test_duplicate_explicit_selection_is_rejected_before_mutation(self):
+        self.record_at(1000, [A, B])
+        before = cw.state_path(self.cwd).read_bytes()
+        with self.assertRaisesRegex(RuntimeError, 'Duplicate conversation IDs'):
+            asyncio.run(cw.capture_all(self.cwd, [A, A, B]))
+        self.assertEqual(cw.state_path(self.cwd).read_bytes(), before)
+
+    def test_manual_save_can_repair_old_duplicate_roster(self):
+        cw.atomic_json(cw.state_path(self.cwd), {'schema_version': 1,
+            'cwd': self.cwd, 'threads': [{'id': A}, {'id': A}, {'id': B}]})
+        with self.assertRaisesRegex(RuntimeError, 'duplicate IDs'):
+            self.record_at(1000, [A])
+        result = self.record_at(1030, [A], confirm_removals=True)
+        self.assertEqual([t['id'] for t in result['threads']], [A])
+
     def test_partial_capture_keeps_observed_order_and_missing_slots(self):
         self.record_at(1000, [A, B, C], tab_order={'source': 'windows_terminal_uia', 'observed_at': 1000})
         result = self.record_at(1030, [C, A], tab_order={'source': 'windows_terminal_uia', 'observed_at': 1030})
