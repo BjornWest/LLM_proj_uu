@@ -142,6 +142,7 @@ class FactRecorder:
         # Decision outputs staged against a capture whose provenance arrives with
         # the background capture: (value, staged entry, registered sources).
         self.deferred=[]
+        self.decision_capture=None
         self.env = None; self.step = 0
         self.current = None; self.capture_count = self.output_count = 0
         self.outputs = OrderedDict(); self.content_outputs = {}
@@ -231,6 +232,7 @@ class FactRecorder:
             # No DOM/probe work before inference: provenance comes from the
             # background capture of the same page revision.
             diagnostics.append({'reason': 'deferred_to_background_capture'})
+            self.decision_capture = f'fact-capture-{self.capture_count:04d}'
         elif post_action:
             # Execution metadata only; the next decision/background capture
             # observes the resulting page. Nothing was captured to map.
@@ -453,7 +455,7 @@ class FactRecorder:
         self.outputs.move_to_end(id(value))
         while len(self.outputs)>64:self.outputs.popitem(last=False)
         if not restaged and self.current is not None and self.current.get('deferred'):
-            self.deferred.append([value,entry,[]])
+            self.deferred.append([value,entry,[],self.decision_capture])
         return record['id']
 
     def finish_decision(self, outcome):
@@ -462,6 +464,12 @@ class FactRecorder:
         Identical AX text is not proof of identical private provenance, so an
         invalidated decision or an unproven revision leaves mappings unknown.
         """
+        # Only the decision being validated may be bound; outputs of any earlier
+        # decision (e.g. one whose completion failed) are never re-bound later.
+        stale = [item for item in self.deferred if item[3] != self.decision_capture]
+        if stale:
+            self.deferred = [item for item in self.deferred if item[3] == self.decision_capture]
+            self._annotate(stale, 'decision_superseded_no_rebinding')
         if outcome.get('valid') and outcome.get('revision_proven'):
             return self.restage_deferred()
         reason = ('decision_invalidated_no_rebinding' if not outcome.get('valid')
@@ -470,7 +478,10 @@ class FactRecorder:
 
     def drop_deferred(self, reason):
         pending, self.deferred = self.deferred, []
-        for value, entry, sources in pending:
+        self._annotate(pending, reason)
+
+    def _annotate(self, pending, reason):
+        for value, entry, sources, decision in pending:
             def annotate(entry=entry):
                 record = entry['record']
                 record['diagnostics'].append({'reason': reason})
@@ -487,12 +498,15 @@ class FactRecorder:
         without provenance leaves them unknown with explicit diagnostics.
         """
         pending, self.deferred = self.deferred, []
-        for value, entry, sources in pending:
+        for value, entry, sources, decision in pending:
             def rebind(value=value, entry=entry, sources=sources):
                 self.stage(self.explorer, value, artifact=entry['artifact'], **entry['stage_options'])
-                updated = self.select(value)
+                # Update the staged entry in place: delivery bookkeeping may hold
+                # this object and register it only at acknowledgment.
+                entry.update(self.select(value))
+                self.outputs[id(value)] = (value, entry)
                 for source in sources:
-                    self.register(source, updated)
+                    self.register(source, entry)
             self.observe(rebind)
 
     def select(self, value):

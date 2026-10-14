@@ -373,7 +373,14 @@ class ObservationPipeline:
             future=self.pool.submit(dispatch)
             fill()
             try:
-                result=future.result()  # Retain success/error/request even if prefetch failed.
+                try:result=future.result()  # Retain success/error/request even if prefetch failed.
+                except BaseException as exc:
+                    if dynamic_pending and getattr(self,'after_validation',None) is not None:
+                        # The decision is never validated: its deferred outputs are
+                        # finalized as unknown before the original error propagates.
+                        self.after_validation({'valid':False,'revision_proven':False,
+                            'error':f'completion_failed: {type(exc).__name__}'})
+                    raise
                 if dynamic_pending and not event['observation_pipeline']['background_error']:
                     try:dynamic.validate()
                     except Exception as exc:failed(exc)

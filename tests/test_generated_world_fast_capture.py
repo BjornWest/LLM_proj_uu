@@ -194,6 +194,23 @@ def test_dom_bid_map_and_attach_skip_text_nodes():
     assert [n.get('browsergym_id') for n in tree['nodes']] == ['7', None, None]
 
 
+class _StubPage:
+    """Playwright connection-wrapper boundary only; optional stalled RPC."""
+    def __init__(self):
+        import asyncio
+        self.loop = asyncio.new_event_loop()
+        async def wrap(cb, *args, **kwargs):
+            return await cb()
+        self.connection = NS(wrap_api_call=wrap, _callbacks={}, _loop=self.loop)
+        self._impl_obj = NS(_connection=self.connection)
+
+    def stalled(self, *args):
+        import asyncio
+        async def rpc():
+            return await asyncio.Future()
+        return self.loop.run_until_complete(self.connection.wrap_api_call(rpc))
+
+
 def _decision(pending_tree, full_tree, *, revision=(1, 1), bids=(), live=None, current_tree=None, monkeypatch=None):
     """BudgetedDecision with stubbed identity; live settle state and fresh AX read are injectable."""
     from intent_browser import budgeted_decision
@@ -201,7 +218,8 @@ def _decision(pending_tree, full_tree, *, revision=(1, 1), bids=(), live=None, c
     decision = BudgetedDecision.__new__(BudgetedDecision)
     identity = {'tab': 't', 'cycle': None, 'document': {'frame_id': 'F'}}
     decision.identity = lambda: identity
-    decision.human = NS(env=NS(page=object()))
+    decision.human = NS(env=NS(page=_StubPage()), capture_timeout_mode='bounded')
+    decision.trace = NS(event=lambda *a, **k: None)
     decision.pending = {'identity': identity, 'revision': {'revision': revision[0]}, 'tree': pending_tree,
                         'bids': list(bids)}
     decision.full = {'human_tab_capture': {'document': identity['document']}, 'axtree_object': full_tree,
@@ -335,6 +353,122 @@ def test_proven_revision_rebinds_decision_facts():
         assert policy['projections']
     finally:
         case.doCleanups()
+
+
+def test_failed_completion_finalizes_its_decision_facts_and_later_decisions_cannot_rebind_them(monkeypatch):
+    # Follow-up review finding 1: a failed completion must not leave its decision
+    # outputs queued for a later, differently-revisioned decision to re-bind.
+    from copy import deepcopy
+    from intent_browser import budgeted_decision
+    from intent_browser.observation_pipeline import ObservationPipeline
+    from intent_browser.fact_provenance import encoded
+    from intent_browser.native_tools import NativeConversation
+    from tests import test_fact_provenance as provenance_cases
+    case = provenance_cases.ProvenanceTests(); case.setUp()
+    pipeline = ObservationPipeline.__new__(ObservationPipeline)
+    pipeline.pending = None; pipeline.pool = None
+    try:
+        x, obs, recorder = case.fixture()
+        recorder.pipeline_boundary = 'test-pipeline'
+        pipeline.after_background = x.capture
+        pipeline.after_validation = recorder.finish_decision
+        def prepare(revision):
+            decision_obs = deepcopy(obs)
+            decision_obs['observation_capture'] = {'version': 'budgeted-decision-v1', 'coverage': 'full'}
+            output = x.prepare_observation(decision_obs)
+            decision = _decision(obs['axtree_object'], deepcopy(obs['axtree_object']), revision=(revision, revision))
+            decision.full.update(obs)
+            decision.capture = lambda: 'background-artifact'
+            pipeline.dynamic = decision
+            return output
+        first = prepare(1)
+        ledger, first_id = case.policy(recorder, first)
+        conversation = NativeConversation()
+        messages = conversation.request('system', 'goal', first if isinstance(first, str) else encoded(first),
+                                        observation_source=first_id)
+        class Failing:
+            supports_background_completion = True
+            def complete(self, messages): raise RuntimeError('synthetic transport failure')
+        with pytest.raises(RuntimeError, match='synthetic transport failure'):
+            pipeline.complete(Failing(), messages, {})
+        assert recorder.deferred == []
+        assert {'reason': 'decision_invalidated_no_rebinding'} in recorder.select(first)['record']['diagnostics']
+        ledger.record({'step': 0, 'messages': messages, 'model_request': {'messages': messages}},
+                      conversation.bindings(), acknowledged=False)
+        conversation.recover(None, 'Retry after transport failure')
+        case.state = 'state-2'; recorder.step = 1
+        second = prepare(2)
+        second_text = second if isinstance(second, str) else encoded(second)
+        second_id = ledger.register('page_observation', second_text, step=1, fact_output=recorder.select(second))
+        messages = conversation.request('system', 'goal', second_text, observation_source=second_id)
+        class Success:
+            supports_background_completion = True
+            def complete(self, messages): return 'retained-completion'
+        monkeypatch.setattr(budgeted_decision, 'settle_call', lambda *a, **k: {'revision': 2})
+        assert pipeline.complete(Success(), messages, {}) == 'retained-completion'
+        assert pipeline.dynamic.revision_proven
+        ledger.record({'step': 1, 'messages': messages, 'model_request': {'messages': messages}},
+                      conversation.bindings(), acknowledged=True)
+        assert json.loads((case.path / f'fact-policy-{first_id}.json').read_text())['projections'] == []
+        # The second decision (a proven revision) is itself re-bound; it only
+        # references content already staged, so it carries no new projections.
+        second_record = recorder.select(second)['record']
+        assert {'reason': 'rebound_to_background_capture'} in second_record['diagnostics']
+        assert second_record['capture'] != recorder.select(first)['record']['capture']
+    finally:
+        if pipeline.pool is not None: pipeline.pool.shutdown()
+        case.doCleanups()
+
+
+_STALL_CHILD = r"""
+import sys, json
+from copy import deepcopy
+from types import SimpleNamespace as NS
+from unittest.mock import patch
+sys.path.insert(0, sys.argv[2])
+from tests.test_generated_world_fast_capture import _decision
+from intent_browser import budgeted_decision
+from intent_browser.observation_pipeline import ObservationPipeline
+TREE = {'nodes': [{'nodeId': '1', 'backendDOMNodeId': 3, 'role': {'value': 'button'},
+                   'name': {'value': 'Commit'}, 'browsergym_id': '9'}]}
+phase = sys.argv[1]
+decision = _decision(TREE, deepcopy(TREE), bids=[(3, 'button', '9')])
+decision.validation_seconds = 0.05
+page = decision.human.env.page
+decision.capture = lambda: 'background-artifact'
+pipeline = ObservationPipeline.__new__(ObservationPipeline)
+pipeline.dynamic = decision; pipeline.pending = None; pipeline.pool = None
+class Backend:
+    supports_background_completion = True
+    def complete(self, messages): return 'retained-completion'
+event = {}
+if phase == 'live_state':
+    state = patch.object(budgeted_decision, 'settle_call', side_effect=lambda *a, **k: page.stalled())
+    ax = patch.object(budgeted_decision, 'extract_json', return_value=TREE)
+else:
+    state = patch.object(budgeted_decision, 'settle_call', return_value=None)
+    ax = patch.object(budgeted_decision, 'extract_json', side_effect=lambda *a: page.stalled())
+with state, ax:
+    result = pipeline.complete(Backend(), [], event)
+pipeline.pool.shutdown()
+print(json.dumps({'result': result, 'invalidated': event['observation_pipeline'].get('invalidated'),
+                  'error': event['observation_pipeline']['background_error']}))
+"""
+
+
+@pytest.mark.parametrize('phase', ['live_state', 'fresh_ax'])
+def test_completion_validation_reads_are_bounded(tmp_path, phase):
+    # Follow-up review finding 2: a stalled completion-time read returns the
+    # completed response with an invalidated decision instead of hanging.
+    import subprocess, sys
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    child = tmp_path / 'stall_child.py'; child.write_text(_STALL_CHILD)
+    done = subprocess.run([sys.executable, str(child), phase, str(root)], capture_output=True, text=True, timeout=20)
+    assert done.returncode == 0, done.stderr
+    result = json.loads(done.stdout.strip().splitlines()[-1])
+    assert result['result'] == 'retained-completion' and result['invalidated'] is True
+    assert 'CaptureDeadlineExceeded' in result['error']
 
 
 def test_page_settle_wait_is_bounded_and_xhr_settles_once(tmp_path):

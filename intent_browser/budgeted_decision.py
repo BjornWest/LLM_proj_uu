@@ -128,6 +128,7 @@ def ax_signatures(tree):
 class BudgetedDecision(DynamicPreview):
     mode = VERSION
     preview_bids = True
+    validation_seconds = 5.0
 
     def __init__(self, human, trace, *, budget_tokens):
         super().__init__(human, trace, depth=1, max_nodes=1, preview_bids=True)
@@ -241,6 +242,26 @@ class BudgetedDecision(DynamicPreview):
                 cdp.detach()
 
     def validate(self):
+        """Completion-boundary validation under one owner-thread RPC deadline.
+
+        A stalled live-state or AX read cannot hold the completed response:
+        bounded mode turns the deadline into an invalidated decision (no action,
+        no fact rebinding); diagnostic mode reports the overrun and waits.
+        """
+        from .native_capture import CaptureBudget, CaptureDeadlineExceeded
+        budget = CaptureBudget(self.human.env.page, self.trace, seconds=self.validation_seconds,
+                               scope='completion_validation',
+                               event_prefix='completion_validation',
+                               enforce=getattr(self.human, 'capture_timeout_mode', 'bounded') == 'bounded')
+        try:
+            with budget.rpc_deadline():
+                self._validate()
+                budget.check()
+        except CaptureDeadlineExceeded as exc:
+            self.revision_proven = False
+            raise ObservationChanged(f'Completion validation deadline exceeded (CaptureDeadlineExceeded: {exc})') from exc
+
+    def _validate(self):
         if self.identity() != self.pending['identity']:
             raise ObservationChanged('Document/custody changed during inference or background capture')
         if self.full is None:
