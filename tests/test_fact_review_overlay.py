@@ -15,17 +15,32 @@ from training.browser_training.fact_exposure import utf16_slice
 
 ROOT=Path(__file__).resolve().parents[1]
 APPROVED_PINS=LEGACY_RENDERER_PINS
-LEGACY_COMMIT='609fec8f400e40b47f487795b6494cc4a1cb60a4'
-SKU_COMMIT='7338ce4e51ca1571b76cac8eaef225005e21bc41'
+LEGACY_FIXTURES=ROOT/'tests/fixtures/fact_review_overlay/legacy_v1'
 
 
-def frozen_source(commit,name,expected):
-    import os
-    raw=subprocess.check_output(['git','-C',str(ROOT),'show',
-        commit+':environments/website_world/'+name+'.py'],
-        env={**os.environ,'GIT_OPTIONAL_LOCKS':'0'})
-    assert sha256(raw).hexdigest()==expected
+def checked_source(path,expected):
+    raw=path.read_bytes()
+    assert sha256(raw).hexdigest()==expected,f'Source pin changed: {path}'
     return raw.decode()
+
+
+def legacy_source(name,expected):
+    # Complete checked-in sources survive Git-free exports and shallow clones.
+    manifest=json.loads((LEGACY_FIXTURES/'manifest.json').read_text())
+    assert manifest['schema']=='fact-review-legacy-source-fixtures-v1'
+    assert manifest['source_commit']=='5d1e8444a6e856f5a5975606ea3d4b5e14a8fd1f'
+    entry=manifest['files'][name+'.py']
+    assert entry=={'source_path':'environments/website_world/'+name+'.py','sha256':expected}
+    return checked_source(LEGACY_FIXTURES/(name+'.py'),expected)
+
+
+def modern_sources():
+    # Validate the actual tested tree, never an unrelated donor Git object.
+    folder=ROOT/'environments/website_world'
+    sources=[checked_source(folder/(name+'.py'),SKU_RENDERER_PINS[name])
+             for name in ['surrounding_pages','native_review_pages']]
+    helper=checked_source(folder/'review_rating_scopes.py',SKU_SCOPE_PIN)
+    return sources,helper,{**SKU_RENDERER_PINS,'review_rating_scopes':SKU_SCOPE_PIN}
 
 
 @pytest.fixture(scope='module')
@@ -33,7 +48,7 @@ def copies():
     # These inputs are source-pinned only. Accepted runtime closure is separate.
     sources=[];expected={}
     for name in ['surrounding_pages','native_review_pages']:
-        sources.append(frozen_source(LEGACY_COMMIT,name,APPROVED_PINS[name]))
+        sources.append(legacy_source(name,APPROVED_PINS[name]))
         expected[name]=APPROVED_PINS[name]
     return (copied_review_classes(*sources,enabled=False),
             copied_review_classes(*sources,enabled=True,expected_sha256=expected),sources,expected)
@@ -164,7 +179,7 @@ def test_mount_copy_changes_only_its_private_renderer_globals(copies):
     from training.browser_training.fact_review_overlay import copied_review_mount
     from environments.website_world import surrounding
     _,on,_,_=copies
-    source=frozen_source(LEGACY_COMMIT,'surrounding','548968f602a6c2757f22a5c58c53a3c49c02aff516f29c9b5ef0702ccfbe31da')
+    source=legacy_source('surrounding','548968f602a6c2757f22a5c58c53a3c49c02aff516f29c9b5ef0702ccfbe31da')
     private=copied_review_mount(source,on,expected_sha256='548968f602a6c2757f22a5c58c53a3c49c02aff516f29c9b5ef0702ccfbe31da')
     assert private.NativeReviewPage is on['NativeReviewPage']
     assert surrounding.NativeReviewPage is not private.NativeReviewPage
@@ -204,10 +219,7 @@ def test_copied_review_recording_uses_same_origin_asset_under_native_csp(copies)
 
 @pytest.fixture(scope='module')
 def sku_copies():
-    sources=[frozen_source(SKU_COMMIT,name,SKU_RENDERER_PINS[name])
-             for name in ('surrounding_pages','native_review_pages')]
-    helper=frozen_source(SKU_COMMIT,'review_rating_scopes',SKU_SCOPE_PIN)
-    pins={**SKU_RENDERER_PINS,'review_rating_scopes':SKU_SCOPE_PIN}
+    sources,helper,pins=modern_sources()
     off=copied_review_classes(*sources,enabled=False,rating_scope_source=helper)
     on=copied_review_classes(*sources,enabled=True,expected_sha256=pins,rating_scope_source=helper)
     return off,on,sources,helper,pins
@@ -526,3 +538,24 @@ def test_verified_corpus_rejection_uses_native_fallback(sku_copies):
     assert clean==plain.page('/reviews/p',{'sku':'s1'})[1]
     assert not payload['registrations']
     assert payload['meta']['recording_diagnostics'][0]['detail']=='Review summary differs from the complete public SKU corpus'
+
+
+def test_source_fixtures_need_no_git_or_external_renderer_objects(monkeypatch):
+    monkeypatch.setattr(subprocess,'check_output',lambda *a,**k:(_ for _ in ()).throw(AssertionError('Git lookup forbidden')))
+    for name,pin in APPROVED_PINS.items():assert legacy_source(name,pin)
+    assert legacy_source('surrounding','548968f602a6c2757f22a5c58c53a3c49c02aff516f29c9b5ef0702ccfbe31da')
+    sources,helper,pins=modern_sources()
+    assert copied_review_classes(*sources,enabled=True,expected_sha256=pins,
+                                 rating_scope_source=helper)['receipt']['source_sha256']==pins
+
+
+@pytest.mark.parametrize('changed',['surrounding_pages','native_review_pages','review_rating_scopes'])
+def test_modern_sources_refuse_drift_in_actual_tested_tree(tmp_path,monkeypatch,changed):
+    import sys
+    folder=tmp_path/'environments/website_world';folder.mkdir(parents=True)
+    for name in ('surrounding_pages','native_review_pages','review_rating_scopes'):
+        raw=(ROOT/'environments/website_world'/(name+'.py')).read_bytes()
+        if name==changed:raw+=b'\n# unreviewed change\n'
+        (folder/(name+'.py')).write_bytes(raw)
+    monkeypatch.setattr(sys.modules[__name__],'ROOT',tmp_path)
+    with pytest.raises(AssertionError,match='Source pin changed: .*'+changed):modern_sources()
