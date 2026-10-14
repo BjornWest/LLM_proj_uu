@@ -183,3 +183,76 @@ def harness_source_packet(normalized):
         'private_context':{'schema':'fact-render-occurrence-joins-v1','occurrences':deepcopy(normalized['occurrences']),
             'diagnostics':deepcopy(normalized['diagnostics']),'unsupported_ax':deepcopy(normalized['ax_diagnostics']),
             'inventory_complete':False,'delivery_evidence':False}}
+
+
+def snapshot_tree(dom, frame_id, selector):
+    """Rebuild a describeNode-shaped subtree from an existing DOMSnapshot.
+
+    Children follow JS childNodes order: pseudo-element and shadow-root nodes
+    (and the flattened shadow content below them) are skipped. Returns the
+    selected root and the document backend ID; no browser call is made.
+    """
+    strings = dom['strings']
+    documents = [d for d in dom['documents'] if strings[d['frameId']] == frame_id]
+    if len(documents) != 1:
+        raise ValueError('Main document absent from DOM snapshot')
+    nodes = documents[0]['nodes']
+    count = len(nodes['parentIndex'])
+    skipped = set(nodes.get('pseudoType', {}).get('index', [])) | set(nodes.get('shadowRootType', {}).get('index', []))
+    children = [[] for _ in range(count)]
+    for index, parent in enumerate(nodes['parentIndex']):
+        if parent >= 0:
+            children[parent].append(index)
+    def value(index):
+        raw = nodes['nodeValue'][index]
+        return '' if raw == -1 else strings[raw]
+    def name(index):
+        return strings[nodes['nodeName'][index]]
+    def attributes(index):
+        raw = nodes['attributes'][index]
+        return {strings[k]: strings[v] for k, v in zip(raw[::2], raw[1::2])}
+    document = next((i for i in range(count) if nodes['nodeType'][i] == 9), None)
+    if document is None:
+        raise ValueError('Document node absent from DOM snapshot')
+    if selector in ('#app', '#main'):
+        matches = [i for i in range(count) if nodes['nodeType'][i] == 1 and i not in skipped
+                   and attributes(i).get('id') == selector[1:]]
+    elif selector in ('main', 'body'):
+        matches = [i for i in range(count) if nodes['nodeType'][i] == 1 and i not in skipped
+                   and name(i).lower() == selector]
+    else:
+        raise ValueError('Unqualified render root')
+    if len(matches) != 1:
+        raise ValueError('Render root absent or ambiguous in DOM snapshot')
+    def build(index, depth=0):
+        if depth > 512:
+            raise ValueError('DOM snapshot subtree too deep')
+        return {'nodeType': nodes['nodeType'][index], 'nodeName': name(index), 'nodeValue': value(index),
+                'backendNodeId': nodes['backendNodeId'][index],
+                'children': [build(c, depth+1) for c in children[index] if c not in skipped]}
+    return build(matches[0]), nodes['backendNodeId'][document]
+
+
+def capture_from_snapshot(commit, dom, raw_ax, *, snapshot_id, frame_id):
+    """Normalize a probe export against the harness capture's own DOM/AX data.
+
+    The caller must establish that the page did not change between the probe and
+    the DOM/AX extraction (public revision bracket). No DOM.getDocument,
+    describeNode, frame-tree or second DOMSnapshot request is made here.
+    """
+    app, document_backend = snapshot_tree(dom, frame_id, commit['meta'].get('root_selector', '#app'))
+    strings = dom['strings']
+    controls = {}
+    for document in dom['documents']:
+        if strings[document['frameId']] != frame_id:
+            continue
+        nodes = document['nodes']; values = nodes.get('inputValue', {'index': [], 'value': []})
+        for index, value in zip(values['index'], values['value']):
+            controls[nodes['backendNodeId'][index]] = '' if value == -1 else strings[value]
+    normalized = normalize(commit, app, snapshot_id=snapshot_id, document_id=str(document_backend),
+                           frame_id=frame_id, control_values=controls)
+    sources, diagnostics = direct_sources(raw_ax, normalized['runs'], snapshot_id=snapshot_id,
+                                          document_id=normalized['document_id'], frame_id=frame_id)
+    normalized.update(ax_sources=sources, ax_diagnostics=diagnostics)
+    return {'normalized': normalized, 'raw_ax': raw_ax, 'commit': commit,
+            'capture_boundary': 'harness-dom-snapshot-v1'}

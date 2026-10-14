@@ -101,7 +101,8 @@ def case(args):
         return original_step(self,action)
     try:
         with patch.object(DynamicPreview,'capture',capture),patch.object(targeted,'check',check),patch('intent_browser.observation_pipeline.ObservationPipeline.step',step):
-            path,summary=run_episode(factory,backend,{'driver':'targeted_action_acceptance','paid_model_calls':0},output=out/'runs',
+            path,summary=run_episode(factory,backend,{'driver':'targeted_action_acceptance','paid_model_calls':0,'tags':['scripted']},output=out/'runs',allow_ungraded=True,
+                ungraded_reason='model-free browser capture regression; no task outcome is graded',
               max_steps=2 if mode in ('deferred_fresh','paced_change','frame_fallback') else 1,
               harness_profile=profile,human_handover=controller,before_observation=before,
               **({} if runtime_defaults and mode!='baseline' else {'observation_pipeline':

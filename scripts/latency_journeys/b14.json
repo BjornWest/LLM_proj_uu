@@ -1,0 +1,259 @@
+{
+ "description": "B14 walking-shoe journey shaped after the 2026-10-14 Qwen trajectory (same elements where possible): search, category click, product click, size select, size-guide link, back, disclosure toggle, cross-shop goto, select, search box fill+press.",
+ "answer": "Selected Tallback Ivalo at Kavelo; size_eu: 42; colour: navy; width: standard. Listed whole-unit price 700.00 SEK. https://kavelo.test/#/product/page-e35db7f780d4c8a85598f617?colour=navy",
+ "steps": [
+  [
+   {
+    "tool": "goto",
+    "args": {
+     "url": "https://eloro.test/"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "walking shoes",
+     "limit": 10
+    }
+   }
+  ],
+  [
+   {
+    "tool": "click",
+    "find_bid": {
+     "role": "link",
+     "name_contains": "Walking shoes"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Granvik",
+     "role": "link",
+     "limit": 5
+    }
+   }
+  ],
+  [
+   {
+    "tool": "click",
+    "find_bid": {
+     "role": "link",
+     "name_contains": "Granvik Aven"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": [
+      "mass",
+      "weight",
+      "gram"
+     ],
+     "limit": 10
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Size (EU)",
+     "role": "combobox",
+     "limit": 5
+    }
+   }
+  ],
+  [
+   {
+    "tool": "select_option",
+    "find_bid": {
+     "role": "combobox",
+     "name_contains": "Size"
+    },
+    "args": {
+     "options": "42"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": [
+      "kr",
+      "Stock",
+      "Selected"
+     ],
+     "limit": 15
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_read",
+    "find_ref": {
+     "name_contains": "Selected"
+    },
+    "args": {
+     "view": "subtree",
+     "depth": 2,
+     "limit": 20
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Size guide",
+     "role": "link",
+     "limit": 3
+    }
+   }
+  ],
+  [
+   {
+    "tool": "click",
+    "find_bid": {
+     "role": "link",
+     "name_contains": "Size guide"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "go_back",
+    "args": {}
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Product details",
+     "limit": 3
+    }
+   }
+  ],
+  [
+   {
+    "tool": "click",
+    "find_bid": {
+     "role": "DisclosureTriangle",
+     "name_contains": "Product details"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Technical product information",
+     "limit": 5
+    }
+   }
+  ],
+  [
+   {
+    "tool": "goto",
+    "args": {
+     "url": "https://kavelo.test/#/results?category=Footwear&type=Walking+shoes"
+    }
+   },
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Tallback",
+     "role": "link",
+     "limit": 5
+    }
+   }
+  ],
+  [
+   {
+    "tool": "goto",
+    "args": {
+     "url": "https://kavelo.test/#/product/page-e35db7f780d4c8a85598f617"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Size",
+     "role": "combobox",
+     "limit": 5
+    }
+   }
+  ],
+  [
+   {
+    "tool": "select_option",
+    "find_bid": {
+     "role": "combobox",
+     "name_contains": "Size"
+    },
+    "args": {
+     "options": "42"
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": [
+      "reference",
+      "mass"
+     ],
+     "limit": 10
+    }
+   }
+  ],
+  [
+   {
+    "tool": "ax_search",
+    "args": {
+     "query": "Search",
+     "limit": 5
+    }
+   }
+  ],
+  [
+   {
+    "tool": "fill",
+    "find_bid": {
+     "role": "searchbox"
+    },
+    "args": {
+     "value": "walking shoes"
+    },
+    "fallback": {
+     "tool": "ax_search",
+     "args": {
+      "query": "search",
+      "role": "textbox",
+      "limit": 3
+     }
+    }
+   },
+   {
+    "tool": "press",
+    "find_bid": {
+     "role": "searchbox"
+    },
+    "args": {
+     "key_comb": "Enter"
+    }
+   }
+  ]
+ ]
+}

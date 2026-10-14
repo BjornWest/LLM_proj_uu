@@ -13,6 +13,25 @@ from .ax_explorer import AXExplorer, encoded
 from .feedback_presentation import summarize_action_error
 
 CONTEXT_TOOLS = ('ax_search','ax_read','ax_changes')
+class LazyEntries:
+    """Ordered (item, records) pairs projected only when iterated."""
+    def __init__(self,context,refs,verbose,repeat,start=0):
+        self.context,self.refs,self.verbose,self.repeat,self.start=context,refs,verbose,repeat,start
+    def __len__(self):return len(self.refs)-self.start
+    def __getitem__(self,key):
+        if not isinstance(key,slice) or key.step not in (None,1) or key.stop is not None:
+            raise TypeError('LazyEntries supports only [offset:] slicing')
+        return LazyEntries(self.context,self.refs,self.verbose,self.repeat,self.start+(key.start or 0))
+    def __bool__(self):return len(self)>0
+    def __iter__(self):
+        for begin in range(self.start,len(self.refs),16):
+            selected=self.refs[begin:begin+16]
+            self.context._prime_nodes([self.context._indices[ref] for ref in selected])
+            for ref in selected:
+                item,record=self.context._item(ref,self.verbose,self.repeat)
+                yield item,({ref:record} if record else {})
+
+
 class AXContext(AXExplorer):
     def __init__(self,config):
         super().__init__(config)
@@ -230,18 +249,62 @@ class AXContext(AXExplorer):
         """entries=(public item, delivery records); stage only items that fit."""
         result={**output,'items':[],'offset':offset,'total_entries':total,'next_offset':offset}
         records={}
-        candidates=self._packed_candidates(result,[item for item,_ in entries],offset)
-        for (candidate,count),(_,updates) in zip(candidates,entries):
+        if isinstance(entries,LazyEntries):
+            result,records=self._pack_lazy(result,entries,offset,budget)
+        else:
+          candidates=self._packed_candidates(result,[item for item,_ in entries],offset)
+          for (candidate,count),(_,updates) in zip(candidates,entries):
             if count>budget-70:break
             result=candidate;records.update(updates)
         result['next_offset']=offset+len(result['items']) if offset+len(result['items'])<total else None
         if len(result['items'])<len(entries):result['budget_limited']=True
         if entries and not result['items']:
             result['error']='Entry exceeds token budget; request less context or ax_read view=node.'
-            result['blocked_ref']=entries[0][0].get('ref')
+            result['blocked_ref']=next(iter(entries))[0].get('ref')
         if self.tokens(encoded(result))>budget:raise ValueError('AX result envelope exceeds token budget')
         if stage:self.pending.update(records)
         return result
+
+    def _pack_lazy(self,result,entries,offset,budget):
+        """Same prefix as _pack, building and counting only near the budget.
+
+        Entries are generated in order while an additive per-entry estimate stays
+        below the limit plus slack; the exact cut (first prefix whose complete
+        JSON exceeds the limit) is then located with exact counts of whole
+        candidates, assuming counts grow with the prefix.
+        """
+        limit=budget-70
+        def candidate(k):
+            return {**result,'items':[item for item,_ in generated[:k]],'next_offset':offset+k}
+        def fits(k):
+            if k not in exact:exact[k]=self.tokens(encoded(candidate(k)))<=limit
+            return exact[k]
+        generated=[];exact={0:True}
+        estimate=self.tokens(encoded(result))
+        iterator=iter(entries)
+        exhausted=False
+        while True:
+            while not exhausted and estimate<=limit+64:
+                try:item,updates=next(iterator)
+                except StopIteration:
+                    exhausted=True;break
+                generated.append((item,updates))
+                estimate+=self.tokens(encoded(item))+1
+            # First failing prefix in 1..len(generated), if any.
+            low,high=0,len(generated)
+            if fits(high):
+                if exhausted:break
+                estimate=self.tokens(encoded(candidate(high)))+1  # recalibrate, keep generating
+                continue
+            while high-low>1:
+                middle=(low+high)//2
+                if fits(middle):low=middle
+                else:high=middle
+            generated=generated[:low]
+            break
+        records={}
+        for _,updates in generated:records.update(updates)
+        return candidate(len(generated)),records
 
     def _entries(self,refs,verbose,repeat):
         result=[]
@@ -259,7 +322,8 @@ class AXContext(AXExplorer):
             queue=deque(self.roots);refs=[]
             while queue:
                 i=queue.popleft();refs.append(self.ref(i));queue.extend(self.nodes[i]['children'])
-            return self._entries(refs,verbose,repeat),full
+            # Entries are built on demand: only those near the budget are projected.
+            return LazyEntries(self,refs,verbose,repeat),full
         entries=[]
         for ref,record in known.items():
             if record is None:continue

@@ -1,6 +1,6 @@
 # Current browser runtime defaults
 
-Version: `browser-runtime-defaults-v1`. This selects capture behavior separately from the policy toolset (`core-tools-v12-ax-reuse`). Implemented and validated locally; this document does not certify deployed workers or unreviewed task adapters.
+Version: `browser-runtime-defaults-v2` (v2 adds the generated-world branch below; the live-web branch is unchanged from v1). This selects capture behavior separately from the policy toolset (`core-tools-v12-ax-reuse`). Implemented and validated locally; this document does not certify deployed workers or unreviewed task adapters.
 
 ## Selection
 
@@ -20,6 +20,56 @@ Automatic screenshots default off on this fast path. The explicit screenshot too
 Other adapters retain complete native observations. This is important for graders that consume complete transition observations; selecting a faster path must not change their evidence contract silently. Unsupported custom BrowserGym overrides remain rejected by the existing pipeline validator rather than being guessed compatible.
 
 Core push-based feedback and asynchronous recording remain the current implementation independently of this selection. Detailed timing is off unless `debug_timings=True` or the process exports `HARNESS_DEBUG_TIMINGS=1`.
+
+## Generated-world agent custody (v2)
+
+Without the human-handover profile, `auto` now has a second reviewed branch for
+generated worlds. It requires all of:
+
+- An adapter that explicitly declares `supports_agent_fast_capture = True`, plus
+  `supports_observation_pipeline`, `supports_dynamic_preview` and
+  `supports_targeted_observations`. Declare it only when the grader does not
+  consume complete transition observations (generated-world graders read chat
+  answers, journals, storage state and ledgers).
+- No open-internet tools, no helper runtime, incremental AX and native tools.
+- A backend class that itself declares background completion and does not need
+  the browser thread.
+
+Otherwise selection stays native; `runtime_selection.reason` names the first
+missing requirement (`requires_live_web_tab_tracking` when the adapter does not
+declare agent fast capture). Explicit `native`, `None` and concrete
+configurations are unchanged. Selected names: `agent_budgeted_targeted`, or
+`agent_budgeted_full_post_action` when automatic screenshots are requested.
+
+The selected configuration adds `agent_custody=True` and
+`decision_capture='budgeted_overview'`:
+
+- Agent-only custody (`agent_browser.py`): HumanBrowser's owner-thread
+  deadlines, stable-frame projection and capture retries, every tab agent-owned,
+  native active-page following. No handover/tab tools, human chat,
+  `proceed_action` or full-content agreement are added; the policy tool schema is
+  unchanged.
+- Decision observation: one unmarked merged AX read. The context shown is the
+  profile's normal token-budgeted overview (`ax_overview_tokens`), not a shallow
+  preview. BIDs come from earlier DOM snapshots of the same document; first-seen
+  elements in overview breadth-first order get native-compatible BIDs.
+- Background capture while the request is in flight: BrowserGym marking (BID
+  assignment), DOMSnapshot, unmarking, then an unmarked AX read. It becomes the
+  AX index for search/read, targeted guards and fact recording. Validation after
+  completion requires the same document/custody and an unchanged public revision
+  or identical AX; otherwise the decision is invalidated and the model is told.
+- Every index uses unmarked AX trees, so the empty structural nodes that marking
+  makes visible (for example an empty paragraph or `rowgroup`) are absent.
+- Readiness (`page_settle.js`): after an action, wait for no in-flight
+  fetch/XHR, a 60 ms DOM quiet period and two animation frames (2 s deadline)
+  instead of BrowserGym's fixed 0.5 s sleep. A timeout keeps the "effects
+  uncertain; inspect before acting" feedback; nothing is replayed. BrowserGym's
+  1000 ms Playwright `slow_mo` is set to 0 for these environments.
+- Fact recording, when enabled with the pipeline recording package, runs one
+  private probe inside the background capture's revision bracket and normalizes
+  against that capture's own DOMSnapshot/AX (no attestations, `DOM.getDocument`,
+  `describeNode` or second DOMSnapshot). The decision overview's fact output is
+  re-bound to the validated background capture before acknowledgment.
 
 ## Python and CLI
 

@@ -57,8 +57,17 @@ class ObservationPipelineConfig:
     preview_node_limit: int = 64
     preview_bids: bool = True
     targeted_actions: bool = False
+    agent_custody: bool = False
+    decision_capture: str = 'shallow_preview'
 
     def __post_init__(self):
+        if type(self.agent_custody) is not bool:raise ValueError('agent_custody must be boolean')
+        if self.decision_capture not in ('shallow_preview','budgeted_overview'):
+            raise ValueError('decision_capture must be shallow_preview or budgeted_overview')
+        if self.decision_capture=='budgeted_overview' and not (self.dynamic_preview and self.agent_custody):
+            raise ValueError('Budgeted decision capture requires dynamic decision capture with agent custody')
+        if self.agent_custody and not self.full_capture_only:
+            raise ValueError('Agent custody requires native full-capture backing')
         if type(self.targeted_actions) is not bool:raise ValueError('targeted_actions must be boolean')
         if self.targeted_actions and (not self.dynamic_preview or self.trace_screenshots):
             raise ValueError('Targeted actions require dynamic_preview and trace_screenshots=False')
@@ -87,7 +96,9 @@ class ObservationPipelineConfig:
     def describe(self):
         return {**asdict(self), 'version':'browsergym-progressive-v1',
             'revision_sha256':hashlib.sha256(REVISION_PATH.read_bytes()).hexdigest(),
-            'fast_path':('targeted main-document action checks; final batch observation deferred to fresh decision preview' if self.targeted_actions else
+            'fast_path':('unmarked AX decision read with budgeted overview; background full capture; targeted checks; final observation deferred'
+                         if self.decision_capture=='budgeted_overview' and self.targeted_actions else
+                         'targeted main-document action checks; final batch observation deferred to fresh decision preview' if self.targeted_actions else
                          'opt-in shallow main-document decision preview; native reset/step/guards' if self.dynamic_preview else
                          'disabled; explicit native full capture' if self.full_capture_only else
                          'declared origin, current response forbids scripts, stable revision, single document'),
@@ -113,6 +124,9 @@ class ObservationPipeline:
         self.navigation_policy='';self.responses={};self.ticket=None;self.last_readiness=None
         self.pool=None;self.serial=0;self.latest_full=None;self.timings=[]
         self.dynamic=None
+        self.overview_budget=lambda:None
+        self.after_background=None
+        self.after_validation=None
         self.defer_next_step=False;self.in_step=False
         self.shell=ReadinessSpec(scope='body',condition={'kind':'count','selector':'body','expected':1})
         def entrypoint(*args,**kwargs):
@@ -293,7 +307,9 @@ class ObservationPipeline:
 
     def prefetch(self):
         if self.dynamic is not None and self.dynamic.pending is not None:
-            return self.dynamic.capture()
+            artifact=self.dynamic.capture()
+            if getattr(self,'after_background',None) is not None:self.after_background(self.dynamic.full)
+            return artifact
         if self.pending is None:return None
         pending=self.pending
         if self.stamp()!=pending['stamp']:raise ObservationChanged('Page changed after shallow preview; stale decision must not execute')
@@ -329,7 +345,7 @@ class ObservationPipeline:
         event['observation_pipeline']={'overlapped':overlapping,'background_error':None}
         barrier_started=time.monotonic()
         if dynamic_pending:
-            event['observation_pipeline']['mode']=(
+            event['observation_pipeline']['mode']=getattr(dynamic,'mode',None) or (
                 'dynamic-main-preview-v2' if dynamic.preview_bids else 'dynamic-main-preview-v1')
         def failed(exc):
             from .batching import DocumentScanInvalidated
@@ -357,10 +373,22 @@ class ObservationPipeline:
             future=self.pool.submit(dispatch)
             fill()
             try:
-                result=future.result()  # Retain success/error/request even if prefetch failed.
+                try:result=future.result()  # Retain success/error/request even if prefetch failed.
+                except BaseException as exc:
+                    if dynamic_pending and getattr(self,'after_validation',None) is not None:
+                        # The decision is never validated: its deferred outputs are
+                        # finalized as unknown before the original error propagates.
+                        self.after_validation({'valid':False,'revision_proven':False,
+                            'error':f'completion_failed: {type(exc).__name__}'})
+                    raise
                 if dynamic_pending and not event['observation_pipeline']['background_error']:
                     try:dynamic.validate()
                     except Exception as exc:failed(exc)
+                if dynamic_pending and getattr(self,'after_validation',None) is not None:
+                    # Owner thread, before policy delivery is acknowledged.
+                    self.after_validation({'valid':not event['observation_pipeline']['background_error'],
+                        'revision_proven':bool(getattr(dynamic,'revision_proven',False)),
+                        'error':event['observation_pipeline']['background_error']})
                 return result
             finally:event['observation_pipeline']['barrier_seconds']=time.monotonic()-barrier_started
         fill()
@@ -375,7 +403,10 @@ class ObservationPipeline:
                  not getattr(backend,'requires_browser_thread',False))
         if not self.config.dynamic_preview or not capable:
             return self.capture()
-        if self.dynamic is None:
+        if self.dynamic is None and self.config.decision_capture=='budgeted_overview':
+            from .budgeted_decision import BudgetedDecision
+            self.dynamic=BudgetedDecision(human,self.trace,budget_tokens=lambda:self.overview_budget())
+        elif self.dynamic is None:
             from .dynamic_preview import DynamicPreview
             self.dynamic=DynamicPreview(human,self.trace,depth=self.config.shallow_depth,
                                         max_nodes=self.config.preview_node_limit,preview_bids=self.config.preview_bids)
