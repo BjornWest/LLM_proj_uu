@@ -36,6 +36,29 @@ def observation_text(obs, limit=16000):
     return f"URL: {obs['url']}\nLast action error: {obs['last_action_error']}\nAccessibility tree:\n{tree}"
 
 
+
+def _browser_step(env, action, *, step, tool, context):
+    """Run once under trusted instrumentation, without replacing env.step.
+
+    A factory returns a fresh synchronous context manager for (step, tool).
+    Its exit runs on step failures; suppressing an action exception is forbidden.
+    Context setup/teardown failures propagate and never cause an action replay.
+    """
+    if context is None:
+        return env.step(action)
+    failure = None
+    with context(step, tool):
+        try:
+            result = env.step(action)
+        except BaseException as exc:
+            failure = (exc, exc.__traceback__)
+            raise
+    if failure is not None:
+        # Preserve the original action error even if an observer suppresses it.
+        exc, traceback = failure
+        raise exc.with_traceback(traceback)
+    return result
+
 def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT_MAX_STEPS, seed=0,
                 record_video=False, hold_seconds=0, search_backend=None, episode_task=None,
                 before_observation=None, *, terminal_response_instruction=None,
@@ -49,17 +72,24 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 trace_screenshots=None, async_recording=True, debug_timings=None,
                 checkpoint_control=None, record_fact_provenance=False, fact_source_provider=None,
                 automatic_grading=None, allow_ungraded=False, ungraded_reason=None, fact_capture_observer=None,
-                environment_admission=None, env_step_telemetry=None):
+                environment_admission=None, env_step_telemetry=None, browser_step_context=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
     limit counts flattened AX characters, excluding the URL/error envelope and
     truncation marker; callers must budget the actual serialized request bytes.
     Neither option repairs model output or changes parsing or verification.
+    browser_step_context(step, tool) optionally returns a fresh synchronous
+    context manager around each actual env.step. Non-browser tools do not call it.
+    Hook failures propagate; action failures cannot be suppressed by the hook.
     max_steps=None explicitly disables the total decision cap and requires an
     input-token limit. Delegation must also explicitly disable its shared call
     cap; external wall-time/resource bounds remain the caller's responsibility.
     """
+    # Trusted instrumentation only; factories receive no environment or page.
+    # Each actual browser step gets a fresh synchronous context, including failures.
+    if browser_step_context is not None and not callable(browser_step_context):
+        raise ValueError('browser_step_context must be a callable context-manager factory or None')
     from .automatic_grading import GradingGate, validate_options, failure_evaluation
     from .episode_admission import EpisodeAdmissionCancelled, await_activation
     if environment_admission is not None and not callable(environment_admission):
@@ -236,6 +266,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
              'observation_text_limit':observation_text_limit,'decision_wait':decision_wait,
              'trace_screenshots':trace_screenshots,'async_recording':async_recording,
              'env_step_telemetry':env_step_telemetry,
+             'browser_step_context':browser_step_context,
              'max_input_tokens':max_input_tokens,'input_counter':input_counter,
              'clarification_callback':clarification_callback,'clarification_audit_id':clarification_audit_id,
              'site_discovery':site_discovery,'site_discovery_audit_id':site_discovery_audit_id,
@@ -253,7 +284,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             record_fact_provenance=record_fact_provenance,fact_source_provider=fact_source_provider,
             automatic_grading=automatic_grading,allow_ungraded=allow_ungraded,ungraded_reason=ungraded_reason,
             fact_capture_observer=fact_capture_observer,environment_admission=environment_admission,
-            env_step_telemetry=env_step_telemetry))
+            env_step_telemetry=env_step_telemetry,browser_step_context=browser_step_context))
     no_browser=agent_actor is not None and agent_actor['browser']=='none'
     if action_timeout_ms is not None:
         validate_action_timeout(action_timeout_ms)
@@ -867,9 +898,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         trace.metadata["env_step_telemetry"] = step_recorder.describe()
                         write_json(trace.directory / "metadata.json", trace.metadata)
                         with step_recorder.observe(base_env, step=index, tool=decision.name):
-                            obs, reward, terminated, truncated, info = env.step(action)
+                            obs, reward, terminated, truncated, info = _browser_step(
+                                env, action, step=index, tool=decision.name, context=browser_step_context)
                     else:
-                        obs, reward, terminated, truncated, info = env.step(action)
+                        obs, reward, terminated, truncated, info = _browser_step(
+                            env, action, step=index, tool=decision.name, context=browser_step_context)
                 finally:
                     event['browser_step_seconds'] = time.monotonic() - started
                     trace.timings.record('action.env_step',started,step=index,tool=decision.name)
