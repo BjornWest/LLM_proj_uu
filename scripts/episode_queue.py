@@ -13,6 +13,10 @@ class QueueCancelled(RuntimeError):
     """The suite stopped before another episode action could be admitted."""
 
 
+class AdmissionBlocked(QueueCancelled):
+    """Only this warmed case is blocked by retained terminal reservations."""
+
+
 class AdmissionError(RuntimeError):
     """The caller violated the declared lifecycle/admission protocol."""
 
@@ -65,6 +69,10 @@ class EpisodeAdmission:
             q.emit('environment_ready', self.case_id)
             q.condition.notify_all()
             while not row['active'] and not q.stopped():
+                if q.blocked_by_quarantine():
+                    row['blocked_admission']=True
+                    q.emit('blocked_admission',self.case_id)
+                    raise AdmissionBlocked('All active slots are terminal quarantines; no dispatch')
                 q.condition.wait(.1)
             self._check_locked()
             q.emit('environment_activated', self.case_id)
@@ -227,6 +235,11 @@ class _Queue:
         live = [r for r in self.rows.values() if r['started'] and (not r['done'] or r.get('quarantine') is not None)]
         return sum(r['active'] for r in live), sum(not r['active'] for r in live)
 
+    def blocked_by_quarantine(self):
+        return (self.isolate_case_errors and self.counts()[0]>=self.target
+                and not any(r["started"] and r["active"] and not r["done"] for r in self.rows.values())
+                and any(r["active"] and r["done"] and r.get("quarantine") is not None for r in self.rows.values()))
+
     def emit(self, event, ident):
         active, warm = self.counts()
         self.events.append(dict(sequence=len(self.events), event=event, case=ident,
@@ -240,8 +253,8 @@ class _Queue:
         row = self.rows[ident]
         row.update(started=True, active=active, status='admitted' if active else 'warming')
         self.emit('admitted' if active else 'warmup_started', ident)
-        thread = Thread(target=self.worker, args=(ident,), name='episode-'+ident)
         try:
+            thread = Thread(target=self.worker, args=(ident,), name='episode-'+ident)
             thread.start()
         except BaseException as exc:
             # Thread admission itself can fail (e.g. a PID/resource ceiling).
@@ -260,7 +273,7 @@ class _Queue:
 
     def pump(self):
         """Called only under the condition lock; record FIFO intent atomically."""
-        if self.stopped():
+        if self.stopped() or self.blocked_by_quarantine():
             return
         for ident in self.order:
             if self.stopped():
@@ -302,11 +315,14 @@ class _Queue:
                         status = 'cancelled'
                     else:
                         raise AdmissionError('Caller returned without episode admission')
+        except AdmissionBlocked as exc:
+            error,status=dict(type=type(exc).__name__,message=str(exc),stage='blocked_admission'),'blocked'
         except QueueCancelled as exc:
             error, status = str(exc), 'cancelled'
         except Exception as exc:
             error = dict(type=type(exc).__name__, message=str(exc))
-            status = ('cancelled' if self.stopped() and admission._native_cancellation is not None
+            status = ('blocked' if self.rows[ident].get('blocked_admission') and not self.stopped() else
+                      'cancelled' if self.stopped() and admission._native_cancellation is not None
                       and isinstance(exc, admission._native_cancellation) else 'failed')
         except BaseException as exc:
             # Do not silently strand a lease when a worker receives SystemExit.
@@ -314,7 +330,7 @@ class _Queue:
             if not self.isolate_case_errors:self.stop_event.set()
         finally:
             with self.condition:
-                if self.isolate_case_errors and status=='failed' and 'quarantine' not in self.rows[ident]:
+                if self.isolate_case_errors and status in ('failed','blocked') and 'quarantine' not in self.rows[ident]:
                     # Unexpected callback/finalizer failure has no cleanup proof.
                     self.rows[ident]['quarantine']={'unverified_callback_failure':error}
                     self.emit('case_quarantined', ident)

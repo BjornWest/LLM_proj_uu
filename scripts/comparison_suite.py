@@ -219,14 +219,16 @@ def bounded_case_cleanup(s,process,connection):
  if process is None:return {'process_created':False,'process_terminal':True}
  grace=min(s.get('shutdown_grace_seconds',30),max(0,s['rental_deadline_utc']-time.time()))
  if process.poll() is None:
-  try:process.terminate()
-  except ProcessLookupError:pass
-  try:process.wait(timeout=max(.1,grace))
+  try:process.wait(timeout=max(.1,grace)) # Give acknowledged native cancellation a bounded cleanup window.
   except subprocess.TimeoutExpired:
-   try:process.kill()
+   try:process.terminate()
    except ProcessLookupError:pass
-   try:process.wait(timeout=10)
-   except subprocess.TimeoutExpired:pass
+   try:process.wait(timeout=5)
+   except subprocess.TimeoutExpired:
+    try:process.kill()
+    except ProcessLookupError:pass
+    try:process.wait(timeout=10)
+    except subprocess.TimeoutExpired:pass
  return {'process_created':True,'process_terminal':process.poll() is not None,
          'returncode':process.poll(),'native_cleanup_not_inferred':True}
 
@@ -1341,7 +1343,7 @@ def _supervise(s,scripted=False,stop=None):
      if watchdog is not None and watchdog.failure is not None:
       deadline_error=CaseDeadline(str(watchdog.failure));deadline_error.__cause__=e;e=deadline_error
      if qwen_mode(s):
-      try:stage=case_error_stage(e,watchdog,out,ident,stage)
+      try:stage='blocked_admission' if isinstance(e,queue['AdmissionBlocked']) else case_error_stage(e,watchdog,out,ident,stage)
       except BaseException as diagnostic:e.add_note('Failure stage read unavailable: '+repr(diagnostic))
       failure={'stage':stage,'type':type(e).__name__,'message':str(e),'quarantined':True,'task_verdict':None}
       try:
@@ -1360,6 +1362,7 @@ def _supervise(s,scripted=False,stop=None):
       events.finish(s['suite_id'],ident,'failed',{'system_failure':failure,'task_verdict':None})
       if not scripted:
        with delivery_lock:flush_completions(s,events,api)
+      if isinstance(e,queue['AdmissionBlocked']):raise e
       raise CaseInfrastructureError(stage+': '+str(e)) from e
      if capacity_host is not None:capacity_host.failed(ident,e,infrastructure=not isinstance(e,queue['QueueCancelled']))
      events.finish(s['suite_id'],ident,'failed',{'system_failure':{'type':type(e).__name__,'message':str(e)},'task_verdict':None})

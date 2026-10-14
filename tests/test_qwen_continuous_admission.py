@@ -250,6 +250,74 @@ class IsolatedCaseTests(unittest.TestCase):
   self.assertIsNotNone(result['cases']['bad']['quarantine'])
   self.assertEqual(result['cases']['last']['status'],'completed')
 
+ def test_default_prewarm_drains_when_all_active_slots_are_quarantined(self):
+  stop=threading.Event();warm=threading.Event();result=[];calls=[]
+  def one(ident,admission):
+   calls.append(ident)
+   if ident=='bad':
+    admission.environment_ready();self.assertTrue(warm.wait(2))
+    admission.quarantine({'native_cleanup':'unacknowledged'});raise RuntimeError('CPU cleanup error')
+   warm.set();admission.environment_ready();raise AssertionError('Warm case must never activate')
+  thread=threading.Thread(target=lambda:result.append(QUEUE['run_ordered_suite'](
+   {x:x for x in ['bad','warm','next']},one,max_concurrent_episodes=1,prewarm_count=1,
+   stop_event=stop,isolate_case_errors=True)))
+  thread.start();thread.join(3)
+  try:self.assertFalse(thread.is_alive())
+  finally:
+   if thread.is_alive():stop.set();thread.join(3)
+  self.assertFalse(stop.is_set());self.assertEqual(calls,['bad','warm'])
+  self.assertEqual([r['status'] for r in result[0]['cases'].values()],['failed','blocked','blocked'])
+  self.assertIsNotNone(result[0]['cases']['warm']['quarantine']) # setup resources need native proof
+  self.assertEqual(max(e['active'] for e in result[0]['events']),1)
+  self.assertEqual(max(e['warming_or_ready'] for e in result[0]['events']),1)
+
+ def test_blocked_warm_native_channel_receives_case_cancel_and_can_cleanup(self):
+  import socket
+  channel=runpy.run_path(str(ROOT/'scripts/episode_queue_channel.py'))
+  class NativeCancelled(RuntimeError):pass
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);stop=threading.Event();warm=threading.Event();child_outcomes=[]
+   def one(ident,admission):
+    if ident=='bad':
+     admission.environment_ready();self.assertTrue(warm.wait(2))
+     admission.quarantine({'cleanup':'unknown'});raise RuntimeError('CPU injected failure')
+    parent,child=socket.socketpair();child.settimeout(3);parent.settimeout(3)
+    def native():
+     try:
+      gate=channel['ChildAdmission'](child,ident,NativeCancelled)
+      gate.environment_admission(SimpleNamespace(episode_id='CPU-scripted-ready',directory=root/'episode',ready_monotonic=time.monotonic()))
+      child_outcomes.append('UNEXPECTED activation')
+     except NativeCancelled:child_outcomes.append('cancelled_before_dispatch')
+     finally:child.close()
+    thread=threading.Thread(target=native);thread.start();warm.set()
+    try:channel['serve_admission'](parent,admission,expected_run_root=root)
+    except QUEUE['AdmissionBlocked']:
+     thread.join(3);self.assertFalse(thread.is_alive())
+     self.assertEqual(child_outcomes,['cancelled_before_dispatch'])
+     admission.quarantine({'CPU_native_channel':'cancel acknowledged'})
+     self.assertTrue(admission.recover_quarantine(lambda:thread.is_alive() is False))
+     raise
+    finally:parent.close();thread.join(3)
+   result=QUEUE['run_ordered_suite']({'bad':'bad','warm':'warm','next':'next'},one,
+    max_concurrent_episodes=1,prewarm_count=1,stop_event=stop,isolate_case_errors=True)
+   self.assertFalse(stop.is_set());self.assertEqual(result['cases']['warm']['status'],'blocked')
+   self.assertIsNone(result['cases']['warm']['quarantine'])
+   self.assertEqual(result['cases']['next']['status'],'blocked')
+   self.assertEqual(child_outcomes,['cancelled_before_dispatch'])
+
+ def test_thread_constructor_failure_does_not_stop_other_cases(self):
+  original=QUEUE['_Queue'].start.__globals__['Thread']
+  def factory(*args,**kw):
+   if kw['name']=='episode-bad':raise RuntimeError('CPU constructor failure')
+   return original(*args,**kw)
+  def one(ident,admission):admission.environment_ready();return ident
+  stop=threading.Event()
+  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':factory}):
+   result=QUEUE['run_ordered_suite']({'bad':'bad','next':'next'},one,max_concurrent_episodes=1,
+    prewarm_count=0,stop_event=stop,isolate_case_errors=True)
+  self.assertFalse(stop.is_set());self.assertEqual(result['cases']['bad']['status'],'failed')
+  self.assertIsNone(result['cases']['bad']['quarantine']);self.assertEqual(result['cases']['next']['status'],'completed')
+
  def test_warm_failure_cannot_be_reactivated_by_recovery_before_return(self):
   stop=threading.Event();started=threading.Event();answers=[];release=threading.Event()
   def one(ident,admission):
@@ -297,7 +365,7 @@ class IsolatedCaseTests(unittest.TestCase):
    class Admission:
     def quarantine(self,evidence):self.evidence=evidence
     def recover_quarantine(self,proof):raise AssertionError('Must not recover')
-   proc=SimpleNamespace(poll=lambda:None,terminate=lambda:(_ for _ in ()).throw(SystemExit('cleanup error')))
+   proc=SimpleNamespace(poll=lambda:None,wait=lambda **kw:(_ for _ in ()).throw(SystemExit('cleanup error')))
    result=CALLER['isolate_case_error'](self.spec(),'bad',ValueError('tool error'),'tool',Path(tmp),proc,None,None,Admission())
    self.assertTrue(result['quarantined'])
    proof=json.loads((Path(tmp)/'bad-case-isolation.json').read_text())

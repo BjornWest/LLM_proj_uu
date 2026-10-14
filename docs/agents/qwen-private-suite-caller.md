@@ -456,8 +456,10 @@ its committed source is a common service dependency. Each admitted task separate
 checks agreement with those pinned pool sources. Recipe/source/readiness checks
 for one task are not performed as a whole-suite launch gate.
 
-If every usable slot is quarantined, remaining cases are explicitly blocked with
-unknown verdicts; the finite queue returns rather than claiming cleanup or hanging
+If every usable slot is a terminal quarantine, a ready prewarmed case receives
+case-local blocked-admission cancellation and bounded cleanup; the cohort stop
+flag stays false. No further warm environment is created. Remaining cases are
+explicitly blocked with unknown verdicts; the finite queue returns rather than claiming cleanup or hanging
 forever. `suite-outcomes.json` separates completed task pass/fail/inconclusive,
 execution failures, blocked and not-started cases. A nonzero CLI status follows
 queue drain and terminal evidence collection. Explicit user cancellation, rental
