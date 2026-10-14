@@ -27,9 +27,11 @@ independent. A local timeout/close does not prove remote cancellation or justify
 early permit release. New policies need fresh source/config/native acceptance;
 under `rental_bounded`, a connected server that stops progressing can consume
 the rest of the rental unless an operator or the host watchdog intervenes.
-Historical releases and their receipts remain unchanged. Private callers declare
-four distinct member canaries at the front of their finite queue; the old four
-remain valid, while a new reviewed configuration can select a narrower set.
+Historical releases and their receipts remain unchanged. Future private GPU
+callers use one continuously replenished finite cohort. Omit `canary_task_ids`
+or set it to `[]`, and omit `canary_enabled` or set it to `false`. Nonempty or
+enabled historical canary configuration is rejected by this new release rather
+than silently reintroducing the completion barrier.
 
 This additive mode extends `scripts/comparison_suite.py`; it reuses the ordered
 queue, prewarming channel, source-isolated saved consumers, recording hook,
@@ -57,12 +59,16 @@ and environment must be qualified before these are usable host commands.
 Use `runtime_mode: "qwen-private-v1"`, `server_context_tokens: 262144`,
 `max_input_tokens: 250000`, `max_steps: null`, `episode_timeout: null`,
 `max_tokens: 16384`, startup watchdog at most 900 seconds and request watchdog
-at most 600 seconds. Four active lifecycles and one warm environment are the
-current proposed bounds. B02/B14/H03/H05 must lead the queue and execute in
-parallel. A shared canary barrier keeps remainder dispatch closed until all four
-have verified grading/projection and terminal cleanup; a model task fail does not
-by itself invalidate infrastructure readiness. `suite_timeout` must be finite and reflect the remaining
-approved rental plus cleanup; it must not become an independent episode ceiling.
+at most 600 seconds. Seven active lifecycles and seven generation requests, with one warm environment,
+are conservative proposed initial settings. These are separate targets: supply
+explicit `runtime_limits` ceilings that fit the deployed browser/tokenizer/host
+bounds, and keep vLLM max-sequence capacity separate. `start_order` determines
+which cold case is created next; it does not delay activation until earlier tasks
+finish. The queue fills and refills its target continuously. There are no injected
+model diagnostics or first-N task-completion barriers. Serving approval must bind
+the complete user-authorized finite case list before launch. `suite_timeout` must
+be finite and reflect the remaining approved rental plus cleanup; it must not
+become an independent model episode ceiling.
 No old MiMo/Luna approvals authorize Qwen or a GPU rental.
 
 The spec separately pins `qwen_sources.runtime` (`qwen_suite_runtime.py`),
@@ -410,3 +416,49 @@ authorization/spec filename from issuing a second attempt. Correctly graded
 no-answer or limit outcomes do not hold later finite cases; infrastructure
 failures can still stop admission. Per-case turn limits apply only in this
 explicit profile, preserving legacy/private no-turn behavior.
+
+
+## Continuous private admission and isolated failures
+
+The prospective private admission policy is `continuous-v1` (default). Hosted
+OpenRouter and historical frozen callers retain their own behavior. One parent
+owns the queue, one capacity controller and one shared metrics poller for the
+whole finite cohort. Existing sticky KV-pressure parking, retirement, acknowledged
+permit release and atomic queue/controller limit CAS remain in force.
+
+A normal negative or inconclusive native task verdict is a measured completion;
+it never aborts other cases. A technical case error can also release its lifecycle
+slot after the child has exited, the exact launcher proves containment, wrapper
+finalizers acknowledge pool and capacity-channel cleanup, and the controller has
+no outstanding request for that case. The failure receipt keeps its task verdict
+null. The parent verifies shared source/service health and fresh telemetry, then
+uses the existing final cleanup boundary to finish that case. It never cancels a
+sent request or grants early capacity credit merely because the child failed.
+
+The parent waits for natural child cleanup for at most the configured shutdown
+grace, bounded by the remaining rental. Missing cleanup evidence, an uncertain
+request/acknowledgement, source integrity failure, dead shared service, stale
+telemetry, containment failure or rental expiry keeps cohort-level failure
+handling. A complete cohort containing isolated technical errors still exits as
+failed after collecting the other cases; its original case grades remain distinct.
+Zero-provider controls retain their explicit scripted allowance; this allowance
+never becomes a real-model episode ceiling.
+
+Trusted phase timestamps are written in `phases/CASE.jsonl` (parent) and
+`CASE/child-phases.jsonl` (child). They include queueing, process launch, environment
+readiness/activation, capacity wait/permission, actual generation dispatch, browser
+step start/end, native-grade availability, grading projection and cleanup, with
+UTC/monotonic times and caller commit/driver/configuration fingerprints. A generation
+scope ending is not a remote cancellation certificate. Native grader entry is not
+instrumented; that timestamp remains unknown. `suite-measurements.json` indexes all
+phase files, including cases without a final result. These machine-readable files
+are inputs for a human timing dashboard; no existing viewer grade is overwritten.
+
+Qualify source, ordinary browser/native grading and HTTP projection locally before
+rental. Reusable serving capability and task acceptance remain separate from cheap
+fresh host/source/config/readiness checks. Changing caller/source/profile bindings
+still requires matching acceptance; this policy does not relabel old evidence as a
+new execution or require an entire redundant scripted cohort on the GPU clock.
+No rental is released until Training's independent, tested expiry/deletion path can
+survive loss of the local workstation. This source change does not implement that
+provider control-plane guard or authorize inference.

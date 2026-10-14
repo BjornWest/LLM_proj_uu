@@ -150,14 +150,15 @@ class CallerReadPolicyTests(unittest.TestCase):
   for mode in ('qwen-openrouter-v1','other',None):
    with self.subTest(mode=mode),self.assertRaises(ValueError):self.caller.check_release({**private,'runtime_mode':mode})
   self.assertNotEqual(self.caller.config_hash(private),self.caller.config_hash({**private,'private_read_wait_policy':'bounded_request'}))
- def test_canaries_are_four_distinct_front_of_queue_members(self):
+ def test_private_continuous_admission_accepts_small_finite_cohort(self):
   from unittest.mock import patch
-  ids=['A01','A03','A04','H09']
-  value={'runtime_mode':'qwen-private-v1','max_steps':None,'episode_timeout':None,'max_input_tokens':250000,'server_context_tokens':262144,'max_tokens':16384,'request_timeout':600,'startup_timeout':900,'shared_tokenizer':True,'shared_chromium':True,'max_concurrent_episodes':4,'canary_task_ids':ids,'start_order':['qwen-'+i for i in ids],'cases':[{'policy_model':API['MODEL'],'max_input_tokens':250000,'id':'qwen-'+i,'task_id':i,'recipe_manifest':{}}for i in ids],'qwen_sources':{},'private_read_wait_policy':'rental_bounded'}
-  with patch.object(self.caller,'checked',return_value=ROOT):self.caller.validate_qwen_limits(value)
-  for canaries in (['A01']*4,ids[:3],['A01','A03','A04','absent'],ids[:3]+[None],list(reversed(ids))):
-   with self.subTest(canaries=canaries),patch.object(self.caller,'checked',side_effect=AssertionError('before target imports')),self.assertRaises(ValueError):self.caller.validate_qwen_limits({**value,'canary_task_ids':canaries})
-  legacy=['B02','B14','H03','H05'];cases=[{'policy_model':API['MODEL'],'max_input_tokens':250000,'id':'qwen-'+i,'task_id':i,'recipe_manifest':{}}for i in legacy]
-  with patch.object(self.caller,'checked',return_value=ROOT):self.caller.validate_qwen_limits({**value,'private_read_wait_policy':'bounded_request','canary_task_ids':legacy,'start_order':['qwen-'+i for i in legacy],'cases':cases})
+  ids=['A01','A03']
+  value={'runtime_mode':'qwen-private-v1','max_steps':None,'episode_timeout':None,'max_input_tokens':250000,'server_context_tokens':262144,'max_tokens':16384,'request_timeout':600,'startup_timeout':900,'shared_tokenizer':True,'shared_chromium':True,'max_concurrent_episodes':2,'start_order':['qwen-'+i for i in ids],'cases':[{'policy_model':API['MODEL'],'max_input_tokens':250000,'id':'qwen-'+i,'task_id':i,'recipe_manifest':{}}for i in ids],'qwen_sources':{},'private_read_wait_policy':'rental_bounded'}
+  for options in ({},{'canary_task_ids':[]},{'canary_enabled':False},{'admission_policy':'continuous-v1'}):
+   with self.subTest(options=options),patch.object(self.caller,'checked',return_value=ROOT):
+    self.caller.validate_qwen_limits({**value,**options})
+  for options in ({'canary_task_ids':ids},{'canary_enabled':True},{'admission_policy':'batch'},{'canary_task_ids':False}):
+   with self.subTest(options=options),patch.object(self.caller,'checked',side_effect=AssertionError('before target imports')),self.assertRaises(ValueError):
+    self.caller.validate_qwen_limits({**value,**options})
 
 if __name__=='__main__':unittest.main()

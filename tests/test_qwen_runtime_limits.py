@@ -305,6 +305,7 @@ class ScriptedChildBoundaryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='limits-child-') as temp:
             out=Path(temp);(out/'supervisor-start.json').write_text(json.dumps({'pid':os.getpid(),'process_start':'fixture'}))
             source={'runtime_mode':'qwen-private-v1','runtime_limits':{},'shared_chromium':False,
+                'caller_commit':'CPU-fixture','driver':{'sha256':'CPU-fixture-source'},
                 'output':str(out),'suite_id':'scripted-fixture','suite_timeout':60,'startup_timeout':60,
                 'sockets':{'qwen-X':'fixture-admission'},'channel':{},'qwen_sources':{'rpc':{}},
                 'capacity_bindings':{'qwen-X':{'path':'fixture-capacity','token':'private','deadline_utc':time.time()+60}}}
@@ -328,6 +329,10 @@ class ScriptedChildBoundaryTests(unittest.TestCase):
             self.assertEqual(reached,['client','native','closed'])
             failure=json.loads((out/'qwen-X/failure.json').read_text())
             self.assertEqual(failure['type'],'NativeBoundary')
+            phases=[json.loads(line) for line in (out/'qwen-X/child-phases.jsonl').read_text().splitlines()]
+            self.assertEqual([row['phase'] for row in phases],['worker_started','cleanup_started','cleanup_finished'])
+            self.assertTrue(all(row['caller_commit']=='CPU-fixture' for row in phases))
+            self.assertTrue(all('private' not in json.dumps(row) for row in phases))
             self.assertEqual(failure['usage']['policy_requests'],0)
             self.assertTrue((out/'qwen-X/cleanup.json').is_file())
 

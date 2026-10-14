@@ -376,6 +376,18 @@ class CapacityHost:
         self.parent.finish_after_cleanup(ident,verify_cleanup=verify_cleanup,
                                          record_terminal=record_terminal,timeout=5)
 
+    def finish_failed_case(self, ident, *, verify_cleanup, record_terminal):
+        """Isolate a fully cleaned case; never release an uncertain sent request."""
+        status = self.controller.status()
+        row = status['episodes'].get(ident)
+        if (self.stop.is_set() or self.parent.closed or self.parent.stop_cause is not None
+                or self.parent.cleanup_failures or status['telemetry_fresh'] is not True
+                or row is not None and row['request_id'] is not None
+                or ident in self.parent.errors or self.relays.get(ident, (None, []))[1]
+                or self.journal.failure is not None or not self.poller.thread.is_alive()):
+            raise RuntimeError('Shared health or exact case request cleanup is unverified')
+        self.finish(ident, verify_cleanup=verify_cleanup, record_terminal=record_terminal)
+
     def failed(self, ident, error, *, infrastructure=True):
         self.parent.abort_after_failure(ident,error,infrastructure=infrastructure)
 

@@ -126,14 +126,100 @@ def validate_qwen_limits(s):
   raise ValueError('One exact Qwen model and task identity per finite case required')
  if not s.get('shared_tokenizer') or not s.get('shared_chromium'):
   raise ValueError('This prospective Qwen composition requires the qualified pooled runtime')
- canaries=s.get('canary_task_ids')
- if (type(canaries)is not list or len(canaries)!=4
-     or any(type(i)is not str or not i for i in canaries) or len(set(canaries))!=4
-     or not set(canaries)<={c['task_id']for c in s['cases']}
-     or s.get('start_order',[])[:4]!=['qwen-'+i for i in canaries]):
-  raise ValueError('Four distinct declared member canaries must lead the queue')
+ private_admission_policy(s)
  for case in s['cases']:checked(case['recipe_manifest'])
  for row in s['qwen_sources'].values():checked(row)
+
+def private_admission_policy(s):
+ """Future private suites have one continuously replenished finite cohort."""
+ if s.get('admission_policy','continuous-v1')!='continuous-v1':
+  raise ValueError('Private Qwen requires continuous-v1 admission')
+ if s.get('canary_task_ids') not in (None,[]) or s.get('canary_enabled',False) is not False:
+  raise ValueError('Private Qwen model canaries are disabled; remove the historical selection')
+ return 'continuous-v1'
+
+
+def make_canary_barrier(s,stop,scripted):
+ if qwen_mode(s):
+  private_admission_policy(s)
+  return None
+ if hosted_qwen_mode(s) and not scripted:
+  return CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop,admission_only=True,
+   require_formatter=s.get('hosted_limit_profile')!='finite-task-limits-v1' and
+    any(i not in ('B17','B19','H01','H02','A03','A04') for i in s['canary_task_ids']))
+ return None
+
+
+def phase_writer(s,ident,output,filename):
+ """Trusted boundary timestamps; policy text and private capabilities stay out."""
+ if not qwen_mode(s):return lambda phase,**values:None
+ path=Path(output)/filename;path.parent.mkdir(parents=True,exist_ok=True)
+ lock=threading.Lock();fingerprint=config_hash(s)
+ def emit(phase,**values):
+  row={'schema':'qwen-suite-phase-v1','case':ident,'phase':phase,
+   'epoch':time.time(),'monotonic':time.monotonic(),'caller_commit':s['caller_commit'],
+   'driver_sha256':s['driver']['sha256'],'configuration_sha256':fingerprint,**values}
+  try:
+   with lock,path.open('a') as stream:stream.write(json.dumps(row,allow_nan=False)+'\n')
+  except OSError as error:
+   if emit.failure is None:
+    emit.failure={'case':ident,'phase':phase,'type':type(error).__name__,'message':str(error)}
+    print(json.dumps({'phase_recording_error':emit.failure}),file=sys.stderr)
+ emit.failure=None
+ return emit
+
+
+def record_browser_steps(env,emit):
+ """Observe actual env.step boundaries without adding a tool/episode timeout."""
+ original=env.step;sequence=0
+ def step(*args,**kwargs):
+  nonlocal sequence
+  sequence+=1;emit('tool_started',sequence=sequence)
+  try:return original(*args,**kwargs)
+  finally:emit('tool_finished',sequence=sequence)
+ env.step=step
+ return env
+
+
+def verified_case_cleanup(s,ident,output,process):
+ """No cleanup credit from termination alone or an unacknowledged permit."""
+ if process is None or process.poll() is None:return False
+ marker=load(Path(output)/ident/'cleanup.json')
+ guardian=load(Path(output)/(ident+'-bounded')/'result.json')
+ return (marker.get('status')=='passed' and marker.get('case')==ident
+  and marker.get('wrapper_finalizers_returned') is True
+  and marker.get('pool_lease_released') is True
+  and marker.get('capacity_channel_closed') is True
+  and marker.get('capacity_infrastructure_error') is None
+  and guardian.get('cleanup_verified') is True
+  and guardian.get('source_sha256')==s['launcher']['sha256'])
+
+
+def finish_case_failure(s,ident,error,output,process,host,services,stop):
+ """Retain a case error, refill only with verified local cleanup/shared health."""
+ if (not qwen_mode(s) or isinstance(error,(KeyboardInterrupt,SystemExit,EpisodeDeadline))
+     or stop.is_set() or time.time()>=s['rental_deadline_utc']):return False
+ if process is None:return False
+ if process.poll() is None:
+  grace=min(s.get('shutdown_grace_seconds',30),max(0,s['rental_deadline_utc']-time.time()))
+  if grace<=0:return False
+  try:process.wait(timeout=grace)
+  except subprocess.TimeoutExpired:return False
+ if stop.is_set() or time.time()>=s['rental_deadline_utc']:return False
+ if any(service is None or service.poll() is not None for service in services):return False
+ if not verified_case_cleanup(s,ident,output,process):return False
+ source_guard(s) # Shared source integrity failures cannot be isolated to a case.
+ proof=Path(output)/(ident+'-case-failure.json')
+ save(proof,{'schema':'qwen-case-infrastructure-failure-v1','case':ident,
+  'type':type(error).__name__,'message':str(error),'task_verdict':None,
+  'case_cleanup_verified':True,'caller_commit':s['caller_commit'],
+  'driver':s['driver'],'configuration_sha256':config_hash(s)})
+ receipt=pin(proof)
+ host.finish_failed_case(ident,
+  verify_cleanup=lambda:verified_case_cleanup(s,ident,output,process),
+  record_terminal=lambda:load(checked(receipt)).get('task_verdict') is None)
+ return True
+
 
 def qwen_live(s):
  runtime,_=qwen_modules(s);admission=runtime['ServingAdmission'](s['serving_live'])
@@ -334,12 +420,15 @@ class CanaryBarrier:
 
 
 class WatchedAdmission:
- def __init__(self,admission,watchdog):self.admission,self.watchdog=admission,watchdog
+ def __init__(self,admission,watchdog,phase=None):
+  self.admission,self.watchdog=admission,watchdog;self.phase=phase or (lambda *a,**k:None)
  def __getattr__(self,name):return getattr(self.admission,name)
  def environment_ready(self,ready=None):
   self.watchdog.ready();self.admission.environment_ready(ready);self.watchdog.activate()
- def step_started(self,sequence):self.watchdog.step_started(sequence)
- def step_finished(self,sequence):self.watchdog.step_finished(sequence)
+ def step_started(self,sequence):
+  self.watchdog.step_started(sequence);self.phase('tool_started',sequence=sequence)
+ def step_finished(self,sequence):
+  self.watchdog.step_finished(sequence);self.phase('tool_finished',sequence=sequence)
 def source_guard(s,c=None):
  checked(s['driver']);checked(s['helpers']);checked(s['events_helper'])
  if c is not None:
@@ -738,6 +827,7 @@ def execute(s,c,scripted=False):
  out=Path(s['output'])/c['id'];out.mkdir(parents=True,exist_ok=False)
  authority=load(Path(s['output'])/'supervisor-start.json')
  timings={'worker_started_monotonic':time.monotonic(),'reset_calls':0,'policy_requests':0,'formatter_requests':0}
+ phase_event=phase_writer(s,c['id'],out,'child-phases.jsonl');phase_event('worker_started')
  save(out/'start.json',{'case':c['id'],'pid':os.getpid(),'epoch':time.time(),'monotonic':timings['worker_started_monotonic'],'scripted':scripted})
  connection=socket.socket(socket.AF_UNIX);connection.settimeout(s['suite_timeout']);connection.connect(s['sockets'][c['id']])
  admission=channel['ChildAdmission'](connection,c['id'],EpisodeAdmissionCancelled)
@@ -774,6 +864,7 @@ def execute(s,c,scripted=False):
   now=time.monotonic()
   if phase=='policy':timings.setdefault('first_policy_dispatch_monotonic',now)
   else:timings.setdefault('first_formatter_dispatch_monotonic',now)
+  phase_event('generation_dispatch',episode_phase=phase)
   counts[phase+'_requests']+=1
   if phase=='formatter' and counts['formatter_requests']>1:raise RuntimeError('One formatter maximum')
  def record(value):
@@ -862,9 +953,11 @@ def execute(s,c,scripted=False):
    return types.SimpleNamespace(text=text,request={'messages':messages},raw={'model':'scripted','choices':[{'finish_reason':'stop','message':{'content':text}}],'usage':{}})
   def close(self):pass
  def environment_ready(ready):
+  phase_event('environment_ready')
   timings['environment_ready_monotonic']=time.monotonic();timings['ready_episode_id']=ready.episode_id;timings['ready_trace']=str(ready.directory)
   save(out/'warm-ready.json',dict(timings));signal.alarm(0)
   admission.environment_admission(ready)
+  phase_event('activated')
   timings['activated_monotonic']=time.monotonic();save(out/'activated.json',dict(timings));signal.alarm(180 if scripted else max(1,math.ceil(serving.deadline-time.time())) if qwen_mode(s) else max(1,math.ceil(s['suite_deadline_utc']-time.time())) if hosted_qwen_mode(s) else s['episode_timeout'])
   if lease is not None:
    proof=lease.begin_episode(c['id']);save(out/'subscription-admission.json',proof)
@@ -890,7 +983,9 @@ def execute(s,c,scripted=False):
    kw['input_counter']=model_matched_input_counter(sizing,assets_root=s['counter_assets_root'],shared_tokenizer=shared)
   kw['environment_admission']=environment_ready;kw['retry_policy']=None
   def make_env(video=None):
-   timings['environment_creation_monotonic']=time.monotonic();env=factory(video);environment_holder['env']=env
+   timings['environment_creation_monotonic']=time.monotonic();phase_event('environment_creation_started')
+   env=factory(video);environment_holder['env']=env;phase_event('environment_created')
+   if qwen_mode(s):env=record_browser_steps(env,phase_event)
    # Count actual reset on this one instance without altering native class/type guards.
    original=env.reset
    def reset(*a,**k):timings['reset_calls']+=1;return original(*a,**k)
@@ -901,10 +996,11 @@ def execute(s,c,scripted=False):
   if telemetry is not None:kw['env_step_telemetry']=telemetry
   return native_run(make_env,b,metadata,**kw)
  def projection(*,trace,grade):
+  phase_event('native_grade_available');phase_event('grade_projection_started')
   if not Path(trace).resolve().is_relative_to(out/'live/runs'):raise ValueError('Trace escaped case')
   result=h['project'](s,out,{**c,'id':c['task_id']},trace=trace,grade=grade)
   if c['task_id'] in ('H01','H02'):result=address_projection_result(trace,result)
-  save(out/'grade-viewer.json',result);return result
+  save(out/'grade-viewer.json',result);phase_event('grade_projection_finished');return result
  def browser_snapshot():
   env=environment_holder['env'];page=env.unwrapped.page
   if page.is_closed():raise RuntimeError('Browser closed before native dispatch')
@@ -915,13 +1011,22 @@ def execute(s,c,scripted=False):
  @contextmanager
  def qwen_turn(phase):
   if phase=='policy':pending_snapshot['before']=browser_snapshot()
-  with capacity_client.turn(phase):yield
+  phase_event('generation_wait_started',episode_phase=phase)
+  try:
+   with capacity_client.turn(phase):
+    phase_event('generation_permitted',episode_phase=phase)
+    try:yield
+    finally:phase_event('generation_operation_finished',episode_phase=phase)
+  finally:phase_event('generation_scope_finished',episode_phase=phase)
  def fresh(phase):
   # Final source/admission guards run once in before(), after count.
   if phase=='policy':
    current=browser_snapshot()
    if current!=pending_snapshot['before']:raise RuntimeError('Browser state changed while parked; stale policy request not dispatched')
    record({'event':'fresh_after_capacity_wait','phase':phase,'browser_semantic_sha256':current})
+ def extraction_backend(path):
+  phase_event('grading_extraction_started')
+  return Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter',directory=path)
  try:
   if qwen_mode(s) and (not scripted or s.get('runtime_limits') is not None):
    if not scripted:qwen,serving=qwen_live(s)
@@ -937,7 +1042,7 @@ def execute(s,c,scripted=False):
     before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
     max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],
     read_wait_policy=private_read_wait_policy(s),turn=qwen_turn)
-  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else c['max_steps'] if s.get('hosted_limit_profile')=='finite-task-limits-v1' else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},lambda path:Formatter() if scripted else factories.extraction_backend_factory(path) if qwen_mode(s) else backend('formatter',directory=path)))
+  result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else c['max_steps'] if s.get('hosted_limit_profile')=='finite-task-limits-v1' else s['max_steps'],'max_input_tokens':c['max_input_tokens'],'trace_screenshots':True,'async_recording':False},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},extraction_backend))
   if result.get('status')!='graded_and_projected':raise ValueError('Missing automatic grading/HTTP projection: '+str(result))
   if scripted and result['viewer_projection']['task_completed'] is not True:raise ValueError('Scripted positive native grade did not pass')
   if timings['reset_calls']!=1:raise ValueError('Warm activation reset or duplicated environment')
@@ -946,6 +1051,7 @@ def execute(s,c,scripted=False):
  except BaseException as e:
   save(out/'failure.json',{'type':type(e).__name__,'message':str(e),'usage':counts,'timings':timings});raise
  finally:
+  phase_event('cleanup_started')
   signal.alarm(0);connection.close()
   try:
    if lease is not None:lease.close()
@@ -958,6 +1064,8 @@ def execute(s,c,scripted=False):
     finally:
      if capacity_client is not None:capacity_client.close()
   save(out/'cleanup.json',{'status':'passed','case':c['id'],'wrapper_finalizers_returned':True,'recording_released':True,'pool_lease_released':pooled is not None,'capacity_channel_closed':capacity_client is not None,'capacity_infrastructure_error':None if capacity_client is None else capacity_client.infrastructure_error})
+  phase_event('cleanup_finished')
+  if qwen_mode(s):save(out/'phase-recording-status.json',{'status':'passed' if phase_event.failure is None else 'failed','error':phase_event.failure,'native_grade_unchanged':True})
 
 
 def timing_record(ident,t,start,initially_warming):
@@ -1034,7 +1142,9 @@ def _supervise(s,scripted=False,stop=None):
   events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[n for n in (10,20,30,35,40,50) if n<len(members)],final=True)
  h['register_roots'](s)
  ceiling=runtime_limits(s)
- stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop,admission_only=hosted_qwen_mode(s),require_formatter=s.get('hosted_limit_profile')!='finite-task-limits-v1' and any(i not in ('B17','B19','H01','H02','A03','A04')for i in s['canary_task_ids'])) if qwen_mode(s) or (hosted_qwen_mode(s) and not scripted) else None
+ stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=make_canary_barrier(s,stop,scripted)
+ phase_events={ident:phase_writer(s,ident,out/'phases',ident+'.jsonl') for ident in s['start_order']}
+ for emit in phase_events.values():emit('queued')
  deadline_timer=None
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
   os.chmod(tmp,0o700);s=dict(s);s['tokenizer_socket']=str(Path(tmp)/'tokenizer.sock');s['sockets']={}
@@ -1088,6 +1198,7 @@ def _supervise(s,scripted=False,stop=None):
      raise queue['QueueCancelled']('Suite deadline/stop before case claim')
     events.start(s['suite_id'],ident);started=time.monotonic();process=None;connection=None;watchdog=None;connections={};stdout=None;stderr=None
     with lock:clocks[ident]={'process_launch_monotonic':started}
+    phase=phase_events[ident];phase('process_launch')
     try:
      stdout=(out/(ident+'-stdout.log')).open('x');stderr=(out/(ident+'-stderr.log')).open('x')
      if capacity_host is not None:capacity_host.begin_relay(ident)
@@ -1096,13 +1207,15 @@ def _supervise(s,scripted=False,stop=None):
      connection,_=listeners[ident].accept();connection.settimeout(s['suite_timeout'])
      connections['connection']=connection
      # Ready receipt precedes gate; activation reply is emitted only under queue's cap.
-     watched=WatchedAdmission(admission,watchdog)
+     watched=WatchedAdmission(admission,watchdog,phase)
      if capacity_host is not None or canary_barrier is not None:
       original=watched.environment_ready
       def ready(value=None):
+       phase('environment_ready')
        original(value)
        if canary_barrier is not None:canary_barrier.wait(ident)
        if capacity_host is not None:capacity_host.activate(ident,priority=s['start_order'].index(ident))
+       phase('activated')
       watched.environment_ready=ready
      proof=channel['serve_admission'](connection,watched,expected_run_root=out/ident/'live/runs')
      code=process.wait(timeout=60);stdout.close();stderr.close()
@@ -1110,12 +1223,14 @@ def _supervise(s,scripted=False,stop=None):
      if code!=0:raise RuntimeError('Child lifecycle exited '+str(code))
      result=load(out/ident/'result.json');grade=load(out/ident/'grade-viewer.json')
      if result['status']!='graded_and_projected' or grade['status']!='verified':raise ValueError('Child grading/viewer unavailable')
+     phase('grade_verified')
      task=result['result']['viewer_projection']['task_completed'];payload={'result':pin(out/ident/'result.json'),'viewer':grade,'usage':result['usage'],'task_verdict':'pass' if task is True else 'fail' if task is False else 'inconclusive'}
      if capacity_host is not None:
       def cleanup():
        marker=load(out/ident/'cleanup.json')
        return process.poll()==0 and marker.get('status')=='passed' and marker.get('case')==ident and marker.get('capacity_channel_closed') is True and marker.get('capacity_infrastructure_error') is None
       capacity_host.finish(ident,verify_cleanup=cleanup,record_terminal=lambda:result['status']=='graded_and_projected' and grade['status']=='verified')
+     phase('terminal_cleanup_verified')
      events.finish(s['suite_id'],ident,'succeeded',payload)
      if not scripted:
       with delivery_lock:flush_completions(s,events,api)
@@ -1125,7 +1240,12 @@ def _supervise(s,scripted=False,stop=None):
      if canary_barrier is not None:canary_barrier.fail(ident)
      if watchdog is not None and watchdog.failure is not None:
       deadline_error=CaseDeadline(str(watchdog.failure));deadline_error.__cause__=e;e=deadline_error
-     if capacity_host is not None:capacity_host.failed(ident,e,infrastructure=not isinstance(e,queue['QueueCancelled']))
+     recovered=False
+     if capacity_host is not None:
+      try:recovered=finish_case_failure(s,ident,e,out,process,capacity_host,(service,pool_service),stop)
+      except BaseException as recovery_error:e.add_note('Case isolation rejected: '+repr(recovery_error))
+      if not recovered:capacity_host.failed(ident,e,infrastructure=not isinstance(e,queue['QueueCancelled']))
+     phase('case_error',type=type(e).__name__,case_isolated=recovered)
      events.finish(s['suite_id'],ident,'failed',{'system_failure':{'type':type(e).__name__,'message':str(e)},'task_verdict':None})
      if not scripted:
       with delivery_lock:flush_completions(s,events,api)
@@ -1144,6 +1264,7 @@ def _supervise(s,scripted=False,stop=None):
         except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10)
        if stdout is not None:stdout.close()
        if stderr is not None:stderr.close()
+       phase('lifecycle_finished')
        with lock:clocks[ident]['lifecycle_finished_monotonic']=time.monotonic()
    options={}
    if s.get('runtime_limits') is not None:
@@ -1153,9 +1274,9 @@ def _supervise(s,scripted=False,stop=None):
    result['max_observed_active']=max(e['active'] for e in result['events']);result['max_observed_warming']=max(e['warming_or_ready'] for e in result['events']);result['clocks']=clocks
    if result['max_observed_active']>ceiling or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
    save(out/'suite-result.json',result)
-   if hosted_qwen_mode(s):
+   if pooled_model_mode(s):
     for ident,row in result['cases'].items():
-     if ident not in clocks:events.finish(s['suite_id'],ident,'not_started',{'stage':'suite_admission','reason':'Canary infrastructure failure or suite stop before claim','queue_state':row['status'],'evidence':pin(out/'suite-result.json')})
+     if ident not in clocks:events.finish(s['suite_id'],ident,'not_started',{'stage':'suite_admission','reason':'Shared service/lifetime/containment failure before claim' if qwen_mode(s) else 'Canary infrastructure failure or suite stop before claim','queue_state':row['status'],'evidence':pin(out/'suite-result.json')})
     if not scripted:flush_completions(s,events,api)
    measurements=[]
    warm_ids={e['case'] for e in result['events'] if e['event']=='warmup_started'}
@@ -1166,7 +1287,11 @@ def _supervise(s,scripted=False,stop=None):
     measurements.append(timing_record(ident,t,start,ident in warm_ids))
    save(out/'suite-measurements.json',{'max_active':result['max_observed_active'],
     'max_warming_or_parked':result['max_observed_warming'],'cases':measurements,
-    'qualification':'Setup and activation timing within one cohort of different tasks; not a paired causal speedup experiment.'})
+    'phase_journals':[{'case':ident,'parent':pin(out/'phases'/(ident+'.jsonl')) if (out/'phases'/(ident+'.jsonl')).exists() else None,
+     'parent_recording_error':phase_events[ident].failure,
+     'child':pin(out/ident/'child-phases.jsonl') if (out/ident/'child-phases.jsonl').exists() else None}for ident in s['start_order']] if qwen_mode(s) else [],
+    'caller_commit':s['caller_commit'],'driver':s['driver'],'configuration_sha256':config_hash(s),
+    'qualification':'Observed boundary times; native grader entry is not instrumented. Missing phases remain unknown, and setup timings are not a paired causal speedup experiment.'})
    if any(r['status']!='completed' for r in result['cases'].values()):raise RuntimeError('One or more case infrastructure failures')
    if not scripted:flush_completions(s,events,api)
   finally:
@@ -1216,7 +1341,7 @@ def main():
    owner_path=Path(s['output'])/'supervisor-start.json'
    primary=sys.exception()
    try:
-    if hosted_qwen_mode(s) and not prior_output and owner_path.is_file() and load(owner_path).get('pid')==os.getpid():
+    if pooled_model_mode(s) and not prior_output and owner_path.is_file() and load(owner_path).get('pid')==os.getpid():
      api=runpy.run_path(str(checked(s['events_helper'])));events=api['Events'](s.get('completion_db',str(Path(s['output'])/'completion.sqlite')))
      finalize_unclaimed(s,events,'Supervisor ended before case admission')
      if mode!='scripted':flush_completions(s,events,api)
@@ -1231,6 +1356,6 @@ def main():
   source_guard(s)
   h=helper(s)
   for c in s['cases']:h['recipe_check'](c)
-  print(json.dumps({'status':'source_prepared_NOT_runtime_ready','cases':[c['id'] for c in s['cases']],'models':0,'provider_requests':0,'caller':s['driver']}))
+  print(json.dumps({'status':'source_prepared_NOT_runtime_ready','cases':[c['id'] for c in s['cases']],'models':0,'provider_requests':0,'caller':s['driver'],**({'admission_policy':private_admission_policy(s),'model_canary_phases':0}if qwen_mode(s) else {})}))
  else:raise ValueError('Unknown mode')
 if __name__=='__main__':main()
