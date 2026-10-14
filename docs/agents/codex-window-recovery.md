@@ -44,12 +44,16 @@ The roster contains IDs, names, directory, distribution and timestamps, not
 conversation content or credentials. Empty logout/reboot samples preserve the
 last nonempty group. Automatic samples remove a conversation only after the same
 smaller group has been observed continuously for two minutes, with no sampling
-gap over 90 seconds or reboot. This prevents closing the first tab during
+gap over 90 seconds or reboot. A missing member must also have been observed
+open in this boot: a manual partial startup or failed restore never quietly
+removes members that have not returned yet. This prevents closing the first tab during
 shutdown from immediately replacing the full recovery group. New members are
 recorded immediately. `codex-windows save` confirms the current identified group
 immediately; ambiguous unidentified windows still block that operation. The last
-eight different accepted memberships/orders remain in the roster's
+eight different accepted memberships remain in the roster's
 `recent_groups` metadata for recovery; they contain no conversation text.
+Reordering alone does not evict that history. While members are absent, observed
+open tabs keep their new relative order and absent members keep their prior slots.
 
 The same sample now reads Windows Terminal's tab strip through read-only Windows
 UI Automation. It matches the current Codex `NAME | DIRECTORY` titles, including
@@ -105,8 +109,9 @@ Without a saved group, recovery prefers identifiable currently open windows,
 then falls back to root conversations in this exact directory whose last
 activity is within three hours of the most recent root conversation. That
 fallback is **approximate**, visibly labeled, and capped at 20 conversations;
-use `list` first. Current workstation groups were saved before the anticipated
-reboot, so they do not need that fallback.
+use `list` first. A fallback saved during a failed launch remains valid and keeps
+its approximate-membership label until live capture or explicit selection
+establishes the group.
 
 ## Duplicate and permission handling
 
@@ -198,8 +203,8 @@ python3 -m unittest discover -s tests -p test_codex_windows.py
 The focused tests also cover visual reordering, working-indicator/status titles,
 unrelated tabs, duplicate-title ambiguity, unavailable/timeout snapshots,
 preserved fallback order, delayed removals, bounded roster history, the timer's
-Linux-only PATH, explicit ordering and launch sequence. Local read-only
-acceptance matched all six live project tabs and saved their current visual order
+Linux-only PATH, explicit ordering and launch sequence. The original read-only
+acceptance matched all six then-live project tabs and saved their visual order
 without opening or interrupting conversations.
 
 Local acceptance also launches short-lived harmless Windows Terminal commands

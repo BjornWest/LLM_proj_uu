@@ -272,7 +272,7 @@ def order_group(cwd, selected, tabs, previous=None):
 
 
 def record_group(cwd, selected, unresolved, *, force=False, tab_order=None,
-                 confirm_removals=False):
+                 confirm_removals=False, live_ids=None):
     if unresolved and not force:
         raise RuntimeError(f'{unresolved} Codex window(s) cannot be identified uniquely. '
                            'Previous roster preserved; use save --threads ID ... to select explicitly.')
@@ -280,13 +280,20 @@ def record_group(cwd, selected, unresolved, *, force=False, tab_order=None,
         return None  # Never replace the last group with an empty logout/reboot snapshot.
     path = state_path(cwd)
     old = load(path)
-    if old and old.get('restore_until', 0) > time.time() and not (force or confirm_removals):
-        return old
-    value = {'schema_version': 1, 'cwd': cwd, 'boot_id': boot_id(), 'saved_at': time.time(),
-             'distro': os.environ.get('WSL_DISTRO_NAME') or (old or {}).get('distro'),
-             'threads': selected}
+    value = dict(old or {})  # Keep still-live duplicate-launch claims.
+    value.update(schema_version=1, cwd=cwd, boot_id=boot_id(), saved_at=time.time(),
+                 distro=os.environ.get('WSL_DISTRO_NAME') or (old or {}).get('distro'),
+                 threads=selected)
+    selected_ids = {t['id'] for t in selected}
+    seen = (old or {}).get('live_seen', {})
+    observed = set(seen.get('ids', [])) if seen.get('boot_id') == value['boot_id'] else set()
+    observed.update(selected_ids if live_ids is None else live_ids)
+    value['live_seen'] = {'boot_id': value['boot_id'], 'ids': sorted(observed)}
+    value.pop('pending_removal', None)
+    if tab_order is not None:
+        value['tab_order'] = tab_order
     if old and not (force or confirm_removals):
-        missing = {t['id'] for t in old['threads']} - {t['id'] for t in selected}
+        missing = {t['id'] for t in old['threads']} - selected_ids
         if missing:
             now = value['saved_at']
             pending = old.get('pending_removal', {})
@@ -294,23 +301,28 @@ def record_group(cwd, selected, unresolved, *, force=False, tab_order=None,
                     pending.get('ids') == sorted(t['id'] for t in selected) and
                     0 <= now - pending.get('last_seen', 0) <= MAX_CAPTURE_GAP_SECONDS)
             first = pending['first_seen'] if same else now
-            if now - first < REMOVAL_GRACE_SECONDS:
-                # Closing the first tab during shutdown must not shrink the
-                # recovery group. Add new members promptly, delay removals only.
-                kept = dict(old)
-                known = {t['id'] for t in old['threads']}
-                kept['threads'] = old['threads'] + [t for t in selected if t['id'] not in known]
-                kept['pending_removal'] = {'ids': sorted(t['id'] for t in selected),
-                    'boot_id': value['boot_id'], 'first_seen': first, 'last_seen': now}
-                atomic_json(path, kept)
-                return kept
-    if tab_order is not None:
-        value['tab_order'] = tab_order
+            unseen = missing - observed
+            if unseen or old.get('restore_until', 0) > now or now - first < REMOVAL_GRACE_SECONDS:
+                # Never remove a member not yet seen in this boot (including
+                # failed/partial restores). Reorder open members within the
+                # old slots while retaining absent members in their old slots.
+                visible = iter(selected)
+                value['threads'] = [next(visible) if t['id'] in selected_ids else t
+                                    for t in old['threads']] + list(visible)
+                value['pending_removal'] = {'ids': sorted(selected_ids),
+                    'boot_id': value['boot_id'], 'first_seen': first, 'last_seen': now,
+                    'never_seen_this_boot': sorted(unseen)}
+                if tab_order and tab_order.get('source') == 'windows_terminal_uia':
+                    value['tab_order'] = {**tab_order, 'source': 'partial_visual_order',
+                        'reason': 'Open tabs observed; absent members retain prior slots'}
+    value['selection_source'] = ('explicit_selection' if force else
+        (old or {}).get('selection_source', 'observed_tuis') if value.get('pending_removal')
+        else 'observed_tuis')
     if old:
         history = list(old.get('recent_groups', []))
-        if [t['id'] for t in old['threads']] != [t['id'] for t in selected]:
+        if {t['id'] for t in old['threads']} != {t['id'] for t in value['threads']}:
             history.insert(0, {k: old[k] for k in
-                ('threads', 'saved_at', 'boot_id', 'distro', 'tab_order') if k in old})
+                ('threads', 'saved_at', 'boot_id', 'distro', 'tab_order', 'selection_source') if k in old})
         if history:
             value['recent_groups'] = history[:8]
     atomic_json(path, value)
@@ -320,18 +332,30 @@ def record_group(cwd, selected, unresolved, *, force=False, tab_order=None,
 def resolve_group(cwd, rows, running, loaded):
     saved = load(state_path(cwd))
     if saved:
+        # Older fallback restores wrote these fields without a schema marker.
+        # Repair only that known shape in memory; dry runs remain read-only.
+        if (saved.get('schema_version') is None and saved.get('cwd') == cwd and
+                'restore_until' in saved and isinstance(saved.get('threads'), list) and
+                saved['threads'] and all(isinstance(t, dict) and t.get('id') in rows and
+                rows[t['id']]['cwd'] == cwd for t in saved['threads'])):
+            saved = {**saved, 'schema_version': 1,
+                     'selection_source': 'approximate legacy fallback; membership not verified'}
         if saved.get('schema_version') != 1 or saved.get('cwd') != cwd:
             raise RuntimeError('Invalid workspace roster; no windows opened.')
-        return saved, 'saved window group'
+        label = saved.get('selection_source', '')
+        return saved, 'saved window group' + ('; ' + label if label.startswith('approximate') else '')
     selected, unresolved = identify(cwd, running, rows, loaded)
     if selected and not unresolved:
         selected, evidence = order_group(cwd, selected, terminal_tabs())
-        return {'cwd': cwd, 'distro': os.environ.get('WSL_DISTRO_NAME'), 'threads': selected,
-                'tab_order': evidence}, 'open windows'
+        return {'schema_version': 1, 'cwd': cwd, 'boot_id': boot_id(), 'saved_at': time.time(),
+                'distro': os.environ.get('WSL_DISTRO_NAME'), 'threads': selected,
+                'tab_order': evidence, 'selection_source': 'observed_tuis'}, 'open windows'
     selected = recent_group(cwd, rows)
     if not selected:
         raise RuntimeError('No Codex conversations for this exact directory.')
-    return {'cwd': cwd, 'distro': os.environ.get('WSL_DISTRO_NAME'), 'threads': selected}, \
+    return {'schema_version': 1, 'cwd': cwd, 'boot_id': boot_id(), 'saved_at': time.time(),
+            'distro': os.environ.get('WSL_DISTRO_NAME'), 'threads': selected,
+            'selection_source': 'approximate metadata fallback; membership not verified'}, \
         'approximate fallback: root conversations within 3 hours of latest activity'
 
 
@@ -414,10 +438,14 @@ async def capture_all(cwd=None, explicit=None, *, force=False):
                     selected, tab_order = order_group(directory, selected, tabs, load(state_path(directory)))
                 result = record_group(directory, selected, unresolved,
                                       force=bool(explicit), confirm_removals=force,
-                                      tab_order=tab_order)
+                                      tab_order=tab_order, live_ids=(
+                                          {p['thread_id'] for p in running
+                                           if p['cwd'] == directory and p['thread_id']}
+                                          if explicit else None))
             if result:
-                detail = ('; waiting for missing tabs to stay closed for two minutes'
-                          if result.get('pending_removal') else '')
+                pending = result.get('pending_removal', {})
+                detail = ('; retaining tabs not yet observed this boot' if pending.get('never_seen_this_boot')
+                          else '; waiting for missing tabs to stay closed for two minutes' if pending else '')
                 print(f'Saved {len(result["threads"])} windows: {directory} '
                       f'(order={result.get("tab_order", {}).get("source", "unknown")}{detail})')
         except (BlockingIOError, RuntimeError) as error:
@@ -441,6 +469,7 @@ async def restore(cwd, dry_run=False):
         print('Tab order: ' + {
             'windows_terminal_uia': 'recorded Windows Terminal left-to-right order',
             'saved_relative_order': 'last saved relative order; current visual order unavailable',
+            'partial_visual_order': 'observed open-tab order; absent members retain prior slots',
             'explicit_argument_order': 'explicit save --threads order',
             'activity_fallback': 'activity fallback; visual order not recorded',
             'saved_roster_order': 'saved roster order; visual order not recorded',

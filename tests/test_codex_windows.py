@@ -233,10 +233,95 @@ class Recovery(unittest.TestCase):
 
     def test_history_is_bounded_without_recursive_snapshots(self):
         for i in range(12):
-            self.record_at(1000 + i, [A, B] if i % 2 else [B, A])
+            self.record_at(1000 + i, [A, B] if i % 2 else [A], confirm_removals=True)
         result = cw.load(cw.state_path(self.cwd))
         self.assertEqual(len(result['recent_groups']), 8)
         self.assertTrue(all('recent_groups' not in row for row in result['recent_groups']))
+
+    def test_reorders_do_not_evict_previous_memberships(self):
+        self.record_at(1000, [A, B, C])
+        self.record_at(1030, [A, B], confirm_removals=True)
+        for i in range(12):
+            self.record_at(1060 + i, [B, A] if i % 2 else [A, B])
+        history = cw.load(cw.state_path(self.cwd))['recent_groups']
+        self.assertEqual(len(history), 1)
+        self.assertEqual({t['id'] for t in history[0]['threads']}, {A, B, C})
+
+    def test_after_reboot_unseen_members_cannot_expire(self):
+        with patch.object(cw, 'boot_id', return_value='old-boot'):
+            self.record_at(1000, [A, B])
+        with patch.object(cw, 'boot_id', return_value='new-boot'):
+            for t in range(2000, 2600, 30):
+                result = self.record_at(t, [A])
+                self.assertEqual(len(result['threads']), 2)
+            self.assertEqual(result['pending_removal']['never_seen_this_boot'], [B])
+            self.record_at(2600, [A, B])
+            for t in range(2630, 2780, 30):
+                result = self.record_at(t, [A])
+            self.assertEqual([t['id'] for t in result['threads']], [A])
+
+    def test_failed_restore_members_are_retained_after_both_grace_periods(self):
+        group = self.record_at(1000, [A, B], force=True, live_ids=[])
+        group['restore_until'] = 1120
+        cw.atomic_json(cw.state_path(self.cwd), group)
+        for t in range(1030, 1630, 30):
+            result = self.record_at(t, [A])
+        self.assertEqual([t['id'] for t in result['threads']], [A, B])
+        self.assertEqual(result['pending_removal']['never_seen_this_boot'], [B])
+
+    def test_partial_capture_keeps_observed_order_and_missing_slots(self):
+        self.record_at(1000, [A, B, C], tab_order={'source': 'windows_terminal_uia', 'observed_at': 1000})
+        result = self.record_at(1030, [C, A], tab_order={'source': 'windows_terminal_uia', 'observed_at': 1030})
+        self.assertEqual([t['id'] for t in result['threads']], [C, B, A])
+        self.assertEqual(result['tab_order']['observed_at'], 1030)
+        self.assertEqual(result['tab_order']['source'], 'partial_visual_order')
+
+    def test_capture_preserves_launch_claims_past_restore_grace(self):
+        group = self.record_at(1000, [A])
+        group.update(restore_until=1100, launch_boot=cw.boot_id(), launch_claims={B: 1125})
+        cw.atomic_json(cw.state_path(self.cwd), group)
+        result = self.record_at(1110, [A])
+        self.assertEqual(result['launch_claims'], {B: 1125})
+        self.assertEqual(result['launch_boot'], cw.boot_id())
+
+    def test_fallback_restore_failure_keeps_valid_labeled_roster(self):
+        with patch.object(cw, 'processes', return_value=[]), \
+             patch.object(cw, 'thread_rows', return_value=self.rows), \
+             patch.object(cw.shutil, 'which', return_value='/bin/true'), \
+             patch.dict(cw.os.environ, {'WSL_DISTRO_NAME': 'Ubuntu'}), \
+             patch.object(cw.subprocess, 'run'), \
+             patch.object(cw, 'RPC', side_effect=RuntimeError('daemon RPC failed')):
+            with self.assertRaisesRegex(RuntimeError, 'daemon RPC failed'):
+                asyncio.run(cw.restore(self.cwd))
+            group = cw.load(cw.state_path(self.cwd))
+            self.assertEqual(group['schema_version'], 1)
+            self.assertIn('approximate', group['selection_source'])
+            asyncio.run(cw.restore(self.cwd, dry_run=True))
+
+    def test_known_old_schema_less_fallback_can_be_read_without_mutation(self):
+        path = cw.state_path(self.cwd)
+        cw.atomic_json(path, {'cwd': self.cwd, 'threads': [{'id': A, 'name': 'main'}], 'restore_until': 123})
+        before = path.read_bytes()
+        group, label = cw.resolve_group(self.cwd, self.rows, [], set())
+        self.assertEqual(group['schema_version'], 1)
+        self.assertIn('approximate', label)
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_unknown_roster_schema_is_not_migrated(self):
+        cw.atomic_json(cw.state_path(self.cwd), {'schema_version': 2, 'cwd': self.cwd,
+            'threads': [{'id': A, 'name': 'main'}], 'restore_until': 123})
+        with self.assertRaisesRegex(RuntimeError, 'Invalid workspace roster'):
+            cw.resolve_group(self.cwd, self.rows, [], set())
+
+    def test_main_distinguishes_manual_save_from_automatic_capture(self):
+        seen = []
+        async def capture(*args, **kwargs):
+            seen.append(kwargs['force'])
+        with patch.object(cw, 'capture_all', new=capture):
+            for command in ('save', 'capture'):
+                with patch.object(cw.sys, 'argv', ['codex-windows', command]):
+                    self.assertEqual(cw.main(), 0)
+        self.assertEqual(seen, [True, False])
 
     def test_timer_preserves_known_distribution_when_environment_lacks_it(self):
         with patch.dict(cw.os.environ, {'WSL_DISTRO_NAME': 'Ubuntu'}):
@@ -276,6 +361,7 @@ class Recovery(unittest.TestCase):
         saved = cw.load(cw.state_path(self.cwd))
         self.assertEqual([t['id'] for t in saved['threads']], [B, A])
         self.assertEqual(saved['tab_order']['source'], 'explicit_argument_order')
+        self.assertEqual(saved['live_seen']['ids'], [])
 
     def test_native_snapshot_handles_unicode_and_rejects_invalid_data(self):
         payload = [{'window': 1, 'index': 0, 'title': '⠋ main | project'}]
