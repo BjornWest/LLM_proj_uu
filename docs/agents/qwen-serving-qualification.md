@@ -153,10 +153,12 @@ remain runnable. A test against an unreviewed caller candidate is preparation,
 not source adoption. Do not replace the caller's independent review or actual
 native-world/grade/viewer/recording acceptance with these mock HTTP results.
 The source hash is checked before loading the external test input. The default
-hash names Evaluation's Claude-reviewed `ea28b1a` runtime:
-`c0684c3ff0923a5054d5804c85b61d231caf774837963ed94641046351419ff3`.
-This release adds the private opt-in `rental_bounded` submitted-read policy;
-the default `bounded_request` behavior and hosted timeout stay separate.
+hash names Evaluation's Claude-reviewed `47aa96f` background-completion runtime:
+`35b5d8aa7bcf54f6940e41aa355a3e63288d0b5e51ad7ce4a9b729013d98d563`.
+Integrate the Training pin update only with this caller runtime; a standalone
+older caller tree deliberately fails the source gate. The inherited private
+opt-in `rental_bounded` submitted-read policy, default `bounded_request` behavior
+and hosted timeout stay separate.
 Its ordered counter projection remains
 `e818865d35a1a4cd9c6d3abc1c3fa02786cad1cb8eb89bd57b870f2ae6b8c27e`.
 

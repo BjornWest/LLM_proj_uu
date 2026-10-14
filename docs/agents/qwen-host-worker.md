@@ -38,7 +38,9 @@ Its ordered counter projection remains
 `e818865d35a1a4cd9c6d3abc1c3fa02786cad1cb8eb89bd57b870f2ae6b8c27e`.
 The unchanged projection alone does not establish background request/cleanup
 acceptance or fresh instance readiness. Keep older frozen qualifiers and receipts
-unchanged. CPU fixtures use this runtime by default; an isolated test tree may set
+unchanged. Integrate this Training pin update only with that Evaluation runtime;
+older caller trees intentionally fail the exact source gate. CPU fixtures use
+the composed tree's runtime by default; an isolated test tree may set
 `QWEN_TEST_RUNTIME_SOURCE` to the exact external reviewed source.
 The worker spec has schema `qwen-ssh-serving-worker-v1` and these fields:
 
