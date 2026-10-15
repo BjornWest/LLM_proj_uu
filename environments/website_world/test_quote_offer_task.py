@@ -185,7 +185,7 @@ def test_native_binding_tampering_rejects(changed):
     if changed == 'world': w['retailers'][0]['offers'][0]['price_minor'] += 1
     elif changed == 'task': t['objective'] = 'fastest_then_cheapest'
     elif changed == 'reference': r['optimal_score'] = [0]
-    else: q.binding['quote_plan_sha256'] = 'foreign'
+    else: q.binding = {**q.binding, 'quote_plan_sha256': 'foreign'}  # Context no longer matches the task.
     with pytest.raises(ValueError):
         QuoteOfferGrader(w, t, r, {'retailer_offers': g.identity.links}, inventory=i, quote_context=q)
 

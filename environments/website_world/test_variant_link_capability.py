@@ -2,9 +2,11 @@
 from copy import deepcopy
 from hashlib import sha256
 import json
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 from .test_variant_link_task import fixture
 from . import variant_link_task as native, variant_link_capability as cap
@@ -102,13 +104,22 @@ class CapabilityControls(unittest.TestCase):
 
     def test_actual_asset_world_or_binding_mismatch_reject(self):
         for key in ('assets', 'world', 'bindings'):
-            with TemporaryDirectory() as folder:
+            with TemporaryDirectory() as folder, patch.dict(os.environ, {'TASK_SOURCE_BINDING': 'pinned'}):
                 w, _, inputs, assets, approval, _ = packet(Path(folder))
                 if key == 'assets': assets = {'shop.js': 'b' * 64}
                 elif key == 'world': w['world_id'] = 'different'
                 else: inputs['bindings']['retailer_offers']['shop/brown38']['url'] += '&extra=true'
                 with self.assertRaises(ValueError): cap.validate(approval, world=w,
                     catalog=inputs['catalog'], bindings=inputs['bindings'], asset_sha256=assets)
+
+    def test_single_version_serves_current_assets_but_keeps_world_and_bindings_exact(self):
+        with TemporaryDirectory() as folder, patch.dict(os.environ, {'TASK_SOURCE_BINDING': 'current'}):
+            w, _, inputs, assets, approval, _ = packet(Path(folder))
+            cap.validate(approval, world=w, catalog=inputs['catalog'], bindings=inputs['bindings'],
+                         asset_sha256={'shop.js': 'b' * 64})  # Current page code may differ.
+            w['world_id'] = 'different'
+            with self.assertRaisesRegex(ValueError, 'world'): cap.validate(approval, world=w,
+                catalog=inputs['catalog'], bindings=inputs['bindings'], asset_sha256=assets)
 
     def test_missing_or_altered_raw_witness_file_reject(self):
         with TemporaryDirectory() as folder:
