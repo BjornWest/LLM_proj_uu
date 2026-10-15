@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from urllib.parse import urlsplit
 
 import pytest
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, Error as PlaywrightError
 from environments.website_world.local_origins import OriginMap, LocalOriginBridge
 
 
@@ -92,8 +92,10 @@ def test_local_redirects_fetch_cookies_and_context_isolation():
 def test_expired_ack_inside_real_cdp_callback_does_not_poison_following_navigation(method):
     """Consume an ID, then deliver its late ack inside the same real callback.
 
-    This deterministically exercises Chromium's expired-ID error and Playwright's
-    event delivery; the HTTP request (including the mutation) is forwarded once.
+    Chromium produces the real expired-ID error. Explicitly use the pinned
+    Playwright dispatch error sink for a leaked callback error: greenlet timing
+    can otherwise print it through asyncio without storing Connection._error.
+    The HTTP request (including the mutation) is forwarded once.
     """
     forwarded=[]
     class Handler(BaseHTTPRequestHandler):
@@ -116,8 +118,13 @@ def test_expired_ack_inside_real_cdp_callback_does_not_poison_following_navigati
         if event['request']['url']=='https://a.test/abandon':
             request=SimpleNamespace(url=event['request']['url'],method=event['request']['method'],
                 _phase_request_id=event['requestId'],_phase_network_id=event.get('networkId'))
-            bridge._send_cdp(session,'Fetch.fulfillRequest',{
-                'requestId':event['requestId'],'responseCode':200,'body':''},request)
+            try:
+                bridge._send_cdp(session,'Fetch.fulfillRequest',{
+                    'requestId':event['requestId'],'responseCode':200,'body':''},request)
+            except PlaywrightError as error:
+                # Model dispatch -> _on_event_listener_error from Playwright
+                # 1.44. This test-only access must never appear in the bridge.
+                session._impl_obj._connection._on_event_listener_error(error)
     bridge._paused=paused
     try:
         with sync_playwright()as pw:
