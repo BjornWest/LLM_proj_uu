@@ -308,19 +308,22 @@ class IsolatedCaseTests(unittest.TestCase):
    self.assertEqual(result['cases']['next']['status'],'blocked')
    self.assertEqual(child_outcomes,['cancelled_before_dispatch'])
 
- def test_thread_constructor_failure_does_not_stop_other_cases(self):
+ def test_persistent_worker_creation_failure_stops_job_without_consuming_cases(self):
+  # Thread creation is a supervisor resource: no case is claimed or failed.
   original=QUEUE['_Queue'].start.__globals__['Thread']
   def factory(*args,**kw):
    if kw['name']=='episode-bad':raise RuntimeError('CPU constructor failure')
    return original(*args,**kw)
   def one(ident,admission):admission.environment_ready();return ident
   stop=threading.Event()
-  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':factory}):
+  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':factory,
+    'WORKER_START_BACKOFF_SECONDS':.02,'WORKER_START_FAILURE_WINDOW_SECONDS':.3}):
    result=QUEUE['run_ordered_suite']({'bad':'bad','next':'next'},one,max_concurrent_episodes=1,
     prewarm_count=0,stop_event=stop,isolate_case_errors=True)
-  self.assertFalse(stop.is_set());self.assertEqual(result['cases']['bad']['status'],'failed')
-  self.assertIsNone(result['cases']['bad']['quarantine']);self.assertEqual(result['cases']['next']['status'],'completed')
-  error=result['cases']['bad']['error'];self.assertEqual(error['stage'],'worker_creation')
+  self.assertTrue(stop.is_set());self.assertEqual(result['job_stop']['cause'],'worker_creation_unavailable')
+  self.assertEqual({k:v['status'] for k,v in result['cases'].items()},{'bad':'not_started','next':'not_started'})
+  error=result['worker_start_failures'][0];self.assertEqual(error['stage'],'worker_creation')
+  self.assertEqual(error['case'],'bad');self.assertGreater(len(result['worker_start_failures']),1)
   self.assertLessEqual(error['epoch'],time.time());self.assertLessEqual(error['monotonic'],time.monotonic())
 
  def test_legacy_thread_constructor_failure_still_raises_with_job_stop(self):
@@ -344,20 +347,80 @@ class IsolatedCaseTests(unittest.TestCase):
   self.assertFalse(any(e['event']=='environment_activated' and e['case']=='warm' for e in result['events']))
   self.assertIsNone(result['cases']['warm']['quarantine'])
 
- def test_thread_creation_failure_is_per_case_and_later_cases_still_start(self):
-  original=QUEUE['_Queue'].start.__globals__['Thread'];attempts=[]
+ def test_transient_thread_start_failure_retries_the_same_unclaimed_case(self):
+  original=QUEUE['_Queue'].start.__globals__['Thread'];attempts=[];failed=[]
   def thread(*args,**kw):
    ident=kw['name'];attempts.append(ident)
-   if ident=='episode-bad':return SimpleNamespace(start=lambda:(_ for _ in ()).throw(RuntimeError('CPU thread limit')))
+   if ident=='episode-bad' and not failed:
+    failed.append(ident);return SimpleNamespace(start=lambda:(_ for _ in ()).throw(RuntimeError('CPU thread limit')))
    return original(*args,**kw)
-  def one(ident,admission):admission.environment_ready();return ident
+  calls=[]
+  def one(ident,admission):calls.append(ident);admission.environment_ready();return ident
   stop=threading.Event()
-  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':thread}):
+  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':thread,'WORKER_START_BACKOFF_SECONDS':.02}):
    result=QUEUE['run_ordered_suite']({'bad':'bad','next':'next'},one,
     max_concurrent_episodes=1,prewarm_count=0,stop_event=stop,isolate_case_errors=True)
-  self.assertFalse(stop.is_set());self.assertEqual(result['cases']['bad']['status'],'failed')
-  self.assertEqual(result['cases']['next']['status'],'completed');self.assertIsNone(result['cases']['bad']['quarantine'])
-  self.assertEqual(attempts,['episode-bad','episode-next'])
+  self.assertFalse(stop.is_set());self.assertIsNone(result['job_stop'])
+  self.assertEqual({k:v['status'] for k,v in result['cases'].items()},{'bad':'completed','next':'completed'})
+  self.assertEqual(attempts,['episode-bad','episode-bad','episode-next']);self.assertEqual(calls,['bad','next'])
+  self.assertEqual(len(result['worker_start_failures']),1)
+
+ def test_brief_thread_exhaustion_does_not_fail_the_remaining_cases(self):
+  # Reviewer F3 reproduction: 50 ms of thread-start failure after case 0.
+  exhausted=threading.Event();real=QUEUE['Thread']
+  class Flaky(real):
+   def start(self):
+    if exhausted.is_set():raise RuntimeError("can't start new thread")
+    return super().start()
+  calls=[]
+  def one(i,admission):
+   admission.environment_ready();calls.append(i)
+   if i==0:exhausted.set();threading.Timer(.05,exhausted.clear).start()
+   return {'ok':True}
+  with patch.dict(QUEUE['_Queue'].start.__globals__,{'Thread':Flaky,'WORKER_START_BACKOFF_SECONDS':.02}):
+   result=QUEUE['run_ordered_suite']({str(i):i for i in range(12)},one,max_concurrent_episodes=1,
+    prewarm_count=0,isolate_case_errors=True)
+  self.assertEqual(sorted(calls),list(range(12)));self.assertFalse(result['cancelled'])
+  self.assertTrue(all(r['status']=='completed' for r in result['cases'].values()))
+
+ def test_lowered_target_with_quarantines_drains_instead_of_blocking(self):
+  # Reviewer F7: target lowered to the quarantine count must not end the suite.
+  handles=[];stop=threading.Event();calls=[];raised=threading.Event()
+  def one(ident,admission):
+   calls.append(ident);admission.environment_ready()
+   if ident=='bad':
+    admission.quarantine({'cleanup':'unknown'})
+    with handles[0].condition:
+     handles[0].validate_target(1);handles[0].set_target(1)
+    raise RuntimeError('CPU cleanup failure')
+   if ident=='ok':
+    self.assertTrue(raised.wait(2))
+   return ident
+  def ready(handle):handles.append(handle)
+  def raise_later():
+   time.sleep(.3)
+   with handles[0].condition:
+    handles[0].validate_target(2);handles[0].set_target(2)
+   raised.set()
+  threading.Thread(target=raise_later,daemon=True).start()
+  result=QUEUE['run_ordered_suite']({x:x for x in ['bad','ok','later']},one,max_concurrent_episodes=2,
+   prewarm_count=1,stop_event=stop,on_queue_ready=ready,max_concurrent_ceiling=2,isolate_case_errors=True)
+  self.assertFalse(stop.is_set());self.assertEqual(result['cases']['later']['status'],'completed')
+  self.assertEqual(result['cases']['bad']['status'],'failed')
+
+ def test_released_case_is_failed_without_an_unverified_quarantine(self):
+  calls=[]
+  def one(ident,admission):
+   calls.append(ident);admission.environment_ready()
+   if ident=='a':
+    admission.release_without_quarantine({'post_terminal_error':'CPU journal write'})
+    raise RuntimeError('post terminal diagnostics')
+   return ident
+  result=QUEUE['run_ordered_suite']({x:x for x in ['a','b','c']},one,max_concurrent_episodes=1,
+   prewarm_count=0,isolate_case_errors=True)
+  self.assertEqual(calls,['a','b','c']);self.assertIsNone(result['cases']['a']['quarantine'])
+  self.assertEqual(result['cases']['a']['status'],'failed')
+  self.assertEqual([result['cases'][x]['status'] for x in 'bc'],['completed','completed'])
 
  def test_scripted_job_failure_has_no_authority_over_separate_model_fixture(self):
   model_stop=threading.Event();script_stop=threading.Event();release=threading.Event();answers=[]
@@ -399,7 +462,7 @@ class ContinuousEventsTests(unittest.TestCase):
    rows[key]={'status':'completed','result':{'payload':{'task_verdict':verdict}}}
   for key in ('failed','blocked','not_started'):rows[key]={'status':key}
   self.assertEqual(CALLER['suite_outcome_counts']({'cases':rows}),{'completed':3,'execution_failed':1,
-   'blocked':1,'not_started':1,'task_pass':1,'task_fail':1,'inconclusive':1,'unknown':3})
+   'blocked':1,'cancelled_by_job_stop':0,'not_started':1,'task_pass':1,'task_fail':1,'inconclusive':1,'unknown':3})
 
  @unittest.skipUnless(os.environ.get('EPISODE_EVENTS_SOURCE'),'Pinned external Events fixture not supplied')
  def test_actual_events_finalize_failed_pending_and_blocked_rows_without_retry(self):
@@ -423,6 +486,106 @@ class ContinuousEventsTests(unittest.TestCase):
    self.assertTrue(rows['blocked'][1]['blocked_by_quarantine'])
    self.assertEqual(len(events.notices()),1)
    with self.assertRaises(ValueError):events.start('CPU-scripted','bad') # no browser/model retry authority
+
+def cleanup_markers(out,ident,marker=None):
+ (out/ident).mkdir(parents=True,exist_ok=True);(out/(ident+'-bounded')).mkdir(exist_ok=True)
+ (out/ident/'cleanup.json').write_text(json.dumps(marker or {'status':'passed','case':ident,
+  'wrapper_finalizers_returned':True,'pool_lease_released':True,'capacity_channel_closed':True,
+  'capacity_infrastructure_error':None}))
+ (out/(ident+'-bounded')/'result.json').write_text(json.dumps({'cleanup_verified':True,'source_sha256':'owned'}))
+
+SPEC={'runtime_mode':'qwen-private-v1','caller_commit':'tip','driver':{'sha256':'driver'},
+ 'launcher':{'sha256':'owned'},'rental_deadline_utc':time.time()+60,'startup_timeout':30}
+
+class FakeAdmission:
+ def __init__(self):self.q=None
+ def quarantine(self,evidence):
+  if self.q is not None:raise RuntimeError('duplicate quarantine')
+  self.q=evidence
+ def recover_quarantine(self,verify_cleanup):
+  if verify_cleanup() is not True:return False
+  self.q=None;return True
+
+class SharedHealthTests(OBS['ObserverTests']):
+ def test_dead_poller_is_shared_evidence_and_keeps_case_quarantined(self):
+  # Reviewer F1: the production isolation path must consult shared health.
+  a=self.client('a');self.host.activate('a',priority=0)
+  with a.turn('policy'):pass
+  a.close();out=self.directory/'caller';cleanup_markers(out,'a')
+  self.host.poller.close()
+  self.assertIn('metrics_poller_dead',self.host.shared_health_problems())
+  admission=FakeAdmission()
+  receipt=CALLER['isolate_case_error'](SPEC,'a',ValueError('policy transport'),'policy_transport',out,
+   SimpleNamespace(poll=lambda:1),None,self.host,admission,shared_health=self.host.shared_health_problems)
+  self.assertTrue(receipt['quarantined']);self.assertEqual(receipt['shared_health_problems'],['metrics_poller_dead'])
+  self.assertIsNotNone(admission.q);self.assertFalse(self.host.controller.status()['episodes']['a']['done'])
+  self.assertFalse(self.stop.is_set()) # The caller owns the job-level stop decision.
+
+ def test_shared_outage_is_reported_even_when_a_request_was_sent(self):
+  a=self.client('a');self.host.activate('a',priority=0);out=self.directory/'caller';cleanup_markers(out,'a')
+  with a.turn('policy'):
+   receipt=CALLER['isolate_case_error'](SPEC,'a',ConnectionError('vLLM reset'),'policy_transport',out,
+    SimpleNamespace(poll=lambda:1),None,self.host,FakeAdmission(),shared_health=lambda:['telemetry_stale'])
+   self.assertTrue(receipt['quarantined']);self.assertEqual(receipt['shared_health_problems'],['telemetry_stale'])
+  a.close();self.host.finish('a',verify_cleanup=lambda:True,record_terminal=lambda:True)
+
+ def test_healthy_shared_services_release_a_clean_failure(self):
+  a=self.client('a');self.host.activate('a',priority=0)
+  with a.turn('policy'):pass
+  a.close();out=self.directory/'caller';cleanup_markers(out,'a')
+  receipt=CALLER['isolate_case_error'](SPEC,'a',ValueError('tool error'),'tool',out,
+   SimpleNamespace(poll=lambda:1),None,self.host,FakeAdmission(),shared_health=lambda:[])
+  self.assertFalse(receipt['quarantined']);self.assertEqual(receipt['shared_health_problems'],[])
+  self.assertTrue(self.host.controller.status()['episodes']['a']['done'])
+
+ def test_isolation_receipt_write_failure_does_not_requarantine_recovered_case(self):
+  # Reviewer F4b: diagnostics output must not change resource accounting.
+  a=self.client('a');self.host.activate('a',priority=0)
+  with a.turn('policy'):pass
+  a.close();out=self.directory/'caller';cleanup_markers(out,'a')
+  namespace=CALLER['isolate_case_error'].__globals__;real=namespace['save']
+  def save(path,value):
+   if str(path).endswith('-case-isolation.json'):raise OSError('CPU disk full')
+   return real(path,value)
+  admission=FakeAdmission()
+  with patch.dict(namespace,{'save':save}):
+   receipt=CALLER['isolate_case_error'](SPEC,'a',ValueError('tool error'),'tool',out,
+    SimpleNamespace(poll=lambda:1),None,self.host,admission,shared_health=lambda:[])
+  self.assertFalse(receipt['quarantined']);self.assertIsNone(admission.q)
+  self.assertEqual(receipt['evidence_error']['type'],'OSError')
+
+class SupervisorHelperTests(unittest.TestCase):
+ def test_early_failure_without_lease_or_channel_has_verifiable_cleanup(self):
+  # Reviewer F5: nothing acquired is not the same as unreleased.
+  with tempfile.TemporaryDirectory() as directory:
+   out=Path(directory)
+   cleanup_markers(out,'a',{'status':'passed','case':'a','wrapper_finalizers_returned':True,
+    'pool_lease_released':True,'pool_lease_acquired':False,'capacity_channel_closed':True,
+    'capacity_channel_opened':False,'capacity_infrastructure_error':None})
+   self.assertTrue(CALLER['verified_case_cleanup'](SPEC,'a',out,SimpleNamespace(poll=lambda:1)))
+   (out/'a/cleanup.json').unlink() # Child died before its finally: unverifiable.
+   self.assertFalse(CALLER['verified_case_cleanup'](SPEC,'a',out,SimpleNamespace(poll=lambda:1)))
+
+ def test_private_rental_deadline_stops_job_before_claim(self):
+  # Reviewer F2: expiry is a job-lifetime stop in private mode.
+  stop=threading.Event();records=[]
+  def job_stop(cause,**evidence):records.append((cause,evidence));stop.set()
+  cancelled=QUEUE['QueueCancelled']
+  CALLER['private_claim_gate'](SPEC,1000.0,30,stop,job_stop,cancelled,now=lambda:900.0)
+  self.assertFalse(stop.is_set())
+  with self.assertRaises(cancelled):
+   CALLER['private_claim_gate'](SPEC,1000.0,30,stop,job_stop,cancelled,now=lambda:950.0)
+  self.assertEqual(records[0][0],'rental_deadline');self.assertEqual(records[0][1]['claim_margin_seconds'],60)
+  stop2=threading.Event();stop2.set()
+  with self.assertRaises(cancelled):
+   CALLER['private_claim_gate'](SPEC,1000.0,30,stop2,job_stop,cancelled,now=lambda:0.0)
+
+ def test_cancelled_cases_are_counted_separately_from_execution_failures(self):
+  result={'cases':{'a':{'status':'cancelled'},'b':{'status':'failed'},'c':{'status':'not_started'},
+   'd':{'status':'completed','result':{'payload':{'task_verdict':'fail'}}}}}
+  counts=CALLER['suite_outcome_counts'](result)
+  self.assertEqual((counts['cancelled_by_job_stop'],counts['execution_failed'],counts['not_started'],
+   counts['completed'],counts['task_fail']),(1,1,1,1,1))
 
 class IsolatedRPCFailureTests(OBS['ObserverTests']):
  def test_bad_cleanup_retains_only_case_and_verified_recovery_clears_it(self):

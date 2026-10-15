@@ -235,6 +235,8 @@ def record_browser_steps(env,emit):
 def verified_case_cleanup(s,ident,output,process):
  """No cleanup credit from termination alone or an unacknowledged permit."""
  if process is None or process.poll() is None:return False
+ if not (Path(output)/ident/'cleanup.json').is_file() or not (Path(output)/(ident+'-bounded')/'result.json').is_file():
+  return False # The child never reached its cleanup finally: unverifiable.
  marker=load(Path(output)/ident/'cleanup.json')
  guardian=load(Path(output)/(ident+'-bounded')/'result.json')
  return (marker.get('status')=='passed' and marker.get('case')==ident
@@ -248,6 +250,12 @@ def verified_case_cleanup(s,ident,output,process):
 
 class CaseInfrastructureError(RuntimeError):
  """A case error is never a model task verdict or a job cancellation."""
+
+
+class SharedServiceUnhealthy(RuntimeError):
+ """Job-level evidence that a shared service failed, independent of one case."""
+ def __init__(self,problems):
+  self.problems=list(problems);super().__init__('Shared services unhealthy: '+', '.join(self.problems))
 
 
 def case_error_stage(error, watchdog, output, ident, fallback):
@@ -281,8 +289,23 @@ def bounded_case_cleanup(s,process,connection):
          'returncode':process.poll(),'native_cleanup_not_inferred':True}
 
 
-def isolate_case_error(s,ident,error,stage,output,process,connection,host,admission):
- """Persist error, reserve unknown resources, and never set a job stop flag."""
+def private_claim_gate(s,deadline_utc,grace,stop,job_stop,cancelled,*,now=time.time):
+ """Private rental expiry is a job-lifetime stop; never claim a case that cannot start."""
+ margin=s['startup_timeout']+grace
+ if now()>=deadline_utc-margin:job_stop('rental_deadline',deadline_utc=deadline_utc,claim_margin_seconds=margin)
+ if stop.is_set():raise cancelled('Job stopped before case claim')
+
+
+SHARED_HEALTH_RECHECKS=5
+SHARED_HEALTH_RECHECK_SECONDS=2
+
+
+def isolate_case_error(s,ident,error,stage,output,process,connection,host,admission,shared_health=None):
+ """Persist error, reserve unknown resources, and never set a job stop flag.
+
+ shared_health() returns job-level problems with shared services. Any problem
+ keeps this case's reservation; the caller owns the job-level disposition.
+ """
  partial=sorted(str(p) for p in (Path(output)/ident/'live/runs').glob('*') if p.is_dir())
  proof=Path(output)/(ident+'-case-failure.json')
  save(proof,{'schema':'qwen-case-infrastructure-failure-v2','case':ident,
@@ -303,23 +326,36 @@ def isolate_case_error(s,ident,error,stage,output,process,connection,host,admiss
  def verified():
   if process is None:return True # No child was created, so no browser/model side effects.
   return verified_case_cleanup(s,ident,output,process)
- recovered=False;recovery_error=None
+ recovered=False;recovery_error=None;health=[]
  try:
+  # Shared health first: a case failing because serving died usually still
+  # holds a sent request, and that is exactly the outage to report.
+  if shared_health is not None:
+   health=shared_health()
+   if health:raise SharedServiceUnhealthy(health)
   if secondary:raise RuntimeError('Case containment/quarantine unverified')
   if host is not None:
    # A sent/uncertain request stays quarantined. Finalization cannot infer an
    # HTTP abort merely from a process exit or a generic cleanup receipt.
-   row=host.controller.status()['episodes'].get(ident)
-   if row is not None and row['request_id'] is not None:raise RuntimeError('Exact request remains quarantined')
+   problems=host.case_recovery_problems(ident)
+   if problems:raise RuntimeError('Case resources remain quarantined: '+', '.join(problems))
    host.finish_isolated_case(ident,verify_cleanup=verified,
     record_terminal=lambda:load(checked(receipt)).get('task_verdict') is None)
   recovered=admission.recover_quarantine(verified)
- except BaseException as problem:recovery_error={'type':type(problem).__name__,'message':str(problem)}
- save(Path(output)/(ident+'-case-isolation.json'),{'case':ident,'stage':stage,
-  'error':receipt,'resource_quarantine_retained':not recovered,'cleanup_verified':recovered,
-  'recovery_error':recovery_error,'secondary_errors':secondary,'no_job_stop_requested':True,'no_model_retry':True})
- return {'stage':stage,'type':type(error).__name__,'message':str(error),
-  'evidence':receipt,'quarantined':not recovered,'task_verdict':None}
+ except BaseException as problem:
+  recovery_error={'type':type(problem).__name__,'message':str(problem)}
+  health=list(getattr(problem,'problems',None) or [])
+ answer={'stage':stage,'type':type(error).__name__,'message':str(error),
+  'evidence':receipt,'quarantined':not recovered,'task_verdict':None,'shared_health_problems':health}
+ try:
+  save(Path(output)/(ident+'-case-isolation.json'),{'case':ident,'stage':stage,
+   'error':receipt,'resource_quarantine_retained':not recovered,'cleanup_verified':recovered,
+   'recovery_error':recovery_error,'shared_health_problems':health,'secondary_errors':secondary,
+   'no_job_stop_requested':True,'no_model_retry':True})
+ except BaseException as problem:
+  # Diagnostics must not change resource accounting after verified recovery.
+  answer['evidence_error']={'type':type(problem).__name__,'message':str(problem)}
+ return answer
 
 
 def child_error_stage(phase):
@@ -1196,7 +1232,9 @@ def execute(s,c,scripted=False):
      if pooled is not None:pooled.close()
     finally:
      if capacity_client is not None:capacity_client.close()
-  save(out/'cleanup.json',{'status':'passed','case':c['id'],'wrapper_finalizers_returned':True,'recording_released':True,'pool_lease_released':pooled is not None,'capacity_channel_closed':capacity_client is not None,'capacity_infrastructure_error':None if capacity_client is None else capacity_client.infrastructure_error})
+  # Reached only after every acquired resource's close returned, so a case
+  # that failed before acquiring a lease/channel has nothing left to release.
+  save(out/'cleanup.json',{'status':'passed','case':c['id'],'wrapper_finalizers_returned':True,'recording_released':True,'pool_lease_released':True,'pool_lease_acquired':pooled is not None,'capacity_channel_closed':True,'capacity_channel_opened':capacity_client is not None,'capacity_infrastructure_error':None if capacity_client is None else capacity_client.infrastructure_error})
   phase_event('cleanup_finished')
   if qwen_mode(s):save(out/'phase-recording-status.json',{'status':'passed' if phase_event.failure is None else 'failed','error':phase_event.failure,'native_grade_unchanged':True})
 
@@ -1279,7 +1317,29 @@ def _supervise(s,scripted=False,stop=None):
  stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;scripted_metrics=None;canary_barrier=make_canary_barrier(s,stop,scripted)
  phase_events={ident:phase_writer(s,ident,out/'phases',ident+'.jsonl') for ident in s['start_order']}
  for emit in phase_events.values():emit('queued')
- deadline_timer=None
+ deadline_timer=None;job_stop_record={}
+ def job_stop(cause,**evidence):
+  """Job-lifetime stop with its own evidence; never caused by one case's error alone."""
+  with lock:
+   if not job_stop_record:
+    job_stop_record.update(cause=cause,epoch=time.time(),monotonic=time.monotonic(),**evidence)
+    try:save(out/'job-stop.json',dict(job_stop_record))
+    except OSError as error:job_stop_record['evidence_write_error']=repr(error)
+  stop.set()
+ def shared_health_now():
+  problems=[]
+  if service is not None and service.poll() is not None:problems.append('tokenizer_service_exited')
+  if pool_service is not None and pool_service.poll() is not None:problems.append('chromium_pool_service_exited')
+  if capacity_host is not None:problems+=capacity_host.shared_health_problems()
+  return problems
+ def shared_health():
+  # Re-observe before acting so a momentary telemetry gap is not an outage.
+  # A dead service process is definitive; stale telemetry must persist.
+  problems=shared_health_now()
+  for _ in range(SHARED_HEALTH_RECHECKS):
+   if not problems or any(p.endswith('_exited') or p=='metrics_poller_dead' for p in problems):break
+   time.sleep(SHARED_HEALTH_RECHECK_SECONDS);problems=shared_health_now()
+  return problems
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
   os.chmod(tmp,0o700);s=dict(s);s['tokenizer_socket']=str(Path(tmp)/'tokenizer.sock');s['sockets']={}
   if hosted_qwen_mode(s):
@@ -1320,6 +1380,10 @@ def _supervise(s,scripted=False,stop=None):
     else:_,serving=qwen_live(s)
     capacity_host=observer_module['CapacityHost'](rpc=modules['rpc'],control=modules['control'],telemetry=modules['telemetry'],source=s,output=out,case_ids=s['start_order'],cap=s['max_concurrent_episodes'],deadline=time.monotonic()+serving.deadline-time.time(),stop_event=stop,directory=tmp,qualification=serving)
     s['capacity_bindings']={ident:capacity_host.child_binding(ident) for ident in s['start_order']}
+    if serving is not None:
+     # Rental/allocation expiry is a job-lifetime control in private mode too.
+     deadline_timer=threading.Timer(max(0,serving.deadline-time.time()),lambda:job_stop('rental_deadline',deadline_utc=serving.deadline))
+     deadline_timer.daemon=True;deadline_timer.start()
     save(out/'observer-transport.json',{'socket':str(capacity_host.observer_rpc.path),'epoch':capacity_host.journal.epoch,'observer_id':capacity_host.observer.observer_id,'session_id':serving.session,'journal':str(out/'serving-telemetry.jsonl'),'maximum_batch_rows':120,'WandB_owner':'workstation controller; no credentials here'})
    for c in s['cases']:
     listener=socket.socket(socket.AF_UNIX);path=str(Path(tmp)/(c['id']+'.sock'));listener.bind(path);listener.listen(1);listener.settimeout(s['startup_timeout']);listeners[c['id']]=listener;s['sockets'][c['id']]=path
@@ -1331,7 +1395,10 @@ def _supervise(s,scripted=False,stop=None):
     if hosted_qwen_mode(s) and (stop.is_set() or (canary_barrier is not None and canary_barrier.failed) or time.time()>=s['suite_deadline_utc']):
      if time.time()>=s['suite_deadline_utc']:stop.set()
      raise queue['QueueCancelled']('Suite deadline/stop before case claim')
+    if qwen_mode(s) and serving is not None:
+     private_claim_gate(s,serving.deadline,grace,stop,job_stop,queue['QueueCancelled'])
     started=time.monotonic();process=None;connection=None;watchdog=None;connections={};stdout=None;stderr=None
+    payload=None;terminal_released=False;events_finished=False
     with lock:clocks[ident]={'process_launch_monotonic':started}
     phase=phase_events[ident];phase('process_launch');stage='setup'
     try:
@@ -1374,8 +1441,9 @@ def _supervise(s,scripted=False,stop=None):
        return process.poll()==0 and verified_case_cleanup(s,ident,out,process)
       stage='cleanup'
       capacity_host.finish_isolated_case(ident,verify_cleanup=cleanup,record_terminal=lambda:result['status']=='graded_and_projected' and grade['status']=='verified')
+     terminal_released=True
      phase('terminal_cleanup_verified')
-     events.finish(s['suite_id'],ident,'succeeded',payload)
+     events.finish(s['suite_id'],ident,'succeeded',payload);events_finished=True
      if not scripted:
       with delivery_lock:flush_completions(s,events,api)
      if canary_barrier is not None:canary_barrier.complete(ident,formatter_exercised=not hosted_qwen_mode(s) or result['usage']['formatter_requests']==1)
@@ -1384,13 +1452,28 @@ def _supervise(s,scripted=False,stop=None):
      if canary_barrier is not None:canary_barrier.fail(ident)
      if watchdog is not None and watchdog.failure is not None:
       deadline_error=CaseDeadline(str(watchdog.failure));deadline_error.__cause__=e;e=deadline_error
+     if qwen_mode(s) and terminal_released:
+      # Capacity and cleanup were verified and released; only later diagnostic
+      # output failed. Do not re-quarantine a finished lifecycle.
+      failure={'stage':'post_terminal_diagnostics','type':type(e).__name__,'message':str(e),
+       'quarantined':False,'events_finished':events_finished,'native_task_verdict':payload['task_verdict']}
+      try:save(out/(ident+'-post-terminal-error.json'),{'case':ident,**failure})
+      except BaseException:pass
+      try:admission.release_without_quarantine({'post_terminal_error':failure})
+      except BaseException:pass
+      if not events_finished:
+       try:events.finish(s['suite_id'],ident,'succeeded',{**payload,'post_terminal_error':failure})
+       except BaseException:pass
+      raise CaseInfrastructureError('post_terminal_diagnostics: '+str(e)) from e
      if qwen_mode(s):
       try:stage='blocked_admission' if isinstance(e,queue['AdmissionBlocked']) else case_error_stage(e,watchdog,out,ident,stage)
       except BaseException as diagnostic:e.add_note('Failure stage read unavailable: '+repr(diagnostic))
+      stopped_cause=job_stop_record.get('cause') or ('external_stop' if stop.is_set() else None)
       failure={'stage':stage,'type':type(e).__name__,'message':str(e),'quarantined':True,'task_verdict':None}
       try:
        if watchdog is not None:watchdog.close()
-       failure=isolate_case_error(s,ident,e,stage,out,process,connection,capacity_host,admission)
+       failure=isolate_case_error(s,ident,e,stage,out,process,connection,capacity_host,admission,
+        shared_health=None if stopped_cause else shared_health)
       except BaseException as diagnostic:
        # Shared output IO may itself fail. Keep the reservation.
        # Do not silently release unknown state.
@@ -1400,11 +1483,16 @@ def _supervise(s,scripted=False,stop=None):
         if capacity_host is not None:capacity_host.quarantine_case(ident,e)
        except BaseException:pass
        failure['evidence_error']=repr(diagnostic)
+      if failure.get('shared_health_problems'):
+       job_stop('shared_service_unhealthy',problems=failure['shared_health_problems'],observed_at_case=ident)
+      if payload is not None:failure['native_task_verdict']=payload['task_verdict'];failure['graded_result']=payload['result']
+      if stopped_cause:failure['job_stop']=stopped_cause
       phase('case_error',stage=stage,type=type(e).__name__,quarantined=failure['quarantined'])
       events.finish(s['suite_id'],ident,'failed',{'system_failure':failure,'task_verdict':None})
       if not scripted:
        with delivery_lock:flush_completions(s,events,api)
       if isinstance(e,queue['AdmissionBlocked']):raise e
+      if stopped_cause:raise queue['QueueCancelled'](stopped_cause+' during case: '+stage+': '+str(e)) from e
       raise CaseInfrastructureError(stage+': '+str(e)) from e
      if capacity_host is not None:capacity_host.failed(ident,e,infrastructure=not isinstance(e,queue['QueueCancelled']))
      events.finish(s['suite_id'],ident,'failed',{'system_failure':{'type':type(e).__name__,'message':str(e)},'task_verdict':None})
@@ -1451,8 +1539,9 @@ def _supervise(s,scripted=False,stop=None):
     options.update({'max_concurrent_ceiling':ceiling,'on_queue_ready':lambda handle:capacity_host.bind_limits(handle,out)})
    result=queue['run_ordered_suite'](queue_cases(s),one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop,**options)
    result['max_observed_active']=max(e['active'] for e in result['events']);result['max_observed_warming']=max(e['warming_or_ready'] for e in result['events']);result['clocks']=clocks
-   if result['max_observed_active']>ceiling or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
+   if job_stop_record:result['job_stop_record']=dict(job_stop_record)
    save(out/'suite-result.json',result)
+   if result['max_observed_active']>ceiling or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
    if pooled_model_mode(s):
     reconcile_queue_events(s,result,clocks,events,out)
     if not scripted:flush_completions(s,events,api)
@@ -1477,7 +1566,7 @@ def _supervise(s,scripted=False,stop=None):
     aggregate=suite_outcome_counts(result)
     save(out/'suite-outcomes.json',{'schema':'continuous-qwen-suite-outcomes-v1','counts':aggregate,
      'quarantined':[ident for ident,row in result['cases'].items() if row.get('quarantine') is not None],
-     'job_stop':stop.is_set(),'source':s['driver'],'caller_commit':s['caller_commit'],
+     'job_stop':stop.is_set(),'job_stop_cause':job_stop_record.get('cause') or (result.get('job_stop') or {}).get('cause'),'source':s['driver'],'caller_commit':s['caller_commit'],
      'scripted':scripted,'no_failed_case_retry':True})
    if any(r['status']!='completed' for r in result['cases'].values()):raise RuntimeError('One or more case infrastructure failures')
    if not scripted:flush_completions(s,events,api)
@@ -1514,14 +1603,16 @@ def _supervise(s,scripted=False,stop=None):
 
 
 def suite_outcome_counts(result):
- aggregate={'completed':0,'execution_failed':0,'blocked':0,'not_started':0,'task_pass':0,'task_fail':0,'inconclusive':0,'unknown':0}
+ aggregate={'completed':0,'execution_failed':0,'blocked':0,'cancelled_by_job_stop':0,'not_started':0,'task_pass':0,'task_fail':0,'inconclusive':0,'unknown':0}
  for row in result['cases'].values():
   if row['status']=='completed':
    aggregate['completed']+=1
    verdict=row['result']['payload']['task_verdict']
    aggregate['task_pass' if verdict=='pass' else 'task_fail' if verdict=='fail' else 'inconclusive']+=1
   else:
-   aggregate['execution_failed' if row['status']=='failed' else 'blocked' if row['status']=='blocked' else 'not_started']+=1
+   # A started case ended by a job stop is cancelled, not an execution failure.
+   aggregate['execution_failed' if row['status']=='failed' else 'blocked' if row['status']=='blocked'
+    else 'cancelled_by_job_stop' if row['status']=='cancelled' else 'not_started']+=1
    aggregate['unknown']+=1
  return aggregate
 

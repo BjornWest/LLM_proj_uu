@@ -378,15 +378,29 @@ class CapacityHost:
         self.parent.finish_after_cleanup(ident,verify_cleanup=verify_cleanup,
                                          record_terminal=record_terminal,timeout=5)
 
+    def shared_health_problems(self):
+        """Job-level evidence about shared serving/telemetry, independent of any case."""
+        problems = []
+        if self.parent.closed:problems.append('capacity_parent_closed')
+        if self.parent.stop_cause is not None:problems.append('capacity_stop_cause')
+        if self.parent.cleanup_failures:problems.append('capacity_cleanup_failures')
+        if self.journal.failure is not None:problems.append('telemetry_journal_failed')
+        if not self.poller.thread.is_alive():problems.append('metrics_poller_dead')
+        elif self.controller.status()['telemetry_fresh'] is not True:problems.append('telemetry_stale')
+        return problems
+
+    def case_recovery_problems(self, ident):
+        """Case-level reasons this lifecycle cannot be released early."""
+        problems = []
+        row = self.controller.status()['episodes'].get(ident)
+        if row is not None and row['request_id'] is not None:problems.append('sent_request_unresolved')
+        if ident in self.parent.errors:problems.append('capacity_parent_case_error')
+        if self.relays.get(ident, (None, []))[1]:problems.append('capacity_relay_error')
+        return problems
+
     def finish_failed_case(self, ident, *, verify_cleanup, record_terminal):
         """Isolate a fully cleaned case; never release an uncertain sent request."""
-        status = self.controller.status()
-        row = status['episodes'].get(ident)
-        if (self.stop.is_set() or self.parent.closed or self.parent.stop_cause is not None
-                or self.parent.cleanup_failures or status['telemetry_fresh'] is not True
-                or row is not None and row['request_id'] is not None
-                or ident in self.parent.errors or self.relays.get(ident, (None, []))[1]
-                or self.journal.failure is not None or not self.poller.thread.is_alive()):
+        if self.stop.is_set() or self.shared_health_problems() or self.case_recovery_problems(ident):
             raise RuntimeError('Shared health or exact case request cleanup is unverified')
         self.finish(ident, verify_cleanup=verify_cleanup, record_terminal=record_terminal)
 

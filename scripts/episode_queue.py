@@ -9,6 +9,12 @@ from math import isfinite
 from threading import Condition, Event, RLock, Thread, get_ident
 import time
 
+# Thread creation is a supervisor resource, not an episode outcome. A failed
+# start returns the case to the queue untouched; creation is retried after a
+# short backoff, and only a failure persisting this long stops the job.
+WORKER_START_BACKOFF_SECONDS = 1.0
+WORKER_START_FAILURE_WINDOW_SECONDS = 60.0
+
 
 class QueueCancelled(RuntimeError):
     """The suite stopped before another episode action could be admitted."""
@@ -121,6 +127,25 @@ class EpisodeAdmission:
             q.condition.notify_all()
         return True
 
+    def release_without_quarantine(self, evidence):
+        """Trusted parent: this failed case holds no resource needing proof.
+
+        Used when the case's capacity/cleanup was already verified and released
+        before a later diagnostic write failed, so the queue must not reserve
+        an unverified slot for it.
+        """
+        if type(evidence) is not dict or not evidence:
+            raise AdmissionError('Explicit release evidence required')
+        q = self._queue
+        with q.condition:
+            row = q.rows[self.case_id]
+            if not row['started'] or row.get('quarantine') is not None:
+                raise AdmissionError('Only an unquarantined started case can be released')
+            row['quarantine'] = None
+            row['released_without_quarantine'] = dict(evidence)
+            q.emit('case_released_without_quarantine', self.case_id)
+            q.condition.notify_all()
+
     def runner_callback(self, cancellation_type):
         """Bind the native cancellation class from the caller's frozen namespace."""
         if (not isinstance(cancellation_type, type)
@@ -228,6 +253,8 @@ class _Queue:
         self.rows = {i: dict(started=False, active=False, ready=False, done=False,
                             status='queued', result=None, error=None) for i in self.order}
         self.threads, self.events = [], []
+        self.start_failures, self.start_backoff_until = [], 0.0
+        self.first_start_failure, self.job_stop = None, None
 
     def stopped(self):
         return self.stop_event.is_set()
@@ -244,9 +271,13 @@ class _Queue:
         return detail
 
     def blocked_by_quarantine(self):
-        return (self.isolate_case_errors and self.counts()[0]>=self.target
-                and not any(r["started"] and r["active"] and not r["done"] for r in self.rows.values())
-                and any(r["active"] and r["done"] and r.get("quarantine") is not None for r in self.rows.values()))
+        # Compare with the fixed ceiling, not the mutable target: an operator
+        # lowering the target drains and can raise it again; only quarantines
+        # filling every provisioned slot make progress impossible.
+        quarantined = sum(r["active"] and r["done"] and r.get("quarantine") is not None
+                          for r in self.rows.values())
+        return (self.isolate_case_errors and quarantined >= self.ceiling
+                and not any(r["started"] and r["active"] and not r["done"] for r in self.rows.values()))
 
     def emit(self, event, ident):
         active, warm = self.counts()
@@ -268,22 +299,44 @@ class _Queue:
             thread.start()
         except BaseException as exc:
             if not constructed and not self.isolate_case_errors:raise
+            if self.isolate_case_errors:
+                # No worker ran, so the case was neither claimed nor executed.
+                # Return it to the queue instead of consuming its one attempt.
+                detail = self.error_detail(exc, 'worker_creation')
+                detail['case'] = ident
+                row.update(started=False, active=False, status='queued')
+                now = time.monotonic()
+                if self.first_start_failure is None:
+                    self.first_start_failure = now
+                self.start_failures.append(detail)
+                self.start_backoff_until = now + WORKER_START_BACKOFF_SECONDS
+                self.emit('worker_start_failed', ident)
+                if now - self.first_start_failure >= WORKER_START_FAILURE_WINDOW_SECONDS:
+                    self.job_stop = dict(cause='worker_creation_unavailable',
+                        seconds=now - self.first_start_failure,
+                        failures=len(self.start_failures), last=detail)
+                    self.stop_event.set()
+                self.condition.notify_all()
+                return False
             # Thread admission itself can fail (e.g. a PID/resource ceiling).
             # There is then no worker/finally block to release this row. Stop
             # further creation, wake parked workers, and retain the failure.
             row.update(done=True, status='failed',
                        error=self.error_detail(exc,'worker_creation'))
-            if self.isolate_case_errors:
-                row['quarantine']=None # No worker or case resource was created.
-            else:self.stop_event.set()
+            self.stop_event.set()
             self.emit('worker_start_failed', ident)
             self.condition.notify_all()
-            return
+            return False
+        self.first_start_failure = None
         self.threads.append(thread)
+        return True
+
+    def backing_off(self):
+        return time.monotonic() < self.start_backoff_until
 
     def pump(self):
         """Called only under the condition lock; record FIFO intent atomically."""
-        if self.stopped() or self.blocked_by_quarantine():
+        if self.stopped() or self.blocked_by_quarantine() or self.backing_off():
             return
         for ident in self.order:
             if self.stopped():
@@ -297,8 +350,8 @@ class _Queue:
                 row.update(active=True, status='admitted')
                 self.emit('admitted', ident)
                 self.condition.notify_all()
-            else:
-                self.start(ident, True)
+            elif not self.start(ident, True):
+                return
         # Lowering drains preexisting actors. Do not construct another cold
         # environment until actual active admission is back within the target.
         if self.counts()[0] > self.target:
@@ -309,8 +362,8 @@ class _Queue:
             if self.counts()[1] >= self.settings.prewarm_count:
                 break
             row = self.rows[ident]
-            if not row['started'] and not row['done']:
-                self.start(ident, False)
+            if not row['started'] and not row['done'] and not self.start(ident, False):
+                return
 
     def worker(self, ident):
         admission = EpisodeAdmission(self, ident)
@@ -358,7 +411,16 @@ class _Queue:
             with self.condition:
                 self.running = True
                 self.pump()
-                while any(r['started'] and not r['done'] for r in self.rows.values()):
+                while True:
+                    if (self.start_backoff_until and not self.backing_off()
+                            and not self.stopped()):
+                        self.start_backoff_until = 0.0
+                        self.pump()
+                    live = any(r['started'] and not r['done'] for r in self.rows.values())
+                    retrying = (self.start_backoff_until and not self.stopped()
+                                and any(not r['started'] and not r['done'] for r in self.rows.values()))
+                    if not live and not retrying:
+                        break
                     self.condition.wait(.1)
                     if self.stopped():
                         self.condition.notify_all()
@@ -388,6 +450,8 @@ class _Queue:
                           cancelled=self.stopped())
             if self.on_queue_ready is not None:
                 result.update(admission_target=self.target, max_concurrent_ceiling=self.ceiling)
+            if self.isolate_case_errors:
+                result.update(worker_start_failures=list(self.start_failures), job_stop=self.job_stop)
             return result
 
 
