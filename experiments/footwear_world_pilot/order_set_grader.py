@@ -5,6 +5,7 @@ from urllib.parse import urlsplit, parse_qsl
 
 from environments.website_world import checkout_domain
 from . import model, basket_quote, order_set_task
+from experiments import source_binding
 
 VERSION = 'native-order-set-response-v1'
 
@@ -57,7 +58,7 @@ def _bound(world,task,reference,plan,domain,coupon_plan,admission_plan=None):
             reference.get('task_sha256')!=model.digest(task) or reference.get('matching_sha256')!=model.digest(matching) or
             reference.get('checkout_domain_sha256')!=domain_id or
             reference.get('vocabulary_sha256')!=model.digest(order_set_task.vocabulary()) or
-            reference.get('source_sha256')!=order_set_task.source_identity(admission_plan)):
+            not source_binding.same_code(reference.get('source_sha256'),order_set_task.source_identity(admission_plan))):
         raise ValueError('Stale or unsupported task/matching/domain/source reference binding')
     result=reference.get('result',{})
     if (reference.get('result_sha256')!=model.digest(result) or not result.get('complete') or

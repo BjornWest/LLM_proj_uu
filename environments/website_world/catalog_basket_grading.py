@@ -9,6 +9,7 @@ from experiments.accepted_catalog_commerce import basket_quote, order_set_optimi
 from experiments.footwear_world_pilot import order_set_grader as historical
 from . import catalog_basket_task as native, catalog_checkout_domain
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-basket-response-v1'
 
@@ -22,7 +23,7 @@ def _bound(world, task, reference, plan, domain, coupon_plan, admission_plan=Non
             or reference.get('matching_sha256') != digest(matching)
             or reference.get('matching') != matching
             or reference.get('checkout_domain_sha256') != digest(domain)
-            or reference.get('source_sha256') != native.source_identity(task)):
+            or not source_binding.same_code(reference.get('source_sha256'), native.source_identity(task))):
         raise ValueError('Stale task/matching/domain/source reference binding')
     result = reference.get('result', {})
     # The historical central quote/search uses compact JSON identities. Task

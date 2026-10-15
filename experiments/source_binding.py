@@ -107,3 +107,12 @@ def accept_asset_drift(manifest, saved, current):
 def compatible(saved, rebuilt):
     """Saved task/reference equals current code's rebuild up to derived ids/added fields."""
     return saved == rebuilt or (mode() == 'current' and not substantive_changes(saved, rebuilt))
+
+
+def same_code(recorded, current):
+    """A recorded producing-code hash map versus this checkout's; data entries stay exact."""
+    if recorded == current:
+        return True
+    if mode() == 'pinned' or not isinstance(recorded, dict) or not isinstance(current, dict):
+        return False
+    return all(current.get(name) == digest for name, digest in recorded.items() if data_source(name))
