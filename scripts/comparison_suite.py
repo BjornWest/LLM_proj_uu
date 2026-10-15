@@ -674,6 +674,11 @@ def check_pool_source_pins(spec,case=None):
   return expected
  selected=[case] if case is not None else [first] if qwen_mode(spec) else queue_cases(spec).values()
  for case in selected:
+  if case.get('source_binding')=='current':
+   # One checkout: the pool and the task import the same files by construction.
+   if Path(case['root']).resolve()!=Path(first['root']).resolve() or case['commit']!=first['commit']:
+    raise ValueError('Single-version case differs from the shared service checkout')
+   continue
   declared=load(checked(case['recipe_manifest'])).get('source_sha256',{})
   missing={name:digest for name,digest in expected.items() if name not in declared}
   if any(name in declared and declared[name]!=digest for name,digest in expected.items()):
