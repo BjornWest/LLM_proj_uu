@@ -7,6 +7,7 @@ from copy import deepcopy
 
 from . import catalog_checkout_domain as checkout, quote_offer_task
 from .adapter import browser_address, digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-shipping-claim-task-v1'
 KIND = 'audit_free_shipping_claim'
@@ -91,8 +92,11 @@ def make(world, spec, *, quote_context, checkout_domain):
 
 def reference(world, task, *, quote_context, checkout_domain):
     selection = {k: deepcopy(task[k]) for k in ('kind', 'retailer_index', 'offer_index', 'quantity', 'delivery_types')}
-    if task != make(world, selection, quote_context=quote_context, checkout_domain=checkout_domain):
-        raise ValueError('Shipping claim task/world/quantity/menu binding changed')
+    rebuilt = make(world, selection, quote_context=quote_context, checkout_domain=checkout_domain)
+    if task != rebuilt:
+        changes = source_binding.substantive_changes(task, rebuilt)
+        if source_binding.mode() == 'pinned' or changes:
+            raise ValueError('Shipping claim task/world/quantity/menu binding changed' + (': ' + ', '.join(changes[:8]) if changes else ''))
     retailer, offer, _, _ = selected_offer(world, selection)
     oid = offer['offer_id']; quantity = task['quantity']
     quote = quote_context.quote(retailer['retailer_id'],

@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 from experiments.footwear_world_pilot.order_set_grader import coverage
 from . import catalog_cart_task as native, catalog_checkout_domain as checkout
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-cart-grade-v1'
 CAPSULE_VERSION = 'website-catalog-cart-capsule-v1'
@@ -129,8 +130,12 @@ def grade(world, task, reference, *, checkout_domain, binding, capsule,
                   'No delivery selection, lowest price, payment or broad external effects are graded.',
                   'Storage captures and whole-run effect authority require independent consumer acceptance.']}
     try:
-        if reference != native.reference(world, task, checkout_domain=checkout_domain, inventory=inventory):
-            raise MissingEvidence('Stale native reference/source binding')
+        rebuilt = native.reference(world, task, checkout_domain=checkout_domain, inventory=inventory)
+        if reference != rebuilt:
+            changes = source_binding.substantive_changes(reference, rebuilt)
+            if source_binding.mode() == 'pinned' or changes:
+                raise MissingEvidence('Stale native reference/source binding'
+                                      + (': ' + ', '.join(changes[:8]) if changes else ''))
         if binding != storage_binding(world, binding['retailers']):
             raise MissingEvidence('Stale runtime storage binding')
         if (type(policy_completed) is not bool or type(episode_id) is not str or not episode_id or type(main_trace_sha256) is not str

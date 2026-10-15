@@ -18,6 +18,7 @@ from .atomic_address_execution import prepared_task
 from .selector_action_capture import SelectorCapture
 from .catalog_cart_authority import ReadOnlyCommitAuthority
 from .generation_configs import observation_runner_options
+from experiments import source_binding
 
 VERSION = 'website-variant-reset-consumer-v1'
 READ_INSTRUCTIONS = """Extract only the FINAL ANSWER. You are a formatter, not
@@ -136,18 +137,23 @@ class VariantResetEpisode:
             self.domain = self.runtime.baskets.domain
             packet = publication.compile_packet(self.runtime.world, task['spec'], catalog=self.catalog,
                 bindings=self.runtime.bindings, checkout_domain=self.domain, runtime_options=runtime_options, asset_sha256=self.runtime.asset_hashes, scoring_scope=self.scoring_scope)
-            if (packet['task'] != task or packet['reference'] != read('variant-reset-reference.private.json')
+            published_id = frozen_task['task_id']
+            if (not source_binding.accept_rebuilt(self.manifest, 'variant-reset-task', task, packet['task'])
+                    or not source_binding.accept_rebuilt(self.manifest, 'variant-reset-reference',
+                        read('variant-reset-reference.private.json'), packet['reference'])
                     or packet['catalog'] != read('variant-reset-catalog.private.json')
                     or packet['bindings'] != read('variant-reset-bindings.private.json')
                     or self.runtime.compositions != read('compositions.private.json')
-                    or self.runtime.asset_hashes != read('variant-reset-assets.private.json')):
+                    or not source_binding.accept_asset_drift(self.manifest,
+                        read('variant-reset-assets.private.json'), self.runtime.asset_hashes)):
                 raise ValueError('Actual runtime task/reference/catalog/bindings/composition changed')
+            task = packet['task']
             episode = read('episode.json')
             manual = episode.get('manual_task')
             if (type(manual) is not dict or set(manual) != {'user_message', 'memories'}
                     or manual['memories'] != task['memories'] or type(manual['user_message']) is not str
                     or not manual['user_message'].strip()
-                    or episode != {'task_id': task['task_id'], 'readable_origins': True,
+                    or episode != {'task_id': published_id, 'readable_origins': True,
                                    'start': task['start'], 'manual_task': manual}):
                 raise ValueError('Public request, memories or direct product start changed')
             declaration = read('variant-reset-setup.private.json')
@@ -158,7 +164,7 @@ class VariantResetEpisode:
             if self.setup_plan['start_url'] != task['start']['url']: raise ValueError('Product start URL changed')
             self.native_task, self.reference = task, packet['reference']
             self.public = public_projection({'schema_version': 'connected-world-manual-v1',
-                'task_id': task['task_id'], 'user_message': manual['user_message'], 'memories': task['memories'],
+                'task_id': published_id, 'user_message': manual['user_message'], 'memories': task['memories'],
                 'start_url': task['start']['url'], 'environment_context': {'currency': 'SEK',
                     'scenario_date': self.runtime.world['quote_as_of']}})
             self.profile = standard_profile(navigation_origins=self.runtime.navigation_origins, helpers=False, data_tools=False)

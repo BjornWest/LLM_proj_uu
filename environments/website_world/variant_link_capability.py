@@ -10,6 +10,7 @@ from pathlib import Path, PurePosixPath
 import re
 
 from . import variant_link_task as native
+from experiments import source_binding
 
 VERSION = 'website-variant-link-navigation-evidence-v1'
 ACCEPTANCE = 'website-variant-link-navigation-acceptance-v1'
@@ -58,16 +59,21 @@ def validate(approval, *, world, catalog, bindings, asset_sha256):
     capability = read('navigation-capability.private.json')
     if native.digest(capability) != accepted.get('capability_sha256'):
         raise ValueError('Accepted capability digest changed')
-    if (read('world.private.json') != world or read('catalog.private.json') != catalog
-            or read('bindings.private.json') != bindings
-            or read('served-assets.private.json') != asset_sha256
-            or capability.get('catalog_sha256') != native.digest(catalog)
-            or capability.get('asset_sha256') != asset_sha256
-            or capability.get('retailer_id') != catalog['siteId']
-            or capability.get('protocol') != native.NAVIGATION_PROTOCOL
-            or capability.get('owner') != 'Product' or capability.get('status') != 'accepted'
-            or capability.get('recipient_states') != 'fresh_and_all_carried_tuples'):
-        raise ValueError('Actual world/catalog/URL/asset capability binding differs')
+    served = read('served-assets.private.json')
+    # Served assets are page code. In the default single-version mode the
+    # approval must be self-consistent; this checkout serves its own copy.
+    assets_ok = (served == asset_sha256 and capability.get('asset_sha256') == asset_sha256
+                 if source_binding.mode() == 'pinned' else served == capability.get('asset_sha256'))
+    failed = [name for name, ok in (
+        ('world', read('world.private.json') == world), ('catalog', read('catalog.private.json') == catalog),
+        ('bindings', read('bindings.private.json') == bindings), ('served_assets', assets_ok),
+        ('catalog_digest', capability.get('catalog_sha256') == native.digest(catalog)),
+        ('retailer', capability.get('retailer_id') == catalog['siteId']),
+        ('protocol', capability.get('protocol') == native.NAVIGATION_PROTOCOL),
+        ('acceptance', capability.get('owner') == 'Product' and capability.get('status') == 'accepted'),
+        ('recipient_states', capability.get('recipient_states') == 'fresh_and_all_carried_tuples')) if not ok]
+    if failed:
+        raise ValueError('Actual world/catalog/URL/asset capability binding differs: ' + ', '.join(failed))
     pages = [p for p in catalog['products'] if p['id'] == capability.get('page_id')]
     if len(pages) != 1:
         raise ValueError('Require the accepted actual merchant page')

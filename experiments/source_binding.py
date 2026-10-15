@@ -50,3 +50,51 @@ def check(root, declared, *, error, digest=file_sha256, locate=lambda name: name
         if actual is not None:
             current[name] = actual
     return current, drift
+
+
+# Identifiers derived from task content: a schema upgrade changes them without
+# changing what the task asks or how it is graded.
+DERIVED_KEYS = frozenset({'task_id', 'schema_version', 'task_sha256'})
+
+
+def substantive_changes(saved, rebuilt, path=''):
+    """Changed or removed values, ignoring derived identifiers and added fields."""
+    if isinstance(saved, dict) and isinstance(rebuilt, dict):
+        changes = []
+        for key, value in saved.items():
+            if key in DERIVED_KEYS:
+                continue
+            if key not in rebuilt:
+                changes.append(path + '/' + key)
+            else:
+                changes += substantive_changes(value, rebuilt[key], path + '/' + key)
+        return changes
+    if isinstance(saved, list) and isinstance(rebuilt, list) and len(saved) == len(rebuilt):
+        return [c for i, (a, b) in enumerate(zip(saved, rebuilt))
+                for c in substantive_changes(a, b, f'{path}[{i}]')]
+    return [] if saved == rebuilt else [path or '/']
+
+
+def record(manifest, kind, value):
+    manifest.setdefault('source_binding', {'mode': mode()}).setdefault(kind, []).append(value)
+
+
+def accept_rebuilt(manifest, label, saved, rebuilt):
+    """Whether current code's rebuild of a saved task part may replace it."""
+    if saved == rebuilt:
+        return True
+    if mode() == 'pinned' or substantive_changes(saved, rebuilt):
+        return False
+    record(manifest, 'rebuilt_upgrades', label)
+    return True
+
+
+def accept_asset_drift(manifest, saved, current):
+    """Served page assets are code: current mode serves this checkout's copy."""
+    if saved == current:
+        return True
+    if mode() == 'pinned':
+        return False
+    record(manifest, 'served_asset_drift', sorted(k for k in set(saved) | set(current)
+                                                  if saved.get(k) != current.get(k)))
+    return True

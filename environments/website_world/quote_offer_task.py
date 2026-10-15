@@ -11,6 +11,7 @@ from pathlib import Path
 from experiments.accepted_catalog_commerce import basket_quote
 from . import basic_offer_task, feature_offer_task
 from .adapter import browser_address, digest
+from experiments import source_binding
 
 VERSION = 'website-single-item-quote-task-v1'
 KIND = 'matching_single_item_delivery'
@@ -138,8 +139,11 @@ def reference(world, task, *, inventory, quote_context, surrounding=None):
     spec = {k: task[k] for k in ('kind', 'concept_id', 'predicates', 'availability',
         'comparison_site_id', 'objective', 'destination', 'delivery_types', 'max_total_minor',
         'arrival_deadline') if k in task}
-    if task != make(world, spec, inventory=inventory, quote_context=quote_context, surrounding=surrounding):
-        raise ValueError('Quote task/world/declaration/plan binding changed')
+    rebuilt = make(world, spec, inventory=inventory, quote_context=quote_context, surrounding=surrounding)
+    if task != rebuilt:
+        changes = source_binding.substantive_changes(task, rebuilt)
+        if source_binding.mode() == 'pinned' or changes:
+            raise ValueError('Quote task/world/declaration/plan binding changed' + (': ' + ', '.join(changes[:8]) if changes else ''))
     features = feature_offer_task.reference(world, task['feature_task'], inventory=inventory, surrounding=surrounding)
     carriers = {c['carrier_id']: c['name'] for c in world['address_context']['carriers']}
     points = {p['point_id']: p['name'] for p in world['address_context']['collection_points']}
