@@ -604,6 +604,11 @@ class Runtime:
         self.sources[str(dependency.relative_to(ROOT))] = sha256(dependency.read_bytes()).hexdigest()
         self.manifest['source_sha256'] = deepcopy(self.sources)
 
+    def initial_page_readiness(self, page):
+        """Explicit setup-only observer, entered before the native initial goto."""
+        from .local_origins import InitialPageNetwork
+        return InitialPageNetwork(page)
+
     def attach_browser(self, context):
         """Attach to the existing task page before navigation; Chromium only."""
         if self.origin_map is None:

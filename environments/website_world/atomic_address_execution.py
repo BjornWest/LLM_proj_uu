@@ -20,12 +20,15 @@ PUBLICATION_VERSION = 'website-atomic-address-publication-v1'
 
 
 class AddressCapture(capture_api.CartCapture):
-    def initialize(self, page):
+    def initialize(self, page, *, readiness=None):
         """Read-poll ordinary storage; CSP permits no string-compiled waits."""
         if not self.installed or self.initialized:
             raise ValueError('Install exactly one baseline before initialization')
         start, pages = page.url, list(page.context.pages)
         self.phase = 'ordinary_baseline_initialization'
+        if readiness is None:
+            raise ValueError('Initial task-page network observation must precede navigation')
+        readiness.wait(timeout_ms=5000, quiet_ms=100)
         for rid, row in self.binding['retailers'].items():
             url = row['origin']+'/#/home'
             page.goto(url);page.wait_for_selector('#app main')
@@ -44,11 +47,26 @@ def prepared_task(base_task, capture, plan, runtime):
     class AddressTask(type(base_task)):
         def make_env(self, video=None):
             env = super().make_env(video);entrypoint = env.unwrapped.task_entrypoint
+            owner = self
             class AddressStart(entrypoint):
                 def setup(self, page):
                     capture.install(page.context)
-                    result = super().setup(page)
-                    capture.initialize(page)
+                    readiness = runtime.initial_page_readiness(page)
+                    def evidence():
+                        capture.initial_page_readiness = deepcopy(readiness.record)
+                        capture_api.save_new(owner.trace.directory/'manual-review-private/initial-page-readiness.private.json',
+                                             capture.initial_page_readiness)
+                    try:
+                        with readiness:
+                            result = super().setup(page)
+                            capture.initialize(page, readiness=readiness)
+                    except BaseException as error:
+                        try:
+                            evidence()
+                        except Exception as evidence_error:
+                            error.add_note('Initial-page readiness evidence failed: ' + type(evidence_error).__name__)
+                        raise
+                    evidence()
                     capture.prepared_setup = setup.apply(page, plan, runtime=runtime)
                     return result
             env.unwrapped.task_entrypoint = AddressStart

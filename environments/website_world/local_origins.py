@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 import re
 from threading import Lock
-from time import monotonic_ns
+from time import monotonic, monotonic_ns
 import unicodedata
 from types import SimpleNamespace
 from urllib.parse import urljoin, urlsplit
@@ -355,3 +355,119 @@ class LocalOriginBridge(LogicalOrigins):
                 route.fulfill(status=502, body='Unsupported local text encoding')
                 return
         route.fulfill(status=response.status_code, headers=result, body=body)
+
+
+class InitialPageNetwork:
+    """Setup-only Chromium target request observer; never a completeness claim.
+
+    Attach on about:blank before native initial navigation. A separate Network
+    session observes actual Chromium identities even when dual Fetch routing
+    hides requests from Playwright. No forwarding, capture or replay is added.
+    """
+    def __init__(self, page):
+        self.page = page
+        self.session = None
+        self.pending = {}
+        self.last_activity = monotonic()
+        self.document_seen = False
+        self.started_requests = self.finished_requests = self.failed_requests = 0
+        self.redirect_hops = self.failed_mutations = 0
+        self.observation_error = None
+        self.record = {'scope': 'initial_task_start_page_network_quietness',
+                       'status': 'not_waited', 'semantic_completeness': 'unclaimed'}
+
+    def __enter__(self):
+        if self.session is not None or self.page.url not in ('about:blank', ''):
+            raise ValueError('Observe an unused task page before initial navigation')
+        self.session = self.page.context.new_cdp_session(self.page)
+        try:
+            self.main_frame_id = self.session.send('Page.getFrameTree')['frameTree']['frame']['id']
+            self.session.on('Network.requestWillBeSent', self._started)
+            self.session.on('Network.loadingFinished', self._finished)
+            self.session.on('Network.loadingFailed', self._failed)
+            self.session.send('Network.enable')
+        except BaseException as error:
+            try:
+                self.close()
+            except Exception as cleanup_error:
+                error.add_note('Initial-page observer cleanup failed: ' + type(cleanup_error).__name__)
+            raise
+        return self
+
+    def _started(self, event):
+        identity = event.get('requestId')
+        if not isinstance(identity, str):
+            self.observation_error = 'invalid_request_identity'
+            return
+        self.last_activity = monotonic()
+        self.started_requests += 1
+        self.redirect_hops += int('redirectResponse' in event)
+        self.pending[identity] = event.get('request', {}).get('method')
+        if event.get('type') == 'Document' and event.get('frameId') == self.main_frame_id:
+            self.document_seen = True
+
+    def _terminal(self, event, *, failed):
+        identity = event.get('requestId')
+        if not isinstance(identity, str):
+            self.observation_error = 'invalid_terminal_identity'
+            return
+        self.last_activity = monotonic()
+        method = self.pending.pop(identity, None)
+        if failed:
+            self.failed_requests += 1
+            if method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+                self.failed_mutations += 1
+        else:
+            self.finished_requests += 1
+
+    def _finished(self, event):
+        self._terminal(event, failed=False)
+
+    def _failed(self, event):
+        self._terminal(event, failed=True)
+
+    def wait(self, *, timeout_ms=5000, quiet_ms=100):
+        if (type(timeout_ms) is not int or type(quiet_ms) is not int
+                or not 0 < quiet_ms < timeout_ms):
+            raise ValueError('Declare positive quiet interval below the finite timeout')
+        if self.session is None or self.record['status'] != 'not_waited':
+            raise ValueError('Initial-page network observation is once-only')
+        from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+        started = monotonic()
+        self.record.update(timeout_ms=timeout_ms, quiet_ms=quiet_ms, status='failed',
+                           observation='Chromium Network events attached before initial navigation')
+        try:
+            while True:
+                now = monotonic()
+                if self.observation_error is not None:
+                    raise ValueError('Initial-page network observation failed: ' + self.observation_error)
+                if now - started >= timeout_ms / 1000:
+                    raise PlaywrightTimeoutError('Initial task-page network quietness exceeded '
+                                                + str(timeout_ms) + 'ms')
+                if (self.document_seen and not self.pending
+                        and now - max(started, self.last_activity) >= quiet_ms / 1000):
+                    self.record['status'] = 'passed'
+                    break
+                # Pump Chromium callbacks; no DOM capture, HTTP call or action.
+                self.page.wait_for_timeout(min(20, max(1, (timeout_ms / 1000 - (now - started)) * 1000)))
+        finally:
+            elapsed = monotonic() - started
+            self.record.update(elapsed_seconds=elapsed, overrun_seconds=max(0., elapsed-timeout_ms/1000),
+                document_seen=self.document_seen, pending_requests=len(self.pending),
+                started_requests=self.started_requests, finished_requests=self.finished_requests,
+                failed_requests=self.failed_requests, redirect_hops=self.redirect_hops,
+                failed_mutations=self.failed_mutations, failed_mutation_backend_effects='unknown')
+        return deepcopy(self.record)
+
+    def close(self):
+        if self.session is not None:
+            session, self.session = self.session, None
+            session.detach()
+
+    def __exit__(self, kind, error, traceback):
+        try:
+            self.close()
+        except Exception as cleanup_error:
+            if error is None:
+                raise
+            error.add_note('Initial-page observer cleanup failed: ' + type(cleanup_error).__name__)
