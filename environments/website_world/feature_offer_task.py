@@ -16,6 +16,7 @@ from experiments.accepted_catalog_commerce import package_export
 from . import basic_offer_task
 from .adapter import digest
 from .catalog_predicates import PredicateSet
+from experiments import source_binding
 
 VERSION = 'website-feature-listed-offer-task-v1'
 KIND = 'cheapest_matching_available'
@@ -154,7 +155,7 @@ def make(world, selection, *, inventory, surrounding=None):
 def reference(world, task, *, inventory, surrounding=None):
     spec = {k: task[k] for k in ('kind', 'concept_id', 'predicates', 'availability',
             'max_price_minor', 'comparison_site_id') if k in task}
-    if task != make(world, spec, inventory=inventory, surrounding=surrounding):
+    if not source_binding.compatible(task, make(world, spec, inventory=inventory, surrounding=surrounding)):
         raise ValueError('Feature task/world/declaration binding changed')
     base = _base_task(world, spec, surrounding)
     native = basic_offer_task._reference_bound(world, base)

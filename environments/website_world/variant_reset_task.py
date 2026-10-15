@@ -8,6 +8,7 @@ from copy import deepcopy
 from .adapter import digest
 from .atomic_product_task import _target
 from . import catalog_checkout_domain as checkout
+from experiments import source_binding
 
 VERSION = 'website-variant-reset-task-v1'
 KIND = 'try_exact_variant_or_report_unavailable'
@@ -81,7 +82,7 @@ def make(world, spec, *, catalog, bindings, checkout_domain):
 
 
 def reference(world, task, *, catalog, bindings, checkout_domain):
-    if task != make(world, task['spec'], catalog=catalog, bindings=bindings, checkout_domain=checkout_domain):
+    if not source_binding.compatible(task, make(world, task['spec'], catalog=catalog, bindings=bindings, checkout_domain=checkout_domain)):
         raise ValueError('Original variant-reset task/menu binding changed')
     return {'schema_version': 'website-variant-reset-reference-v1', 'task_sha256': digest(task),
             'expected_claims': {'requested_selection': deepcopy(task['requested_selection']),

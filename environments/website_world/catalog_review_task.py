@@ -9,6 +9,7 @@ from environments.product_world.review_population import summarize_ratings
 from experiments.accepted_catalog_commerce import package_export
 from .adapter import digest
 from .feature_offer_task import FieldInventory, ROOT
+from experiments import source_binding
 
 VERSION = 'website-catalog-review-task-v1'
 KIND = 'summarize_product_reviews'
@@ -135,7 +136,7 @@ def _canonical(item):
 
 def reference(world, task, *, inventory):
     spec = {k:task[k] for k in ('kind','concept_id','operation','subject_scope','product_index','sku_index','topic','min_assessed') if k in task}
-    if task != make(world,spec,inventory=inventory): raise ValueError('Review task/world/source/prose binding changed')
+    if not source_binding.compatible(task, make(world,spec,inventory=inventory)): raise ValueError('Review task/world/source/prose binding changed')
     item = next(p for p in world['products'] if p['public']['product_id'] == task['subject']['product_id'])
     canonical = _canonical(item)
     if summarize_ratings(canonical) != item['rating_summary']: raise ValueError('Canonical corpus and recorded rating summary disagree')

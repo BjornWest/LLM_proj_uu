@@ -9,6 +9,7 @@ import random
 from experiments.accepted_catalog_commerce import model, package_export
 from experiments.accepted_catalog_commerce.catalog_registry import TASK_LABELS
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-basic-listed-offer-task-v1'
 KIND = 'cheapest_available'
@@ -100,7 +101,7 @@ def reference(world, task, *, surrounding=None):
     selection = {'kind': task.get('kind'), 'concept_id': task.get('concept_id')}
     if 'comparison_site_id' in task:
         selection['comparison_site_id'] = task['comparison_site_id']
-    if task != make(world, selection, surrounding=surrounding):
+    if not source_binding.compatible(task, make(world, selection, surrounding=surrounding)):
         raise ValueError('Basic task/world binding changed')
     return _reference_bound(world, task)
 

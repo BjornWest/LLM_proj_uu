@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from . import catalog_memory, feature_offer_task
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-memory-feature-task-v1'
 KIND = 'cheapest_matching_with_memory'
@@ -55,7 +56,7 @@ def make(world, value, *, inventory, surrounding=None):
 def reference(world, task, *, inventory, surrounding=None):
     spec = {k: task[k] for k in ('kind', 'concept_id', 'recipient', 'predicates', 'memory_records',
         'availability', 'max_price_minor', 'comparison_site_id') if k in task}
-    if task != make(world, spec, inventory=inventory, surrounding=surrounding):
+    if not source_binding.compatible(task, make(world, spec, inventory=inventory, surrounding=surrounding)):
         raise ValueError('Memory task/world/source/prose/resolution binding changed')
     native = feature_offer_task.reference(world, task['selection_task'], inventory=inventory, surrounding=surrounding)
     return {'schema_version': VERSION, 'task_id': task['task_id'], 'world_id': world['world_id'],

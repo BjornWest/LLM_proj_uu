@@ -9,6 +9,7 @@ from environments.product_world.review_population import summarize_ratings
 from experiments.carrier_service_pilot.prose import POOLS
 from .adapter import digest
 from .feature_offer_task import ROOT
+from experiments import source_binding
 
 VERSION = 'website-carrier-review-task-v1'
 KIND = 'summarize_carrier_reviews'
@@ -186,7 +187,7 @@ def _statements(world, public):
 def reference(world, task, *, inventory):
     spec = {k: task[k] for k in ('kind', 'operation', 'carrier_index', 'shipping_class',
         'date_from', 'date_to', 'aspect', 'min_assessed') if k in task}
-    if task != make(world, spec, inventory=inventory):
+    if not source_binding.compatible(task, make(world, spec, inventory=inventory)):
         raise ValueError('Carrier review task/world/source binding changed')
     _, public = canonical_public(world)
     rows = [r for r in public.values() if r['carrier_id'] == task['subject']['carrier_id']

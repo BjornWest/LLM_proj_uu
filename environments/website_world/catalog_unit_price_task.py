@@ -4,6 +4,7 @@ from fractions import Fraction
 
 from . import feature_offer_task as feature
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-unit-price-task-v2'
 KIND = 'cheapest_matching_unit_price'
@@ -124,7 +125,7 @@ def rounded_minor(value):
 def reference(world, task, *, inventory, surrounding=None):
     spec = {k: deepcopy(task[k]) for k in ('kind','concept_id','predicates','availability',
             'max_price_minor','comparison_site_id','unit_basis') if k in task}
-    if task != make(world, spec, inventory=inventory, surrounding=surrounding):
+    if not source_binding.compatible(task, make(world, spec, inventory=inventory, surrounding=surrounding)):
         raise ValueError('Unit-price task/world/quantity declaration binding changed')
     derived, _ = quantity_inventory(world, inventory)
     inner = feature.reference(world, task['feature_task'], inventory=derived, surrounding=surrounding)

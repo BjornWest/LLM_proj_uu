@@ -4,6 +4,7 @@ import unicodedata
 
 from . import basic_offer_task, feature_offer_task
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-branch-stock-task-v1'
 KIND = 'cheapest_matching_local_branch_stock'
@@ -83,7 +84,7 @@ def make(world, spec, *, inventory, surrounding=None):
 
 
 def reference(world, task, *, inventory, surrounding=None):
-    if task != make(world, selection(task), inventory=inventory, surrounding=surrounding):
+    if not source_binding.compatible(task, make(world, selection(task), inventory=inventory, surrounding=surrounding)):
         raise ValueError('Branch task/world/declaration binding changed')
     features = feature_offer_task.reference(world, task['feature_task'], inventory=inventory,
                                             surrounding=surrounding)

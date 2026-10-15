@@ -7,6 +7,7 @@ from copy import deepcopy
 from hashlib import sha256
 import json
 from urllib.parse import parse_qsl, urlsplit
+from experiments import source_binding
 
 VERSION = 'website-variant-link-task-v1'
 KIND = 'link_exact_variant'
@@ -124,8 +125,8 @@ def make(world, spec, *, catalog, bindings, navigation_capability):
 
 def reference(world, task, *, catalog, bindings, navigation_capability):
     spec = {k: task[k] for k in ('kind', 'retailer_id', 'offer_id')}
-    if task != make(world, spec, catalog=catalog, bindings=bindings,
-                    navigation_capability=navigation_capability):
+    if not source_binding.compatible(task, make(world, spec, catalog=catalog, bindings=bindings,
+                    navigation_capability=navigation_capability)):
         raise ValueError('Original variant-link task, menu or navigation binding changed')
     return {'schema_version': 'website-variant-link-reference-v1',
             'task_sha256': digest(task), 'offer_id': task['offer_id'],

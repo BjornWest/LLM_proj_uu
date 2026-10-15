@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from . import feature_offer_task as feature
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-shortlist-task-v1'
 KIND = 'shortlist_matching_models'
@@ -47,7 +48,7 @@ def make(world, spec, *, inventory, surrounding=None):
 def reference(world, task, *, inventory, surrounding=None):
     spec = {k: deepcopy(task[k]) for k in ('kind', 'concept_id', 'predicates', 'availability',
             'max_price_minor', 'comparison_site_id', 'limit') if k in task}
-    if task != make(world, spec, inventory=inventory, surrounding=surrounding):
+    if not source_binding.compatible(task, make(world, spec, inventory=inventory, surrounding=surrounding)):
         raise ValueError('Shortlist task/world/declaration binding changed')
     inner = feature.reference(world, task['feature_task'], inventory=inventory, surrounding=surrounding)
     groups = {}

@@ -5,6 +5,7 @@ from decimal import Decimal
 from . import feature_offer_task as feature
 from .adapter import digest
 from .catalog_predicates import PredicateSet, _lookup
+from experiments import source_binding
 
 VERSION = 'website-catalog-priority-task-v2'
 KIND = 'recommend_matching_by_priorities'
@@ -122,7 +123,7 @@ def make(world, spec, *, inventory, surrounding=None):
 def reference(world, task, *, inventory, surrounding=None):
     spec = {k:deepcopy(task[k]) for k in ('kind','concept_id','predicates','availability',
         'max_price_minor','comparison_site_id','priorities') if k in task}
-    if task != make(world,spec,inventory=inventory,surrounding=surrounding):
+    if not source_binding.compatible(task, make(world,spec,inventory=inventory,surrounding=surrounding)):
         raise ValueError('Priority task/world/declaration binding changed')
     inner = feature.reference(world,task['feature_task'],inventory=inventory,surrounding=surrounding)
     probes = [PredicateSet(inventory.fields,[_probe(p,inventory.fields[p['field']])],

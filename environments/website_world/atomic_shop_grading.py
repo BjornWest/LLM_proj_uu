@@ -2,6 +2,7 @@
 from . import address_grading, atomic_shop_task as native, catalog_cart_grading as capture
 from . import catalog_checkout_domain as checkout
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-atomic-address-grade-v1'
 
@@ -15,7 +16,7 @@ def grade(world, task, reference, *, checkout_domain, binding, capsule,
                   'Navigation scope requires separate consumer trace checks; terminal storage cannot prove which pages were visited.',
                   'No payment, delivery choice, account mutation, or reading/exposure inference.']}
     try:
-        if reference != native.reference(world, task):
+        if not source_binding.compatible(reference, native.reference(world, task)):
             raise capture.MissingEvidence('Stale native address reference')
         checkout.validate(world, checkout_domain)
         if binding != capture.storage_binding(world, binding['retailers']):

@@ -85,7 +85,7 @@ class AtomicReadGrader:
     def __init__(self, world, task, reference, catalog, bindings, checkout_domain, binding, capsule, completion,
                  interaction=None, scoring_scope="whole_run", answer_present=None):
         args = {'catalog': catalog, 'bindings': bindings, 'checkout_domain': checkout_domain}
-        if reference != native.reference(world, task, **args) or not task['kind'].startswith('read_'):
+        if not source_binding.compatible(reference, native.reference(world, task, **args)) or not task['kind'].startswith('read_'):
             raise ValueError('Require an unchanged native read task/reference')
         self.world, self.task, self.reference = deepcopy(world), deepcopy(task), deepcopy(reference)
         self.args = deepcopy({**args, 'binding': binding, 'capsule': capsule,

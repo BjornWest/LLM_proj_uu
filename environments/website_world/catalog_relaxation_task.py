@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from . import feature_offer_task as feature
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-relaxation-task-v1'
 KIND = 'cheapest_matching_with_permitted_relaxations'
@@ -107,7 +108,7 @@ def make(world, spec, *, inventory, surrounding=None):
 def reference(world, task, *, inventory, surrounding=None):
     spec = {k: deepcopy(task[k]) for k in ('kind','concept_id','predicates','availability',
             'max_price_minor','comparison_site_id','relaxations') if k in task}
-    if task != make(world, spec, inventory=inventory, surrounding=surrounding):
+    if not source_binding.compatible(task, make(world, spec, inventory=inventory, surrounding=surrounding)):
         raise ValueError('Relaxation task/world/declared criteria binding changed')
     refs = [feature.reference(world, s['feature_task'], inventory=inventory, surrounding=surrounding)
             for s in task['scenarios']]

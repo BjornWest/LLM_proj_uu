@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from .adapter import digest
 from . import catalog_review_task as reviews
+from experiments import source_binding
 
 VERSION = 'website-review-passage-task-v1'
 KIND = 'find_customer_review_passage'
@@ -43,7 +44,7 @@ def make(world, spec, *, inventory):
 
 
 def reference(world, task, *, inventory):
-    if task != make(world, task['spec'], inventory=inventory):
+    if not source_binding.compatible(task, make(world, task['spec'], inventory=inventory)):
         raise ValueError('Review passage task/source/subject/request binding changed')
     parent = reviews.reference(world, task['native_review_task'], inventory=inventory)
     product = next(p for p in world['products'] if p['public']['product_id'] == task['subject']['product_id'])

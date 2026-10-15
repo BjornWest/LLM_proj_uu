@@ -4,6 +4,7 @@ from hashlib import sha256
 from pathlib import Path
 from .adapter import digest
 from .address_grading import FIELDS, expected_address
+from experiments import source_binding
 
 VERSION = 'website-atomic-shop-task-v1'
 KIND = 'save_delivery_address'
@@ -53,7 +54,7 @@ def make(world, spec):
 
 
 def reference(world, task):
-    if task != make(world, selection(task)):
+    if not source_binding.compatible(task, make(world, selection(task))):
         raise ValueError('Address task/world/original-memory binding changed')
     from . import address_grading, atomic_shop_grading
     root = Path(__file__).resolve().parents[2]

@@ -12,6 +12,7 @@ from pathlib import Path
 from experiments.footwear_world_pilot.order_set_grader import coverage
 from . import catalog_basket_task as basket, catalog_checkout_domain as checkout
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-catalog-cart-task-v1'
 REFERENCE_VERSION = 'website-catalog-cart-reference-v1'
@@ -73,7 +74,7 @@ def make(world, spec, *, checkout_domain, inventory=None):
 
 def matching(world, task, *, checkout_domain, inventory=None):
     inventory = inventory or basket.Inventory()
-    if task != make(world, selection(task), checkout_domain=checkout_domain, inventory=inventory):
+    if not source_binding.compatible(task, make(world, selection(task), checkout_domain=checkout_domain, inventory=inventory)):
         raise ValueError('Cart task/world/domain/field binding changed')
     return basket.match(world, task['matching_task'], checkout_domain=checkout_domain, inventory=inventory)
 

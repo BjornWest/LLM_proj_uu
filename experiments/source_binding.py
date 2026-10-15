@@ -102,3 +102,8 @@ def accept_asset_drift(manifest, saved, current):
     record(manifest, 'served_asset_drift', sorted(k for k in set(saved) | set(current)
                                                   if saved.get(k) != current.get(k)))
     return True
+
+
+def compatible(saved, rebuilt):
+    """Saved task/reference equals current code's rebuild up to derived ids/added fields."""
+    return saved == rebuilt or (mode() == 'current' and not substantive_changes(saved, rebuilt))

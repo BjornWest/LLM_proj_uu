@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from .adapter import digest
 from . import catalog_comparison_task as comparison, catalog_review_task as reviews
+from experiments import source_binding
 
 VERSION = 'website-catalog-compare-review-task-v1'
 KIND = 'compare_facts_and_reviews'
@@ -74,7 +75,7 @@ def make(world, spec, *, inventory, review_inventory):
 
 
 def reference(world, task, *, inventory, review_inventory):
-    if task != make(world, task['spec'], inventory=inventory, review_inventory=review_inventory):
+    if not source_binding.compatible(task, make(world, task['spec'], inventory=inventory, review_inventory=review_inventory)):
         raise ValueError('Compound task/world/declaration/subject binding changed')
     return {'schema_version': VERSION, 'task_id': task['task_id'], 'world_sha256': task['world_sha256'],
         'comparison': comparison.reference(world, task['comparison_task'], inventory=inventory),

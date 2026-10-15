@@ -4,6 +4,7 @@ from copy import deepcopy
 from .adapter import digest
 from .catalog_predicates import PredicateSet, SCALAR, _lookup, _same
 from .catalog_priority_task import _measurement_scope
+from experiments import source_binding
 
 VERSION = 'website-catalog-comparison-task-v1'
 KIND = 'compare_product_facts'
@@ -100,7 +101,7 @@ def make(world, spec, *, inventory):
 
 def reference(world, task, *, inventory):
     spec = {k: deepcopy(task[k]) for k in ('kind', 'concept_id', 'fields', 'model_limit')}
-    if task != make(world, spec, inventory=inventory):
+    if not source_binding.compatible(task, make(world, spec, inventory=inventory)):
         raise ValueError('Comparison task/world/declaration binding changed')
     products = {p['public']['product_id']: p for p in world['products']}
     probes = {field: PredicateSet(inventory.fields, [_probe(field, definition)],

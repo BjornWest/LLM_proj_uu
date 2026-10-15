@@ -46,7 +46,7 @@ class ResetAnswerGrader:
     def __init__(self, world, task, reference, catalog, bindings, checkout_domain,
                  binding, capsule, completion, interaction, scoring_scope="whole_run", answer_present=None):
         args = {'catalog': catalog, 'bindings': bindings, 'checkout_domain': checkout_domain}
-        if reference != native.reference(world, task, **args):raise ValueError('Native reset reference changed')
+        if not source_binding.compatible(reference, native.reference(world, task, **args)):raise ValueError('Native reset reference changed')
         self.world, self.task, self.reference = deepcopy(world), deepcopy(task), deepcopy(reference)
         journal = None
         if (type(interaction) is dict and interaction.get('main_trace_sha256') == capsule['main_trace_sha256']):

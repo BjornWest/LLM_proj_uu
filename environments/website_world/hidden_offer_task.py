@@ -4,6 +4,7 @@ from copy import deepcopy
 from . import feature_offer_task, catalog_clarification
 from .catalog_predicates import PredicateSet
 from .adapter import digest
+from experiments import source_binding
 
 VERSION = 'website-hidden-feature-task-v1'
 KIND = 'cheapest_matching_after_clarification'
@@ -49,7 +50,7 @@ def make(world,value,*,inventory,surrounding=None):
 def reference(world,task,*,inventory,surrounding=None):
     spec = {k:task[k] for k in ('kind','concept_id','predicates','hidden_requirement','availability',
                                'max_price_minor','comparison_site_id') if k in task}
-    if task != make(world,spec,inventory=inventory,surrounding=surrounding):
+    if not source_binding.compatible(task, make(world,spec,inventory=inventory,surrounding=surrounding)):
         raise ValueError('Hidden task/world/source/prose/reply binding changed')
     native = feature_offer_task.reference(world,task['selection_task'],inventory=inventory,surrounding=surrounding)
     original = {r['offer_id'] for r in native['candidates']}; contrasts = []

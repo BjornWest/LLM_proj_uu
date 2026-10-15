@@ -14,6 +14,7 @@ from . import catalog_checkout_domain
 from .adapter import digest
 from .catalog_predicates import PredicateSet
 from .feature_offer_task import FieldInventory, _wording
+from experiments import source_binding
 
 VERSION = 'website-catalog-basket-task-v1'
 REFERENCE_VERSION = 'website-catalog-basket-reference-v1'
@@ -116,7 +117,7 @@ def make(world, spec, *, checkout_domain, inventory=None):
 
 def match(world, task, *, checkout_domain, inventory=None):
     inventory = inventory or Inventory()
-    if task != make(world, _selection(task), checkout_domain=checkout_domain, inventory=inventory):
+    if not source_binding.compatible(task, make(world, _selection(task), checkout_domain=checkout_domain, inventory=inventory)):
         raise ValueError('Basket task/world/field/domain binding changed')
     products = {p['public']['product_id']: p for p in world['products']}
     matches, evaluations = {}, {}
