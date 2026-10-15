@@ -16,6 +16,7 @@ from experiments.footwear_world_pilot import model as producer
 from experiments.footwear_world_pilot import difficulty_generation as address_stage
 from experiments.address_checkout_pilot.model import parameters as address_parameters
 from experiments.world_sampling_defaults import model as population
+from experiments import source_binding
 from environments.product_world.geography import cities
 from environments.website_drafts.component_sampling import canonical, load_priors, probabilities
 from .adapter import ROOT
@@ -432,45 +433,6 @@ def prepare(request, output):
     return manifest
 
 
-SOURCE_BINDING_ENV = 'WEBSITE_WORLD_SOURCE_BINDING'
-
-
-def source_binding_mode():
-    """'current' (default): one checkout runs every task; 'pinned': exact historical bytes."""
-    import os
-    mode = os.environ.get(SOURCE_BINDING_ENV, 'current')
-    if mode not in ('current', 'pinned'):
-        raise ValueError('Unknown website-world source binding: ' + mode)
-    return mode
-
-
-def data_source(name):
-    """Declared sources that are task/world data rather than code stay exact."""
-    return name.startswith('.local/') or '/data/' in name
-
-
-def bind_current_sources(declared):
-    """Re-hash declared code from this checkout; data must still match exactly.
-
-    Returns the current hashes (guarded unchanged for the rest of the episode)
-    and the drift from the code the task was generated with, as provenance.
-    """
-    current, drift = {}, []
-    for name, expected in declared.items():
-        path = (ROOT/name).resolve()
-        if not path.is_relative_to(ROOT):
-            raise ValueError('Declared source escaped the checkout: ' + name)
-        actual = sha256(path.read_bytes()).hexdigest() if path.is_file() else None
-        if data_source(name):
-            if actual != expected:
-                raise ValueError('Generated data source changed: ' + name)
-        elif actual != expected:
-            drift.append({'path': name, 'declared_sha256': expected, 'current_sha256': actual})
-        if actual is not None:
-            current[name] = actual
-    return current, drift
-
-
 def load(output):
     output = Path(output).resolve()
     manifest = json.loads((output/'manifest.json').read_text())
@@ -480,16 +442,11 @@ def load(output):
         path = (output/name).resolve()
         if not path.is_relative_to(output) or sha256(path.read_bytes()).hexdigest() != expected:
             raise ValueError('Generated artifact changed: ' + name)
-    if source_binding_mode() == 'pinned':
-        for name, expected in manifest['source_sha256'].items():
-            path = (ROOT/name).resolve()
-            if not path.is_relative_to(ROOT) or sha256(path.read_bytes()).hexdigest() != expected:
-                raise ValueError('Generation source changed: ' + name)
-        return manifest
     declared = manifest['source_sha256']
-    manifest['source_sha256'], drift = bind_current_sources(declared)
-    manifest['source_binding'] = {'mode': 'current', 'declared_source_sha256': declared,
-                                  'code_drift': drift}
+    manifest['source_sha256'], drift = source_binding.check(ROOT, declared, error='Generation source changed: ')
+    if drift:
+        manifest['source_binding'] = {'mode': source_binding.mode(), 'declared_source_sha256': declared,
+                                      'code_drift': drift}
     return manifest
 
 

@@ -254,7 +254,7 @@ def configure_case(spec, case):
     os.environ['HARNESS_AX_TOKENIZER'] = str(checked(spec['tokenizer']))
     # Website-world loaders follow the case binding; historical frozen roots
     # keep exact source pins.
-    os.environ['WEBSITE_WORLD_SOURCE_BINDING'] = 'current' if current_binding(case) else 'pinned'
+    os.environ['TASK_SOURCE_BINDING'] = 'current' if current_binding(case) else 'pinned'
     sys.dont_write_bytecode = True
     module = importlib.import_module(case['callable']['module'])
     function = getattr(module, case['callable'].get('symbol', 'run'))

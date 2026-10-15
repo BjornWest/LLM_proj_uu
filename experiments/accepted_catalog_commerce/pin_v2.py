@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 
 from . import model, basket_quote, package_export, source_bundle
+from experiments import source_binding
 
 VERSION = 'accepted-catalog-commerce-pin-v2'
 ARTIFACTS = {'world.private.json', 'basket-plan.private.json',
@@ -55,10 +56,13 @@ def load(output, *, source_store):
     bundle = source_bundle.open_bundle(descriptor['bundle_id'], store=source_store)
     if bundle.descriptor != descriptor or descriptor['source_sha256'] != manifest['source_sha256']:
         raise ValueError('Commerce source bundle binding changed')
-    for name, expected in manifest['source_sha256'].items():
-        path = (package_export.ROOT/source_bundle._path(name)).resolve()
-        if not path.is_relative_to(package_export.ROOT) or package_export.digest_file(path) != expected:
-            raise ValueError('Commerce source changed: ' + name)
+    declared = manifest['source_sha256']
+    manifest['source_sha256'], drift = source_binding.check(
+        package_export.ROOT, declared, error='Commerce source changed: ',
+        digest=package_export.digest_file, locate=source_bundle._path)
+    if drift:
+        manifest['source_binding'] = {'mode': source_binding.mode(), 'declared_source_sha256': declared,
+                                      'code_drift': drift}
     world = json.loads((output/'world.private.json').read_text())
     model.validate(world)
     if world['world_id'] != manifest['world_id']:

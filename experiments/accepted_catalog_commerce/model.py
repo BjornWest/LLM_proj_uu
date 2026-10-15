@@ -20,6 +20,7 @@ from environments.product_world.geography import cities
 from environments.product_world.locations import plan_locations
 from environments.product_world import retailer_naming
 from . import package_export
+from experiments import source_binding
 from .catalog_registry import naming_profile
 
 VERSION='accepted-catalog-commerce-world-v1'
@@ -283,9 +284,9 @@ def load(output):
     for name,expected in m['files'].items():
         path=(output/name).resolve()
         if not path.is_relative_to(output) or package_export.digest_file(path)!=expected:raise ValueError('Commerce pin artifact changed: '+name)
-    for name,expected in m['source_sha256'].items():
-        path=(package_export.ROOT/name).resolve()
-        if not path.is_relative_to(package_export.ROOT) or package_export.digest_file(path)!=expected:raise ValueError('Commerce source changed: '+name)
+    declared=m['source_sha256']
+    m['source_sha256'],drift=source_binding.check(package_export.ROOT,declared,error='Commerce source changed: ',digest=package_export.digest_file)
+    if drift:m['source_binding']={'mode':source_binding.mode(),'declared_source_sha256':declared,'code_drift':drift}
     world=json.loads((output/'world.private.json').read_text());validate(world)
     if world['world_id']!=m['world_id']:raise ValueError('Commerce pin identity differs')
     return world,m
