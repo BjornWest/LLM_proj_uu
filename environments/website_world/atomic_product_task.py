@@ -10,6 +10,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 from .adapter import digest
 from . import catalog_cart_task as carts, catalog_checkout_domain as checkout
+from experiments import source_binding
 
 VERSION = 'website-atomic-product-task-v1'
 QUALIFIED_VERSION = 'website-atomic-product-task-v2'
@@ -169,8 +170,12 @@ def make(world, spec, *, catalog, bindings, checkout_domain):
 
 
 def reference(world, task, *, catalog, bindings, checkout_domain):
-    if task != make(world, task['spec'], catalog=catalog, bindings=bindings, checkout_domain=checkout_domain):
-        raise ValueError('Original atomic task/schema/source/world/public page/domain changed')
+    rebuilt = make(world, task['spec'], catalog=catalog, bindings=bindings, checkout_domain=checkout_domain)
+    if task != rebuilt:
+        changes = source_binding.substantive_changes(task, rebuilt)
+        if source_binding.mode() == 'pinned' or changes:
+            raise ValueError('Original atomic task/schema/source/world/public page/domain changed'
+                             + (': ' + ', '.join(changes[:8]) if changes else ''))
     _, offer, _, _, _ = _target(world, task['retailer_id'], task['offer_id'], catalog, bindings)
     expected = None
     if task['kind'] == 'read_listed_price':
