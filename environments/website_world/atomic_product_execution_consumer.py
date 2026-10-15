@@ -218,7 +218,6 @@ class AtomicProductEpisode:
                     or packet['bindings'] != read('atomic-product-bindings.private.json')
                     or self.runtime.compositions != read('compositions.private.json')):
                 raise ValueError('Actual runtime task/reference/catalog/bindings/composition changed')
-            task = packet['task']
             if (self.scoring_scope != 'whole_run' and not source_binding.accept_asset_drift(
                     self.manifest, read('atomic-product-assets.private.json'), self.runtime.asset_hashes)):
                 raise ValueError('Actual atomic served assets changed')
@@ -235,7 +234,9 @@ class AtomicProductEpisode:
                 raise ValueError('Ordinary initial selection differs from native setup')
             self.setup_plan = setup.make_plan(self.runtime, retailer_id=task['retailer_id'], **declaration)
             if self.setup_plan['start_url'] != task['start']['url']: raise ValueError('Product start URL changed')
-            self.native_task, self.reference = task, packet['reference']
+            # The saved (published) task and reference drive capture and grading;
+            # the rebuild above only proves current code derives a compatible one.
+            self.native_task, self.reference = task, read('atomic-product-reference.private.json')
             self.public = public_projection({'schema_version': 'connected-world-manual-v1',
                 'task_id': published_id, 'user_message': manual['user_message'], 'memories': task['memories'],
                 'start_url': task['start']['url'], 'environment_context': {'currency': 'SEK',

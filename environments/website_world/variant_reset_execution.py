@@ -147,7 +147,6 @@ class VariantResetEpisode:
                     or not source_binding.accept_asset_drift(self.manifest,
                         read('variant-reset-assets.private.json'), self.runtime.asset_hashes)):
                 raise ValueError('Actual runtime task/reference/catalog/bindings/composition changed')
-            task = packet['task']
             episode = read('episode.json')
             manual = episode.get('manual_task')
             if (type(manual) is not dict or set(manual) != {'user_message', 'memories'}
@@ -162,7 +161,9 @@ class VariantResetEpisode:
                 raise ValueError('Ordinary initial selection differs from native setup')
             self.setup_plan = setup.make_plan(self.runtime, retailer_id=task['retailer_id'], **declaration)
             if self.setup_plan['start_url'] != task['start']['url']: raise ValueError('Product start URL changed')
-            self.native_task, self.reference = task, packet['reference']
+            # The saved (published) task and reference drive capture and grading;
+            # the rebuild above only proves current code derives a compatible one.
+            self.native_task, self.reference = task, read('variant-reset-reference.private.json')
             self.public = public_projection({'schema_version': 'connected-world-manual-v1',
                 'task_id': published_id, 'user_message': manual['user_message'], 'memories': task['memories'],
                 'start_url': task['start']['url'], 'environment_context': {'currency': 'SEK',
