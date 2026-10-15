@@ -112,6 +112,17 @@ def verify_source_export(root, commit, descriptor, required):
     return row
 
 
+CODE_PACKAGES = ('scripts', 'intent_browser', 'experiments', 'environments')
+
+
+def current_binding(case):
+    """True when the case runs from the one current checkout, not a frozen root."""
+    mode = case.get('source_binding', 'pinned')
+    if mode not in ('current', 'pinned'):
+        raise ValueError('Unknown case source binding: ' + str(mode))
+    return mode == 'current'
+
+
 def recipe_check(case):
     recipe = Path(case['recipe']).resolve()
     manifest = load(checked(case['recipe_manifest']))
@@ -121,7 +132,18 @@ def recipe_check(case):
             raise ValueError('Recipe path escaped its root')
         checked({'path': str(path), 'sha256': digest})
     root = Path(case['root']).resolve()
-    if 'source_export' in case:
+    current = current_binding(case)
+    if current:
+        # One checkout runs every task: verify that exact clean commit, and
+        # keep only data-like declared sources exact (code drift is recorded
+        # by generation.load as provenance).
+        if subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'],
+                                   text=True).strip() != case['commit']:
+            raise ValueError('Single-version checkout is not at the accepted commit')
+        if subprocess.check_output(['git', '-C', str(root), 'status', '--porcelain', '--untracked-files=no',
+                                    '--', *CODE_PACKAGES], text=True).strip():
+            raise ValueError('Single-version checkout has uncommitted code changes')
+    elif 'source_export' in case:
         verify_source_export(root, case['commit'], case['source_export'], manifest['source_sha256'])
     elif subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'],
                                  text=True).strip() != case['commit']:
@@ -130,6 +152,8 @@ def recipe_check(case):
         path = root/name
         if not path.resolve().is_relative_to(root):
             raise ValueError('Declared source escaped accepted root')
+        if current and not (name.startswith('.local/') or '/data/' in name):
+            continue
         checked({'path': str(path), 'sha256': digest})
     setup_names = ['saved-answer-setup.private.json', 'simulated-order-setup.private.json',
                    'variant-reset-setup.private.json', 'saved-review-setup.private.json']
@@ -228,12 +252,15 @@ def configure_case(spec, case):
     sys.meta_path.insert(0, FrozenSourceFinder({**{p: root for p in
         ('scripts', 'intent_browser', 'experiments', 'environments')}, 'agent_trace': external}))
     os.environ['HARNESS_AX_TOKENIZER'] = str(checked(spec['tokenizer']))
+    # Website-world loaders follow the case binding; historical frozen roots
+    # keep exact source pins.
+    os.environ['WEBSITE_WORLD_SOURCE_BINDING'] = 'current' if current_binding(case) else 'pinned'
     sys.dont_write_bytecode = True
     module = importlib.import_module(case['callable']['module'])
     function = getattr(module, case['callable'].get('symbol', 'run'))
     if not Path(module.__file__).resolve().is_relative_to(root):
         raise ValueError('Task callable imported outside its accepted source root')
-    if 'source' in case['callable']:
+    if 'source' in case['callable'] and not current_binding(case):
         checked(case['callable']['source'])
     return function
 
