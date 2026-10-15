@@ -66,6 +66,10 @@ def substantive_changes(saved, rebuilt, path=''):
                 continue
             if key not in rebuilt:
                 changes.append(path + '/' + key)
+            elif key == 'source_sha256' and isinstance(value, dict) and isinstance(rebuilt[key], dict):
+                # A nested record of the producing code: only its data entries matter.
+                changes += [f'{path}/{key}/{name}' for name in value
+                            if data_source(name) and value[name] != rebuilt[key].get(name)]
             else:
                 changes += substantive_changes(value, rebuilt[key], path + '/' + key)
         return changes
