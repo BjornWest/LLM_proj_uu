@@ -140,6 +140,11 @@ class LocalOriginBridge(LogicalOrigins):
         self.closed = False
         self.sessions = []
         self.pages = set()
+        # A page can abandon an intercepted response during navigation. Keep
+        # bounded, body/URL-free acknowledgement evidence even without a file
+        # sink. Expiry never establishes whether a forwarded mutation committed.
+        self.expired_interception_ack_count = 0
+        self.expired_interception_acknowledgements = []
 
     def _record_phase(self, phase, request, **fields):
         if self.diagnostics_path is None or self.diagnostics_error is not None:
@@ -180,8 +185,37 @@ class LocalOriginBridge(LogicalOrigins):
             self._record_phase(name + '_exit', request, failed=failed, **fields)
 
     def _send_cdp(self, session, method, parameters, request):
+        from playwright.sync_api import Error as PlaywrightError
         with self._phase('cdp', request, rpc_method=method):
-            return session.send(method, parameters)
+            try:
+                return session.send(method, parameters)
+            except PlaywrightError as error:
+                # Do not leak this terminal request-ID acknowledgement into
+                # Playwright's event-listener error slot: it would prevent the
+                # next unrelated CDP command from being sent. No HTTP or CDP
+                # request is retried. Other protocol/target/transport errors
+                # retain their normal failure path.
+                suffix = f'Protocol error ({method}): Invalid InterceptionId.'
+                if (type(error) is not PlaywrightError
+                        or method not in ('Fetch.fulfillRequest', 'Fetch.failRequest')
+                        or not error.message.endswith(suffix)):
+                    raise
+                outcome = {
+                    'rpc_method': method,
+                    'request_id': getattr(request, '_phase_request_id', None),
+                    'network_id': getattr(request, '_phase_network_id', None),
+                    'method': request.method if isinstance(request.method, str)
+                              and request.method in _PHASE_METHODS else None,
+                    'browser_acknowledged': False,
+                    'backend_effects': 'unknown',
+                    'replayed': False,
+                }
+                self.expired_interception_ack_count += 1
+                self.expired_interception_acknowledgements.append(outcome)
+                del self.expired_interception_acknowledgements[:-64]
+                self._record_phase('cdp_ack_expired', request, rpc_method=method,
+                    browser_acknowledged=False, backend_effects='unknown', replayed=False)
+                return {}
 
     def replace(self, text):
         return self.identity.rewrite(text)

@@ -3,8 +3,10 @@ from contextlib import ExitStack
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 import json
+from types import SimpleNamespace
 from urllib.parse import urlsplit
 
+import pytest
 from playwright.sync_api import sync_playwright
 from environments.website_world.local_origins import OriginMap, LocalOriginBridge
 
@@ -84,3 +86,54 @@ def test_local_redirects_fetch_cookies_and_context_isolation():
             c1.close(); c2.close()
             assert bridge1.closed and bridge2.closed
             browser.close()
+
+
+@pytest.mark.parametrize('method', ['GET', 'POST'])
+def test_expired_ack_inside_real_cdp_callback_does_not_poison_following_navigation(method):
+    """Consume an ID, then deliver its late ack inside the same real callback.
+
+    This deterministically exercises Chromium's expired-ID error and Playwright's
+    event delivery; the HTTP request (including the mutation) is forwarded once.
+    """
+    forwarded=[]
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self,*args):pass
+        def do_GET(self):
+            forwarded.append(('GET',self.path))
+            body=b'<html><title>healthy</title><body>ok</body></html>'
+            self.send_response(200);self.send_header('Content-Type','text/html');self.end_headers();self.wfile.write(body)
+        def do_POST(self):
+            forwarded.append(('POST',self.path))
+            self.send_response(200);self.end_headers();self.wfile.write(b'committed')
+    server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+    thread=Thread(target=server.serve_forever,daemon=True);thread.start()
+    identity=OriginMap([dict(site_id='a',name='a',kind='retailer',
+                            origin=f'http://localhost:{server.server_port}')],world_id='expired-ack')
+    bridge=LocalOriginBridge(identity)
+    original=bridge._paused
+    def paused(session,event):
+        original(session,event)
+        if event['request']['url']=='https://a.test/abandon':
+            request=SimpleNamespace(url=event['request']['url'],method=event['request']['method'],
+                _phase_request_id=event['requestId'],_phase_network_id=event.get('networkId'))
+            bridge._send_cdp(session,'Fetch.fulfillRequest',{
+                'requestId':event['requestId'],'responseCode':200,'body':''},request)
+    bridge._paused=paused
+    try:
+        with sync_playwright()as pw:
+            browser=pw.chromium.launch()
+            try:
+                context=browser.new_context(service_workers='block');page=context.new_page();bridge.attach(context)
+                page.goto('https://a.test/start')
+                if method=='GET':page.goto('https://a.test/abandon')
+                else:assert page.evaluate("async()=>await(await fetch('/abandon',{method:'POST',body:'one mutation'})).text()")=='committed'
+                page.goto('https://a.test/after',timeout=3000)
+                assert page.title()=='healthy'
+                assert forwarded.count((method,'/abandon'))==1
+                assert bridge.expired_interception_ack_count==1
+                assert bridge.expired_interception_acknowledgements[0]['backend_effects']=='unknown'
+                assert bridge.expired_interception_acknowledgements[0]['replayed'] is False
+                context.close()
+            finally:browser.close()
+    finally:
+        bridge.close();server.shutdown();server.server_close();thread.join(3)
