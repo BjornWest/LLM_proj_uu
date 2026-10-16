@@ -59,6 +59,9 @@ def _browser_step(env, action, *, step, tool, context):
         raise exc.with_traceback(traceback)
     return result
 
+MAX_OUTPUT_LIMIT_REPLIES = 2  # Capped replies tolerated before ending the episode.
+
+
 def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT_MAX_STEPS, seed=0,
                 record_video=False, hold_seconds=0, search_backend=None, episode_task=None,
                 before_observation=None, *, terminal_response_instruction=None,
@@ -486,6 +489,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     reward = 0.0
     terminated = truncated = False
     stop_reason = "max_steps" if max_steps is not None else "running"
+    output_limit_replies = 0
     history = []
     final_ref = None
     error = None
@@ -1178,11 +1182,36 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     event['completion_diagnostic']=diagnostic
                     trace.event('completion_classified',step=index,diagnostic=diagnostic)
                 if native_tools:
-                    from .native_tools import MissingNativeToolCall
+                    from .native_tools import MissingNativeToolCall, OutputLimitWithoutToolCall
                     try:
                         decisions, assistant, argument_results, argument_channel = harness_profile.tools.parse_for_dispatch(
                             completion, batching=batching, allow_search=search_backend is not None,
                             has_call_id=conversation.has_call_id,recover_missing_calls=retry_policy is None)
+                    except OutputLimitWithoutToolCall:
+                        # Runaway reasoning: let the policy act after a notice, but end
+                        # the episode cleanly (graded as no answer) on repeated cutoffs.
+                        output_limit_replies = output_limit_replies + 1
+                        trace.event('native_reply_rejected',step=index,reason='output_limit_without_tool_call',
+                            not_executed=True,tool_call_count=0,occurrence=output_limit_replies)
+                        if output_limit_replies > MAX_OUTPUT_LIMIT_REPLIES:
+                            stop_reason = 'max_output_tokens'
+                            event.update(kind='output_limit',actions=[],browser_stepped=False,
+                                action_dispatch_started=False,not_executed=True)
+                            break
+                        value={'execution':'not_executed','reason':'output_limit_without_tool_call',
+                            'feedback':'Your reply reached the output-token limit before any tool call; nothing ran. '
+                                       'Reason briefly and call a tool now. To finish, call send_msg_to_user with your answer.',
+                            'scope':'Controller protocol feedback; no action or tool result was invented.'}
+                        notice=json.dumps(value,ensure_ascii=False,sort_keys=True)
+                        source=delivery.register('batch_result',notice,step=index,
+                            provenance={'scope':'Output-limited reply without calls; no action dispatched'}) if delivery else None
+                        conversation.recover(completion.raw,notice,
+                            preserve_reasoning=False,notice_source=source,preserve_empty_content=True)
+                        event.update(kind='native_protocol_rejection',policy_feedback=value,actions=[],
+                            browser_stepped=False,action_dispatch_started=False,not_executed=True,
+                            native_feedback_channel='controller',native_feedback_reason='output_limit_without_tool_call',
+                            next_observation=final_ref)
+                        continue
                     except MissingNativeToolCall:
                         value={'execution':'not_executed','reason':'missing_native_tool_call',
                             'feedback':'No native tool call was returned. Use the provided native tool schema for your next decision. '

@@ -185,6 +185,10 @@ class NativeArgumentError(ValueError):
         self.force_controller = force_controller
 
 
+class OutputLimitWithoutToolCall(ValueError):
+    """The reply hit its output-token limit (usually runaway reasoning) with no call."""
+
+
 class MissingNativeToolCall(ValueError):
     """Completed assistant reply has no calls; controller feedback, never an action."""
 
@@ -457,6 +461,10 @@ class NativeBrowserTools(BrowserTools):
         from .retry_policy import argument_diagnostic
         raw = completion.raw
         choices = raw.get('choices') if isinstance(raw,dict) else None
+        if (isinstance(choices,list) and len(choices)==1 and isinstance(choices[0],dict)
+                and choices[0].get('finish_reason')=='length'
+                and not (choices[0].get('message') or {}).get('tool_calls')):
+            raise OutputLimitWithoutToolCall('Reply reached its output limit without a tool call; nothing executed')
         if recover_missing_calls and isinstance(choices,list) and len(choices)==1 and isinstance(choices[0],dict):
             choice=choices[0];message=choice.get('message')
             if isinstance(message,dict):
