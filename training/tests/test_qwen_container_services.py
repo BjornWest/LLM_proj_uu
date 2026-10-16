@@ -125,7 +125,7 @@ class ServicesTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             spec,run=self.fixture(Path(t));argv=C.launch_argv(spec,run,12.5,'qwen-test-qualification',binding={'path':'/binding','sha256':'a'*64})
             self.assertEqual(argv[argv.index('--memory-mib')+1],'512')
-            self.assertEqual(argv[argv.index('--tasks')+1],'64')
+            self.assertEqual(argv[argv.index('--tasks')+1],'0')  # memory is the only guard
             self.assertEqual(argv[argv.index('--wall-seconds')+1],'12.5')
             self.assertIn(str(run/'qwen-test-qualification'),argv)
             self.assertIn(str(run/'ready'),argv)

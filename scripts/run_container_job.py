@@ -224,8 +224,10 @@ def timeout_wall(command):
 
 
 def validate(args):
-    if args.memory_mib <= 0 or args.tasks <= 0:
-        raise ValueError("memory-mib and tasks must be positive")
+    # --tasks 0 disables the thread-count threshold: the memory limit is the guard
+    # that matters, and a thread cap only kills shared services under load.
+    if args.memory_mib <= 0 or args.tasks < 0:
+        raise ValueError("memory-mib must be positive and tasks nonnegative (0 disables)")
     if not math.isfinite(args.sample_seconds) or not .02 <= args.sample_seconds <= 2:
         raise ValueError("Sample must be .02-2s")
     configured = os.environ.get("CONTAINER_JOB_WALL_SECONDS")
@@ -520,7 +522,7 @@ def run(args):
                 raise ValueError("Specify a foreground command after --")
             if outer["visible_effective_memory_max"] is None or outer["visible_effective_pids_max"] is None:
                 raise RuntimeError("Finite visible outer memory.max and pids.max are required")
-            if args.memory_mib * MIB > outer["visible_effective_memory_max"] or args.tasks > outer["visible_effective_pids_max"]:
+            if args.memory_mib * MIB > outer["visible_effective_memory_max"] or (args.tasks and args.tasks > outer["visible_effective_pids_max"]):
                 raise ValueError("Requested monitored thresholds exceed observed outer hard limits")
             if len(list(Path("/proc/self/task").iterdir())) != 1 or descendant_rows(process_table(), os.getpid()):
                 raise RuntimeError("Supervisor must start single-threaded without existing children")
@@ -641,7 +643,7 @@ def run(args):
                     if sample["summed_rss_bytes"] > args.memory_mib * MIB:
                         stop_reason = "monitored_memory_threshold"
                         break
-                    if sample["threads"] > args.tasks:
+                    if args.tasks and sample["threads"] > args.tasks:
                         stop_reason = "monitored_task_threshold"
                         break
                     if supervisor.root_status is not None:

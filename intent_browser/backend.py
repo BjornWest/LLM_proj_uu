@@ -98,7 +98,8 @@ class ChatCompletionsBackend:
         if self.session_routing and self.session_id is None:
             raise ValueError('Begin an episode before sending a session-routed request')
         request = {
-            "model": self.model, "messages": messages, "temperature": 0,
+            "model": self.model, "messages": messages,
+            **getattr(self, 'sampling', {"temperature": 0}),
             "max_tokens": self.max_tokens, "stream": False,
             **self.request_options,
             **({'session_id': self.session_id} if self.session_routing else {}),

@@ -271,6 +271,31 @@ class ServingAdmission:
                                stream=False, tools=tools, tool_choice='auto', parallel_tool_calls=False))
 
 
+# Per-phase decoding. Greedy thinking loops (Qwen advises against it), so the
+# policy samples by default; extraction is deterministic transcription without
+# thinking. A run spec may override these through QwenFactories(sampling=...).
+DEFAULT_SAMPLING = {
+    'policy': {'temperature': 0.6, 'top_p': 0.95, 'top_k': 20},
+    'formatter': {'temperature': 0, 'chat_template_kwargs': {'enable_thinking': False}},
+}
+
+
+def sampling_valid(request):
+    temperature = request['temperature']
+    if type(temperature) not in (int, float) or not 0 <= temperature <= 2:
+        raise ValueError('Temperature must be within 0..2')
+    if 'top_p' in request and (type(request['top_p']) not in (int, float) or not 0 < request['top_p'] <= 1):
+        raise ValueError('top_p must be within (0, 1]')
+    if 'top_k' in request and (type(request['top_k']) is not int or not (request['top_k'] == -1 or request['top_k'] >= 1)):
+        raise ValueError('top_k must be -1 or positive')
+    if 'presence_penalty' in request and (type(request['presence_penalty']) not in (int, float)
+                                          or not -2 <= request['presence_penalty'] <= 2):
+        raise ValueError('presence_penalty must be within -2..2')
+    if 'chat_template_kwargs' in request and (request['chat_template_kwargs'].keys() - {'enable_thinking'}
+            or type(request['chat_template_kwargs'].get('enable_thinking', True)) is not bool):
+        raise ValueError('Only the enable_thinking template switch is supported')
+
+
 def tokenize_payload(request):
     """Mirror vLLM reasoning alias without sorting nested tool-schema keys.
 
@@ -278,11 +303,13 @@ def tokenize_payload(request):
     capability checks for prompt independence. Raw generation remains unchanged.
     """
     allowed = {'model', 'messages', 'temperature', 'max_tokens', 'stream',
-               'tools', 'tool_choice', 'parallel_tool_calls', 'response_format'}
+               'tools', 'tool_choice', 'parallel_tool_calls', 'response_format',
+               'top_p', 'top_k', 'presence_penalty', 'chat_template_kwargs'}
     required = {'model', 'messages', 'temperature', 'max_tokens', 'stream'}
     if not isinstance(request, dict) or not required <= set(request) or set(request)-allowed:
         raise ValueError('Unqualified generation wire fields')
-    if (request['model'] != MODEL or request['temperature'] != 0 or request['stream'] is not False
+    sampling_valid(request)
+    if (request['model'] != MODEL or request['stream'] is not False
             or not isinstance(request['messages'], list) or type(request['max_tokens']) is not int
             or request['max_tokens'] <= 0):
         raise ValueError('Invalid private generation request')
@@ -309,6 +336,8 @@ def tokenize_payload(request):
             message['reasoning'] = reasoning
     if request.get('tools'):
         payload['tools'] = deepcopy(request['tools'])
+    if 'chat_template_kwargs' in request:
+        payload['chat_template_kwargs'] = deepcopy(request['chat_template_kwargs'])
     return payload
 
 
@@ -324,7 +353,7 @@ class QwenFactories:
     def __init__(self, *, backend_class, admission, before_policy, before_formatter,
                  meter, freshness_guard, max_output_tokens=16384, request_timeout=600,
                  read_wait_policy='bounded_request', turn=lambda phase: nullcontext(),
-                 background_completion=False):
+                 background_completion=False, sampling=None):
         for f in (backend_class, before_policy, before_formatter, meter, turn, freshness_guard):
             if not callable(f):
                 raise ValueError('Explicit factory, guards, turn and meter required')
@@ -337,6 +366,11 @@ class QwenFactories:
         if type(background_completion) is not bool:
             raise ValueError("Explicit boolean background completion required")
         self.background_completion=background_completion
+        self.sampling = deepcopy(DEFAULT_SAMPLING if sampling is None else sampling)
+        if set(self.sampling) != {'policy', 'formatter'}:
+            raise ValueError('Sampling must define policy and formatter phases')
+        for phase in self.sampling.values():
+            sampling_valid({'temperature': 0, **phase})
         self.operation_lock=Lock()
         self.backend_class, self.admission = backend_class, admission
         self.policy_guard, self.formatter_guard, self.meter, self.turn = before_policy, before_formatter, meter, turn
@@ -474,7 +508,7 @@ class QwenBackend:
         elif set(options)-{'tools', 'tool_choice', 'parallel_tool_calls'}:
             raise ValueError('Unknown policy request option')
         selected = deepcopy(messages)
-        request = dict(model=MODEL, messages=selected, temperature=0,
+        request = dict(model=MODEL, messages=selected, **deepcopy(f.sampling[self.phase]),
                        max_tokens=f.maximum, stream=False, **options)
         # One serialized request owns the permit across counting/generation.
         # Certified background execution performs no browser reads; the owner
@@ -496,6 +530,7 @@ class QwenBackend:
                 raise ValueError('Extraction schema changed during admission')
             self.raw.max_tokens = request['max_tokens']
             self.raw.request_options = deepcopy(options)
+            self.raw.sampling = deepcopy(f.sampling[self.phase])
             f.meter({'event': 'admission', 'phase': self.phase, 'count': final,
                      'max_tokens': request['max_tokens']})
             f.check(completion=type(self).__dict__.get('supports_background_completion') is True)

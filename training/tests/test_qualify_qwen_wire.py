@@ -56,7 +56,7 @@ class WireTests(unittest.TestCase):
         self.assertEqual(loaded['MODEL'], Q.MODEL)
         self.assertEqual(loaded['CONTEXT'], Q.CONTEXT)
         self.assertEqual(loaded['projection_sha256'](),
-                         'e818865d35a1a4cd9c6d3abc1c3fa02786cad1cb8eb89bd57b870f2ae6b8c27e')
+                         '51c038eef3b4a12e2336d87a4e231a0b11aec3a21e955bbf85ab2be76abf736b')
         self.assertTrue(callable(loaded['QwenFactories'].http_timeout))
 
     def test_old_runtime_pin_rejected_before_source_read(self):

@@ -694,8 +694,18 @@ def check_pool_source_pins(spec,case=None):
  return expected
 
 
+def task_caps(spec):
+ """Thread-count caps are workstation protection; deployments turn them off (0)."""
+ value=spec.get('task_caps',True)
+ if type(value) is not bool:raise ValueError('task_caps must be boolean')
+ return value
+
+
 def pool_resource_options(spec):
  memory=spec.get('pool_memory_mib',3072);tasks=spec.get('pool_tasks',512)
+ if not task_caps(spec):
+  if type(memory)is not int or memory<1024:raise ValueError('Explicit shared-pool memory limit required')
+  return memory,0
  if type(memory)is not int or not 1024<=memory<=8192 or type(tasks)is not int or not 128<=tasks<=512:
   raise ValueError('Finite explicit shared-pool resource limits required')
  return memory,tasks
@@ -1215,7 +1225,7 @@ def execute(s,c,scripted=False):
     before_policy=lambda:before('policy'),before_formatter=lambda:before('formatter'),meter=record,freshness_guard=fresh,
     max_output_tokens=s['max_tokens'],request_timeout=s['request_timeout'],
     read_wait_policy=private_read_wait_policy(s),turn=qwen_turn,
-    background_completion=capture_options(s)['observation_pipeline']=='auto')
+    background_completion=capture_options(s)['observation_pipeline']=='auto',sampling=s.get('sampling'))
   result=run(c['argument'],out/'live',policy_session=session,metadata={'suite':s['suite_id'],'source':s['suite_id'],'case':c['id'],'model':'scripted' if scripted else model,'tags':['scripted','queue-acceptance'] if scripted else ['comparison',model,c['task_id']],'training_eligible':False},runner_options={'max_steps':c.get('scripted_max_steps',1) if scripted else c['max_steps'] if s.get('hosted_limit_profile')=='finite-task-limits-v1' else s['max_steps'],'max_input_tokens':c['max_input_tokens'],**{k:v for k,v in capture_options(s).items() if k!='recording_capture'}},viewer_projection=projection,quota_guard=guard,runner=runner,**h['case_options']({**c,'id':c['task_id']},extraction_backend))
   if result.get('status')!='graded_and_projected':raise ValueError('Missing automatic grading/HTTP projection: '+str(result))
   # A negative scripted task verdict is a completed control, not a job error.
@@ -1413,7 +1423,7 @@ def _supervise(s,scripted=False,stop=None):
      stage='setup'
      stdout=(out/(ident+'-stdout.log')).open('x');stderr=(out/(ident+'-stderr.log')).open('x')
      if capacity_host is not None:capacity_host.begin_relay(ident)
-     process=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','2048','--tasks','256','--receipt',str(out/(ident+'-bounded')),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',s['driver']['path'],'scripted-case' if scripted else 'case',str(runtime),ident],stdout=stdout,stderr=stderr,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
+     process=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','2048','--tasks','256' if task_caps(s) else '0','--receipt',str(out/(ident+'-bounded')),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',s['driver']['path'],'scripted-case' if scripted else 'case',str(runtime),ident],stdout=stdout,stderr=stderr,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
      watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop,browser_step_seconds=browser_step_options(s)[0],rental_deadline=time.monotonic()+s['suite_deadline_utc']-time.time() if hosted_qwen_mode(s) else None if serving is None else time.monotonic()+serving.deadline-time.time())
      stage='readiness'
      connection,_=listeners[ident].accept();connection.settimeout(s['suite_timeout'])

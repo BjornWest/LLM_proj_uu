@@ -105,7 +105,8 @@ def unit_argv(spec, run, remaining):
         '--property=StandardOutput=append:'+str(run/'vllm.log'),'--property=StandardError=inherit',
         '--property=WorkingDirectory='+str(run),'/usr/bin/env','-i',
         *[key+'='+value for key,value in env.items()],spec['rl_python'],'-I','-B',str(entry),
-        '--snapshot',spec['snapshot'],'--receipt',str(run/'installed-serving.json'),'--cache-root',spec['cache_root']]
+        '--snapshot',spec['snapshot'],'--receipt',str(run/'installed-serving.json'),'--cache-root',spec['cache_root'],
+        '--max-num-seqs',str(spec.get('max_num_seqs',8))]
 
 
 class Units:

@@ -148,7 +148,7 @@ class FactoryTests(unittest.TestCase):
             def configure_tools(self,options):self.request_options.update(options)
             def begin_episode(self,episode_id):pass
             def complete(self,messages):
-                request=dict(model=API['MODEL'],messages=deepcopy(messages),temperature=0,max_tokens=self.max_tokens,stream=False,**deepcopy(self.request_options))
+                request=dict(model=API['MODEL'],messages=deepcopy(messages),**deepcopy(getattr(self,'sampling',{'temperature':0})),max_tokens=self.max_tokens,stream=False,**deepcopy(self.request_options))
                 self.last_request=request;outer.calls.append(request)
                 return SimpleNamespace(request=request,raw={'usage':{'prompt_tokens':outer.n}},text='answer')
             def close(self):pass

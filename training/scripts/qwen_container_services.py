@@ -72,9 +72,10 @@ def launch_argv(spec, run, remaining, name, *, binding=None):
     else:
         payload = [spec['rl_python'], '-I', '-B', str(entry/'serve_qwen_suite.py'),
                    '--snapshot', spec['snapshot'], '--receipt', str(run/'installed-serving.json'),
-                   '--cache-root', spec['cache_root']]
+                   '--cache-root', spec['cache_root'], '--max-num-seqs', str(spec.get('max_num_seqs', 8))]
     return [spec['browser_python'], '-I', '-B', spec['container_launcher']['path'],
-            '--memory-mib', str(memory), '--tasks', '64' if binding else '2048',
+            # Memory is the guard; thread caps (0) only kill services under load.
+            '--memory-mib', str(memory), '--tasks', '0',
             '--receipt', str(run/name), '--wall-seconds', str(remaining),
             '--grace-seconds','10','--cleanup-seconds','20','--',
             '/usr/bin/env', '-i', *[k+'='+v for k, v in env.items()], *payload]
