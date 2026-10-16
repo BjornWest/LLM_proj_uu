@@ -388,7 +388,9 @@ def case_binding(c):
 
 def execution_binding(s,c):
  excluded={'review','ready','cases','start_order','output','completion_db','suite_id','spec_path','sockets','tokenizer_socket','chromium_descriptor','scripted_hold_seconds','case_dependencies','caller_acceptance'}
- if qwen_mode(s):excluded|={'serving_live','rental_deadline_utc','capacity_bindings','chromium_descriptor'}
+ # Scripted controls need no serving: excluding its fingerprint lets them run
+ # while the model loads instead of after qualification.
+ if qwen_mode(s):excluded|={'serving_live','rental_deadline_utc','capacity_bindings','chromium_descriptor','serving_compatibility_fingerprint'}
  if hosted_qwen_mode(s):excluded|={'suite_deadline_utc'}
  fields={k:v for k,v in s.items() if k not in excluded}
  fields['case_dependencies']=s.get('case_dependencies',{}).get(c['id'],[])
@@ -1426,7 +1428,14 @@ def _supervise(s,scripted=False,stop=None):
      process=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','2048','--tasks','256' if task_caps(s) else '0','--receipt',str(out/(ident+'-bounded')),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',s['driver']['path'],'scripted-case' if scripted else 'case',str(runtime),ident],stdout=stdout,stderr=stderr,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
      watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop,browser_step_seconds=browser_step_options(s)[0],rental_deadline=time.monotonic()+s['suite_deadline_utc']-time.time() if hosted_qwen_mode(s) else None if serving is None else time.monotonic()+serving.deadline-time.time())
      stage='readiness'
-     connection,_=listeners[ident].accept();connection.settimeout(s['suite_timeout'])
+     # Poll so a child that dies during startup fails now, not after startup_timeout.
+     accept_deadline=time.monotonic()+s['startup_timeout'];listeners[ident].settimeout(1)
+     while True:
+      try:connection,_=listeners[ident].accept();break
+      except socket.timeout:
+       if process.poll() is not None:raise RuntimeError('Child lifecycle exited '+str(process.returncode)+' before connecting')
+       if time.monotonic()>=accept_deadline:raise TimeoutError('Child did not connect within startup_timeout')
+     connection.settimeout(s['suite_timeout'])
      connections['connection']=connection
      # Ready receipt precedes gate; activation reply is emitted only under queue's cap.
      watched=WatchedAdmission(admission,watchdog,phase)
