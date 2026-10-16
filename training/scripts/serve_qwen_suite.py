@@ -30,8 +30,8 @@ CPU_BYTES = 20 << 30
 def command(snapshot, *, port=8000, max_num_seqs=8, memory_fraction=.90):
     if type(port) is not int or not 1 <= port <= 65535:
         raise ValueError('Invalid serving port')
-    if type(max_num_seqs) is not int or not 1 <= max_num_seqs <= 32:
-        raise ValueError('Use a sequence cap in 1..32')
+    if type(max_num_seqs) is not int or not 1 <= max_num_seqs <= 256:
+        raise ValueError('Use a sequence cap in 1..256')
     if not .50 <= memory_fraction <= .90:
         raise ValueError('GPU memory fraction must be in 0.50..0.90')
     argv = [sys.executable, '-P', '-m', 'vllm.entrypoints.cli.main', 'serve', str(snapshot)]

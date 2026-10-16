@@ -44,7 +44,7 @@ def test_native_profile_retains_offload_and_uses_localhost():
     assert '--enforce-eager' not in argv and '--disable-log-stats' not in argv
 
 
-@pytest.mark.parametrize('kwargs', [{'port': 0}, {'max_num_seqs': 33},
+@pytest.mark.parametrize('kwargs', [{'port': 0}, {'max_num_seqs': 257},
                                     {'memory_fraction': .95}])
 def test_unsupported_launch_values_rejected(kwargs):
     with pytest.raises(ValueError):
