@@ -232,3 +232,17 @@ review initially found two implementation defects: unsent SSE events could consu
 the recovery attempt, and budget stops could restart an episode. Both were fixed
 with actual-handler/budget-reason regressions. Review and disposition live in
 `.local/coordination/demo-sprint/workers/review-web-g.md`.
+
+Native Windows preflight also passed all six checks, including the actual Raven
+extension worker: `.local/coordination/demo-sprint/web-g-smoke-windows/results.json`
+and `web-g-smoke-windows.log`. The first isolated Windows launch failed with the
+pre-existing startup race `chrome.sidePanel` unavailable after the startup wait;
+the second launch succeeded without source changes. This is a remaining service
+startup limitation, separate from in-episode recovery. Logs are
+`web-g-windows-service.log` and `web-g-windows-service-2.log`. Both isolated test
+services were stopped; the owner service on 8770 retained PID 2057962 throughout.
+
+The 84-file asset integrity check passed after refreshing the two changed bundle
+hashes (`python3 design/raven/tools/verify_bundle.py`). The panel now renders its
+friendly failure sentence once in the answer bubble and returns the status line
+to Ready. Raw-mode error detail remains available when `--no-demo-mode` is used.

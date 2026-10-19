@@ -85,6 +85,8 @@ def test_recovery_and_friendly_errors_in_both_layouts(tmp_path):
                 text = page.locator('body').inner_text()
                 assert 'Worker.evaluate' not in text and 'private stack trace' not in text
                 assert 'Taking another look…' in text
+                if permanent:
+                    assert text.count(FRIENDLY_ERROR) == 1
                 assert not errors, errors
                 page.screenshot(path=str(output / f'{name}.png'))
                 assert all(run.attempt == 1 and run.done for run in service.runs.values())

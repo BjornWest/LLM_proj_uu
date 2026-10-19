@@ -90,12 +90,12 @@ window.addEventListener('DOMContentLoaded', () => {
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{status:'complete'}}));
         }
         if (e.type === 'error') {
-          status.textContent=window.ravenTransport.errorMessage(e);c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');
+          status.textContent=window.ravenTransport.errorMessage(e);c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');if(window.ravenTransport.demoMode)status.textContent='Ready';
         }
         if (e.type === 'done') {
           steps.stop();mode.disabled=false;
           stream.close();stream=null;run=null;stop.disabled=true;handovers.clear();showHandover();
-          status.textContent=window.ravenTransport.demoMode ? (e.stop_reason === 'cancelled' ? 'Stopped' : e.stop_reason === 'agent_finished' ? 'Ready' : window.ravenTransport.errorMessage(e)) : e.stop_reason === 'cancelled' ? 'Stopped' : e.stop_reason === 'agent_finished' ? 'Ready' : "I couldn't finish that: "+({max_total_input_tokens:'the research budget was reached',max_total_output_tokens:'the answer budget was reached',max_input_tokens:'the conversation became too long',error:'please try again'}[e.stop_reason] || 'the task ended before an answer was ready');
+          status.textContent=window.ravenTransport.demoMode ? (e.stop_reason === 'cancelled' ? 'Stopped' : 'Ready') : e.stop_reason === 'cancelled' ? 'Stopped' : e.stop_reason === 'agent_finished' ? 'Ready' : "I couldn't finish that: "+({max_total_input_tokens:'the research budget was reached',max_total_output_tokens:'the answer budget was reached',max_input_tokens:'the conversation became too long',error:'please try again'}[e.stop_reason] || 'the task ended before an answer was ready');
           if(!c.agentReply)c.cancelTask({announce:false});
         }
       }, onError:error => {
@@ -103,10 +103,10 @@ window.addEventListener('DOMContentLoaded', () => {
         const id=run;generation++;stream?.close();stream=null;run=null;stop.disabled=true;
         handovers.clear();showHandover();c.cancelTask({announce:false});
         status.textContent=window.ravenTransport.errorMessage(error);
-        c.appendMessage(status.textContent,'Raven');
+        c.appendMessage(status.textContent,'Raven');if(window.ravenTransport.demoMode)status.textContent='Ready';
         if(id)post('/api/tasks/'+id+'/cancel').catch(()=>{});
       }});
-    }).catch(e => {mode.disabled=false;status.textContent=window.ravenTransport.errorMessage(e);stop.disabled=true;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');});
+    }).catch(e => {mode.disabled=false;status.textContent=window.ravenTransport.errorMessage(e);stop.disabled=true;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');if(window.ravenTransport.demoMode)status.textContent='Ready';});
     return true;
   };
   stop.onclick = async () => {
