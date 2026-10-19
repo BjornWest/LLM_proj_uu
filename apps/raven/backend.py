@@ -28,7 +28,7 @@ if __name__ == '__main__' and sys.prefix == sys.base_prefix and (SHARED / '.venv
     env['LD_LIBRARY_PATH'] = libs + os.pathsep + env.get('LD_LIBRARY_PATH', '')
     os.execve(str(SHARED / '.venv/bin/python'), [str(SHARED / '.venv/bin/python'), *sys.argv], env)
 sys.path.insert(0, str(ROOT))
-from apps.raven.episode import episode_main, MODEL
+from apps.raven.episode import episode_main, MODEL, OPENROUTER_MODEL
 
 ASSETS = ROOT / 'design/raven/outputs/raven'
 APP = Path(__file__).resolve().parent
@@ -91,6 +91,8 @@ class UserWindow:
                 welcome.close()
                 page.bring_to_front()
                 self.cdp_url = f'http://127.0.0.1:{debug_port}'
+                self.browser = pw.chromium.connect_over_cdp(self.cdp_url)
+                self.background_contexts = []
                 self.ready.set()
                 while True:
                     try:
@@ -100,18 +102,35 @@ class UserWindow:
                         continue
                     try:
                         if action == 'close':
+                            for context in self.background_contexts:
+                                context.close()
+                            self.browser.close()
                             self.context.close()
                             response.put(True)
                             break
-                        if action == 'tabs':
+                        if action == 'background':
+                            browser = self.browser
+                            session = browser.new_browser_cdp_session()
+                            before = set(session.send('Target.getBrowserContexts')['browserContextIds'])
+                            context = browser.new_context(accept_downloads=False, service_workers='block', no_viewport=True)
+                            self.background_contexts.append(context)
+                            after = set(session.send('Target.getBrowserContexts')['browserContextIds'])
+                            context_id = (after - before).pop()
+                            target = session.send('Target.createTarget', dict(url='about:blank',
+                                browserContextId=context_id, newWindow=True, background=True))['targetId']
+                            window_id = session.send('Browser.getWindowForTarget', {'targetId':target})['windowId']
+                            session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'minimized'}})
+                            session.detach()
+                            response.put(target)
+                        elif action == 'tabs':
                             from apps.raven.shared_browser import active_target
                             active = active_target(self.context)
                             rows = []
-                            for p in self.context.pages:
+                            for p in [p for c in [self.context, *self.background_contexts] for p in c.pages]:
                                 if p.is_closed() or p.url.startswith('chrome-extension:'):
                                     continue
                                 try:
-                                    tid = target_id(self.context, p)
+                                    tid = target_id(p.context, p)
                                     rows.append(dict(tab_id=tid, url=p.url,
                                         title=p.title(), owner='human', active=tid == active))
                                 except Exception:
@@ -119,8 +138,12 @@ class UserWindow:
                                         raise
                             response.put(rows)
                         elif action == 'focus':
-                            for p in self.context.pages:
-                                if target_id(self.context, p) == data:
+                            for p in [p for c in [self.context, *self.background_contexts] for p in c.pages]:
+                                if target_id(p.context, p) == data:
+                                    session = p.context.new_cdp_session(p)
+                                    wid = session.send('Browser.getWindowForTarget')['windowId']
+                                    session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'windowState':'normal'}})
+                                    session.detach()
                                     p.bring_to_front()
                                     response.put(True)
                                     break
@@ -168,15 +191,22 @@ class Run:
 
 
 class Service:
-    def __init__(self, port, user_window=False, profile_dir=None):
+    def __init__(self, port, user_window=False, profile_dir=None, model_backend='sol', reasoning_effort='medium', service_tier='priority'):
         self.port = port
         self.runs = {}
         self.lock = threading.RLock()
         self.window = UserWindow(port, profile_dir) if user_window else None
         self.context = mp.get_context('spawn')
+        self.options = dict(model_backend=model_backend, reasoning_effort=reasoning_effort, service_tier=service_tier)
+        self.model = OPENROUTER_MODEL if model_backend == 'openrouter' else MODEL
 
     def submit(self, payload, scripted=None):
         with self.lock:
+            payload = dict(payload)
+            if payload['mode'] == 'background_window':
+                if not self.window:
+                    raise ValueError('Start the backend with --user-window')
+                payload['_background_target'] = self.window.call('background')
             if payload['mode'] == 'user_window':
                 if not self.window:
                     raise ValueError('Start the backend with --user-window')
@@ -188,7 +218,8 @@ class Service:
             events, run.controls = self.context.Queue(), self.context.Queue()
             run.process = self.context.Process(target=episode_main, args=(payload,
                 str(ROOT / '.local/raven-runs' / run.run_id), events, run.controls,
-                self.window.cdp_url if payload['mode'] == 'user_window' else None, scripted))
+                self.window.cdp_url if payload['mode'] in ('user_window', 'background_window') else None,
+                scripted, self.options))
             run.process.start()
             threading.Thread(target=self.collect, args=(run, events), daemon=True).start()
             return run
@@ -235,25 +266,24 @@ class Service:
         if not self.window:
             return []
         rows = self.window.call('tabs')
-        runs = [r for r in self.runs.values() if r.payload['mode'] == 'user_window']
-        if not runs:
-            return rows
-        run = runs[-1]
-        reverse = {target: tid for tid, target in run.targets.items()}
-        ownership = {t['tab_id']: t['owner'] for t in run.tabs}
-        states = {t['tab_id']: t['state'] for t in run.controller.get('tabs', [])}
+        runs = [r for r in self.runs.values() if r.payload['mode'] in ('user_window', 'background_window')]
         for row in rows:
-            row['tab_id'] = reverse.get(row['tab_id'], row['tab_id'])
-            tid = row['tab_id']
-            if run.done:
-                row['owner'] = 'human'
-            else:
-                row['owner'] = ('agent' if states[tid] == 'agent_controlled' else 'human') if tid in states else ownership.get(tid, 'human')
+            for run in reversed(runs):
+                tid = next((tid for tid, target in run.targets.items() if target == row['tab_id']), None)
+                if tid:
+                    row['tab_id'] = run.run_id + ':' + tid
+                    row['owner'] = next((t['owner'] for t in run.tabs if t['tab_id'] == tid), 'human')
+                    break
         return rows
 
     def focus(self, tab_id):
         if not self.window:
             raise ValueError('No shared window')
+        if ':' in tab_id:
+            run_id, tab_id = tab_id.split(':', 1)
+            run = self.runs[run_id]
+            self.window.call('focus', run.targets[tab_id])
+            return
         for run in reversed(list(self.runs.values())):
             if tab_id in run.targets:
                 tab_id = run.targets[tab_id]
@@ -294,7 +324,8 @@ class Handler(preview.Handler):
         path = urlsplit(self.path).path
         service = self.server.service
         if path == '/api/health':
-            return self.json(dict(ok=True, model=MODEL, modes=['background', 'user_window']))
+            return self.json(dict(ok=True, model=service.model, **service.options,
+                modes=['background', 'user_window', 'background_window'] if service.window else ['background']))
         if path == '/api/tabs':
             try:
                 return self.json({'tabs': service.tabs()})
@@ -333,7 +364,7 @@ class Handler(preview.Handler):
             finally:
                 with run.condition:
                     run.subscribers -= 1
-                    if run.subscribers == 0 and not run.done and run.payload['mode'] == 'user_window':
+                    if run.subscribers == 0 and not run.done and run.payload['mode'] in ('user_window', 'background_window'):
                         # Extension iframe teardown can drop unload fetch/beacon.
                         # Its last SSE connection is the remaining lifecycle signal.
                         service.cancel(run)
@@ -346,12 +377,13 @@ class Handler(preview.Handler):
             self.send_error(403, 'Local origin required')
             return
         service = self.server.service
-        parts = urlsplit(self.path).path.strip('/').split('/')
+        from urllib.parse import unquote
+        parts = [unquote(p) for p in urlsplit(self.path).path.strip('/').split('/')]
         try:
             data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', '0'))) or '{}')
             if parts == ['api', 'tasks']:
-                if not isinstance(data.get('text'), str) or not data['text'].strip() or data.get('mode') not in ('background', 'user_window'):
-                    raise ValueError('Expected text and mode background or user_window')
+                if not isinstance(data.get('text'), str) or not data['text'].strip() or data.get('mode') not in ('background', 'user_window', 'background_window'):
+                    raise ValueError('Expected text and mode background, user_window or background_window')
                 run = service.submit(data)
                 return self.json({'run_id': run.run_id})
             if len(parts) == 4 and parts[:2] == ['api', 'tasks']:
@@ -382,10 +414,14 @@ def main():
     parser.add_argument('--port', type=int, default=8766)
     parser.add_argument('--user-window', action='store_true')
     parser.add_argument('--profile-dir', type=Path)
+    parser.add_argument('--model-backend', choices=['sol', 'openrouter'], default='sol')
+    parser.add_argument('--reasoning-effort', choices=['low', 'medium', 'high', 'xhigh'], default='medium')
+    parser.add_argument('--service-tier', choices=['priority', 'default'], default='priority')
     args = parser.parse_args()
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     server.daemon_threads = True
-    server.service = Service(args.port, args.user_window, args.profile_dir)
+    server.service = Service(args.port, args.user_window, args.profile_dir,
+        args.model_backend, args.reasoning_effort, args.service_tier)
     print(f'Raven: http://localhost:{args.port}/panel.html', flush=True)
     try:
         server.serve_forever()

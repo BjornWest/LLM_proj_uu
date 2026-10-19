@@ -1,6 +1,6 @@
-# Integrated Raven demo (WEB-C)
+# Integrated Raven demo (WEB-D)
 
-The real backend serves full-page chat at `/` (`mode=background`, headless browser) and the extension layout at `/panel.html` (`mode=user_window`, the dedicated visible Chromium window). The same API and model serve both. The optional third background-window extension mode is not implemented.
+The real backend serves full-page chat at `/` (`mode=background`, headless browser) and the extension layout at `/panel.html` (`mode=user_window`, the dedicated visible Chromium window). The same API and model serve both. The panel also offers `background_window`: an isolated, initially minimized Chromium context. Agent tab indicators open the selected tab on a user click.
 
 ## Launch
 
@@ -11,15 +11,15 @@ python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
   python3 apps/raven/backend.py --port 8766 --user-window
 ```
 
-The Python entry uses the workstation shared virtualenv, agent_trace import path and library directory automatically. Model keys stay server-side. Do not interrupt an existing owner service on 8766. Isolated test launch:
+The Python entry uses the workstation shared virtualenv, agent_trace import path and library directory automatically. Model keys stay server-side. Do not interrupt an existing owner service on 8766 or 8770. Isolated test launch:
 
 ```sh
 python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
-  python3 apps/raven/backend.py --port 8770 --user-window \
-  --profile-dir .local/raven-web-c-profile
+  python3 apps/raven/backend.py --port 8772 --user-window \
+  --profile-dir .local/raven-web-d-profile
 ```
 
-Full-page: <http://localhost:8770/>. Panel preview: <http://localhost:8770/panel.html>. The actual extension opens automatically in the dedicated visible window.
+Full-page: <http://localhost:8772/>. Panel preview: <http://localhost:8772/panel.html>. The actual extension opens automatically in the dedicated visible window.
 
 Offline fallback is explicit and uses no model:
 
@@ -29,6 +29,28 @@ python3 scripts/run_bounded_job.py --memory-mib 768 -- \
 ```
 
 Open <http://localhost:8771/chat-fullpage-v42.html>. The mock identifies illustrative evidence. Never use it as real-model acceptance.
+
+## WEB-D model and window options
+
+The one-command isolated launch above defaults to `--model-backend sol --reasoning-effort medium --service-tier priority`, requesting **gpt-6.1-sol** through the existing Codex-subscription Pi bridge. Pi must already be installed and logged in. Use `--reasoning-effort low` for a lower reasoning setting, `--service-tier default` for standard requests, or `--model-backend openrouter` for Qwen. No browser receives model credentials.
+
+Each subscription run declares `EpisodeConcurrency`, a `SubscriptionQuotaGuard` (1% remaining floor), and a lock under its own `.local/raven-runs/RUN_ID/` directory. There is no cross-run exclusion. The bridge uses `OpaqueReasoningInputCounter(QwenInputCounter(.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json))`: these are Qwen-based message/tool estimates plus provider usage for opaque reasoning, not Sol tokenizer counts. Admission supports an explicitly declared limit up to 1000; the UI tests use bounded concurrency of two.
+
+Pi 0.80.6 supports the priority field and the worker preserves the exact audited Responses request. **The subscription endpoint accepted `service_tier: priority` but reported `service_tier: default` in all measured responses. Priority service/speed is therefore unverified.** Raw requested/served tier and usage stay in `bridge-transport/NNNN/`; newer runs also journal `usage.jsonl`. Subscription dollar charges are unreported (`null`); legacy runner `usage_totals.cost=0` must not be interpreted as a verified free charge.
+
+Both chats show a live “Working: …” line and retain readable step history in “Show steps (N)” under the answer. The panel mode selector chooses the current user window or an isolated, minimized context. Agent tab buttons show hostnames and site favicons. A click restores and fronts that tab; automatic agent selection does not front it. Finished research tabs remain available until the demo service closes.
+
+### Single-run latency comparison
+
+Identical WEB-C prompts, full-page UI, Sol medium, two independent cases at a time:
+
+| Prompt | WEB-C Qwen | WEB-D Sol | Sol result |
+|---|---:|---:|---|
+| Swedish retailer price | 67.52 s | 113.07 s | 2,149 SEK with captured source |
+| Product comparison | 130.53 s | 146.49 s | Both inspected product links and comparison table |
+| Two-site question | 211.89 s | 38.22 s | Both source links |
+
+These are end-to-end observations, not a controlled benchmark or confirmed priority runs. Raw UI results/screenshots: `.local/coordination/demo-sprint/web-d-shots/sol-medium/`; model traces: `.local/raven-runs/`. No purchases were requested by the acceptance driver.
 
 ## Runtime changes
 

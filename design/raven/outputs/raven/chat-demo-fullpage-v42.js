@@ -148,6 +148,7 @@
     isNearBottom(){return this.messages.scrollHeight-this.messages.clientHeight-this.messages.scrollTop<=48;}
     followLatest(){window.RavenCitations?.hide?.();this.messages.scrollTop=this.messages.scrollHeight;if(this.newReply)this.newReply.hidden=true;}
     cancelTask({announce=true,keepalive=false}={}){
+      this.liveSteps?.stop();
       const task=this.task;this.task=null;const generation=++this.taskGeneration;this.assetGeneration++;task?.transport?.cancel({keepalive}).catch(error=>{if(generation===this.taskGeneration)this.countdown.textContent='Could not confirm cancellation: '+error.message;});
       this.started=null;this.director=null;this.preparing=false;this.pendingReturn=false;
       this.gesture=null;this.settling=null;this.diveStartClock=null;this.diveStartPoint=null;
@@ -198,6 +199,7 @@
       this.launch(task);return true;
     }
     launch(task){
+      this.liveSteps ||= new RavenSteps(this.scene);this.liveSteps.reset();
       this.taskGeneration++;
       this.started=performance.now();this.stepMotion(this.started);this.taskStartClock=this.motionClock;this.replyAdded=false;this.pendingReturn=false;this.wasTypingAfterReply=false;this.rollStartRaw=null;this.lastPatrolRaw=null;this.rollQueued=false;this.nextRollAt=Infinity;
       this.send.disabled=true;this.setState(this.motion.matches?'working':'takeoff');
@@ -211,6 +213,7 @@
     }
     submit(){return this.start();}
     handleTaskEvent(event){
+      this.liveSteps?.event(event);
       if(event.type==='site')document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{...event,label:event.title}}));
       else if(event.type==='step')this.countdown.textContent=event.summary;
       else if(event.type==='status')this.countdown.textContent=event.state==='starting'?'Starting research…':event.state==='finishing'?'Preparing your answer…':'Researching…';
@@ -221,7 +224,7 @@
     completeTask({markdown,sources=[]}){if(this.started===null||this.replyAdded)return;this.stepMotion(performance.now());this.replyAdded=true;
       this.task?.transport?.close();this.task=null;
       const message=markdown;
-      this.appendMessage(message,'Raven',{sources});this.countdown.textContent='Response ready · coming down';
+      this.appendMessage(message,'Raven',{sources});this.liveSteps?.finish(this.messages.lastElementChild);this.countdown.textContent='Response ready · coming down';
       if(this.motion.matches){this.setState('cawing');this.land(performance.now());}else {const patrolElapsed=this.motionClock-this.taskStartClock-this.timing.patrolStartMs;this.pendingReturn=patrolElapsed<0;const refs=this.pendingReturn?[]:this.director?.requestReturn(Math.max(0,patrolElapsed))||[];this.forecastKey=null;const preload=refs.flatMap(r=>this.clipRefs(r.clip,r.frame,1));preload.push(...this.clipRefs('diving',0,this.clip('diving').frames));this.warmRefs(preload).catch(()=>{});}
       this.scene.dispatchEvent(new CustomEvent('raven-chat-reply',{detail:{message},bubbles:true}));}
     land(now){this.started=null;this.director=null;this.send.disabled=false;this.resetIdle();this.cawStarted=this.motionClock;this.setState(this.wasTypingAfterReply||this.input.value.length?'idle':'cawing');this.countdown.textContent='Ready for another message';this.scene.dispatchEvent(new CustomEvent('raven-chat-land',{bubbles:true}));}

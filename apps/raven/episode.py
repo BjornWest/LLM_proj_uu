@@ -76,7 +76,49 @@ DEMO_POLICY = (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-MODEL = 'qwen/qwen3.8-27b'
+MODEL = 'gpt-6.1-sol'
+OPENROUTER_MODEL = 'qwen/qwen3.8-27b'
+
+
+def subscription_backend(output, emit, options):
+    """One episode-owned Pi bridge; no cross-run subscription exclusion."""
+    import secrets
+    from experiments.external_agent.backend import ExternalAgentBackend
+    from experiments.external_agent.server import BridgeServer
+    from experiments.external_agent.episode_admission import EpisodeConcurrency
+    from experiments.external_agent.subscription_quota import SubscriptionQuotaGuard
+    from intent_browser.input_budget import OpaqueReasoningInputCounter, QwenInputCounter
+    directory = Path(output)
+    directory.mkdir(parents=True, exist_ok=True)
+    raw = ExternalAgentBackend(MODEL, directory / 'bridge-transport',
+        reasoning_effort=options.get('reasoning_effort', 'medium'),
+        service_tier=options.get('service_tier', 'priority'),
+        max_tokens=16384, timeout=180, provider_output_limit=True,
+        lock_path=directory / '.subscription.lock',
+        episode_concurrency=EpisodeConcurrency('raven/' + directory.name, 1, 1),
+        quota_guard=SubscriptionQuotaGuard(directory / 'subscription-quota', remaining_floor=1))
+    raw.begin_episode('raven/' + directory.name)
+    token = secrets.token_urlsafe(32)
+    server = BridgeServer(raw, token, max_requests=100000)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    backend = ChatCompletionsBackend(f'http://127.0.0.1:{server.server_port}/v1', MODEL,
+        token, timeout=260, max_tokens=16384, supports_images=True)
+    def received(response):
+        response.read()
+        try:
+            value = response.json()
+        except ValueError:
+            value = {}
+        provider = value.get('external_bridge', {}).get('raw_response') or {}
+        record = dict(http_status=response.status_code, model=MODEL, provider='codex-subscription',
+            usage=value.get('usage'), reported_cost_usd=None,
+            requested_service_tier=raw.service_tier, served_service_tier=provider.get('service_tier'))
+        with (directory / 'usage.jsonl').open('a') as stream:
+            stream.write(json.dumps(record) + '\n')
+    backend.client.event_hooks = {'response': [received]}
+    counter = OpaqueReasoningInputCounter(QwenInputCounter(str(
+        ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')))
+    return backend, counter, raw, server
 
 
 def evidence_excerpt(captured, answer):
@@ -98,7 +140,7 @@ def evidence_excerpt(captured, answer):
     return ('\n'.join(selected) if selected else captured)[:12000]
 
 
-def episode_main(payload, output, events, controls, cdp_url=None, scripted=None):
+def episode_main(payload, output, events, controls, cdp_url=None, scripted=None, options=None):
     os.setsid()
     from dotenv import load_dotenv
     load_dotenv('/home/bjorn/code/LLM_proj_uu/.env', override=False)
@@ -111,6 +153,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
     from intent_browser.openrouter import provider_options, DEFAULT_PROVIDERS
     from intent_browser.actions import make_action_set
 
+    options = options or {}
     sources, seen_tabs, captured_texts = {}, {}, {}
     current_step = 0
     last_site = None
@@ -142,6 +185,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                     'handover_tab':'Asking for your help', 'noop':'Waiting for the page'}.get(name, 'Reviewing the page')
                 if args.get('url'):
                     summary += ': ' + (urlsplit(args['url']).hostname or 'website')
+                elif name == 'fill' and args.get('value'):
+                    summary = 'Searching for “' + str(args['value'])[:100] + '”'
                 emit('step', index=data.get('step', current_step), summary=summary[:240])
             if kind == 'human_tab_transition':
                 t = data['transition']
@@ -274,6 +319,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
         if cdp_url:
             env = SharedBrowserEnv(cdp_url, task_entrypoint=SharedWebTask,
                 task_kwargs=dict(start_url=task.start_url, goal=goal), headless=False,
+                initial_target=payload.get('_background_target'),
                 action_mapping=actions.to_python_code, wait_for_user_message=False)
         else:
             from apps.raven.shared_browser import BackgroundBrowserEnv
@@ -285,6 +331,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
         env.raven_drain_notes = before_observation
         env_holder.append(env)
         return env
+    raw = bridge = input_counter = None
+    model = OPENROUTER_MODEL if options.get('model_backend') == 'openrouter' else MODEL
     if scripted is not None:
         class ScriptedBackend:
             initial_tab = None
@@ -308,21 +356,27 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
             def close(self): pass
         backend = ScriptedBackend()
         backend.model = MODEL
-    else:
-        backend = DemoBackend('https://openrouter.ai/api/v1', MODEL,
+    elif options.get('model_backend') == 'openrouter':
+        backend = DemoBackend('https://openrouter.ai/api/v1', model,
             os.environ['OPENROUTER_API_KEY'],
             on_retry=lambda: emit('step', index=current_step, summary='Provider slow, retrying…'), supports_images=True,
             request_options=provider_options(os.getenv('OPENROUTER_PROVIDERS') or DEFAULT_PROVIDERS))
         backend.sampling = {'temperature': 0.6}
-    metadata = dict(task='openended', goal=goal, model=MODEL if scripted is None else 'scripted',
+    else:
+        backend, input_counter, raw, bridge = subscription_backend(output, emit, options)
+    metadata = dict(task='openended', goal=goal, model=model if scripted is None else 'scripted',
         driver='llm' if scripted is None else 'scripted', tags=['raven'] if scripted is None else ['raven', 'scripted'],
         source='open-internet-v1', training_eligible=False, headless=not bool(cdp_url),
-        generation={'temperature': 0.6}, conversation_id=payload.get('conversation_id'))
+        generation=({'temperature': 0.6} if model == OPENROUTER_MODEL else {
+            'reasoning_effort': options.get('reasoning_effort', 'medium'),
+            'requested_service_tier': options.get('service_tier', 'priority')}),
+        browser_mode=payload['mode'], conversation_id=payload.get('conversation_id'))
     try:
         emit('status', state='working')
         directory, summary = runner.run_episode(factory, backend, metadata, output, max_steps=None, episode_task=task,
             harness_profile=profile, human_handover=controller, before_observation=before_observation, observation_pipeline='auto', trace_screenshots=False,
-            max_input_tokens=250000, max_total_input_tokens=4000000, max_total_output_tokens=60000,
+            max_input_tokens=250000, input_counter=input_counter,
+            max_total_input_tokens=4000000, max_total_output_tokens=60000,
             allow_ungraded=True, ungraded_reason='Raven supervised live-web demo',
             terminal_response_instruction='Answer the user with findings, Markdown source links and uncertainties using send_msg_to_user.')
         emit('status', state='finishing')
@@ -350,3 +404,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
         emit('done', stop_reason='error')
     finally:
         backend.close()
+        if bridge:
+            bridge.shutdown()
+            bridge.server_close()
+        if raw:
+            raw.close()

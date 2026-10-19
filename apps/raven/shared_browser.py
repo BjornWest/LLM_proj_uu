@@ -47,19 +47,27 @@ class SharedWebTask(OpenWebTask):
 
 
 class SharedBrowserEnv(BrowserEnv):
-    def __init__(self, cdp_url, **kwargs):
+    def __init__(self, cdp_url, initial_target=None, **kwargs):
         super().__init__(**kwargs)
         self.cdp_url = cdp_url
+        self.initial_target = initial_target
 
     def reset(self, seed=None, **kwargs):
         # Deliberately avoid BrowserEnv.reset's launch/new-context/new-page path.
         pw = _get_global_playwright()
         pw.selectors.set_test_id_attribute('bid')
         self.browser = pw.chromium.connect_over_cdp(self.cdp_url)
-        self.context = WebContext(self.browser.contexts[0])
+        context = self.browser.contexts[0]
+        if self.initial_target:
+            context = next(c for c in self.browser.contexts for p in c.pages
+                           if page_target(c, p) == self.initial_target)
+        active = self.initial_target or active_target(context)
+        session = self.browser.new_browser_cdp_session()
+        context_id = session.send('Target.getTargetInfo', {'targetId':active})['targetInfo']['browserContextId']
+        session.detach()
+        self.context = WebContext(context, context_id)
         self.context.set_default_timeout(5000)
         pages = [p for p in self.context.pages if not p.url.startswith('chrome-extension:')]
-        active = active_target(self.context)
         self.page = next((p for p in pages if page_target(self.context, p) == active), None)
         if self.page is None:
             self.page = pages[0] if pages else self.context.new_page()
@@ -103,12 +111,40 @@ class BackgroundBrowserEnv(BrowserEnv):
 
 class WebContext:
     """Keep Raven's own extension surfaces outside the agent's task tab list."""
-    def __init__(self, context):
+    def __init__(self, context, browser_context_id=None):
         self._context = context
+        self.browser_context_id = browser_context_id
 
     @property
     def pages(self):
-        return [p for p in self._context.pages if not p.url.startswith('chrome-extension:')]
+        pages = [p for p in self._context.pages if not p.url.startswith('chrome-extension:')]
+        if not self.browser_context_id:
+            return pages
+        # Playwright 1.43 CDP attachments group pre-existing incognito targets
+        # into the default wrapper. Filter by Chromium's actual context identity.
+        selected = []
+        for page in pages:
+            session = self._context.new_cdp_session(page)
+            try:
+                if session.send('Target.getTargetInfo')['targetInfo'].get('browserContextId') == self.browser_context_id:
+                    selected.append(page)
+            finally:
+                session.detach()
+        return selected
+
+    def new_page(self):
+        if not self.browser_context_id:
+            return self._context.new_page()
+        session = self._context.browser.new_browser_cdp_session()
+        try:
+            target = session.send('Target.createTarget', dict(url='about:blank',
+                browserContextId=self.browser_context_id, background=True))['targetId']
+        finally:
+            session.detach()
+        for page in self.pages:
+            if page_target(self._context, page) == target:
+                return page
+        return self._context.wait_for_event('page', predicate=lambda p: page_target(self._context, p) == target)
 
     def __getattr__(self, name):
         return getattr(self._context, name)

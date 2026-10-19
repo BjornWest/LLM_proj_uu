@@ -50,6 +50,33 @@ def main():
             other.goto('https://example.com/')
             other.evaluate('window.humanFormState=99')
             page.bring_to_front()
+            # Separate minimized context: agent research preserves the human's
+            # selected tab, URL and JavaScript state. Independent of bg above.
+            bw=svc.submit({'text':'Read in background then finish.', 'mode':'background_window'},[
+                action('goto',url='https://example.com/'),
+                action('send_msg_to_user',text='[Example Domain](https://example.com/) is the heading.')])
+            results['background_window']=wait_done(bw)
+            assert any(e['type']=='final' and e['sources'] for e in bw.events),bw.events
+            assert not any(e['type']=='error' for e in bw.events),bw.events
+            from apps.raven.shared_browser import active_target
+            assert active_target(context)==target_id(context,page)
+            assert page.evaluate('window.ravenPreserveState')==42
+            assert other.evaluate('window.humanFormState')==99
+            tid=next(t['tab_id'] for t in bw.tabs if t['owner']=='agent')
+            agent_target=bw.targets[tid]
+            cdp=browser.new_browser_cdp_session()
+            agent_context=cdp.send('Target.getTargetInfo',{'targetId':agent_target})['targetInfo']['browserContextId']
+            human_context=cdp.send('Target.getTargetInfo',{'targetId':target_id(context,page)})['targetInfo']['browserContextId']
+            cdp.detach()
+            assert agent_context != human_context
+            assert len(bw.tabs)==1,bw.tabs
+            cdp=browser.new_browser_cdp_session()
+            window=cdp.send('Browser.getWindowForTarget',{'targetId':agent_target})
+            assert window['bounds']['windowState']=='minimized',window
+            svc.focus(bw.run_id+':'+tid)
+            assert cdp.send('Browser.getWindowForTarget',{'targetId':agent_target})['bounds']['windowState']=='normal'
+            cdp.detach()
+            page.bring_to_front()
             sw=svc.submit({'text':'Hand over this tab then finish.', 'mode':'user_window'},[
                 action('new_tab'),
                 action('goto',url='https://example.com/'),

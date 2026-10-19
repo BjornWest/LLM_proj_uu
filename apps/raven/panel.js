@@ -5,6 +5,13 @@ window.addEventListener('DOMContentLoaded', () => {
   const stop = document.querySelector('#stop');
   const handover = document.querySelector('#handover');
   const history = [];
+  const mode = document.querySelector('#browser-mode');
+  const steps = new RavenSteps(document.querySelector('#chat-scene'));
+  const append = c.appendMessage.bind(c);
+  c.appendMessage = function(text, who, options) {
+    append(text, who, options);
+    if (who === 'Raven') steps.finish(c.messages.lastElementChild);
+  };
   const conversation = crypto.randomUUID();
   let run = null, stream = null, pendingTab = null, generation = 0;
   const post = async (url, body = {}) => {
@@ -26,9 +33,14 @@ window.addEventListener('DOMContentLoaded', () => {
     root.replaceChildren();
     for (const tab of tabs.values()) {
       const button = document.createElement('button');
-      button.textContent = tab.title || tab.url || tab.tab_id;
+      if(tab.owner !== 'agent') continue;
+      let site;try {site=new URL(tab.url);} catch {}
+      button.textContent = site?.hostname.replace(/^www\./,'') || tab.title || 'New tab';
+      if (site && ['http:','https:'].includes(site.protocol)) {
+        const icon=document.createElement('img');icon.src=site.origin+'/favicon.ico';icon.alt='';icon.width=14;icon.height=14;icon.onerror=()=>icon.remove();button.prepend(icon);
+      }
       button.title = tab.url;
-      button.onclick = () => post('/api/tabs/'+tab.tab_id+'/focus').catch(e => status.textContent=e.message);
+      button.onclick = () => post('/api/tabs/'+encodeURIComponent(tab.focus_id || tab.tab_id)+'/focus').catch(e => status.textContent=e.message);
       root.append(button);
     }
   }
@@ -48,10 +60,11 @@ window.addEventListener('DOMContentLoaded', () => {
     c.agentReply = null;
     if (!originalStart(options)) return false;
     history.push({who:'You', text});
+    steps.reset();mode.disabled=true;
     const token = ++generation;
     stop.disabled = false;
     status.textContent = 'Starting…';
-    post('/api/tasks', {text, conversation_id:conversation, mode:'user_window', history:prior}).then(data => {
+    post('/api/tasks', {text, conversation_id:conversation, mode:mode.value, history:prior}).then(data => {
       if (token !== generation) {post('/api/tasks/'+data.run_id+'/cancel');return;}
       run = data.run_id;
       tabs.clear();drawTabs();handovers.clear();showHandover();
@@ -59,13 +72,15 @@ window.addEventListener('DOMContentLoaded', () => {
       stream.onmessage = msg => {
         if (token !== generation) return;
         const e = JSON.parse(msg.data);
+        steps.event(e);
         if (e.type === 'status') status.textContent = {starting:'Starting research…',working:'Researching…',finishing:'Preparing your answer…'}[e.state] || 'Researching…';
         if (e.type === 'step') status.textContent = e.summary;
         if (e.type === 'site') {
+          const tab=tabs.get(e.tab_id);if(tab){Object.assign(tab,{url:e.url,title:e.title});drawTabs();}
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{url:e.url,label:e.title}}));
         }
         if (e.type === 'tab') {
-          if(e.action === 'closed') {tabs.delete(e.tab_id);handovers.delete(e.tab_id);showHandover();} else tabs.set(e.tab_id,e);
+          if(e.action === 'closed') {tabs.delete(e.tab_id);handovers.delete(e.tab_id);showHandover();} else tabs.set(e.tab_id,{...e,focus_id:run+':'+e.tab_id});
           drawTabs();
         }
         if (e.type === 'handover') {
@@ -79,22 +94,25 @@ window.addEventListener('DOMContentLoaded', () => {
           status.textContent="I couldn't finish that: "+e.message;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');
         }
         if (e.type === 'done') {
+          steps.stop();mode.disabled=false;
           stream.close();stream=null;run=null;stop.disabled=true;handovers.clear();showHandover();
           status.textContent=e.stop_reason === 'cancelled' ? 'Stopped' : e.stop_reason === 'agent_finished' ? 'Ready' : "I couldn't finish that: "+({max_total_input_tokens:'the research budget was reached',max_total_output_tokens:'the answer budget was reached',max_input_tokens:'the conversation became too long',error:'please try again'}[e.stop_reason] || 'the task ended before an answer was ready');
           if(!c.agentReply)c.cancelTask({announce:false});
         }
       };
       stream.onerror = () => {
+        steps.stop();mode.disabled=false;
         const id=run;generation++;stream?.close();stream=null;run=null;stop.disabled=true;
         handovers.clear();showHandover();c.cancelTask({announce:false});
         status.textContent="I couldn't finish that: the connection was interrupted. Please try again.";
         c.appendMessage(status.textContent,'Raven');
         if(id)post('/api/tasks/'+id+'/cancel').catch(()=>{});
       };
-    }).catch(e => {status.textContent="I couldn't finish that: "+e.message;stop.disabled=true;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');});
+    }).catch(e => {mode.disabled=false;status.textContent="I couldn't finish that: "+e.message;stop.disabled=true;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');});
     return true;
   };
   stop.onclick = async () => {
+    steps.stop();mode.disabled=false;
     generation++;
     const id=run;run=null;stream?.close();stream=null;stop.disabled=true;handovers.clear();showHandover();
     const cancelled = id ? post('/api/tasks/'+id+'/cancel') : Promise.resolve();

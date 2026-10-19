@@ -53,7 +53,7 @@ def worker(envelope, responses=None):
 
 
 @pytest.mark.parametrize('values', [('', 2, 3), (' ', 1, 1), ('x', True, 2),
-    ('x', 2, False), ('x', 0, 2), ('x', 2, 1), ('x', 35, 35), ('x', 1, 35), ('x', 1.0, 2)])
+    ('x', 2, False), ('x', 0, 2), ('x', 2, 1), ('x', 1001, 1001), ('x', 1, 1001), ('x', 1.0, 2)])
 def test_config_rejects_missing_unbounded_or_noninteger_limits(values):
     with pytest.raises(ValueError):
         EpisodeConcurrency(*values)

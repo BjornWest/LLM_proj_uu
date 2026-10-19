@@ -30,7 +30,7 @@ class ExternalAgentBackend:
     def __init__(self, model, artifacts, *, reasoning_effort='medium', max_tokens=16384,
                  timeout=180, pi_cli=None, command=None, lock_path=None, before_dispatch=None,
                  provider_output_limit=False, episode_concurrency=None, quota_guard=None,
-                 suite_episode=None, episode_phase='policy'):
+                 suite_episode=None, episode_phase='policy', service_tier=None):
         if suite_episode is not None:
             if not isinstance(suite_episode, SuiteEpisode) or episode_concurrency is not None:
                 raise ValueError('Supply one case-owned SuiteEpisode, not a second configuration')
@@ -51,6 +51,7 @@ class ExternalAgentBackend:
             if suite_episode is None and lock_path is None:
                 raise ValueError('Finite suites require an explicit canonical shared subscription lock path')
         self.model, self.reasoning_effort = model, reasoning_effort
+        self.service_tier = service_tier
         self.max_tokens, self.timeout = max_tokens, timeout
         self.artifacts = Path(artifacts).resolve()
         self.artifacts.mkdir(parents=True, exist_ok=False)
@@ -146,6 +147,8 @@ class ExternalAgentBackend:
                    **deepcopy(self.request_options)}
         payload = request_body(request, replay=self.replay, reasoning_effort=self.reasoning_effort,
                                provider_output_limit=self.provider_output_limit)
+        if self.service_tier is not None:
+            payload['service_tier'] = self.service_tier
         payload.setdefault('prompt_cache_key', self.session_id)
         self.sequence += 1
         directory = self.artifacts / f'{self.sequence:04d}'

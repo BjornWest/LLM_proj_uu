@@ -16,7 +16,7 @@ import tempfile
 import threading
 import time
 
-MAX_CONCURRENCY = 34
+MAX_CONCURRENCY = 1000
 CONTROL_TIMEOUT = 20
 # RPC: 5s connect + two 15s calls + websocket close allowance; leave
 # headroom for local ledger I/O. Custom guard readers must also be bounded.
@@ -35,7 +35,7 @@ class EpisodeConcurrency:
         if (type(self.max_concurrent_episodes) is not int or
                 type(self.max_suite_episodes) is not int or
                 not 1 <= self.max_concurrent_episodes <= self.max_suite_episodes <= MAX_CONCURRENCY):
-            raise ValueError('Use explicit integer episode limits: 1 <= concurrency <= suite episodes <= 34')
+            raise ValueError('Use explicit integer episode limits: 1 <= concurrency <= suite episodes <= 1000')
 
 
 def _write(path, record):

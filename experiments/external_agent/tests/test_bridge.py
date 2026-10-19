@@ -181,6 +181,18 @@ class ProcessTests(unittest.TestCase):
         with self.assertRaises(ValueError): backend.complete(request()['messages'])
         self.assertFalse((self.root / 'one/0002').exists())
 
+    def test_priority_tier_reaches_pi_dispatch_and_retains_served_tier(self):
+        raw = response(); raw['service_tier'] = 'default'
+        backend = self.backend({'response': raw})
+        backend.service_tier = 'priority'
+        backend.begin_episode('offline-priority')
+        result = backend.complete(request()['messages'])
+        folder = self.root / 'one/0001'
+        sent = json.loads((folder / 'responses-request.json').read_text())
+        self.assertEqual(sent['service_tier'], 'priority')
+        self.assertTrue(json.loads((folder / 'dispatch.json').read_text())['exact_payload_verified'])
+        self.assertEqual(result.raw['external_bridge']['raw_response']['service_tier'], 'default')
+
     def test_explicit_gpt6_luna_descriptor_never_substitutes_model(self):
         raw = response(); raw['model'] = 'gpt-6-luna'
         backend = self.backend({'response': raw}); backend.model = 'gpt-6-luna'
