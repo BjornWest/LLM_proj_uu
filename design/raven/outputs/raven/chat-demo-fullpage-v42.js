@@ -20,7 +20,7 @@
       this.status=document.getElementById('raven-status');this.countdown=document.getElementById('countdown');
       this.tracking=document.getElementById('mouse-tracking');this.darker=document.getElementById('dark-palette');this.petButton=document.getElementById('pet-raven');this.frameRate=document.getElementById('frame-rate');this.models=new Map();
       this.pathToggle=document.getElementById('show-flight-path');this.guideCanvas=document.getElementById('flight-guides');this.guideCtx=this.guideCanvas?.getContext('2d');this.flightSeed=new URLSearchParams(window.location?.search||'').get('seed');this.flightStarts=0;
-      this.motion=matchMedia('(prefers-reduced-motion: reduce)');this.state='loading';this.ready=false;this.started=null;this.lastDrawKey='';this.motionClock=0;this.motionLast=null;this.assetGeneration=0;
+      this.motion=matchMedia('(prefers-reduced-motion: reduce)');this.state='loading';this.ready=false;this.started=null;this.taskGeneration=0;this.lastDrawKey='';this.motionClock=0;this.motionLast=null;this.assetGeneration=0;
       this.trackingZone=document.getElementById('tracking-zone');this.pointer=null;this.circle=null;this.headPose=[0,0,0];this.headTick=-1;this.orbitStart=null;this.orbitCooldown=0;this.attentionReturning=false;this.gesture=null;this.settling=null;
       this.input.addEventListener('input',()=>this.onTyping());this.form.addEventListener('submit',e=>{e.preventDefault();this.start();});
       document.addEventListener('pointermove',e=>this.trackPointer(e),{passive:true});document.addEventListener('pointerleave',()=>{this.clearPointer();this.scene.style.cursor='';});window.addEventListener('blur',()=>{this.clearPointer();this.scene.style.cursor='';});
@@ -148,7 +148,7 @@
     isNearBottom(){return this.messages.scrollHeight-this.messages.clientHeight-this.messages.scrollTop<=48;}
     followLatest(){window.RavenCitations?.hide?.();this.messages.scrollTop=this.messages.scrollHeight;if(this.newReply)this.newReply.hidden=true;}
     cancelTask({announce=true,keepalive=false}={}){
-      const task=this.task;this.task=null;const generation=++this.assetGeneration;task?.transport?.cancel({keepalive}).catch(error=>{if(generation===this.assetGeneration)this.status.textContent='Could not confirm cancellation: '+error.message;});
+      const task=this.task;this.task=null;const generation=++this.taskGeneration;this.assetGeneration++;task?.transport?.cancel({keepalive}).catch(error=>{if(generation===this.taskGeneration)this.status.textContent='Could not confirm cancellation: '+error.message;});
       this.started=null;this.director=null;this.preparing=false;this.pendingReturn=false;
       this.gesture=null;this.settling=null;this.diveStartClock=null;this.diveStartPoint=null;
       this.diveStartWorld=null;this.diveStartDepthScale=1;this.lastFlightAction=null;this.replyAdded=false;
@@ -198,7 +198,7 @@
       this.launch(task);return true;
     }
     launch(task){
-      this.assetGeneration++;
+      this.taskGeneration++;
       this.started=performance.now();this.stepMotion(this.started);this.taskStartClock=this.motionClock;this.replyAdded=false;this.pendingReturn=false;this.wasTypingAfterReply=false;this.rollStartRaw=null;this.lastPatrolRaw=null;this.rollQueued=false;this.nextRollAt=Infinity;
       this.send.disabled=true;this.setState(this.motion.matches?'working':'takeoff');
       this.task=task;

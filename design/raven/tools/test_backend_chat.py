@@ -39,7 +39,7 @@ async def main(args):
                   document.getElementById('chat-scene').addEventListener('raven-chat-land',()=>window.landed=true);
                   new MutationObserver(()=>observedStates.push(document.getElementById('chat-scene').dataset.state)).observe(document.getElementById('chat-scene'),{attributes:true,attributeFilter:['data-state']});
                 }''')
-                if name=='cancel-error':
+                if name in ('cancel-error','cancel-error-current'):
                     async def delayed_cancel_error(route):
                         await route.fetch()
                         await asyncio.sleep(1.5)
@@ -61,7 +61,10 @@ async def main(args):
                 await page.locator('#chat-form').evaluate('(form)=>form.requestSubmit()')
                 await page.wait_for_function("ravenChatDemo.state==='takeoff'")
                 assert requests[0]['mode'] == 'background' and requests[0]['history'] == []
-                if name=='cancel-error':
+                if name=='cancel-error-current':
+                    await page.locator('#stop-task').click()
+                    await page.get_by_text('Could not confirm cancellation: Backend request failed (503)',exact=True).wait_for(timeout=5000)
+                elif name=='cancel-error':
                     await page.locator('#stop-task').click()
                     await page.locator('#message-input').fill('A new question in the same conversation')
                     await page.locator('#chat-form').evaluate('(form)=>form.requestSubmit()')
@@ -169,5 +172,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--url', default='http://localhost:8767/chat-fullpage-v42.html')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--cases', nargs='+', default=['full','cancel','error','creation-race','switch','early-final','dropped-stream','active-reselect','pagehide','pending-pagehide','cancel-error'])
+    parser.add_argument('--cases', nargs='+', default=['full','cancel','error','creation-race','switch','early-final','dropped-stream','active-reselect','pagehide','pending-pagehide','cancel-error','cancel-error-current'])
     asyncio.run(main(parser.parse_args()))
