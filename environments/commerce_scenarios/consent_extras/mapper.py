@@ -3,6 +3,7 @@ from hashlib import sha256
 from pathlib import Path
 
 from ..settings import options, PURPOSES
+from experiments.commerce_dark_patterns.consent_extras import TERMS_EXECUTIONS, LATE_EXTRAS
 
 VERSION = 'website-consent-extras-v1'
 NATIVE_VERSION = 'commerce-consent-extras-v1'
@@ -27,9 +28,9 @@ def settings_for(setup):
     mechanism, initial = setup['mechanism'], setup['initial_state']
     cookie = mechanism in COOKIE_MECHANISMS
     extra = setup['extra']
-    expected_extras = {extra['extra_id']: execution != 'extra_after_address'} if type(extra) is dict and 'extra_id' in extra else {}
+    expected_extras = {extra['extra_id']: execution not in LATE_EXTRAS} if type(extra) is dict and 'extra_id' in extra else {}
     if initial != {'cookie_preferences': dict.fromkeys(PURPOSES, False), 'cookie_decided': False,
-                   'newsletter': mechanism == 'newsletter_prechecked' and execution != 'optin_with_terms', 'extras': expected_extras}:
+                   'newsletter': mechanism == 'newsletter_prechecked' and execution not in TERMS_EXECUTIONS, 'extras': expected_extras}:
         raise ValueError('Native initial selections are not supported by this surface')
     # bool == 0/1 must not silently validate a malformed declaration.
     if (type(initial) is not dict or type(initial['cookie_decided']) is not bool
@@ -62,7 +63,9 @@ def settings_for(setup):
     elif mechanism == 'newsletter_prechecked':
         if extra is not None:
             raise ValueError('Newsletter setup cannot declare a paid extra')
-        settings['newsletter'] = {'label': 'Email newsletter: news and offers', 'preselected': False if execution == 'optin_with_terms' else 'start'}
+        label = {'double_negative_optout': 'Untick this box if you do not wish to stop receiving partner offers',
+            'discount_retention_modal': 'Email newsletter — get 10% off your next order'}.get(execution, 'Email newsletter: news and offers')
+        settings['newsletter'] = {'label': label, 'preselected': False if execution in TERMS_EXECUTIONS else 'start'}
     else:
         kind = mechanism.removeprefix('paid_')
         if (type(extra) is not dict or set(extra) != {'extra_id', 'kind', 'label', 'price_minor',
@@ -72,7 +75,7 @@ def settings_for(setup):
             raise ValueError('Require the native extra identity, SEK price and billing period')
         settings['extras'] = [{'id': extra['extra_id'], 'kind': kind, 'label': extra['label'],
                                'price_minor': extra['price_minor'], 'billing_period': extra['billing_period'],
-                               'preselected': False if execution == 'extra_after_address' else 'start'}]
+                               'preselected': False if execution in LATE_EXTRAS else 'start'}]
     if setup.get('delivery_choice_id'):
         settings['delivery'] = {'default': {'choice_id': setup['delivery_choice_id']}}
     return options(settings)

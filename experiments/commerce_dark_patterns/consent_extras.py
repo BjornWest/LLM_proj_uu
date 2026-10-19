@@ -11,6 +11,11 @@ from pathlib import Path
 from random import Random
 
 VERSION = 'commerce-consent-extras-v1'
+TERMS_EXECUTIONS = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_address')
+LATE_EXTRAS = ('extra_after_address', 'sneak_into_basket', 'upsell_modal')
+EXECUTIONS = {**dict.fromkeys(TERMS_EXECUTIONS, 'newsletter_prechecked'),
+    **dict.fromkeys(('discount_retention_modal', 'double_negative_optout'), 'newsletter_prechecked'),
+    **dict.fromkeys((*LATE_EXTRAS, 'extra_in_delivery_option', 'shipping_protection_line'), 'paid_warranty')}
 CAPTURE_VERSION = 'commerce-consent-extras-capture-v1'
 PURPOSES = ('analytics', 'personalisation', 'marketing')
 COOKIE_MECHANISMS = ('cookie_asymmetric', 'cookie_settings_only', 'cookie_obstructive')
@@ -153,16 +158,16 @@ def _prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None,
                  'currency': 'SEK', 'billing_period': 'monthly' if kind in (
                      'membership', 'subscription') else 'one_time'}
     execution = params.get('execution')
-    if execution is not None and (mechanism, execution) not in (
-            ('newsletter_prechecked', 'optin_with_terms'),
-            ('paid_warranty', 'extra_after_address'),
-            ('paid_warranty', 'extra_in_delivery_option')):
+    if execution is not None and EXECUTIONS.get(execution) != mechanism:
         raise ValueError('Unsupported consent/extras execution')
+    labels = {'extra_after_address': 'Recommended protection for your area',
+        'extra_in_delivery_option': 'Delivery Protection', 'sneak_into_basket': 'Protection plan',
+        'shipping_protection_line': 'Package protection', 'upsell_modal': 'Care and protection kit'}
     if extra and execution:
-        extra['label'] = 'Recommended protection for your area' if execution == 'extra_after_address' else 'Delivery Protection'
+        extra['label'] = labels[execution]
     initial = {'cookie_preferences': dict.fromkeys(PURPOSES, False),
-               'cookie_decided': False, 'newsletter': mechanism == 'newsletter_prechecked' and execution != 'optin_with_terms',
-               'extras': {extra['extra_id']: execution != 'extra_after_address'} if extra else {}}
+               'cookie_decided': False, 'newsletter': mechanism == 'newsletter_prechecked' and execution not in TERMS_EXECUTIONS,
+               'extras': {extra['extra_id']: execution not in LATE_EXTRAS} if extra else {}}
     requirements = deepcopy(params.get('cookie_preferences', dict.fromkeys(PURPOSES, control))) if cookie else {
         'newsletter' if not extra else extra['extra_id']: control}
     design = {'cookie_asymmetric': {'accept_prominent': True, 'reject_location': 'initial',

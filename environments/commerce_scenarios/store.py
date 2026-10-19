@@ -504,7 +504,8 @@ class SessionStore:
         _fields(request, 'trigger')
         execution = self._settings['presentation'].get('consent_extras', {}).get('execution')
         trigger = request['trigger']
-        if execution == 'optin_with_terms' and trigger == 'terms':
+        if (execution in ('optin_with_terms', 'optin_with_terms_inline') and trigger == 'terms'
+                or execution == 'optin_with_address' and trigger == 'address_saved'):
             self._state['newsletter'] = True
             self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
         elif execution == 'extra_after_address' and trigger == 'address_saved':
@@ -673,6 +674,13 @@ class SessionStore:
             # A delivery option belongs to the basket it was quoted for.
             state['delivery_option_id'] = None
             self._event('basket_change', 'user', {'op': operation, 'offer_id': offer, 'quantity': quantity})
+            if (operation == 'add' and self._settings['presentation'].get('consent_extras', {}).get('execution') == 'sneak_into_basket'
+                    and not getattr(self, '_basket_extra_added', False)):
+                self._basket_extra_added = True
+                extra_id = self._settings['extras'][0]['id']
+                state['extras'][extra_id] = True
+                self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                    'value': True, 'trigger': 'add_to_cart'})
 
         if location != state['checkout']['location']:
             state['checkout']['location'] = location

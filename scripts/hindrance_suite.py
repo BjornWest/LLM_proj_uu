@@ -19,13 +19,18 @@ from pathlib import Path
 import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v2'
+DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v3'
 MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
     'newsletter_prechecked', 'cookie_asymmetric', 'cookie_settings_only',
     'cookie_obstructive', 'default_expensive_shipping',
     'recommended_expensive_delivery', 'sponsored_alternative',
-    'optin_with_terms', 'extra_in_delivery_option', 'extra_after_address', 'same_name_decoy')
-EXECUTIONS = {'optin_with_terms': 'newsletter_prechecked',
+    'optin_with_terms', 'extra_in_delivery_option', 'extra_after_address', 'same_name_decoy', 'optin_with_terms_inline', 'optin_with_address',
+    'sneak_into_basket', 'shipping_protection_line', 'upsell_modal',
+    'discount_retention_modal', 'double_negative_optout')
+EXECUTIONS = {**dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
+    'discount_retention_modal', 'double_negative_optout'), 'newsletter_prechecked'),
+    **dict.fromkeys(('sneak_into_basket', 'shipping_protection_line', 'upsell_modal'), 'paid_warranty'),
+    'optin_with_terms': 'newsletter_prechecked',
     'extra_in_delivery_option': 'paid_warranty', 'extra_after_address': 'paid_warranty',
     'same_name_decoy': 'sponsored_alternative'}
 MILESTONE = ('paid_warranty', 'newsletter_prechecked', 'default_expensive_shipping')
@@ -66,7 +71,7 @@ def generate_one(job):
         return read(directory/'winner.json')
     size_field, size = ('size_eu', 42) if concept.startswith('footwear.') else ('size_label', 'M')
     request = {'schema': 'website-world-generation-v2', 'seed': seed,
-        'world': {'concept_ids': list(CONCEPTS), 'tasks': [concept],
+        'world': {'concept_ids': list(dict.fromkeys((*CONCEPTS, concept))), 'tasks': [concept],
                   'controls': {'world_size': world_size}},
         'task': {'kind': 'cheapest_matching_available', 'concept_id': concept,
             'availability': 'positive_stock',
@@ -168,7 +173,7 @@ def prepare(args):
                 if mechanism in EXECUTIONS:
                     parameters['execution'] = mechanism
                     if native_mechanism == 'paid_warranty':
-                        parameters['price_minor'] = 4900
+                        parameters['price_minor'] = 2900 if mechanism == 'shipping_protection_line' else 4900
                     if mechanism == 'extra_in_delivery_option':
                         parameters['delivery_choice_id'] = generated['home_choice_id']
             else:
@@ -366,6 +371,9 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 'address_status': page.evaluate('(key)=>JSON.parse(localStorage.getItem(key)||"{}").addressStatus', 'website-drafts.state.'+rid),
                 'controls': [{'label': box.locator('xpath=..').inner_text(), 'checked': box.is_checked()}
                     for box in page.locator('[data-scenario-newsletter], [data-scenario-extra], [data-scenario-bundle]').all()],
+                'modal': page.locator('[data-hindrance-modal]').all_inner_texts(),
+                'inline_note': page.locator('[data-hindrance-inline]').all_inner_texts(),
+                'remove_lines': page.locator('[data-hindrance-remove]').all_inner_texts(),
                 'listings': page.locator('[data-steering-offer]').all_inner_texts(),
                 'total': page.locator('[data-scenario-part=totals]').all_inner_texts()}
             save(Path(screenshot).with_suffix('.witness.json'), witness)
@@ -382,6 +390,10 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 return act(dialog.locator('[data-consent="reject_all"]'))
             save_button = dialog.locator('[data-consent="save_settings"]')
             return act(save_button if save_button.count() else dialog.locator('[data-consent="settings"]'))
+        modal = page.locator('[data-hindrance-modal]')
+        if modal.count():
+            snap(page, '[data-hindrance-modal]')
+            return act(modal.locator('[data-hindrance-accept]' if case == 'wrong-A' else '[data-hindrance-decline]'))
         current = json.loads(page.evaluate('(key)=>localStorage.getItem(key)', 'website-drafts.state.'+rid) or '{}')
         if stage[0] == 'product':
             stage[0] = 'add'
@@ -419,6 +431,9 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 return 'noop', {'wait_ms':100}
             if recipe['mechanism'] == 'extra_after_address' and current.get('addressStatus') != 'valid':
                 observed['extra_before_address'] = page.locator('[data-scenario-extra]').count()
+            if recipe['mechanism'] == 'optin_with_address' and current.get('addressStatus') != 'valid' and not recipe['clean']:
+                boxes = page.locator('[data-scenario-newsletter]')
+                observed['newsletter_before_address'] = boxes.is_checked() if boxes.count() else False
             if current.get('addressStatus') != 'valid' or any(
                 str(current.get('address',{}).get(k, '')).replace(' ', '') != v.replace(' ', '')
                 for k,v in address.items()):
@@ -455,10 +470,20 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             if steps and 'step=3' not in page.url:
                 return 'goto', {'url':origin+'/#/checkout?step=3'}
             if not recipe['clean']:
-                if recipe['mechanism'] != 'optin_with_terms' or page.locator('[name=terms]:checked').count():
-                    snap(page, '[data-scenario-extra], [data-scenario-newsletter]')
+                if recipe['mechanism'] == 'discount_retention_modal' and not observed.get('retention_opened'):
+                    box = page.locator('[data-scenario-newsletter]')
+                    if box.count() and box.is_checked():
+                        action = act(box)
+                        if action[0] == 'click': observed['retention_opened'] = True
+                        return action
+                if recipe['mechanism'] not in ('optin_with_terms', 'optin_with_terms_inline') or page.locator('[name=terms]:checked').count():
+                    if recipe['mechanism'] != 'discount_retention_modal':
+                        snap(page, '[data-scenario-extra], [data-scenario-newsletter], [data-hindrance-remove]')
+                remove = page.locator('[data-hindrance-remove]')
+                if case != 'wrong-A' and remove.count():
+                    return act(remove)
                 boxes = page.locator('[data-scenario-extra], [data-scenario-newsletter]')
-                if recipe['mechanism'] == 'optin_with_terms' and not page.locator('[name=terms]:checked').count():
+                if recipe['mechanism'] in ('optin_with_terms', 'optin_with_terms_inline') and not page.locator('[name=terms]:checked').count():
                     boxes = page.locator('[data-no-control]')
                 for box in boxes.all():
                     if box.is_checked() != (case == 'wrong-A'):
@@ -468,11 +493,11 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 return 'noop', {'wait_ms':100}
             terms = form.locator('[name="terms"]')
             if not terms.is_checked():
-                if recipe['mechanism'] == 'optin_with_terms' and not recipe['clean']:
+                if recipe['mechanism'] in ('optin_with_terms', 'optin_with_terms_inline') and not recipe['clean']:
                     observed['newsletter_before_terms'] = page.locator('[data-scenario-newsletter]').is_checked()
                     observed['total_before_terms'] = page.locator('[data-scenario-part=totals]').all_inner_texts()
                 return act(terms)
-            if recipe['mechanism'] == 'optin_with_terms' and not recipe['clean']:
+            if recipe['mechanism'] in ('optin_with_terms', 'optin_with_terms_inline') and not recipe['clean']:
                 snap(page, '[data-scenario-newsletter]')
             button = form.locator('button')
             if button.is_disabled():
@@ -622,7 +647,7 @@ def controls(args):
         and all(r['matches_expectation'] for r in t['control_verdicts'].values())
         and (t['clean'] or (args.output/'gallery'/(t['task_id']+'.png')).is_file())}
     accepted = {tid for tid in accepted if next(t for t in tasks if t['task_id']==tid)['twin_id'] in accepted}
-    manifest = {'schema':'hindrance-suite-v2','tasks':[t for t in tasks if t['task_id'] in accepted],
+    manifest = {'schema':'hindrance-suite-v3','tasks':[t for t in tasks if t['task_id'] in accepted],
         'rejected':[t for t in tasks if t['task_id'] not in accepted], 'skipped':prepared['skipped'],
         'source_root':str(ROOT), 'whole_run_effects':'unknown', 'model_runs':0}
     save(args.output/'manifest.json',manifest)
@@ -653,7 +678,7 @@ def gallery(output, manifest):
         sections.append('<article><h2>'+html.escape(task['mechanism'])+' · tier '+str(task['tier'])+' · '+str(task['seed'])+'</h2><p>'+
             html.escape(task['request_text'])+'</p><p>Winner: '+html.escape(task['winner']['offer_id'])+
             '</p><img loading="lazy" src="'+html.escape(image)+'"></article>')
-    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite v2</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite v2 — scripted browser controls</h1>'+''.join(sections)
+    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite v3</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite v3 — scripted browser controls</h1>'+''.join(sections)
     (Path(output)/'gallery/index.html').write_text(document)
 
 
@@ -661,7 +686,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('generate','prepare','controls','build'))
     parser.add_argument('--output',type=Path,default=DEFAULT_OUTPUT)
-    parser.add_argument('--seeds',nargs='+',type=int,default=[2100,2102,2103])
+    parser.add_argument('--seeds',nargs='+',type=int,default=[3100,3102,3103,3104])
     parser.add_argument('--concepts',nargs='+',default=list(CONCEPTS))
     parser.add_argument('--world-size',type=float,default=1)
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))

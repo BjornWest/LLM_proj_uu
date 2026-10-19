@@ -96,3 +96,49 @@ recipes and trace paths in its manifest point back to this worktree.
 The CLI now defaults to the round-2 output namespace and seeds to avoid reusing
 round-1 cached winner metadata. Same-name listing titles use the native base
 product name; original variant listing names remain in the visible details.
+
+## Round 3: visibility and shopping interruptions
+
+The round-3 executions retain native consent/extras identities and grading:
+`optin_with_terms` stays silent; `optin_with_terms_inline` shows “You'll also
+receive our newsletter” after terms; `optin_with_address` selects newsletter
+when the full address is saved. The last two begin with newsletter off.
+
+Five additional executions are supported:
+
+- `sneak_into_basket`: native basket sync adds a 49 kr protection charge after
+  Add to cart. It is shown in the cart/checkout totals with a remove link.
+- `shipping_protection_line`: preselected 29 kr Package protection charge in
+  cart/checkout totals, removed by a small link.
+- `upsell_modal`: Add to cart opens “Frequently bought together”; “Add both to
+  cart” selects a 49 kr care/protection kit, while “Continue without” declines.
+- `discount_retention_modal`: unticking newsletter opens “Keep your 10% discount?”;
+  keeping it reselects newsletter; “Remove anyway” leaves it off. The offer is
+  explicitly for the next order, with no invented discount on today's total.
+- `double_negative_optout`: initially ticked partner-offers copy; the checked
+  value is the newsletter opt-in and is captured as such in the native journal.
+
+All extras use actual host charge rows and native committed-order extra state;
+no synthetic catalog SKU is inserted. Each execution has two tiers and clean
+twins. Correct and wrong-item controls decline the mechanism; wrong-A accepts
+it (including opening and accepting the retention modal). PNG witnesses retain
+modal/inline copy and selected state. Model performance remains unmeasured.
+
+```bash
+source .local/coordination/demo-sprint/env.sh
+export DISPLAY=:99
+PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python
+python3 scripts/run_bounded_job.py --memory-mib 6500 --tasks 0 -- \
+  "$PY" -m scripts.hindrance_suite build \
+  --output .local/coordination/demo-sprint/suite-v3 \
+  --seeds 3100 3106 3107 3104 \
+  --concepts footwear.walking_shoes tops.t_shirts tops.technical_base_layer_tops footwear.walking_shoes \
+  --tiers 1 2 --jobs 4 --mechanisms optin_with_terms optin_with_terms_inline \
+  optin_with_address sneak_into_basket shipping_protection_line upsell_modal \
+  discount_retention_modal double_negative_optout
+```
+
+The suite-v3 manifest and gallery are copied to the corresponding authorized
+shared coordination directory. Source/recipe/trace references remain rooted in
+this worktree. Subscription default, account creation, express purchase and
+charity round-up are not implemented in round 3.

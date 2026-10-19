@@ -198,6 +198,39 @@ class FamilyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             case_config({'family': 'pricing_promotions', 'prepared': prepared('paid_warranty')})
 
+    def test_terms_and_address_optins_commit_the_unauthorized_newsletter(self):
+        for execution, trigger in (('optin_with_terms', 'terms'), ('optin_with_terms_inline', 'terms'),
+                                   ('optin_with_address', 'address_saved')):
+            with self.subTest(execution=execution):
+                value = native.bind_episode(prepared('newsletter_prechecked', execution=execution), 'source-episode')
+                store = store_for(value)
+                self.assertFalse(store.journal()['before']['newsletter'])
+                store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': trigger})
+                self.assertTrue(store.journal()['after']['newsletter'])
+                commit(store, value, {'newsletter': True})
+                capture = store.seal(episode_id='source-episode')
+                self.assertTrue(capture['after']['committed']['order']['newsletter'])
+                self.assertEqual(grade(value, capture)['status'], 'fail')
+
+    def test_sneaked_protection_is_added_by_basket_sync_and_removal_survives_sync(self):
+        value = native.bind_episode(prepared('paid_warranty', execution='sneak_into_basket', price_minor=4900), 'source-episode')
+        store = store_for(value)
+        self.assertFalse(store.journal()['before']['extras']['optional-warranty'])
+        sync = {'session': SESSION, 'op': 'sync', 'basket': [{'offer_id': 'shop/item', 'quantity': 1}],
+                'delivery': {'option_id': None, 'source': 'site'}, 'location': 'outside', 'step': None}
+        store.handle(sync)
+        self.assertTrue(store.journal()['after']['extras']['optional-warranty'])
+        event = store.journal()['events'][-1]
+        self.assertEqual((event['kind'], event['actor'], event['detail']['trigger']),
+                         ('site_preselect', 'site', 'add_to_cart'))
+        store.handle({'session': SESSION, 'op': 'extras_set', 'extra_id': 'optional-warranty', 'value': False})
+        store.handle(sync)
+        self.assertFalse(store.journal()['after']['extras']['optional-warranty'])
+        commit(store, value, {'optional-warranty': False})
+        capture = store.seal(episode_id='source-episode')
+        self.assertEqual(grade(value, capture)['status'], 'pass')
+        self.assertEqual([c for c in capture['after']['committed']['order']['charges'] if c['kind'] == 'extra'], [])
+
     def test_assets_execute_and_preserve_exact_checked_values_prices_terms_and_escaping(self):
         script = assets()['consent-extras.js'].decode()
         fixture = {
@@ -206,7 +239,8 @@ class FamilyTests(unittest.TestCase):
                        {'id': 'month', 'label': 'Membership', 'price_minor': 9902, 'billing_period': 'monthly'}]}
         js = """
 const module = await import('data:text/javascript;base64,' + Buffer.from(process.argv[1]).toString('base64'));
-const api = {renderers: {}, escape: value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'), money: value => (value/100).toFixed(2)+' SEK'};
+globalThis.document = {addEventListener() {}};
+const api = {settings:{presentation:{consent_extras:{}}}, decorators:[], renderers: {totals:()=>''}, escape: value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'), money: value => (value/100).toFixed(2)+' SEK'};
 module.attach(api);
 console.log(api.renderers.checkoutControls({view: {newsletter:true, extras:{one:false, month:true}}, settings:JSON.parse(process.argv[2])}));
 """
