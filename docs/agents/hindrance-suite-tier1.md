@@ -142,3 +142,7 @@ The suite-v3 manifest and gallery are copied to the corresponding authorized
 shared coordination directory. Source/recipe/trace references remain rooted in
 this worktree. Subscription default, account creation, express purchase and
 charity round-up are not implemented in round 3.
+
+The bare CLI defaults use the validated seeds 3100, 3106 and 3104 with the
+two default concepts (shoes, T-shirts, shoes). Use the explicit round-3 command
+above for all four worlds and the third concept.

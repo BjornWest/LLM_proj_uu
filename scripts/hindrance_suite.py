@@ -686,7 +686,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('generate','prepare','controls','build'))
     parser.add_argument('--output',type=Path,default=DEFAULT_OUTPUT)
-    parser.add_argument('--seeds',nargs='+',type=int,default=[3100,3102,3103,3104])
+    parser.add_argument('--seeds',nargs='+',type=int,default=[3100,3106,3104])
     parser.add_argument('--concepts',nargs='+',default=list(CONCEPTS))
     parser.add_argument('--world-size',type=float,default=1)
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))
