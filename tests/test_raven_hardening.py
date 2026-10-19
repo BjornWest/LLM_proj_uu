@@ -72,6 +72,7 @@ def test_price_excerpt_matches_localized_currency_and_spacing():
 def test_demo_launch_removes_marker_and_pins_invisible_display(monkeypatch):
     from apps.raven.browser_launch import demo_launch_options
     monkeypatch.setenv('DISPLAY', ':0')
+    monkeypatch.setenv('RAVEN_BROWSER_DISPLAY', ':99')
     options = demo_launch_options(args=['--start-minimized'],
         ignore_default_args=['--hide-scrollbars'], env={'DISPLAY': ':0'})
     assert options['env']['DISPLAY'] == ':99'

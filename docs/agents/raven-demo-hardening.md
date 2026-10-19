@@ -23,6 +23,43 @@ python3 scripts/run_bounded_job.py --memory-mib 768 -- \
 
 Open <http://localhost:8771/chat-fullpage-v42.html>. The mock identifies illustrative evidence. Never use it as real-model acceptance.
 
+## Native Windows browser (WEB-F)
+
+The backend and model stay in WSL. `--windows-browser` opts into a native Windows
+Chrome for Testing window with the Raven side panel; it implies `--user-window`.
+Both `user_window` and the separate minimized `background_window` use that Windows
+browser over the existing PowerShell loopback CDP relay. The default remains Linux.
+
+Install the win64 browser once (downloads the official stable Chrome for Testing):
+
+```sh
+DISPLAY=:99 python3 scripts/run_bounded_job.py --memory-mib 1024 --tasks 128 -- \
+  python3 -m apps.raven.windows_browser --setup
+```
+
+Then launch, choosing an unused service port:
+
+```sh
+DISPLAY=:99 python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
+  python3 apps/raven/backend.py --port 8776 --windows-browser --reasoning-effort low
+```
+
+This opens a window on the Windows desktop. `DISPLAY=:99` still keeps any Linux
+test windows off the owner's display. The side panel embeds the service at
+`http://127.0.0.1:8776/panel.html`; Windows-to-WSL localhost forwarding must work.
+Chrome for Testing is used because branded Chrome blocks command-line unpacked
+extension loading. The launch has no `--enable-automation` and includes
+`--disable-blink-features=AutomationControlled`.
+
+Assets live under `%LOCALAPPDATA%\raven-demo`: `chrome-win64`, a copied `extension`,
+and persistent dedicated `profiles\PORT`. No normal Chrome profile is used.
+`--profile-dir 'C:\Users\bpfwe\AppData\Local\raven-demo\profiles\custom'` selects
+another **dedicated** Windows profile; `/mnt/c/...` paths also work. Setup reuses
+an existing installation. Launch arguments/PID/version are recorded under
+`.local/raven-windows/PORT/windows-started.json`. Stop the test service with Ctrl+C
+to close its owned Windows browser and relay. The resource wrapper bounds WSL
+processes; the native Windows browser runs outside the Linux cgroup.
+
 ## WEB-D model and window options
 
 The one-command isolated launch above defaults to `--model-backend sol --reasoning-effort medium --service-tier priority`, requesting **gpt-6.1-sol** through the existing Codex-subscription Pi bridge. Pi must already be installed and logged in. Use `--reasoning-effort low` for a lower reasoning setting, `--service-tier default` for standard requests, or `--model-backend openrouter` for Qwen. No browser receives model credentials.

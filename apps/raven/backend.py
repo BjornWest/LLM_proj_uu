@@ -48,9 +48,11 @@ def target_id(context, page):
 
 class UserWindow:
     """All persistent Playwright objects belong to one service thread."""
-    def __init__(self, port, profile_dir=None):
+    def __init__(self, port, profile_dir=None, windows_browser=False):
         self.port = port
         self.profile_dir = profile_dir
+        self.windows_browser = windows_browser
+        self.windows_chrome = None
         self.commands = queue.Queue()
         self.ready = threading.Event()
         self.error = None
@@ -71,17 +73,31 @@ class UserWindow:
                 debug_port = sock.getsockname()[1]
             with sync_playwright() as pw:
                 extension = APP / 'extension'
-                self.context = pw.chromium.launch_persistent_context(**demo_launch_options(
-                    user_data_dir=str(self.profile_dir or ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
-                    no_viewport=True,
-                    args=[f'--load-extension={extension}', f'--disable-extensions-except={extension}',
-                          f'--remote-debugging-port={debug_port}', '--remote-debugging-address=127.0.0.1',
-                          '--window-size=1440,1000', '--hide-crash-restore-bubble'],
-                    ignore_default_args=['--disable-extensions'],
-                    accept_downloads=False, service_workers='allow'))
+                if self.windows_browser:
+                    from apps.raven.windows_browser import launch_browser
+                    self.windows_chrome = launch_browser(
+                        ROOT / '.local/raven-windows' / str(self.port), extension, self.port, self.profile_dir)
+                    self.browser = pw.chromium.connect_over_cdp(self.windows_chrome.endpoint, timeout=30000)
+                    self.context = self.browser.contexts[0]
+                else:
+                    self.context = pw.chromium.launch_persistent_context(**demo_launch_options(
+                        user_data_dir=str(self.profile_dir or ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
+                        no_viewport=True,
+                        args=[f'--load-extension={extension}', f'--disable-extensions-except={extension}',
+                              f'--remote-debugging-port={debug_port}', '--remote-debugging-address=127.0.0.1',
+                              '--window-size=1440,1000', '--hide-crash-restore-bubble'],
+                        ignore_default_args=['--disable-extensions'],
+                        accept_downloads=False, service_workers='allow'))
                 page = self.context.pages[0] if self.context.pages else self.context.new_page()
                 page.goto('https://example.com/')
                 worker = self.context.service_workers[0] if self.context.service_workers else self.context.wait_for_event('serviceworker')
+                # On a Windows profile restart CDP can expose the worker before
+                # Chrome has installed its extension API bindings.
+                if self.windows_browser:
+                    for _ in range(100):
+                        if worker.evaluate("typeof chrome !== 'undefined' && !!chrome.sidePanel"):
+                            break
+                        page.wait_for_timeout(100)
                 worker.evaluate("port => chrome.sidePanel.setOptions({path:'sidepanel.html?port='+port})", self.port)
                 extension_origin = worker.url.rsplit('/', 1)[0]
                 welcome = next((p for p in self.context.pages if p.url.endswith('/welcome.html')), None)
@@ -91,8 +107,8 @@ class UserWindow:
                 welcome.locator('#open').click()
                 welcome.close()
                 page.bring_to_front()
-                self.cdp_url = f'http://127.0.0.1:{debug_port}'
-                self.browser = pw.chromium.connect_over_cdp(self.cdp_url)
+                if not self.windows_browser:
+                    self.browser = pw.chromium.connect_over_cdp(f'http://127.0.0.1:{debug_port}')
                 # Create the separate agent window during startup, before the
                 # user's window is presented. WSL can focus newly mapped windows
                 # even when Target.createTarget requests background:true.
@@ -109,6 +125,7 @@ class UserWindow:
                 session.detach()
                 self.background_contexts = [background]
                 page.bring_to_front()
+                self.cdp_url = self.windows_chrome.endpoint if self.windows_browser else f'http://127.0.0.1:{debug_port}'
                 self.ready.set()
                 while True:
                     try:
@@ -120,8 +137,13 @@ class UserWindow:
                         if action == 'close':
                             for context in self.background_contexts:
                                 context.close()
+                            if self.windows_browser:
+                                self.browser.new_browser_cdp_session().send('Browser.close')
                             self.browser.close()
-                            self.context.close()
+                            if not self.windows_browser:
+                                self.context.close()
+                            else:
+                                self.windows_chrome.close()
                             response.put(True)
                             break
                         if action == 'background':
@@ -160,6 +182,9 @@ class UserWindow:
                         response.put(exc)
         except Exception as exc:
             self.error = str(exc)
+        finally:
+            if self.windows_chrome is not None:
+                self.windows_chrome.close()
             self.ready.set()
 
     def call(self, action, data=None):
@@ -198,11 +223,11 @@ class Run:
 
 
 class Service:
-    def __init__(self, port, user_window=False, profile_dir=None, model_backend='sol', reasoning_effort='medium', service_tier='priority'):
+    def __init__(self, port, user_window=False, profile_dir=None, model_backend='sol', reasoning_effort='medium', service_tier='priority', windows_browser=False):
         self.port = port
         self.runs = {}
         self.lock = threading.RLock()
-        self.window = UserWindow(port, profile_dir) if user_window else None
+        self.window = UserWindow(port, profile_dir, windows_browser) if user_window or windows_browser else None
         self.context = mp.get_context('spawn')
         self.options = dict(model_backend=model_backend, reasoning_effort=reasoning_effort, service_tier=service_tier)
         self.model = OPENROUTER_MODEL if model_backend == 'openrouter' else MODEL
@@ -428,7 +453,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8766)
     parser.add_argument('--user-window', action='store_true')
-    parser.add_argument('--profile-dir', type=Path)
+    parser.add_argument('--windows-browser', action='store_true', help='Use native Windows Chrome for Testing for panel modes (implies --user-window)')
+    parser.add_argument('--profile-dir', type=Path, help='Dedicated profile; Windows path when using --windows-browser')
     parser.add_argument('--model-backend', choices=['sol', 'openrouter'], default='sol')
     parser.add_argument('--reasoning-effort', choices=['low', 'medium', 'high', 'xhigh'], default='medium')
     parser.add_argument('--service-tier', choices=['priority', 'default'], default='priority')
@@ -436,7 +462,7 @@ def main():
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     server.daemon_threads = True
     server.service = Service(args.port, args.user_window, args.profile_dir,
-        args.model_backend, args.reasoning_effort, args.service_tier)
+        args.model_backend, args.reasoning_effort, args.service_tier, args.windows_browser)
     print(f'Raven: http://localhost:{args.port}/panel.html', flush=True)
     try:
         server.serve_forever()

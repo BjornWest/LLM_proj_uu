@@ -8,7 +8,8 @@ from types import SimpleNamespace
 from contextlib import contextmanager
 
 class WindowsChrome:
-    def __init__(self, directory, port=19229, *, headless=False, layout=None, background=True, windows_chat=True):
+    def __init__(self, directory, port=19229, *, headless=False, layout=None, background=True, windows_chat=True,
+                 executable=None, profile_dir=None, extensions=(), extra_args=()):
         if type(port) is not int or not 1 <= port <= 65535:
             raise ValueError("port must be an integer from 1 to 65535")
         self.directory=Path(directory); self.port=port; self.relays=[]; self.browser=None
@@ -34,10 +35,26 @@ $args='--user-data-dir="'+$profile+'" --no-first-run --no-default-browser-check 
 $p=Start-Process -FilePath $exe -ArgumentList $args -PassThru
 @{pid=$p.Id;profile=$profile;port=$port;version=(Get-Item $exe).VersionInfo.ProductVersion;arguments=$args;enable_automation_flag=$false} | ConvertTo-Json -Compress
 '''.replace('PORT',str(port))
+        # Raven uses CfT and a dedicated persistent profile so its side-panel
+        # extension can run. Existing BrowserGym launches remain incognito.
+        if executable is not None:
+            script = script.replace("$exe='C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'",
+                                    "$exe='" + str(executable).replace("'", "''") + "'")
+        if profile_dir is not None:
+            script = script.replace("$profile=Join-Path $env:TEMP ('browser-agent-research-'+[guid]::NewGuid().ToString('N'))",
+                                    "$profile='" + str(profile_dir).replace("'", "''") + "'")
+            script = script.replace('--incognito ', '')
+        launch_args = list(extra_args)
+        if extensions:
+            paths = ','.join(str(p) for p in extensions)
+            launch_args.extend([f'--load-extension={paths}', f'--disable-extensions-except={paths}'])
+        if launch_args:
+            arguments = subprocess.list2cmdline(launch_args).replace("'", "''")
+            script = script.replace("+' about:blank'", "+' " + arguments + " about:blank'")
         if background and not headless:
-            script = script.replace('--incognito ', '--incognito --no-startup-window ')
+            script = script.replace('--no-default-browser-check ', '--no-default-browser-check --no-startup-window ')
         if headless:
-            script = script.replace('--incognito ', '--incognito --headless=new ')
+            script = script.replace('--no-default-browser-check ', '--no-default-browser-check --headless=new ')
         r=self.powershell(script); self.start=json.loads(r)
         (self.directory/'windows-started.json').write_text(json.dumps(self.start,indent=2))
         self.listener=socket.socket(); self.listener.bind(('127.0.0.1',0)); self.listener.listen(8)
@@ -48,7 +65,9 @@ $p=Start-Process -FilePath $exe -ArgumentList $args -PassThru
             try:
                 version=json.loads(self.powershell(f'Invoke-RestMethod http://127.0.0.1:{port}/json/version | ConvertTo-Json -Compress'));break
             except Exception: time.sleep(.25)
-        if version is None: raise RuntimeError('Windows Chrome did not expose loopback debugging')
+        if version is None:
+            self.close()
+            raise RuntimeError('Windows Chrome did not expose loopback debugging')
         self.endpoint=version['webSocketDebuggerUrl'].replace(f'127.0.0.1:{port}',f'127.0.0.1:{self.local_port}').replace(f'localhost:{port}',f'127.0.0.1:{self.local_port}')
     @staticmethod
     def powershell(script):

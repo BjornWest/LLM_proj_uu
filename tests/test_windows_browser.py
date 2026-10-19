@@ -73,6 +73,52 @@ class CleanupTests(unittest.TestCase):
         for port in [True,0,65536,'123']:
             with self.subTest(port=port),self.assertRaises(ValueError):WindowsChrome('.',port)
 
+    def test_persistent_extension_launch_uses_windows_paths_without_automation(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(WindowsChrome, 'powershell') as powershell, \
+             patch('intent_browser.windows_browser.socket.socket'), \
+             patch('intent_browser.windows_browser.threading.Thread'):
+            powershell.side_effect = [json.dumps({'pid':123}), json.dumps({
+                'webSocketDebuggerUrl':'ws://127.0.0.1:19229/devtools/browser/test'})]
+            WindowsChrome(tmp, layout={}, background=False, windows_chat=False,
+                executable=r'C:\Raven demo\chrome-win64\chrome.exe',
+                profile_dir=r'C:\Raven demo\profile', extensions=[r'C:\Raven demo\extension'],
+                extra_args=['--disable-blink-features=AutomationControlled'])
+            script = powershell.call_args_list[0].args[0]
+            self.assertIn("$exe='C:\\Raven demo\\chrome-win64\\chrome.exe'", script)
+            self.assertIn("$profile='C:\\Raven demo\\profile'", script)
+            self.assertIn('"--load-extension=C:\\Raven demo\\extension"', script)
+            self.assertIn('"--disable-extensions-except=C:\\Raven demo\\extension"', script)
+            self.assertIn('--disable-blink-features=AutomationControlled', script)
+            self.assertNotIn('--incognito', script)
+            self.assertNotIn('--enable-automation', script)
+            self.assertNotIn('--no-startup-window', script)
+
+    def test_default_launch_keeps_temporary_incognito_profile(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(WindowsChrome, 'powershell') as powershell, \
+             patch('intent_browser.windows_browser.socket.socket'), \
+             patch('intent_browser.windows_browser.threading.Thread'):
+            powershell.side_effect = [json.dumps({'pid':123}), json.dumps({
+                'webSocketDebuggerUrl':'ws://127.0.0.1:19229/devtools/browser/test'})]
+            WindowsChrome(tmp, layout={})
+            script = powershell.call_args_list[0].args[0]
+            self.assertIn('browser-agent-research-', script)
+            self.assertIn('--incognito', script)
+            self.assertIn('--no-startup-window', script)
+
+    def test_failed_debug_start_closes_owned_launch(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(WindowsChrome, 'powershell') as powershell, \
+             patch.object(WindowsChrome, 'close') as close, \
+             patch('intent_browser.windows_browser.socket.socket'), \
+             patch('intent_browser.windows_browser.threading.Thread'), \
+             patch('intent_browser.windows_browser.time.sleep'):
+            powershell.side_effect = [json.dumps({'pid':123})] + [RuntimeError('not ready')] * 20
+            with self.assertRaisesRegex(RuntimeError, 'did not expose'):
+                WindowsChrome(tmp, layout={})
+            close.assert_called_once()
+
 
 class LayoutTests(unittest.TestCase):
     def test_negative_display_work_area(self):
