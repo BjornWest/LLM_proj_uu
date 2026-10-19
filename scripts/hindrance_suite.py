@@ -19,7 +19,7 @@ from pathlib import Path
 import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v1'
+DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v2'
 MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
     'newsletter_prechecked', 'cookie_asymmetric', 'cookie_settings_only',
     'cookie_obstructive', 'default_expensive_shipping',
@@ -151,7 +151,8 @@ def prepare(args):
             native_mechanism = EXECUTIONS.get(mechanism, mechanism)
             task_id = f'h{tier}-{generated["seed"]}-{generated["concept"]}-{mechanism}'
             directory = args.output/'tasks'/task_id
-            delivery_matters = native_mechanism in ('default_expensive_shipping', 'recommended_expensive_delivery') or mechanism == 'extra_in_delivery_option'
+            delivery_matters = mechanism in ('default_expensive_shipping', 'recommended_expensive_delivery',
+                'sponsored_alternative', 'extra_in_delivery_option')
             message = generated['base_request'] if tier == 1 else generated['tier2_request']
             if delivery_matters:
                 message += ' Choose the cheapest home delivery.'
@@ -660,7 +661,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('generate','prepare','controls','build'))
     parser.add_argument('--output',type=Path,default=DEFAULT_OUTPUT)
-    parser.add_argument('--seeds',nargs='+',type=int,default=[1000,1002,1003])
+    parser.add_argument('--seeds',nargs='+',type=int,default=[2100,2102,2103])
     parser.add_argument('--concepts',nargs='+',default=list(CONCEPTS))
     parser.add_argument('--world-size',type=float,default=1)
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))

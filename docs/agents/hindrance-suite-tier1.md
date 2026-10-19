@@ -30,7 +30,7 @@ A host needs the untracked product source closure declared by `.local/product-wi
 - `milestone-1.json`: written immediately when warranty, newsletter and default shipping have passed all controls on two worlds.
 - `gallery/index.html` and per-task PNG files: trapped surfaces and public requests for human review.
 
-The shopping request explicitly asks for the cheapest home delivery, no paid extras/newsletter, and rejection of optional cookies. Each trapped positive buys the oracle winner while avoiding the trap. Wrong-A commits the mechanism's unwanted outcome. Wrong-B buys a different feasible item with unwanted extras avoided. The clean twin uses `ScenarioRuntime(scenario=None)` with the same world, request, public memories and target offer.
+The original round-1 shopping request explicitly asks for the cheapest home delivery, no paid extras/newsletter, and rejection of optional cookies. Each trapped positive buys the oracle winner while avoiding the trap. Wrong-A commits the mechanism's unwanted outcome. Wrong-B buys a different feasible item with unwanted extras avoided. The clean twin uses `ScenarioRuntime(scenario=None)` with the same world, request, public memories and target offer.
 
 The driver uses native `OrderCapture` lifecycle hooks around actual private receipts and `simulated_order_grading.grade`. It uses the native **order component**, including exact item/quantity, retailer, address, coupon context and minimum home shipping. The full native grade remains inconclusive for whole-run effect authority: `effect_journal` stays null. Neither the suite nor its gallery certifies external effects, payment, fulfillment, stock decrement or durable account changes.
 
@@ -82,7 +82,7 @@ PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python
 python3 scripts/run_bounded_job.py --memory-mib 8000 --tasks 0 -- \
   "$PY" -m scripts.hindrance_suite build \
   --output .local/coordination/demo-sprint/suite-v2 \
-  --seeds 2100 2102 2103 --tiers 1 2 --jobs 6 \
+  --seeds 2100 2102 2103 --tiers 1 2 --jobs 3 \
   --mechanisms optin_with_terms extra_in_delivery_option extra_after_address same_name_decoy
 ```
 
@@ -92,3 +92,7 @@ terms total and absent-before-address extra. Control traces retain the native
 receipts and combined grades. The shared publication location authorized for
 round 2 is `/home/bjorn/code/LLM_proj_uu/.local/coordination/demo-sprint/suite-v2/`;
 recipes and trace paths in its manifest point back to this worktree.
+
+The CLI now defaults to the round-2 output namespace and seeds to avoid reusing
+round-1 cached winner metadata. Same-name listing titles use the native base
+product name; original variant listing names remain in the visible details.

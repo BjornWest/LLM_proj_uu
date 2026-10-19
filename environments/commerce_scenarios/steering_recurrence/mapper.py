@@ -72,7 +72,10 @@ def settings_from_prepared(prepared, *, extra_terms=None):
     settings = {'retailer_id': p['retailer_id'],
                 'presentation': {'schema': VERSION, 'mechanism': mechanism}}
     if presentation.get('execution'):
-        settings['presentation'].update(execution=presentation['execution'], target_offer_id=p['task']['offer_ids'][0])
+        product_id = p['reference']['winners'][0]['product_id']
+        product = next(item['public'] for item in p['world']['products'] if item['public']['product_id'] == product_id)
+        settings['presentation'].update(execution=presentation['execution'],
+            target_offer_id=p['task']['offer_ids'][0], product_name=product['name'])
     delivery = {}
     for field, native in (('default', 'default_option_id'), ('prominent', 'prominent_option_id')):
         if presentation.get(native) is not None:

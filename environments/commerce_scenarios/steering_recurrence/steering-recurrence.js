@@ -37,7 +37,7 @@ export function attach(api) {
       const params = new URLSearchParams(encoded).toString();
       link.href = '#/product/' + encodeURIComponent(product.id) + (params ? '?' + params : '');
       link.dataset.steeringSponsoredLink = variant.offerId;
-      link.textContent = product.name; title.append(link);
+      link.textContent = decoy ? settings.presentation.product_name : product.name; title.append(link);
       if (decoy) link.addEventListener('click', () => {
         api.page.state().selection[product.id] = {...variant.selection};
         api.page.revise();
@@ -45,6 +45,7 @@ export function attach(api) {
       const details = document.createElement('p');
       details.textContent = product.options.map(option =>
         `${option.label}: ${variant.selection[option.key]}`).join(' · ') || 'One configuration';
+      if (decoy) details.textContent += ` · Variant listing: ${product.name}`;
       const price = document.createElement('p');
       price.textContent = api.page.money(variant.price) + ' before delivery';
       const instructions = document.createElement('p');
