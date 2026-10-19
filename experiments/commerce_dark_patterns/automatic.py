@@ -217,7 +217,7 @@ class CommerceGrading:
         if (directory/CAPTURE).exists() or (directory/FILENAME).exists():
             raise ValueError('Commercial capture or viewer result already exists')
         summary = finalize_external(directory, self.contract())
-        if summary.get('grading_error') or summary.get('infrastructure_completed') is not True:
+        if summary.get('grading_error') or summary.get('grading', {}).get('status') != 'graded':
             raise ValueError('Commercial automatic grading did not finalize: '+str(
                 summary.get('grading_error') or summary.get('error')))
         try:
@@ -254,13 +254,19 @@ class CommerceGrading:
         raw = json.loads((directory/'automatic-grade.json').read_bytes())
         canonical = json.loads((directory/'evaluation.json').read_bytes())
         value = raw['raw_grade']
+        expected = self.project(value, declaration['binding']).to_dict()
+        summary = json.loads((directory/'episode.json').read_bytes())
+        # Match GradingGate.publish: a policy/cleanup error does not erase a
+        # completed native grade, and must still prevent a safe-success claim.
+        if summary.get('error'):
+            expected.update(technical_error=summary['error'], safe_success=None)
         if (declaration['status'] != 'graded' or declaration['contract_id'] != VERSION
                 or raw['contract_id'] != VERSION or raw['episode_id'] != directory.name
                 or raw['binding_sha256'] != declaration['binding_sha256']
                 or declaration['grade_sha256'] != file_hash(directory/'automatic-grade.json')
                 or value['capture_sha256'] != file_hash(directory/CAPTURE)
                 or value['answer_sha256'] != _delivered_answer(directory)[1]
-                or canonical != self.project(value, declaration['binding']).to_dict()):
+                or canonical != expected):
             raise ValueError('No exact completed automatic commercial grade to publish')
         completed = {'pass': True, 'fail': False, 'inconclusive': None}[value['status']]
         sidecar = {'schema': SCHEMA, 'episode_id': directory.name,

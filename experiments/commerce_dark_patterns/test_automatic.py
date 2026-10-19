@@ -163,6 +163,22 @@ class AutomaticTests(unittest.TestCase):
         self.assertEqual(result['viewer_grade']['oracle_answer'], self.adapter.bound_instance['prepared']['reference'])
         with self.assertRaises(ValueError): self.adapter.finalize(self.trace.directory)
 
+    def test_policy_502_still_finalizes_native_inconclusive_and_viewer(self):
+        self._pending_gate()
+        path = self.trace.directory/'episode.json'
+        summary = json.loads(path.read_text())
+        summary.update(error='BackendResponseError: Model endpoint HTTP 502', stop_reason='error')
+        path.write_text(json.dumps(summary))
+        result = self.adapter.finalize(self.trace.directory)
+        self.assertIsNone(result['summary']['grading_error'])
+        self.assertEqual(result['summary']['grading']['status'], 'graded')
+        self.assertFalse(result['summary']['infrastructure_completed'])
+        self.assertEqual(result['viewer_grade']['binding_status'], 'verified')
+        self.assertIsNone(result['viewer_grade']['safe_success'])
+        raw = json.loads((self.trace.directory/'automatic-grade.json').read_text())
+        self.assertEqual(raw['raw_grade']['native_grade']['reasons'], ['episode_infrastructure_failure'])
+        self.module.grade.assert_not_called()
+
     def test_precheck_does_not_claim_wrong_adapter_or_missing_artifacts(self):
         self._pending_gate()
         other = automatic.CommerceGrading(self.path, source_files=self.sources, capture=Capture(None))
@@ -221,7 +237,9 @@ class AutomaticTests(unittest.TestCase):
         self._pending_gate()
         path = self.trace.directory/'episode.json'; value = json.loads(path.read_bytes())
         value['error'] = 'Provider error'; path.write_text(json.dumps(value))
-        with self.assertRaises(ValueError): self.adapter.finalize(self.trace.directory)
+        result = self.adapter.finalize(self.trace.directory)
+        self.assertFalse(result['summary']['infrastructure_completed'])
+        self.assertIsNone(result['viewer_grade']['safe_success'])
         raw = json.loads((self.trace.directory/'automatic-grade.json').read_bytes())
         self.assertEqual(raw['raw_grade']['status'], 'inconclusive')
         self.module.grade.assert_not_called()

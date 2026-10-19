@@ -19,6 +19,16 @@ ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'qwen/qwen3.8-27b'
 
 
+class GradingFinalizationError(RuntimeError):
+    pass
+
+
+def require_finalized(summary):
+    if summary.get('grading_error') or summary.get('grading', {}).get('status') != 'graded':
+        raise GradingFinalizationError(str(summary.get('grading_error') or
+            summary.get('grading', {}).get('error') or 'Native grading did not complete'))
+
+
 def read(path):
     return json.loads(Path(path).read_text())
 
@@ -140,11 +150,21 @@ def summarize(rows):
                            'Missing provider usage is unknown; cost totals include reported charges only.']}
 
 
-def core_profile(episode):
+def core_profile(episode, options):
+    from dataclasses import replace
     from intent_browser.standard_profile import standard_profile
     from intent_browser.harness import with_site_discovery
     profile = standard_profile(navigation_origins=episode.runtime.navigation_origins,
                                helpers=False, data_tools=False)
+    if options.get('context_keep_turns'):
+        from functools import partial
+        from intent_browser.hindrance_context import WindowedConversation
+        profile = replace(profile,
+            conversation_factory=partial(WindowedConversation, options['context_keep_turns']),
+            ax_config=replace(profile.ax_config, revisit_reuse=False),
+            instructions=profile.instructions + ' Older browser evidence is omitted after '
+                + str(options['context_keep_turns']) + ' decisions. Keep useful facts in your own notes; '
+                'read the current page again when needed. Historical action IDs remain invalid.')
     episode.profile = with_site_discovery(profile) if episode.site_discovery else profile
 
 
@@ -164,6 +184,12 @@ def recording_runner(runner, directory, enabled):
 def backend_for(options, directory, records, holder, policy=None):
     import httpx
     from intent_browser.backend import ChatCompletionsBackend
+    if not options['offline']:
+        from intent_browser.hindrance_context import PreflightInputCounter
+        from intent_browser.input_budget import QwenInputCounter
+        holder['input_counter'] = PreflightInputCounter(QwenInputCounter(
+            str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')),
+            options.get('max_input_tokens', 150000))
     if options['offline']:
         backend = ChatCompletionsBackend('https://offline.invalid/v1', 'scripted-hindrance', supports_images=True)
         backend.client.close()
@@ -185,7 +211,6 @@ def backend_for(options, directory, records, holder, policy=None):
         import secrets, threading
         from experiments.external_agent.backend import ExternalAgentBackend
         from experiments.external_agent.server import BridgeServer
-        from intent_browser.input_budget import OpaqueReasoningInputCounter, QwenInputCounter
         model = options['bridge']
         from experiments.external_agent.episode_admission import EpisodeConcurrency
         from experiments.external_agent.subscription_quota import SubscriptionQuotaGuard
@@ -202,8 +227,6 @@ def backend_for(options, directory, records, holder, policy=None):
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         holder['bridge'] = (raw, server)
-        holder['input_counter'] = OpaqueReasoningInputCounter(QwenInputCounter(
-            str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')))
         backend = ChatCompletionsBackend('http://127.0.0.1:' + str(server.server_port) + '/v1', model, token,
             timeout=260, max_tokens=16384, supports_images=True)
         def received_bridge(response):
@@ -219,8 +242,8 @@ def backend_for(options, directory, records, holder, policy=None):
                 stream.write(json.dumps(record) + '\n')
         backend.client.event_hooks = {'response': [received_bridge]}
         return backend
-    from intent_browser.openrouter import DEFAULT_PROVIDERS, provider_options
-    request = provider_options(options.get('providers') or DEFAULT_PROVIDERS)
+    from intent_browser.openrouter import provider_options
+    request = provider_options(options.get('providers') or 'chutes,akashml')
     request.update(top_p=0.95, top_k=20)
     backend = ChatCompletionsBackend('https://openrouter.ai/api/v1', MODEL,
         os.environ['OPENROUTER_API_KEY'], timeout=180, max_tokens=16384,
@@ -281,7 +304,7 @@ def execute_one(entry, options, directory):
             from scripts import hindrance_suite as build
             from intent_browser.automatic_grading import finalize_external
             recipe, episode, prepared, capture, reference = build.prepare_task(entry['recipe_path'])
-            core_profile(episode)
+            core_profile(episode, options)
             if entry.get('request_text') and entry['request_text'] != recipe['request_text']:
                 raise ValueError('Manifest request differs from the prepared recipe request')
             policy = build.browser_policy(episode, recipe, 'positive', reference) if options['offline'] else None
@@ -308,13 +331,15 @@ def execute_one(entry, options, directory):
                         trace_screenshots=False)
                 row['trace'] = str(trace)
                 if prepared is not None:
-                    adapter.finalize(trace)
+                    try:
+                        adapter.finalize(trace)
+                    except Exception as error:
+                        raise GradingFinalizationError(str(error)) from error
                     native = read(Path(trace) / 'automatic-grade.json')['raw_grade']['native_grade']
                     build.finish_order(episode, capture, reference, trace, summary)
                 else:
                     finalized = finalize_external(trace, contract)
-                    if finalized.get('grading_error') or not finalized.get('infrastructure_completed'):
-                        raise RuntimeError('Clean automatic grading failed: ' + str(finalized.get('grading_error')))
+                    require_finalized(finalized)
                     native = read(Path(trace) / 'suite-order-grade.json')['native_grade']
                 order_status = read(Path(trace) / 'suite-order-grade.json')['status']
             finally:
@@ -333,7 +358,7 @@ def execute_one(entry, options, directory):
             prepared = prepare_episode(entry['world_dir'], entry['instance_path'],
                 offer_id=entry.get('offer_id') if entry.get('offer_id') and
                 read(entry['instance_path'])['family'] == 'consent_extras' else None)
-            core_profile(prepared.episode)
+            core_profile(prepared.episode, options)
             if entry.get('request_text') and entry['request_text'] != prepared.episode.public['user_message']:
                 raise ValueError('Manifest request differs from the prepared instance request')
             backend = backend_for(options, directory, records, holder, prepared.policy)
@@ -348,12 +373,18 @@ def execute_one(entry, options, directory):
                         max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), input_counter=holder.get('input_counter'),
                     trace_screenshots=False)
             row['trace'] = str(trace)
-            prepared.adapter.finalize(trace)
+            try:
+                prepared.adapter.finalize(trace)
+            except Exception as error:
+                raise GradingFinalizationError(str(error)) from error
             native = read(Path(trace) / 'automatic-grade.json')['raw_grade']['native_grade']
             row['grade'] = mechanism_outcome(native)
         row.update(status='graded', native_grade=native)
         save(directory / 'grade.json', {'grade': row['grade'], 'native_grade': native})
     except Exception as error:
+        if isinstance(error, GradingFinalizationError):
+            row.update(status='grading_error', grading_error=str(error),
+                       grade={'status': 'inconclusive', 'reason': 'native_grading_failed'})
         row['error'] = type(error).__name__ + ': ' + str(error)
         (directory / 'error.txt').write_text(traceback.format_exc())
     finally:
@@ -403,7 +434,10 @@ def main():
     parser.add_argument('--max-total-input-tokens', type=int, default=None, help='cumulative provider prompt tokens per episode')
     parser.add_argument('--max-total-output-tokens', type=int, default=None, help='cumulative completion tokens per episode')
     parser.add_argument('--max-input-tokens', type=int, default=150000)
-    parser.add_argument('--providers', help='Existing OpenRouter provider slugs, comma separated')
+    parser.add_argument('--providers', default='chutes,akashml',
+                        help='Qwen default: chutes,akashml (comma-separated OpenRouter slugs)')
+    parser.add_argument('--context-keep-turns', type=int, default=0,
+                        help='Opt in: retain browser evidence for N decisions; 0 preserves full history')
     parser.add_argument('--no-fact-provenance', action='store_true')
     parser.add_argument('--shared-chromium', action='store_true', help='one pooled Chromium for all episodes (fresh contexts per episode)')
     parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
@@ -423,7 +457,7 @@ def main():
             parser.error('Unknown --episode ID')
     if args.limit is not None:
         entries = entries[:args.limit]
-    if not entries or args.concurrency < 1 or args.max_steps < 0:
+    if not entries or args.concurrency < 1 or args.max_steps < 0 or args.context_keep_turns < 0:
         parser.error('Require entries and positive concurrency/turn limits')
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -433,6 +467,7 @@ def main():
                'suite_episodes': len(entries),
                'max_total_input_tokens': args.max_total_input_tokens, 'max_total_output_tokens': args.max_total_output_tokens,
                'max_input_tokens': args.max_input_tokens, 'providers': args.providers,
+               'context_keep_turns': args.context_keep_turns,
                'fact_provenance': not args.no_fact_provenance}
     save(output / 'launch.json', {'entries': entries, 'options': options, 'model': MODEL,
          'concurrency': args.concurrency, 'sampling': {'temperature': 0.6, 'top_p': 0.95, 'top_k': 20},
@@ -472,7 +507,7 @@ def run_pool(args, entries, options, output, rows):
                 save(output / 'summary.json', summarize(rows))
                 print(json.dumps({'id': row['id'], 'status': row['status'],
                                   'grade': row.get('grade'), 'cost_usd': row['usage']['cost_usd']}), flush=True)
-    if any(r['status'] == 'system_failure' for r in rows):
+    if any(r['status'] in ('system_failure', 'grading_error') for r in rows):
         raise SystemExit(1)
 
 
