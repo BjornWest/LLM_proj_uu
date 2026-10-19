@@ -69,6 +69,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 retry_policy=None, helper_env_factory=None, agent_runtime=None, agent_actor=None,
                 delegated_instructions=None, delegated_goal=None, decision_wait=None,
                 max_input_tokens=None, input_counter=None,
+                max_total_input_tokens=None, max_total_output_tokens=None,
                 clarification_callback=None, clarification_audit_id=None, memory_adapter=None,
                 site_discovery=None, site_discovery_audit_id=None,
                 observation_pipeline="auto", human_handover=None, human_handover_ui=None,
@@ -490,6 +491,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     terminated = truncated = False
     stop_reason = "max_steps" if max_steps is not None else "running"
     output_limit_replies = 0
+    usage_totals = {"input": 0, "output": 0}
     history = []
     final_ref = None
     error = None
@@ -1113,6 +1115,17 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         event['model_dispatch_skipped'] = True
                         # No HTTP call, reservation, action or policy acknowledgment.
                         break
+                # Episode cost budgets: cumulative provider-billed input and output tokens.
+                if ((max_total_input_tokens is not None and usage_totals['input'] >= max_total_input_tokens)
+                        or (max_total_output_tokens is not None and usage_totals['output'] >= max_total_output_tokens)):
+                    stop_reason = ('max_total_input_tokens' if max_total_input_tokens is not None
+                                   and usage_totals['input'] >= max_total_input_tokens else 'max_total_output_tokens')
+                    event['kind'] = 'token_budget'
+                    event['model_dispatch_skipped'] = True
+                    trace.event('token_budget_exhausted', step=index, **usage_totals,
+                                max_total_input_tokens=max_total_input_tokens,
+                                max_total_output_tokens=max_total_output_tokens)
+                    break
                 if checkpoint_control is not None:
                     phase='checkpoint_boundary'
                     if checkpoint_control.boundary(env,trace,conversation,ax_explorer,delivery,
@@ -1143,6 +1156,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     trace.timings.record('decision.completion_barrier',started,step=index)
                 event.update(model_output=completion.text, model_response=completion.raw,
                              model_request=completion.request)
+                _usage = (completion.raw or {}).get('usage') or {} if isinstance(completion.raw, dict) else {}
+                usage_totals['input'] += int(_usage.get('prompt_tokens') or 0)
+                usage_totals['output'] += int(_usage.get('completion_tokens') or 0)
                 if getattr(backend,'recorded_replay',False) is True:
                     event['recorded_replay']=deepcopy(backend.replay_evidence[-1])
                     trace.event('recorded_decision_replayed',step=index,**event['recorded_replay'])

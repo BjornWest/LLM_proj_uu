@@ -180,6 +180,45 @@ def backend_for(options, directory, records, holder, policy=None):
         backend.client = httpx.Client(transport=httpx.MockTransport(transport))
         backend.requires_browser_thread = True
         return backend
+    if options.get('bridge'):
+        # Codex subscription via Pi's transport behind a local OpenAI-compatible bridge.
+        import secrets, threading
+        from experiments.external_agent.backend import ExternalAgentBackend
+        from experiments.external_agent.server import BridgeServer
+        from intent_browser.input_budget import OpaqueReasoningInputCounter, QwenInputCounter
+        model = options['bridge']
+        from experiments.external_agent.episode_admission import EpisodeConcurrency
+        from experiments.external_agent.subscription_quota import SubscriptionQuotaGuard
+        # Declared parallel suite lease (the default exclusive lock allows one episode at a time).
+        raw = ExternalAgentBackend(model, directory / 'bridge-transport', reasoning_effort=options.get('reasoning_effort') or 'medium',
+            max_tokens=16384, timeout=180, provider_output_limit=True,
+            # Per-run lock: no cross-run/subscription-wide exclusion (owner decision 2026-10-19).
+            lock_path=directory.parent / '.subscription.lock',
+            episode_concurrency=EpisodeConcurrency(options['suite_id'], options['concurrency'], options['suite_episodes']),
+            quota_guard=SubscriptionQuotaGuard(directory / 'subscription-quota', remaining_floor=1))
+        raw.begin_episode('hindrance/' + directory.name + '/' + secrets.token_hex(6))
+        token = secrets.token_urlsafe(32)
+        server = BridgeServer(raw, token, max_requests=100000)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        holder['bridge'] = (raw, server)
+        holder['input_counter'] = OpaqueReasoningInputCounter(QwenInputCounter(
+            str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')))
+        backend = ChatCompletionsBackend('http://127.0.0.1:' + str(server.server_port) + '/v1', model, token,
+            timeout=260, max_tokens=16384, supports_images=True)
+        def received_bridge(response):
+            response.read()
+            try:
+                value = response.json()
+            except ValueError:
+                value = {}
+            record = {'http_status': response.status_code, 'model': model, 'provider': 'codex-subscription',
+                      'usage': value.get('usage')}
+            records.append(record)
+            with (directory / 'usage.jsonl').open('a') as stream:
+                stream.write(json.dumps(record) + '\n')
+        backend.client.event_hooks = {'response': [received_bridge]}
+        return backend
     from intent_browser.openrouter import DEFAULT_PROVIDERS, provider_options
     request = provider_options(options.get('providers') or DEFAULT_PROVIDERS)
     request.update(top_p=0.95, top_k=20)
@@ -254,7 +293,8 @@ def execute_one(entry, options, directory):
                         output=directory / 'runs', episode_task=episode.task, harness_profile=episode.profile,
                         site_discovery=episode.site_discovery, observation_pipeline='native',
                         automatic_grading=contract, retry_policy=None,
-                        max_steps=options['max_steps'], max_input_tokens=options['max_input_tokens'],
+                        max_steps=options['max_steps'] or None, max_input_tokens=options['max_input_tokens'],
+                        max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), input_counter=holder.get('input_counter'),
                         trace_screenshots=False)
                 row['trace'] = str(trace)
                 if prepared is not None:
@@ -294,7 +334,8 @@ def execute_one(entry, options, directory):
                     output=directory / 'runs', episode_task=prepared.episode.task,
                     harness_profile=prepared.episode.profile, site_discovery=prepared.episode.site_discovery,
                     observation_pipeline='native', automatic_grading=contract, retry_policy=None,
-                    max_steps=options['max_steps'], max_input_tokens=options['max_input_tokens'],
+                    max_steps=options['max_steps'] or None, max_input_tokens=options['max_input_tokens'],
+                        max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), input_counter=holder.get('input_counter'),
                     trace_screenshots=False)
             row['trace'] = str(trace)
             prepared.adapter.finalize(trace)
@@ -308,6 +349,12 @@ def execute_one(entry, options, directory):
     finally:
         if backend is not None:
             backend.close()
+        if holder.get('bridge'):
+            raw, server = holder['bridge']
+            try:
+                server.shutdown()
+            finally:
+                raw.close()
         if prepared is not None:
             prepared.close()
         elif episode is not None:
@@ -337,15 +384,19 @@ def main():
     parser.add_argument('--limit', type=int)
     parser.add_argument('--episode', action='append', help='Exact manifest entry ID; repeatable')
     parser.add_argument('--offline', action='store_true')
-    parser.add_argument('--max-steps', type=int, default=60)
+    parser.add_argument('--max-steps', type=int, default=0, help='0 = no decision cap (use token budgets)')
+    parser.add_argument('--max-total-input-tokens', type=int, default=None, help='cumulative provider prompt tokens per episode')
+    parser.add_argument('--max-total-output-tokens', type=int, default=None, help='cumulative completion tokens per episode')
     parser.add_argument('--max-input-tokens', type=int, default=150000)
     parser.add_argument('--providers', help='Existing OpenRouter provider slugs, comma separated')
     parser.add_argument('--no-fact-provenance', action='store_true')
+    parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
+    parser.add_argument('--reasoning-effort', default='medium')
     args = parser.parse_args()
     if args.env_file:
         from dotenv import load_dotenv
         load_dotenv(args.env_file, override=False)
-    if not args.offline and not os.environ.get('OPENROUTER_API_KEY'):
+    if not args.offline and not args.bridge and not os.environ.get('OPENROUTER_API_KEY'):
         parser.error('Use --env-file with the existing OPENROUTER_API_KEY')
     os.environ['TASK_SOURCE_BINDING'] = 'current'
     os.environ.setdefault('HARNESS_AX_TOKENIZER', str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json'))
@@ -356,11 +407,15 @@ def main():
             parser.error('Unknown --episode ID')
     if args.limit is not None:
         entries = entries[:args.limit]
-    if not entries or args.concurrency < 1 or args.max_steps < 1:
+    if not entries or args.concurrency < 1 or args.max_steps < 0:
         parser.error('Require entries and positive concurrency/turn limits')
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     options = {'offline': args.offline, 'max_steps': args.max_steps,
+               'bridge': args.bridge, 'reasoning_effort': args.reasoning_effort,
+               'suite_id': 'hindrance/' + args.output.resolve().name, 'concurrency': args.concurrency,
+               'suite_episodes': len(entries),
+               'max_total_input_tokens': args.max_total_input_tokens, 'max_total_output_tokens': args.max_total_output_tokens,
                'max_input_tokens': args.max_input_tokens, 'providers': args.providers,
                'fact_provenance': not args.no_fact_provenance}
     save(output / 'launch.json', {'entries': entries, 'options': options, 'model': MODEL,

@@ -16,7 +16,7 @@ import tempfile
 import threading
 import time
 
-MAX_CONCURRENCY = 34
+MAX_CONCURRENCY = 1000  # deployment: memory, not a count, is the limit
 CONTROL_TIMEOUT = 20
 # RPC: 5s connect + two 15s calls + websocket close allowance; leave
 # headroom for local ledger I/O. Custom guard readers must also be bounded.
