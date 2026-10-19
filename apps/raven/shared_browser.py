@@ -99,14 +99,31 @@ class SharedBrowserEnv(BrowserEnv):
 class BackgroundBrowserEnv(BrowserEnv):
     def reset(self, seed=None, **kwargs):
         # Native reset with an in-memory chat: no second hidden Chromium for chat.
-        from types import FunctionType, MethodType
+        from types import FunctionType, MethodType, SimpleNamespace
+        from apps.raven.browser_launch import demo_launch_options
         original = BrowserEnv.reset
         scope = dict(original.__globals__)
         self.raven_chat = PanelChat()
         scope['Chat'] = lambda **kw: self.raven_chat
+        pw = _get_global_playwright()
+        # BrowserGym passes args/ignore_default_args explicitly, so merge at
+        # its launch call rather than duplicating those keyword arguments.
+        def launch(**options):
+            options.update(headless=False)
+            options['args'] = [*options.get('args', []), '--start-minimized']
+            return pw.chromium.launch(**demo_launch_options(**options))
+        scope['_get_global_playwright'] = lambda: SimpleNamespace(
+            selectors=pw.selectors, chromium=SimpleNamespace(launch=launch))
         reset = FunctionType(original.__code__, scope, original.__name__, original.__defaults__, original.__closure__)
         reset.__kwdefaults__ = original.__kwdefaults__
-        return MethodType(reset, self)(seed=seed, **kwargs)
+        result = MethodType(reset, self)(seed=seed, **kwargs)
+        session = self.context.new_cdp_session(self.page)
+        try:
+            window = session.send('Browser.getWindowForTarget')['windowId']
+            session.send('Browser.setWindowBounds', {'windowId': window, 'bounds': {'windowState': 'minimized'}})
+        finally:
+            session.detach()
+        return result
 
 
 class WebContext:
@@ -182,6 +199,14 @@ class SharedHumanBrowser(HumanBrowser):
                 self.select(self.id_for(blank))
                 self.emit()
                 return {'tool':'new_tab', 'execution':'call_completed', 'active_tab_id':self.active}
+        if decision.name == 'handover_tab':
+            # Pause inference on this tab, retaining ordinary tab tools during
+            # research. The general wait profile also disables those tools.
+            self.wait_for_human = True
+            try:
+                return super().execute(decision)
+            finally:
+                self.wait_for_human = False
         return super().execute(decision)
 
     def close(self):

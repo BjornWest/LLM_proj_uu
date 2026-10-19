@@ -69,11 +69,33 @@ DEMO_POLICY = (
     "Use only absolute HTTP(S) URLs. A rejected call did nothing; correct it and continue. "
     "Give a concise answer in the user’s language with links to inspected sources; "
     "say clearly when a price or fact could not be verified. Reuse the current tab for navigation. "
-    "If a site blocks access or still fails after one retry, use another public source or "
-    "finish with that limitation. Do not keep waiting or reloading the same blocked page. "
-    "After handing over a tab, wait for its return or finish explaining what help is needed; "
-    "do not repeatedly poll using model calls."
+    "Do not browse eBay.com (its automated-access restriction explicitly includes buy-for-me "
+    "and LLM agents), Amazon.se (its robots rules exclude named shopping/AI agents), or "
+    "Trustpilot (its policy explicitly restricts AI-agent collection). Explain the site-specific "
+    "restriction briefly and offer another source. These demo exclusions come from "
+    "docs/browser-site-automation-policies.md; do not claim all other sites permit automation. "
+    "Never solve or interact with CAPTCHAs or bot checks: Cloudflare security/Just a moment "
+    "interstitials, Turnstile, reCAPTCHA/I'm not a robot, hCaptcha, or 403/418 bot-block pages. "
+    "Inspect page text when the title/status alone is ambiguous. Once a challenge is identified, "
+    "do not retry, reload, wait for it to clear, or loop through other sites. "
+    "After human handback, inspect the fresh page and continue on that same site; handback alone "
+    "does not prove verification passed. If still challenged, ask for human help again. "
+    "For ordinary failures without a bot challenge, retry at most once, then report the limitation."
 )
+
+
+def verification_policy(mode):
+    if mode == 'background':
+        return ('On a bot check, stop research and finish with a short explanation naming the site. '
+                'Offer to continue in the user’s window so they can complete verification themselves.')
+    if mode == 'background_window':
+        return ('On a bot check, stop research and call handover_tab on the challenged tab. '
+                'Say research is paused and offer to continue in their window after they complete '
+                'verification and hand the tab back. Raven will bring this tab to the front. '
+                'Wait for handback without model polling or alternative research.')
+    return ('On a bot check, immediately call handover_tab on that tab with a short message, '
+            'for example: "Prisjakt wants to check you’re human; can you complete it and hand the tab back?" '
+            'Wait for handback without model polling or alternative research.')
 
 ROOT = Path(__file__).resolve().parents[2]
 MODEL = 'gpt-6.1-sol'
@@ -146,7 +168,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
     load_dotenv('/home/bjorn/code/LLM_proj_uu/.env', override=False)
     from intent_browser import runner
     from intent_browser.trace import Trace
-    from intent_browser.open_internet import OpenInternetTask, open_profile, with_human_handover
+    from intent_browser.open_internet import (OpenInternetTask, open_profile, with_human_handover,
+        HUMAN_VERIFICATION_TEST_POLICY, HUMAN_VERIFICATION_WAIT_POLICY)
     from intent_browser.standard_profile import standard_profile
     from intent_browser.human_handover import HumanHandoverController
     from intent_browser.backend import Completion
@@ -305,13 +328,17 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
     if cdp_url:
         profile = with_human_handover(profile, wait_for_human=False, compact_tabs=True,
                                      stable_frames=True, capture_timeout_mode='bounded')
-    profile = replace(profile, instructions=profile.instructions + '\n' + DEMO_POLICY)
+        profile = replace(profile, instructions=profile.instructions.replace(
+            HUMAN_VERIFICATION_TEST_POLICY, HUMAN_VERIFICATION_WAIT_POLICY).replace(
+            'Use handover_tab when human intervention is needed, then continue in another tab.',
+            'Use handover_tab when human intervention is needed, then wait for handback.'))
+    profile = replace(profile, instructions=profile.instructions + '\n' + DEMO_POLICY + '\n' + verification_policy(payload['mode']))
     history = '\n'.join(f"{m['who']}: {m['text']}" for m in payload.get('history', []))
     goal = (('Previous conversation (context):\n' + history + '\n\n') if history else '') + payload['text']
     goal += ('\n\nFor research answers, link to pages you actually inspected. '
              'For requests outside the demo policy, give a short refusal without browsing. '
              'Do not purchase or create accounts.')
-    task = OpenInternetTask('https://www.google.com/', goal, headless=not bool(cdp_url))
+    task = OpenInternetTask('https://www.google.com/', goal, headless=False)
     task.supported_harness_profiles = (profile.name,)
     if cdp_url:
         from apps.raven.shared_browser import SharedBrowserEnv, SharedWebTask, SharedHumanBrowser
@@ -335,7 +362,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
             from intent_browser.open_internet import OpenWebTask
             env = BackgroundBrowserEnv(task_entrypoint=OpenWebTask,
                 task_kwargs=dict(start_url=task.start_url, goal=goal, record=task.trace.event),
-                headless=True, action_mapping=actions.to_python_code, wait_for_user_message=False,
+                headless=False, action_mapping=actions.to_python_code, wait_for_user_message=False,
                 pw_context_kwargs={'accept_downloads':False, 'service_workers':'block'})
         env.raven_drain_notes = before_observation
         env_holder.append(env)
@@ -375,7 +402,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
         backend, input_counter, raw, bridge = subscription_backend(output, emit, options)
     metadata = dict(task='openended', goal=goal, model=model if scripted is None else 'scripted',
         driver='llm' if scripted is None else 'scripted', tags=['raven'] if scripted is None else ['raven', 'scripted'],
-        source='open-internet-v1', training_eligible=False, headless=not bool(cdp_url),
+        source='open-internet-v1', training_eligible=False, headless=False,
         generation=({'temperature': 0.6} if model == OPENROUTER_MODEL else {
             'reasoning_effort': options.get('reasoning_effort', 'medium'),
             'requested_service_tier': options.get('service_tier', 'priority')}),

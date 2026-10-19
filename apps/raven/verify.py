@@ -13,6 +13,7 @@ from uuid import uuid4
 from playwright.sync_api import sync_playwright
 
 OUT = Path('.local/coordination/demo-sprint')
+PORT = int(os.environ.get('RAVEN_VERIFY_PORT', '18766'))
 
 
 def action(name, **args):
@@ -31,8 +32,8 @@ def wait_done(run, seconds=90):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    server=ThreadingHTTPServer(('127.0.0.1',18766),Handler)
-    svc=Service(18766,True,Path('.local/raven-verification-profiles',uuid4().hex).resolve())
+    server=ThreadingHTTPServer(('127.0.0.1',PORT),Handler)
+    svc=Service(PORT,True,Path('.local/raven-verification-profiles',uuid4().hex).resolve())
     server.service=svc
     threading.Thread(target=server.serve_forever,daemon=True).start()
     results={}
@@ -111,7 +112,7 @@ def main():
             assert sw.targets[initial] != sw.targets[other_id]
             human_opened=context.new_page()
             human_opened.goto('https://example.com/')
-            req=Request(f'http://127.0.0.1:18766/api/tasks/{sw.run_id}/handback',
+            req=Request(f'http://127.0.0.1:{PORT}/api/tasks/{sw.run_id}/handback',
                 data=json.dumps({'tab_id':pending['tab_id'],'note':'Checked by scripted acceptance'}).encode(),
                 headers={'Content-Type':'application/json'},method='POST')
             assert urlopen(req).status==200
@@ -129,11 +130,11 @@ def main():
             results['background']=wait_done(bg)
             assert any(e['type']=='final' and e['sources'] for e in bg.events), bg.events
             # SSE replays exactly, including terminal done for late subscribers.
-            replay=urlopen(f'http://127.0.0.1:18766/api/tasks/{bg.run_id}/events').read().decode()
+            replay=urlopen(f'http://127.0.0.1:{PORT}/api/tasks/{bg.run_id}/events').read().decode()
             assert [json.loads(s[6:]) for s in replay.splitlines() if s.startswith('data: ')]==bg.events
             results['sse_replay']=True
-            # Human closes a handed-over tab; stale handback is friendly and the
-            # agent continues in a workspace that is removed if left blank.
+            # Closing a tab while Raven waits ends that run; it must not create
+            # a replacement workspace or keep researching elsewhere.
             sacrificial=context.new_page()
             sacrificial.goto('https://example.com/')
             sacrificial.bring_to_front()
@@ -147,8 +148,8 @@ def main():
             assert any(e['type']=='handover' for e in closed.events),closed.events
             sacrificial.close()
             results['closed_handover']=wait_done(closed)
-            assert any(e['type']=='final' for e in closed.events),closed.events
-            assert not any(e['type']=='error' for e in closed.events),closed.events
+            assert any(e['type']=='error' and 'Supervised tab closed' in e['message'] for e in closed.events),closed.events
+            assert not any(e['type']=='final' for e in closed.events),closed.events
             page.title()  # Pump this independent CDP client's pending tab-close events.
             assert not any(p.url=='about:blank' for p in context.pages)
             page.bring_to_front()
@@ -227,7 +228,7 @@ def main():
                 time.sleep(.1)
             assert any(e['type']=='handover' for e in reload_run.events),reload_run.events
             frame.locator('#handover').wait_for(state='visible',timeout=30000)
-            extra=urlopen(f'http://127.0.0.1:18766/api/tasks/{reload_run.run_id}/events')
+            extra=urlopen(f'http://127.0.0.1:{PORT}/api/tasks/{reload_run.run_id}/events')
             assert extra.readline().startswith(b'data: ')
             extra.close()
             time.sleep(5)

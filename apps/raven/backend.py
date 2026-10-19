@@ -29,6 +29,7 @@ if __name__ == '__main__' and sys.prefix == sys.base_prefix and (SHARED / '.venv
     os.execve(str(SHARED / '.venv/bin/python'), [str(SHARED / '.venv/bin/python'), *sys.argv], env)
 sys.path.insert(0, str(ROOT))
 from apps.raven.episode import episode_main, MODEL, OPENROUTER_MODEL
+from apps.raven.browser_launch import demo_launch_options
 
 ASSETS = ROOT / 'design/raven/outputs/raven'
 APP = Path(__file__).resolve().parent
@@ -70,14 +71,14 @@ class UserWindow:
                 debug_port = sock.getsockname()[1]
             with sync_playwright() as pw:
                 extension = APP / 'extension'
-                self.context = pw.chromium.launch_persistent_context(
-                    str(self.profile_dir or ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
-                    no_viewport=True, env={**os.environ, 'DISPLAY': os.getenv('DISPLAY', ':0')},
+                self.context = pw.chromium.launch_persistent_context(**demo_launch_options(
+                    user_data_dir=str(self.profile_dir or ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
+                    no_viewport=True,
                     args=[f'--load-extension={extension}', f'--disable-extensions-except={extension}',
                           f'--remote-debugging-port={debug_port}', '--remote-debugging-address=127.0.0.1',
                           '--window-size=1440,1000', '--hide-crash-restore-bubble'],
                     ignore_default_args=['--disable-extensions'],
-                    accept_downloads=False, service_workers='allow')
+                    accept_downloads=False, service_workers='allow'))
                 page = self.context.pages[0] if self.context.pages else self.context.new_page()
                 page.goto('https://example.com/')
                 worker = self.context.service_workers[0] if self.context.service_workers else self.context.wait_for_event('serviceworker')
@@ -249,6 +250,8 @@ class Service:
             elif '_trace' in event:
                 run.trace = event['_trace']
             else:
+                if event['type'] == 'handover' and run.payload['mode'] == 'background_window':
+                    self.focus(run.run_id + ':' + event['tab_id'])
                 run.emit(event)
         run.process.join()
         if not run.done:
