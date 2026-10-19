@@ -4,22 +4,15 @@ The real backend serves full-page chat at `/` (`mode=background`, headless brows
 
 ## Launch
 
-From this worktree:
+From this worktree, with the existing invisible Xvfb display:
 
 ```sh
-python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
-  python3 apps/raven/backend.py --port 8766 --user-window
-```
-
-The Python entry uses the workstation shared virtualenv, agent_trace import path and library directory automatically. Model keys stay server-side. Do not interrupt an existing owner service on 8766 or 8770. Isolated test launch:
-
-```sh
-python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
+DISPLAY=:99 python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
   python3 apps/raven/backend.py --port 8772 --user-window \
-  --profile-dir .local/raven-web-d-profile
+  --profile-dir .local/raven-web-d-xvfb-profile
 ```
 
-Full-page: <http://localhost:8772/>. Panel preview: <http://localhost:8772/panel.html>. The actual extension opens automatically in the dedicated visible window.
+The Python entry selects the workstation shared virtualenv, agent_trace path and library directory automatically. Full-page: <http://localhost:8772/>. Panel preview: <http://localhost:8772/panel.html>. Tests use a separate profile on display `:99`; the owner's service on `8770` is separate. Model credentials stay server-side.
 
 Offline fallback is explicit and uses no model:
 
@@ -77,7 +70,7 @@ python3 design/raven/tools/verify_bundle.py
 Browser integration (scripted decisions, no model calls):
 
 ```sh
-LD_LIBRARY_PATH=/home/bjorn/code/LLM_proj_uu/.local/system-libs/usr/lib/x86_64-linux-gnu \
+DISPLAY=:99 LD_LIBRARY_PATH=/home/bjorn/code/LLM_proj_uu/.local/system-libs/usr/lib/x86_64-linux-gnu \
 PYTHONPATH="$PWD:/home/bjorn/code/cau-merge-20261016" \
 python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
 /home/bjorn/code/LLM_proj_uu/.venv/bin/python -m apps.raven.verify
@@ -88,7 +81,7 @@ Evidence: `.local/coordination/demo-sprint/scripted-acceptance.json`, `web-c-scr
 Full-page lifecycle suite against the mock:
 
 ```sh
-LD_LIBRARY_PATH=/home/bjorn/code/LLM_proj_uu/.local/system-libs/usr/lib/x86_64-linux-gnu \
+DISPLAY=:99 LD_LIBRARY_PATH=/home/bjorn/code/LLM_proj_uu/.local/system-libs/usr/lib/x86_64-linux-gnu \
 PYTHONPATH="$PWD:/home/bjorn/code/cau-merge-20261016" \
 python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
 /home/bjorn/code/LLM_proj_uu/.venv/bin/python design/raven/tools/test_backend_chat.py \
@@ -98,4 +91,8 @@ python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
 
 The six-question model UI check is `apps/raven/demo_check.py`. It requires an explicit CDP endpoint for the isolated visible window and an output directory. It runs background cases with bounded concurrency and serializes cases sharing the visible window. Background-only selections never attach or reload the panel. Use `--cases NAME...` to run only selected cases and preserve the finite episode allowance. It does not authorize additional model episodes: obey the worker's finite allowance. An unfiltered rerun repeats all six prompts and incurs new charges.
 
-Current results, exact reviewed commits and disposition are recorded in the requested shared worker log: `/home/bjorn/code/LLM_proj_uu/.local/coordination/demo-sprint/workers/log-web-c.md`. Shared screenshots and per-question JSON are under `.../web-c-shots/`; local raw model traces are `.local/raven-runs/RUN_ID/EPISODE_ID/`.
+Final WEB-D evidence is in this worktree under `.local/coordination/demo-sprint/`: `workers/log-web-d.md`, `workers/review-web-d.md`, `web-d-shots/`, `web-d-scripted-frozen-final.log` and `web-d-frozen-binding.json`. The shared tree was kept read-only. The rendered report is served locally at <http://localhost:8892/>.
+
+Eight real model episodes completed: all six full-page low/medium runs plus two Swedish background-panel runs. Subscription requested priority and returned default in all 44 provider responses; dollar charges remain unreported. 64 unit tests passed, a focused final rerun passed 23, and the 84-file bundle passed. The exact WEB-D scripted acceptance passed context isolation, preserved human document/tab identity, actual tab closure recovery, handover/handback, cancellation, SSE replay, duplicate-tab controls, transient handback errors, panel Stop/error/reload recovery and plain-URL citations. Scripted traces carry the `scripted` tag. A separate labeled visual replay verifies readable final step text without a model call.
+
+Concurrent WEB-E commits were interleaved on the branch. WEB-D acceptance loads the reviewed `ae67faa` runtime plus the isolated `836ce35` test correction and `776b3ab` close-race fix; the final panel color comes from `0d9df96`. Frozen module/asset hashes are recorded in `web-d-frozen-binding.json`; no concurrent source was replaced. Review/adoption must identify the selected commits explicitly and treat WEB-E review separately. OS focus remains unverified on Xvfb/WSL where the window manager focus property is absent or zero; Chrome tab identity and context isolation are separately verified.
