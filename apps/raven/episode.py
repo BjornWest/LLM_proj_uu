@@ -192,7 +192,9 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
                 t = data['transition']
                 events.put({'_controller': controller.snapshot()})
                 custody = getattr(env_holder[0]._active_page_check, '__self__', None) if env_holder else None
-                if t.get('event') == 'closed' and not getattr(custody, 'raven_closing', False):
+                page = getattr(custody, 'pages', {}).get(t['tab_id'])
+                if t.get('event') == 'closed' and (not getattr(custody, 'raven_closing', False)
+                        or page is None or page.is_closed()):
                     emit('tab', action='closed', tab_id=t['tab_id'], url='', title='', owner='human')
                 if t['event'] == 'handover' and t['tab_id'] in getattr(custody, 'raven_requested_handovers', set()):
                     emit('handover', tab_id=t['tab_id'], message=t.get('reason') or 'Your help is needed.')
