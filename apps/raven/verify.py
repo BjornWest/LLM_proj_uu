@@ -46,7 +46,9 @@ def main():
         with sync_playwright() as pw:
             browser=pw.chromium.connect_over_cdp(svc.window.cdp_url)
             context=browser.contexts[0]
-            page=next(p for p in context.pages if not p.url.startswith('chrome-extension:'))
+            # CDP groups the pre-created incognito blank into this wrapper too.
+            # Select the human page explicitly, then establish the focus baseline.
+            page=next(p for p in context.pages if p.url=='https://example.com/')
             page.goto('https://example.com/')
             page.evaluate('window.ravenPreserveState=42')
             other=context.new_page()
@@ -54,6 +56,8 @@ def main():
             other.evaluate('window.humanFormState=99')
             page.bring_to_front()
             page.wait_for_timeout(300)
+            from apps.raven.shared_browser import active_target
+            assert active_target(context)==target_id(context,page)
             human_focus=subprocess.check_output(['xprop','-root','_NET_ACTIVE_WINDOW'],text=True)
             focus_id=re.search(r'0x[0-9a-fA-F]+',human_focus)
             results['os_focus_probe_available']=bool(focus_id and int(focus_id.group(),16)>0)
