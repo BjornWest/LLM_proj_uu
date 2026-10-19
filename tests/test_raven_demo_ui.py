@@ -17,6 +17,9 @@ class FailureService(Service):
         self.output = output
         self.window = SimpleNamespace(cdp_url='scripted-fixture')
 
+    def tabs(self):
+        return []
+
     def stop_process(self, run):
         run.process.stopped.set()
 
@@ -78,6 +81,7 @@ def test_recovery_and_friendly_errors_in_both_layouts(tmp_path):
                 message = FRIENDLY_ERROR if permanent else 'Recovered answer.'
                 page.locator('.message:not(.user)').filter(has_text=message).wait_for(timeout=30000)
                 page.wait_for_function('!document.querySelector("#send-button").disabled', timeout=15000)
+                page.locator('.raven-steps summary').click()
                 text = page.locator('body').inner_text()
                 assert 'Worker.evaluate' not in text and 'private stack trace' not in text
                 assert 'Taking another look…' in text

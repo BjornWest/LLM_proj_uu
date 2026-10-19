@@ -353,7 +353,8 @@ class Service:
                 if journal:
                     with journal.open('a') as stream:
                         stream.write(json.dumps({'service_error': failure}) + '\n')
-            if demo and failure and not answered:
+            retryable = failure and (terminal is None or terminal['stop_reason'] == 'error')
+            if demo and retryable and not answered:
                 with run.condition:
                     self.stop_process(run)
                     if run.done or run.cancelled:
@@ -501,8 +502,9 @@ class Handler(preview.Handler):
                         break
             except (BrokenPipeError, ConnectionResetError):
                 LOG.exception('Run %s SSE disconnected', run.run_id)
-                if service.demo_mode and not run.done:
-                    service.retry(run, cursor)
+                # Only the client knows the last received event ID. Its automatic
+                # /retry request owns stream recovery; the write cursor can include
+                # buffered events the client never received.
             finally:
                 with run.condition:
                     run.subscribers -= 1

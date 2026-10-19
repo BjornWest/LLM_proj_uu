@@ -162,3 +162,38 @@ const vm=require('node:vm');
 })().catch(error=>{console.error(error);process.exitCode=1;});
 '''
     subprocess.run(['node', '-e', script], cwd=root, check=True)
+
+
+@pytest.mark.parametrize('reason', ['max_input_tokens', 'max_total_input_tokens', 'max_total_output_tokens'])
+def test_budget_exhaustion_does_not_start_another_episode(reason):
+    svc = service()
+    svc.start_attempt = Mock()
+    run = Run('test', {'mode': 'background'}, process=fake_process())
+    svc.collect(run, attempt_events(
+        {'type': 'error', 'message': 'The episode ended before the agent supplied an answer.'},
+        {'type': 'done', 'stop_reason': reason}))
+    assert run.done and run.attempt == 0
+    assert not any(e['type'] == 'error' for e in run.events)
+    assert run.events[-1] == {'type': 'done', 'stop_reason': reason}
+    svc.start_attempt.assert_not_called()
+
+
+def test_broken_old_stream_cannot_charge_unsent_retry_marker():
+    # A browser already requested recovery, but the old stream has not discovered
+    # its broken socket. Its pending batch now includes an unsent retry marker.
+    run = Run('drop', {'mode': 'background'}, attempt=1, retry_cursor=2)
+    run.events = [{'type': 'status', 'state': 'starting'},
+                  {'type': 'step', 'summary': 'Taking another look…'}]
+    svc = SimpleNamespace(demo_mode=True, runs={'drop': run}, retry=Mock(), cancel=Mock())
+    handler = Handler.__new__(Handler)
+    handler.server = SimpleNamespace(service=svc)
+    handler.path = '/api/tasks/drop/events'
+    handler.headers = {'Last-Event-ID': '1'}
+    handler.allowed_client = lambda: True
+    handler.send_response = handler.send_header = handler.end_headers = Mock()
+    handler.wfile = SimpleNamespace(write=Mock(side_effect=BrokenPipeError('old stream')), flush=Mock())
+    handler.do_GET()
+    assert run.subscribers == 0
+    assert not run.retry_requested.is_set()
+    svc.retry.assert_not_called()
+    svc.cancel.assert_not_called()

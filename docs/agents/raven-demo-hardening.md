@@ -153,8 +153,8 @@ Window modes reconnect to the last captured active tab when its target is known,
 preserving its current document. A destroyed browser/closed tab cannot be restored
 by this retry; full-page background episodes start a fresh browser. Retry is the
 same user request, not a restored model conversation. Streams carry event IDs so
-reconnection resumes after the last received event. Server and browser reports of
-the same stream drop share the same retry allowance. A failed reconnect has a
+reconnection resumes after the last received event. The reconnecting browser requests recovery with its last received event ID;
+server-side socket failures are logged and cannot consume a second attempt. A failed reconnect has a
 15-second client deadline, then shows the friendly line and cancels the run.
 
 Full errors remain in server stderr and
@@ -211,7 +211,7 @@ worker errors, abnormal process exit, exhausted retries, cancellation, retained 
 diagnostics when demo mode is off, indexed replay and duplicate stream-drop reports.
 
 WEB-G validation on the isolated Linux service at port 8778: the five smoke checks
-passed. Twenty-three focused unit checks passed. Two Sol attempts (one injected
+passed. Twenty-seven focused unit checks passed, including review regressions. Two Sol attempts (one injected
 failure after a real response, then one automatic retry) returned **Raven retry
 works.** with the original tab target and JavaScript document marker preserved.
 No OpenRouter calls were made. Provider-reported usage was 12,680 input tokens
@@ -225,3 +225,10 @@ Model driver and result:
 `web-g-model-retry.json`, `web-g-model-retry.log`.
 Traces: `.local/raven-runs/a457314142df4a3fb8efb0af9828f9ef/attempt-{1,2}/`.
 This finite check used two of the four authorized real episode attempts.
+
+The final scripted browser recovery suite passed all six cases (one pytest case,
+24.38 seconds before review; final rerun recorded in `web-g-ui.log`). Independent
+review initially found two implementation defects: unsent SSE events could consume
+the recovery attempt, and budget stops could restart an episode. Both were fixed
+with actual-handler/budget-reason regressions. Review and disposition live in
+`.local/coordination/demo-sprint/workers/review-web-g.md`.
