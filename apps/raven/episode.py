@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import json
 import os
 import re
+import queue
 from pathlib import Path
 import threading
 from urllib.parse import urlsplit
@@ -46,6 +47,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
     initial_chat_count = 0
     controller = HumanHandoverController() if cdp_url else None
     env_holder = []
+    human_notes = queue.Queue()
 
     def emit(kind, **data):
         events.put({'type': kind, **data})
@@ -58,7 +60,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                 current_step = int(data['call_id'].rsplit('-', 1)[-1])
             if kind == 'environment_reset_completed':
                 initial_chat_count = len(env_holder[0].raven_chat.messages)
-            if kind in ('tool_started', 'batch_call_started'):
+            if kind in ('tool_started', 'batch_call_started', 'raven_tab_tool_started'):
                 args = data.get('arguments', {})
                 name = data.get('tool', 'Inspecting page')
                 summary = name.replace('_', ' ')
@@ -68,7 +70,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
             if kind == 'human_tab_transition':
                 t = data['transition']
                 events.put({'_controller': controller.snapshot()})
-                if t['event'] == 'handover':
+                custody = getattr(env_holder[0]._active_page_check, '__self__', None) if env_holder else None
+                if t['event'] == 'handover' and t['tab_id'] in getattr(custody, 'raven_requested_handovers', set()):
                     emit('handover', tab_id=t['tab_id'], message=t.get('reason') or 'Your help is needed.')
 
         def observation(self, index, obs, text, **kwargs):
@@ -125,12 +128,20 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                 env = env_holder[0]
                 mapping = {}
                 custody = getattr(env._active_page_check, '__self__', None)
+                from playwright.sync_api import Error as PlaywrightError
                 for tid, page in getattr(custody, 'pages', {}).items():
                     if page.is_closed():
                         continue
-                    session = env.context.new_cdp_session(page)
-                    mapping[tid] = session.send('Target.getTargetInfo')['targetInfo']['targetId']
-                    session.detach()
+                    try:
+                        session = env.context.new_cdp_session(page)
+                        try:
+                            mapping[tid] = session.send('Target.getTargetInfo')['targetInfo']['targetId']
+                        finally:
+                            session.detach()
+                    except PlaywrightError:
+                        if page.is_closed():
+                            continue  # Human closed a tab between the snapshot and target lookup.
+                        raise
                 events.put({'_targets': mapping})
             return ref
 
@@ -143,13 +154,19 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                     tab = next(t for t in controller.snapshot()['tabs'] if t['tab_id'] == command['tab_id'])
                     if tab['state'] == 'awaiting_human':
                         controller.signal(tab['tab_id'], 'start')
+                    if command.get('note'):
+                        human_notes.put(command['note'])
                     controller.signal(tab['tab_id'], 'complete')
-                    # Note is delivered through the same trusted chat ingress as native handover UI.
-                    if command.get('note') and env_holder:
-                        env_holder[0].chat._js_user_message_received_callback(msg=command['note'])
                 except Exception as exc:
                     emit('error', message=str(exc))
     threading.Thread(target=control_loop, daemon=True).start()
+    def before_observation():
+        while True:
+            try:
+                note = human_notes.get_nowait()
+            except queue.Empty:
+                break
+            env_holder[0].raven_chat._js_user_message_received_callback(msg=note)
     profile = open_profile(standard_profile(helpers=False, data_tools=False))
     if cdp_url:
         profile = with_human_handover(profile, wait_for_human=False, compact_tabs=True,
@@ -182,6 +199,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                 task_kwargs=dict(start_url=task.start_url, goal=goal, record=task.trace.event),
                 headless=True, action_mapping=actions.to_python_code, wait_for_user_message=False,
                 pw_context_kwargs={'accept_downloads':False, 'service_workers':'block'})
+        env.raven_drain_notes = before_observation
         env_holder.append(env)
         return env
     if scripted is not None:
@@ -219,7 +237,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
     try:
         emit('status', state='working')
         directory, summary = runner.run_episode(factory, backend, metadata, output, 40, episode_task=task,
-            harness_profile=profile, human_handover=controller, observation_pipeline='auto', trace_screenshots=False,
+            harness_profile=profile, human_handover=controller, before_observation=before_observation, observation_pipeline='auto', trace_screenshots=False,
             max_input_tokens=100000, allow_ungraded=True, ungraded_reason='Raven supervised live-web demo',
             terminal_response_instruction='Answer the user with findings, Markdown source links and uncertainties using send_msg_to_user.')
         emit('status', state='finishing')
@@ -230,7 +248,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
             if answers:
                 final = answers[-1]
         if final:
-            captured = list(sources.values())
+            captured = [s for s in sources.values() if s['url'] in final] or list(sources.values())
             for source in captured:
                 source['evidence'] = evidence_excerpt(captured_texts[source['url']], final)
                 if source['url'] in final:

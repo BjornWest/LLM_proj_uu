@@ -68,12 +68,18 @@ def main():
             svc.focus(pending['tab_id'])
             assert other.evaluate('window.humanFormState')==99
             assert sw.targets[initial] != sw.targets[other_id]
+            human_opened=context.new_page()
+            human_opened.goto('https://example.com/')
             req=Request(f'http://127.0.0.1:18766/api/tasks/{sw.run_id}/handback',
                 data=json.dumps({'tab_id':pending['tab_id'],'note':'Checked by scripted acceptance'}).encode(),
                 headers={'Content-Type':'application/json'},method='POST')
             assert urlopen(req).status==200
             results['shared']=wait_done(sw)
             assert any(e['type']=='final' for e in sw.events), sw.events
+            transitions=[json.loads(line) for line in (Path(sw.trace)/'events.jsonl').read_text().splitlines()]
+            assert any(e['event']=='human_chat_queued_for_policy' for e in transitions)
+            assert len([e for e in sw.events if e['type']=='handover'])==1
+            assert sum(e['type']=='step' for e in sw.events)>=6
             assert page.evaluate('window.ravenPreserveState')==42
             assert any(e['type']=='tab' and e['action']=='opened' and e['tab_id']=='tab-3' for e in sw.events)
             assert any(e['type']=='tab' and e['action']=='closed' and e['tab_id']=='tab-3' for e in sw.events)
@@ -94,13 +100,14 @@ def main():
             assert cancel.events[-1]=={'type':'done','stop_reason':'cancelled'}
             assert not cancel.process.is_alive()
             assert page.title()
+            page.goto('https://example.com/')  # Interrupted CDP route hooks no longer intercept navigation.
             results['cancel']=cancel.events
             # Exercise the actual panel's Stop and failed-submit recovery, with no API inference.
             original_submit=svc.submit
             def ui_submit(payload, scripted=None):
                 if payload['text']=='Force error acceptance':
                     raise ValueError('Scripted submit failure')
-                return original_submit(payload, [action('handover_tab',tab_id='$initial',reason='Panel cancellation')])
+                return original_submit(payload, [action('handover_tab',tab_id='$initial',reason='Panel cancellation'),action('tab_focus',tab_id='$initial'),action('send_msg_to_user',text='Returned')])
             svc.submit=ui_submit
             panel=next(p for p in context.pages if '/sidepanel.html' in p.url)
             panel.reload()  # Attach existing extension OOPIFs on this independent CDP client.
@@ -115,6 +122,14 @@ def main():
             while not any(not r.done for r in svc.runs.values()) and time.monotonic()<end:
                 time.sleep(.1)
             ui_run=list(svc.runs.values())[-1]
+            end=time.monotonic()+60
+            while not any(e['type']=='handover' for e in ui_run.events) and time.monotonic()<end:
+                time.sleep(.1)
+            matching=frame.locator('#tabs button[title="https://example.com/"]')
+            assert matching.count()>=2
+            for i in range(2):
+                matching.nth(i).click()
+            results['panel_duplicate_url_tabs']=True
             frame.locator('#stop').click()
             wait_done(ui_run)
             assert ui_run.events[-1]=={'type':'done','stop_reason':'cancelled'},ui_run.events

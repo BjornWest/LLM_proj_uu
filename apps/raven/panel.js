@@ -14,6 +14,13 @@ window.addEventListener('DOMContentLoaded', () => {
     return data;
   };
   const tabs = new Map();
+  const handovers = new Map();
+  function showHandover() {
+    const next = handovers.entries().next().value;
+    pendingTab = next?.[0] || null;
+    handover.hidden = !next;
+    document.querySelector('#handover-message').textContent = next?.[1] || '';
+  }
   function drawTabs() {
     const root = document.querySelector('#tabs');
     root.replaceChildren();
@@ -47,6 +54,7 @@ window.addEventListener('DOMContentLoaded', () => {
     post('/api/tasks', {text, conversation_id:conversation, mode:'user_window', history:prior}).then(data => {
       if (token !== generation) {post('/api/tasks/'+data.run_id+'/cancel');return;}
       run = data.run_id;
+      tabs.clear();drawTabs();handovers.clear();showHandover();
       stream = new EventSource('/api/tasks/'+run+'/events');
       stream.onmessage = msg => {
         if (token !== generation) return;
@@ -57,13 +65,11 @@ window.addEventListener('DOMContentLoaded', () => {
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{url:e.url,label:e.title}}));
         }
         if (e.type === 'tab') {
-          for(const [id,tab] of tabs)if(id!==e.tab_id && tab.url===e.url)tabs.delete(id);
           if(e.action === 'closed') tabs.delete(e.tab_id); else tabs.set(e.tab_id,e);
           drawTabs();
         }
         if (e.type === 'handover') {
-          pendingTab=e.tab_id;handover.hidden=false;
-          document.querySelector('#handover-message').textContent=e.message;
+          handovers.set(e.tab_id,e.message);showHandover();
         }
         if (e.type === 'final') {
           c.agentReply=e;c.reply();history.push({who:'Raven',text:e.markdown});
@@ -73,7 +79,7 @@ window.addEventListener('DOMContentLoaded', () => {
           status.textContent=e.message;c.cancelTask({announce:false});c.appendMessage(e.message,'Raven');
         }
         if (e.type === 'done') {
-          stream.close();stream=null;run=null;stop.disabled=true;handover.hidden=true;
+          stream.close();stream=null;run=null;stop.disabled=true;handovers.clear();showHandover();
           status.textContent=e.stop_reason;
           if(!c.agentReply)c.cancelTask({announce:false});
         }
@@ -84,15 +90,16 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   stop.onclick = async () => {
     generation++;
-    const id=run;run=null;stream?.close();stream=null;stop.disabled=true;handover.hidden=true;
+    const id=run;run=null;stream?.close();stream=null;stop.disabled=true;handovers.clear();showHandover();
     const cancelled = id ? post('/api/tasks/'+id+'/cancel') : Promise.resolve();
     c.cancelTask({announce:false});status.textContent='Cancelled';
     try {await cancelled;} catch(e) {status.textContent=e.message;}
   };
   document.querySelector('#handback').onclick = async () => {
+    const tab = pendingTab;
     try {
-      await post('/api/tasks/'+run+'/handback',{tab_id:pendingTab,note:null});
-      handover.hidden=true;status.textContent='Returned to Raven';
+      await post('/api/tasks/'+run+'/handback',{tab_id:tab,note:null});
+      handovers.delete(tab);showHandover();status.textContent='Returned to Raven';
     } catch(e) {status.textContent=e.message;}
   };
   fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs)tabs.set(t.tab_id,t);drawTabs();});

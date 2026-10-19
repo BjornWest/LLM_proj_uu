@@ -58,11 +58,9 @@ class SharedBrowserEnv(BrowserEnv):
         self.browser = pw.chromium.connect_over_cdp(self.cdp_url)
         self.context = WebContext(self.browser.contexts[0])
         self.context.set_default_timeout(5000)
-        for page in self.context.pages:
-            disable_focus_emulation(self.context, page)
         pages = [p for p in self.context.pages if not p.url.startswith('chrome-extension:')]
-        visible = [p for p in pages if p.evaluate('document.visibilityState === "visible"')]
-        self.page = (visible or pages)[-1] if pages else self.context.new_page()
+        active = active_target(self.context)
+        self.page = next(p for p in pages if page_target(self.context, p) == active)
         self.task = self.task_entrypoint(seed=seed, **self.task_kwargs)
         self.chat = self.raven_chat = PanelChat()
         self.goal_object = [{'type': 'text', 'text': self.task.goal}]
@@ -110,11 +108,6 @@ class WebContext:
     def pages(self):
         return [p for p in self._context.pages if not p.url.startswith('chrome-extension:')]
 
-    def new_page(self):
-        page = self._context.new_page()
-        disable_focus_emulation(self._context, page)
-        return page
-
     def __getattr__(self, name):
         return getattr(self._context, name)
 
@@ -124,6 +117,7 @@ from intent_browser.human_browser import HumanBrowser
 
 class SharedHumanBrowser(HumanBrowser):
     def start(self):
+        self.raven_requested_handovers = set()
         super().start()
         # Only the current tab was assigned to Raven. Preserve all other user tabs.
         for tab_id, page in self.pages.items():
@@ -131,11 +125,32 @@ class SharedHumanBrowser(HumanBrowser):
                 self.controller.handover(tab_id, 'Existing user tab; human control retained.')
         self.emit()
 
+    def _sync(self, budget=None):
+        self.env.raven_drain_notes()
+        return super()._sync(budget)
 
-def disable_focus_emulation(context, page):
-    # Playwright otherwise reports every attached tab as visible/focused over CDP.
+    def execute(self, decision):
+        if decision.name == 'handover_tab':
+            self.raven_requested_handovers.add(decision.arguments['tab_id'])
+        if decision.name in ('handover_tab', 'tab_focus', 'new_tab', 'tab_close'):
+            self.trace.event('raven_tab_tool_started', tool=decision.name, arguments=decision.arguments)
+        return super().execute(decision)
+
+
+def page_target(context, page):
     session = context.new_cdp_session(page)
     try:
-        session.send('Emulation.setFocusEmulationEnabled', {'enabled': False})
+        return session.send('Target.getTargetInfo')['targetInfo']['targetId']
     finally:
         session.detach()
+
+
+def active_target(context):
+    # CDP emulates focus/visibility for every attached Page. Chrome's own tab API
+    # supplies actual active identity, including two tabs with identical URLs.
+    worker = next(w for w in context.service_workers if w.url.startswith('chrome-extension:'))
+    return worker.evaluate("""async () => {
+      const [tab] = await chrome.tabs.query({active:true, lastFocusedWindow:true});
+      const targets = await chrome.debugger.getTargets();
+      return targets.find(target => target.tabId === tab.id).id;
+    }""")

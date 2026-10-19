@@ -78,8 +78,6 @@ class UserWindow:
                           '--window-size=1440,1000', '--hide-crash-restore-bubble'],
                     ignore_default_args=['--disable-extensions'],
                     accept_downloads=False, service_workers='allow')
-                from apps.raven.shared_browser import disable_focus_emulation
-                self.context.on('page', lambda p: disable_focus_emulation(self.context, p))
                 page = self.context.pages[0] if self.context.pages else self.context.new_page()
                 page.goto('https://example.com/')
                 worker = self.context.service_workers[0] if self.context.service_workers else self.context.wait_for_event('serviceworker')
@@ -106,13 +104,15 @@ class UserWindow:
                             response.put(True)
                             break
                         if action == 'tabs':
+                            from apps.raven.shared_browser import active_target
+                            active = active_target(self.context)
                             rows = []
                             for p in self.context.pages:
                                 if p.url.startswith('chrome-extension:'):
                                     continue
-                                disable_focus_emulation(self.context, p)
-                                rows.append(dict(tab_id=target_id(self.context, p), url=p.url,
-                                    title=p.title(), owner='human', active=p.evaluate('document.visibilityState === "visible"')))
+                                tid = target_id(self.context, p)
+                                rows.append(dict(tab_id=tid, url=p.url,
+                                    title=p.title(), owner='human', active=tid == active))
                             response.put(rows)
                         elif action == 'focus':
                             for p in self.context.pages:
