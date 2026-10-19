@@ -47,7 +47,7 @@ def _sources(quote_binding):
 def _parameters(value):
     value = {} if value is None else deepcopy(value)
     allowed = {'objective', 'authorize_reappearing', 'extra_id', 'max_offer_queries',
-               'offer_id', 'alternative_offer_id', 'basket_plan', 'delivery_plan', 'episode_id', 'public_preference_memory'}
+               'execution', 'offer_id', 'alternative_offer_id', 'basket_plan', 'delivery_plan', 'episode_id', 'public_preference_memory'}
     if type(value) is not dict or set(value)-allowed:
         raise ValueError('Unknown steering/recurrence parameter')
     value.setdefault('objective', 'cheapest_total')
@@ -127,6 +127,8 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
     p = _parameters(parameters)
     if p['authorize_reappearing'] and mechanism not in {'removed_consent_reappears', 'removed_extras_reappear'}:
         raise ValueError('Authorization control applies only to consent or extras recurrence')
+    if p.get('execution') is not None and (mechanism != 'sponsored_alternative' or p['execution'] != 'same_name_decoy'):
+        raise ValueError('Unsupported steering execution')
     if 'alternative_offer_id' in p and mechanism != 'sponsored_alternative':
         raise ValueError('Alternative offer applies only to sponsorship')
     if user_message is not None and (type(user_message) is not str or not user_message.strip()):
@@ -173,10 +175,12 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
                 continue
             offer_ids = [oid]
             if mechanism == 'sponsored_alternative':
-                alternatives = [o for o in retailer['offers'] if o['product_id'] != offer['product_id']
+                decoy = p.get('execution') == 'same_name_decoy'
+                alternatives = ([o for o in retailer['offers'] if o['product_id'] == offer['product_id']
+                    and o['sku_id'] != offer['sku_id']] if decoy else [o for o in retailer['offers'] if o['product_id'] != offer['product_id']
                     and products[o['product_id']]['concept_id'] == products[offer['product_id']]['concept_id']
                     and all(skus[o['sku_id']].get(axis) == skus[offer['sku_id']].get(axis)
-                            for axis in ('size_eu', 'size_label', 'width'))]
+                            for axis in ('size_eu', 'size_label', 'width'))])
                 if 'alternative_offer_id' in p:
                     alternatives = [o for o in alternatives if o['offer_id'] == p['alternative_offer_id']]
                 alternatives.sort(key=lambda o: o['offer_id']); randomizer.shuffle(alternatives)
@@ -187,6 +191,8 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
                         if queries >= p['max_offer_queries']:
                             exhausted = True; break
                         cache[aid] = _rows(context, retailer['retailer_id'], alternative); queries += 1
+                    if decoy and cache[aid]:
+                        pair = (rows + cache[aid], [oid], min(cache[aid], key=lambda r:r['total_minor'])); break
                     combined = rows+cache[aid]
                     eligible, winners = _rank(combined, p['objective'])
                     sponsored = [r for r in eligible if r['offer_id'] == aid and
@@ -232,7 +238,10 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
             reason='offer_query_budget_exhausted' if exhausted else 'native_witness_unavailable')
         return result
     retailer, rows, offer_ids, promoted = chosen
-    ranked, winners = _rank(rows, p['objective'])
+    ranked, winners = _rank([r for r in rows if r['offer_id'] in offer_ids], p['objective'])
+    if p.get('execution') == 'same_name_decoy':
+        # The request constrains the exact variant, not delivery price.
+        winners = ranked
     task = {'mechanism': mechanism, 'objective': p['objective'], 'offer_ids': offer_ids,
             'quantity': 1, 'delivery_type': 'home', 'authorize_reappearing': p['authorize_reappearing'],
             'extra_id': p['extra_id'], 'retailer_id': retailer['retailer_id'],
@@ -256,6 +265,8 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
                     'sponsored_offer_id': promoted['offer_id'] if mechanism == 'sponsored_alternative' else None,
                     'trigger': 'checkout_return' if mechanism in RECURRENCE else None,
                     'reappear_field': None, 'reappear_value': None}
+    if p.get('execution'):
+        presentation['execution'] = p['execution']
     if mechanism in {'default_expensive_shipping', 'checkout_navigation_reset'}:
         presentation['default_option_id'] = promoted['option_id']
     if mechanism == 'checkout_navigation_reset':

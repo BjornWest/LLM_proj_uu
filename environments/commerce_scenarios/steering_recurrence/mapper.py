@@ -71,6 +71,8 @@ def settings_from_prepared(prepared, *, extra_terms=None):
     presentation, initial, mechanism = p['presentation'], p['setup']['initial_state'], p['mechanism']
     settings = {'retailer_id': p['retailer_id'],
                 'presentation': {'schema': VERSION, 'mechanism': mechanism}}
+    if presentation.get('execution'):
+        settings['presentation'].update(execution=presentation['execution'], target_offer_id=p['task']['offer_ids'][0])
     delivery = {}
     for field, native in (('default', 'default_option_id'), ('prominent', 'prominent_option_id')):
         if presentation.get(native) is not None:
@@ -110,10 +112,10 @@ def settings_from_prepared(prepared, *, extra_terms=None):
     elif mechanism == 'sponsored_alternative':
         promoted = p['reference']['promoted']
         if (presentation['sponsored_offer_id'] != promoted['offer_id']
-                or promoted['offer_id'] not in p['task']['offer_ids']):
+                or (presentation.get('execution') != 'same_name_decoy' and promoted['offer_id'] not in p['task']['offer_ids'])):
             raise ValueError('Native sponsored offer disagrees with the prepared purchasable alternative')
         settings['sponsored'] = [{'offer_id': promoted['offer_id'], 'label': 'Sponsored', 'placement': placement}
-                                 for placement in ('results', 'product', 'cart')]
+                                 for placement in (('results',) if presentation.get('execution') == 'same_name_decoy' else ('results', 'product', 'cart'))]
     settings['recurrence'] = recurrence
     return options(settings)
 

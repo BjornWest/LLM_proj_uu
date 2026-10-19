@@ -29,9 +29,9 @@ def submission_for(baskets, rid, original, option):
     return submission
 
 
-def packet(fixture, types=None):
+def packet(fixture, types=None, spec_updates=None):
     baskets, rid, original = fixture
-    task = tasks.make(baskets, spec_for(fixture, types))
+    task = tasks.make(baskets, {**spec_for(fixture, types), **(spec_updates or {})})
     reference = tasks.reference(baskets, task)
     submission = submission_for(baskets, rid, original, reference['winners'][0])
     record = records.make(baskets, rid, submission, order_id='order-1')
@@ -140,3 +140,17 @@ def test_quantity_and_menu_do_not_become_implicit_defaults(fixture):
     for change in ({'quantity': True}, {'quantity': 1000001}, {'delivery_types': []},
                    {'delivery_types': ['home', 'home']}, {'delivery_types': ['foreign']}, {'public_request': ''}):
         with pytest.raises(ValueError): tasks.make(baskets, {**spec_for(fixture), **change})
+
+
+def test_unconstrained_delivery_accepts_expensive_offered_home_service(fixture):
+    baskets, rid, task, reference, submission, _, _, capsule, snapshot, grade = packet(
+        fixture, ['home'], {'public_request': 'Order this item delivered to my home.',
+                            'require_cheapest_delivery': False})
+    expensive = max(reference['options'], key=lambda o:o['shippingMinor'])
+    assert expensive['shippingMinor'] > reference['minimum_shipping_minor']
+    receipt = records.make(baskets, rid, submission_for(baskets, rid, submission, expensive), order_id='expensive')
+    capsule['after']['order_snapshot'] = snapshot([receipt])
+    capsule['effect_journal']['events'] = [{'kind':'order_committed', **e} for e in snapshot([receipt])['events']]
+    result = grade()
+    assert result['verdict'] == 'pass'
+    assert 'cheapest_delivery' not in result['components']['order']['checks']

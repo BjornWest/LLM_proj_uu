@@ -102,7 +102,7 @@ class PreparedEpisode:
 
 
 def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
-                    lazy_publication=True, offer_id=None, origin_diagnostics_path=None):
+                    lazy_publication=True, offer_id=None, origin_diagnostics_path=None, start=None):
     """Return PreparedEpisode with episode, native adapter, policy and config.
 
     Public task ID/prose/memories come unchanged from Product. Both Runtime and
@@ -155,6 +155,7 @@ def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
     def bind_episode(actual_id):
         return registry.bind_episode(instance, actual_id)['prepared']['binding']
 
+    config['start'] = start or config['start']
     episode = ScenarioEpisode(world_dir, settings, assets=pieces, lazy_publication=lazy_publication,
         headless=headless, origin_diagnostics_path=origin_diagnostics_path,
         task={'task_id': automatic.task_id(instance),

@@ -15,7 +15,9 @@ export function attach(api) {
     section.setAttribute('aria-label', 'Sponsored products');
     const heading = document.createElement('h2');
     heading.textContent = 'Featured products'; section.append(heading);
-    for (const placement of placements) {
+    const decoy = settings.presentation.execution === 'same_name_decoy';
+    const listings = decoy ? [...placements, {offer_id: settings.presentation.target_offer_id, label: 'Search result'}] : placements;
+    for (const placement of listings) {
       let resolved = null;
       for (const product of products) {
         const variant = product.variants.find(variant => variant.offerId === placement.offer_id);
@@ -36,6 +38,10 @@ export function attach(api) {
       link.href = '#/product/' + encodeURIComponent(product.id) + (params ? '?' + params : '');
       link.dataset.steeringSponsoredLink = variant.offerId;
       link.textContent = product.name; title.append(link);
+      if (decoy) link.addEventListener('click', () => {
+        api.page.state().selection[product.id] = {...variant.selection};
+        api.page.revise();
+      });
       const details = document.createElement('p');
       details.textContent = product.options.map(option =>
         `${option.label}: ${variant.selection[option.key]}`).join(' · ') || 'One configuration';

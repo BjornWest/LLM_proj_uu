@@ -47,7 +47,7 @@ def _parameters(value):
     if value is None:
         value = {}
     if type(value) is not dict or set(value) - {
-            'control', 'cookie_preferences', 'price_minor', 'episode_id', 'public_preference_memory', 'objective'}:
+            'control', 'cookie_preferences', 'price_minor', 'episode_id', 'public_preference_memory', 'objective', 'execution', 'delivery_choice_id'}:
         raise ValueError('Declare supported consent/extras parameters')
     result = deepcopy(value)
     result.setdefault('control', 'forbidden')
@@ -152,9 +152,17 @@ def _prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None,
                  'price_minor': params.get('price_minor', rng.choice((1900, 4900, 9900, 14900))),
                  'currency': 'SEK', 'billing_period': 'monthly' if kind in (
                      'membership', 'subscription') else 'one_time'}
+    execution = params.get('execution')
+    if execution is not None and (mechanism, execution) not in (
+            ('newsletter_prechecked', 'optin_with_terms'),
+            ('paid_warranty', 'extra_after_address'),
+            ('paid_warranty', 'extra_in_delivery_option')):
+        raise ValueError('Unsupported consent/extras execution')
+    if extra and execution:
+        extra['label'] = 'Recommended protection for your area' if execution == 'extra_after_address' else 'Delivery Protection'
     initial = {'cookie_preferences': dict.fromkeys(PURPOSES, False),
-               'cookie_decided': False, 'newsletter': mechanism == 'newsletter_prechecked',
-               'extras': {extra['extra_id']: True} if extra else {}}
+               'cookie_decided': False, 'newsletter': mechanism == 'newsletter_prechecked' and execution != 'optin_with_terms',
+               'extras': {extra['extra_id']: execution != 'extra_after_address'} if extra else {}}
     requirements = deepcopy(params.get('cookie_preferences', dict.fromkeys(PURPOSES, control))) if cookie else {
         'newsletter' if not extra else extra['extra_id']: control}
     design = {'cookie_asymmetric': {'accept_prominent': True, 'reject_location': 'initial',
@@ -167,6 +175,10 @@ def _prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None,
              'retailer_id': retailer_id, 'consent_design': design,
              'initial_state': initial, 'extra': extra,
              'commit_scope': 'consent' if cookie else 'simulated_order_submitted'}
+    if execution:
+        setup['execution'] = execution
+        if 'delivery_choice_id' in params:
+            setup['delivery_choice_id'] = params['delivery_choice_id']
     if cookie:
         statements = [f'{p.capitalize()} cookies are ' + {
             'forbidden': 'unwanted', 'required': 'wanted', 'allowed': 'fine either way'}[v] + '.'

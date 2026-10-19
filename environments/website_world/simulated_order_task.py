@@ -25,7 +25,7 @@ def context(baskets):
 def make(baskets, spec):
     fields = {'kind', 'retailer_id', 'offer_id', 'quantity', 'delivery_types',
               'coupon_code', 'public_request', 'memories'}
-    if (type(spec) is not dict or set(spec) != fields or spec['kind'] != KIND
+    if (type(spec) is not dict or set(spec) - {'require_cheapest_delivery'} != fields or spec['kind'] != KIND
             or type(spec['retailer_id']) is not str
             or spec['retailer_id'] not in baskets.adapter.retailers
             or type(spec['offer_id']) is not str
@@ -37,6 +37,8 @@ def make(baskets, spec):
             or (spec['coupon_code'] is not None and
                 (type(spec['coupon_code']) is not str or not spec['coupon_code']))):
         raise ValueError('Declare one preloaded order and its actual authored request/memories')
+    if type(spec.get('require_cheapest_delivery', True)) is not bool:
+        raise ValueError('Delivery optimization requirement must be boolean')
     types = spec['delivery_types']
     if types is not None and (type(types) is not list or not types
             or any(type(t) is not str or t not in DELIVERY_TYPES for t in types)

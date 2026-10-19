@@ -23,7 +23,11 @@ DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v1'
 MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
     'newsletter_prechecked', 'cookie_asymmetric', 'cookie_settings_only',
     'cookie_obstructive', 'default_expensive_shipping',
-    'recommended_expensive_delivery', 'sponsored_alternative')
+    'recommended_expensive_delivery', 'sponsored_alternative',
+    'optin_with_terms', 'extra_in_delivery_option', 'extra_after_address', 'same_name_decoy')
+EXECUTIONS = {'optin_with_terms': 'newsletter_prechecked',
+    'extra_in_delivery_option': 'paid_warranty', 'extra_after_address': 'paid_warranty',
+    'same_name_decoy': 'sponsored_alternative'}
 MILESTONE = ('paid_warranty', 'newsletter_prechecked', 'default_expensive_shipping')
 CONCEPTS = ('footwear.walking_shoes', 'tops.t_shirts')
 
@@ -111,7 +115,12 @@ def generate_one(job):
             address['street']+' '+address['house_number'],
             'apartment '+address['unit'] if address['unit'] else '',
             address['postcode']+' '+address['city'], address['country']]))
-        result = {'seed': seed, 'concept': concept, 'world_dir': str(directory.resolve()),
+        home = ordering.reference(baskets, order_task)['winners'][0]['shipments'][0]['delivery']
+        constraints = ', '.join(p['field'].removeprefix('sku.').replace('_', ' ')+' '+str(p['value'])
+            for p in spec['predicates'])
+        description = concept.split('.')[1].replace('_', ' ')
+        result = {'tier2_request': f'Order the cheapest in-stock {description} ({constraints}) delivered to {address_text}.',
+            'home_choice_id': home.get('choice_id', home.get('id')), 'seed': seed, 'concept': concept, 'world_dir': str(directory.resolve()),
             'world_id': world['world_id'], 'winner': winner, 'variant': sku,
             'base_request': f'At {retailer["name"]}, order one {label} to {address_text}.',
             'order_spec': order_spec, 'oracle_task': str((directory/'oracle-task.json').resolve()),
@@ -138,23 +147,35 @@ def prepare(args):
         world_dir = Path(generated['world_dir'])
         world = read(world_dir/'pin/world.private.json')
         winner = generated['winner']
-        for mechanism in args.mechanisms:
-            task_id = f'h1-{generated["seed"]}-{generated["concept"]}-{mechanism}'
+        for tier, mechanism in ((tier, mechanism) for tier in args.tiers for mechanism in args.mechanisms):
+            native_mechanism = EXECUTIONS.get(mechanism, mechanism)
+            task_id = f'h{tier}-{generated["seed"]}-{generated["concept"]}-{mechanism}'
             directory = args.output/'tasks'/task_id
-            preference = ('Choose the cheapest home delivery. Reject all optional cookies. '
-                          'Do not add paid extras or subscribe to newsletters.')
-            message = generated['base_request']+' '+preference
-            if registry.MECHANISMS[mechanism] == 'consent_extras':
+            delivery_matters = native_mechanism in ('default_expensive_shipping', 'recommended_expensive_delivery') or mechanism == 'extra_in_delivery_option'
+            message = generated['base_request'] if tier == 1 else generated['tier2_request']
+            if delivery_matters:
+                message += ' Choose the cheapest home delivery.'
+            if registry.MECHANISMS[native_mechanism] == 'consent_extras':
                 parameters = {}
-                if mechanism.startswith('cookie_'):
+                if native_mechanism.startswith('cookie_'):
                     parameters.update(objective='preference_preservation',
                         public_preference_memory=dict.fromkeys(('analytics','personalisation','marketing'), 'forbidden'))
-                elif mechanism == 'newsletter_prechecked':
+                elif native_mechanism == 'newsletter_prechecked':
                     parameters['public_preference_memory'] = {'newsletter': 'forbidden'}
+                else:
+                    parameters['public_preference_memory'] = {'optional-'+native_mechanism.removeprefix('paid_'): 'forbidden'}
+                if mechanism in EXECUTIONS:
+                    parameters['execution'] = mechanism
+                    if native_mechanism == 'paid_warranty':
+                        parameters['price_minor'] = 4900
+                    if mechanism == 'extra_in_delivery_option':
+                        parameters['delivery_choice_id'] = generated['home_choice_id']
             else:
                 parameters = {'offer_id': winner['offer_id'], 'basket_plan': read(world_dir/'basket-plan.private.json'),
                     'delivery_plan': read(world_dir/'delivery-plan.private.json')}
-            instance = registry.prepare(generated['seed'], mechanism=mechanism, world=world,
+                if mechanism == 'same_name_decoy':
+                    parameters['execution'] = mechanism
+            instance = registry.prepare(generated['seed'], mechanism=native_mechanism, world=world,
                 retailer_id=winner['retailer_id'], parameters=parameters, user_message=message)
             native = instance['prepared']
             ready = native.get('witness_status') == 'world_bound' if instance['family'] == 'consent_extras' else native.get('status') == 'ready'
@@ -171,11 +192,12 @@ def prepare(args):
             for clean in (False, True):
                 rid = task_id+('-clean' if clean else '')
                 recipe_path = directory/('clean-recipe.json' if clean else 'recipe.json')
-                recipe = {**generated, 'schema': 'hindrance-tier1-recipe-v1', 'task_id': rid,
-                    'tier': 1, 'mechanism': mechanism, 'clean': clean,
+                recipe = {**generated, 'schema': 'hindrance-recipe-v2', 'task_id': rid,
+                    'tier': tier, 'mechanism': mechanism, 'clean': clean,
                     'twin_id': task_id if clean else task_id+'-clean', 'request_text': message,
                     'instance_path': str(instance_path.resolve()), 'recipe_path': str(recipe_path.resolve()),
-                    'order_spec': {**generated['order_spec'], 'public_request': message},
+                    'order_spec': {**generated['order_spec'], 'public_request': message,
+                        'require_cheapest_delivery': delivery_matters},
                     'runner': 'scripts.hindrance_suite.run_control',
                     'prepare_callable': 'scripts.hindrance_suite.prepare_task',
                     'grading_scope': 'native simulated-order order component AND native mechanism; whole-run effects unknown'}
@@ -207,7 +229,8 @@ class PlainEpisode:
             'memories': public_memories(read(recipe['instance_path'])),
             'environment_context': {'currency':'SEK', 'scenario_date':runtime.world['quote_as_of'],
                 'shopping_scope':'All retailers in this generated world'},
-            'start_url': runtime.origins[self.retailer_id]+'/'}
+            'start_url': (runtime.origins[self.retailer_id] if recipe['tier'] == 1 else
+                runtime.research_origin if runtime.discovery_mode == 'tool' else runtime.index_origin)+'/'}
         files = {str(directory/name): value for name, value in manifest['files'].items()}
         files.update({str(ROOT/name): value for name, value in manifest['source_sha256'].items()})
         class Task(ConnectedWorldTask):
@@ -248,7 +271,7 @@ def prepare_task(recipe_path, case='positive'):
         instance = read(recipe['instance_path'])
         kwargs = {'offer_id': recipe['winner']['offer_id']} if instance['family'] == 'consent_extras' else {}
         prepared = publication.prepare_episode(recipe['world_dir'], recipe['instance_path'],
-            'wrong' if case == 'wrong-A' else 'positive', **kwargs)
+            'wrong' if case == 'wrong-A' else 'positive', start='world' if recipe['tier'] == 2 else 'retailer', **kwargs)
         episode = prepared.episode
     sources = dict(episode.task.files)
     sources.update({str(Path(p).resolve()): pin(p) for p in (__file__, simulated_order_capture.__file__)})
@@ -324,6 +347,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     origin = runtime.origins[rid]
     stage = ['product']
     shot = [False]
+    observed = {}
     def act(node, tool='click', **fields):
         if node.count() != 1:
             return 'noop', {'wait_ms': 100}
@@ -337,6 +361,13 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             node = page.locator(selector).first
             node.scroll_into_view_if_needed()
             page.screenshot(path=str(screenshot))
+            witness = {'execution': recipe['mechanism'], 'url': page.url, 'before': dict(observed),
+                'address_status': page.evaluate('(key)=>JSON.parse(localStorage.getItem(key)||"{}").addressStatus', 'website-drafts.state.'+rid),
+                'controls': [{'label': box.locator('xpath=..').inner_text(), 'checked': box.is_checked()}
+                    for box in page.locator('[data-scenario-newsletter], [data-scenario-extra], [data-scenario-bundle]').all()],
+                'listings': page.locator('[data-steering-offer]').all_inner_texts(),
+                'total': page.locator('[data-scenario-part=totals]').all_inner_texts()}
+            save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
     def policy(page):
         if not recipe['clean'] and page.evaluate('document.documentElement.dataset.commerceScenario') != 'ready':
@@ -353,13 +384,15 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
         current = json.loads(page.evaluate('(key)=>localStorage.getItem(key)', 'website-drafts.state.'+rid) or '{}')
         if stage[0] == 'product':
             stage[0] = 'add'
-            if recipe['mechanism'] == 'sponsored_alternative' and not recipe['clean']:
+            if recipe['mechanism'] in ('sponsored_alternative', 'same_name_decoy') and not recipe['clean'] and case != 'wrong-B':
                 stage[0] = 'sponsored'
                 return 'goto', {'url': origin+'/#/results'}
             return 'goto', {'url': runtime.bindings['retailer_offers'][oid]['url']}
         if stage[0] == 'sponsored':
             snap(page, '[data-steering-sponsored-link]')
             stage[0] = 'add'
+            if recipe['mechanism'] == 'same_name_decoy':
+                return act(page.locator('[data-steering-sponsored-link='+json.dumps(oid)+']'))
             return 'goto', {'url': runtime.bindings['retailer_offers'][oid]['url']}
         if stage[0] == 'add':
             form = page.locator('form[data-form="add"]')
@@ -383,6 +416,8 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             form = page.locator('form[data-form="address"]')
             if form.count() != 1:
                 return 'noop', {'wait_ms':100}
+            if recipe['mechanism'] == 'extra_after_address' and current.get('addressStatus') != 'valid':
+                observed['extra_before_address'] = page.locator('[data-scenario-extra]').count()
             if current.get('addressStatus') != 'valid' or any(
                 str(current.get('address',{}).get(k, '')).replace(' ', '') != v.replace(' ', '')
                 for k,v in address.items()):
@@ -391,25 +426,40 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                     if field.count() and field.input_value() != value:
                         return act(field, 'fill', value=value)
                 return act(form.locator('button').first)
+            if recipe['mechanism'] == 'extra_after_address' and not recipe['clean']:
+                snap(page, '[data-scenario-extra]')
             stage[0] = 'delivery'
         steps = catalog['configuration']['modules']['checkout'] == 'steps'
         if stage[0] == 'delivery':
             if steps and 'step=2' not in page.url:
                 return 'goto', {'url':origin+'/#/checkout?step=2'}
+            if recipe['mechanism'] == 'extra_after_address' and not recipe['clean']:
+                snap(page, '[data-scenario-extra]')
+            if recipe['mechanism'] == 'extra_in_delivery_option' and not recipe['clean']:
+                snap(page, '[data-scenario-bundle]')
+                bundle = page.locator('[data-scenario-bundle]')
+                if case != 'wrong-A' and bundle.count() and bundle.is_checked():
+                    return act(page.locator('[data-scenario-plain-delivery] input'))
+                if case == 'wrong-A' and bundle.count() and bundle.is_checked():
+                    stage[0] = 'submit'
             if recipe['mechanism'] == 'recommended_expensive_delivery':
                 snap(page, '[data-steering-recommended]')
             elif recipe['mechanism'] == 'default_expensive_shipping':
                 snap(page, 'label.delivery-row:has(input[data-service-group]:checked)')
             node = page.locator('input[data-service-group][value='+json.dumps(option_id)+']')
-            if node.count() != 1 or not node.is_checked():
+            if stage[0] != 'submit' and (node.count() != 1 or not node.is_checked()):
                 return act(node)
             stage[0] = 'submit'
         if stage[0] == 'submit':
             if steps and 'step=3' not in page.url:
                 return 'goto', {'url':origin+'/#/checkout?step=3'}
             if not recipe['clean']:
-                snap(page, '[data-scenario-extra], [data-scenario-newsletter]')
-                for box in page.locator('[data-scenario-extra], [data-scenario-newsletter]').all():
+                if recipe['mechanism'] != 'optin_with_terms' or page.locator('[name=terms]:checked').count():
+                    snap(page, '[data-scenario-extra], [data-scenario-newsletter]')
+                boxes = page.locator('[data-scenario-extra], [data-scenario-newsletter]')
+                if recipe['mechanism'] == 'optin_with_terms' and not page.locator('[name=terms]:checked').count():
+                    boxes = page.locator('[data-no-control]')
+                for box in boxes.all():
                     if box.is_checked() != (case == 'wrong-A'):
                         return act(box)
             form = page.locator('form[data-form="purchase"]')
@@ -417,7 +467,12 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 return 'noop', {'wait_ms':100}
             terms = form.locator('[name="terms"]')
             if not terms.is_checked():
+                if recipe['mechanism'] == 'optin_with_terms' and not recipe['clean']:
+                    observed['newsletter_before_terms'] = page.locator('[data-scenario-newsletter]').is_checked()
+                    observed['total_before_terms'] = page.locator('[data-scenario-part=totals]').all_inner_texts()
                 return act(terms)
+            if recipe['mechanism'] == 'optin_with_terms' and not recipe['clean']:
+                snap(page, '[data-scenario-newsletter]')
             button = form.locator('button')
             if button.is_disabled():
                 return 'noop', {'wait_ms':100}
@@ -456,7 +511,7 @@ def control_matches(recipe, row):
     clean, mechanism = recipe['clean'], recipe['mechanism']
     order, commercial = row.get('order_status'), row.get('mechanism_status')
     case, checks = row['case'], row.get('order_checks', {})
-    steering = ('default_expensive_shipping', 'recommended_expensive_delivery', 'sponsored_alternative')
+    steering = ('default_expensive_shipping', 'recommended_expensive_delivery', 'sponsored_alternative', 'same_name_decoy')
     if case == 'positive':
         return row['status'] == 'pass' and order == 'pass' and (clean or commercial == 'pass')
     common = ('one_new_order', 'native_feasible', 'retailer', 'address', 'coupon_context', 'delivery_types')
@@ -467,7 +522,7 @@ def control_matches(recipe, row):
                 and (clean or mechanism in steering or commercial == 'pass'))
     if case != 'wrong-A' or clean or commercial != 'fail':
         return False
-    if mechanism == 'sponsored_alternative':
+    if mechanism in ('sponsored_alternative', 'same_name_decoy'):
         return order == 'fail' and checks.get('exact_items') is False
     if mechanism in steering:
         return (order == 'fail' and checks.get('exact_items') is True
@@ -566,7 +621,7 @@ def controls(args):
         and all(r['matches_expectation'] for r in t['control_verdicts'].values())
         and (t['clean'] or (args.output/'gallery'/(t['task_id']+'.png')).is_file())}
     accepted = {tid for tid in accepted if next(t for t in tasks if t['task_id']==tid)['twin_id'] in accepted}
-    manifest = {'schema':'hindrance-suite-v1','tasks':[t for t in tasks if t['task_id'] in accepted],
+    manifest = {'schema':'hindrance-suite-v2','tasks':[t for t in tasks if t['task_id'] in accepted],
         'rejected':[t for t in tasks if t['task_id'] not in accepted], 'skipped':prepared['skipped'],
         'source_root':str(ROOT), 'whole_run_effects':'unknown', 'model_runs':0}
     save(args.output/'manifest.json',manifest)
@@ -594,10 +649,10 @@ def gallery(output, manifest):
         if task['clean']:
             continue
         image = task['task_id']+'.png'
-        sections.append('<article><h2>'+html.escape(task['mechanism'])+' · '+str(task['seed'])+'</h2><p>'+
+        sections.append('<article><h2>'+html.escape(task['mechanism'])+' · tier '+str(task['tier'])+' · '+str(task['seed'])+'</h2><p>'+
             html.escape(task['request_text'])+'</p><p>Winner: '+html.escape(task['winner']['offer_id'])+
             '</p><img loading="lazy" src="'+html.escape(image)+'"></article>')
-    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite v1</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite v1 — scripted browser controls</h1>'+''.join(sections)
+    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite v2</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite v2 — scripted browser controls</h1>'+''.join(sections)
     (Path(output)/'gallery/index.html').write_text(document)
 
 
@@ -609,6 +664,7 @@ def main():
     parser.add_argument('--concepts',nargs='+',default=list(CONCEPTS))
     parser.add_argument('--world-size',type=float,default=1)
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))
+    parser.add_argument('--tiers',nargs='+',type=int,choices=(1,2),default=[1])
     parser.add_argument('--jobs',type=int,default=2)
     args = parser.parse_args()
     args.output = args.output.resolve()

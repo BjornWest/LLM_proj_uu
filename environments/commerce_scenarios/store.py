@@ -499,6 +499,24 @@ class SessionStore:
         if trigger in recurrence['delivery']:
             self._reset_trigger, self._reset_directive = trigger, True
 
+    def _op_checkout_trigger(self, request):
+        """Apply the site's declared silent side effect at its checkout trigger."""
+        _fields(request, 'trigger')
+        execution = self._settings['presentation'].get('consent_extras', {}).get('execution')
+        trigger = request['trigger']
+        if execution == 'optin_with_terms' and trigger == 'terms':
+            self._state['newsletter'] = True
+            self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
+        elif execution == 'extra_after_address' and trigger == 'address_saved':
+            if not getattr(self, '_address_extra_shown', False):
+                self._address_extra_shown = True
+                extra_id = self._settings['extras'][0]['id']
+                self._state['extras'][extra_id] = True
+                self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                    'value': True, 'trigger': trigger})
+        else:
+            raise ValueError('No declared site rule for this checkout trigger')
+
     def _op_state(self, request):
         _fields(request)
 
@@ -684,7 +702,7 @@ class SessionStore:
                 self._event('delivery_select', 'user', {'option_id': option_id})
                 self._reset_trigger = None
 
-    _OPERATIONS = {'state': _op_state, 'cookie_dialog': _op_cookie_dialog,
+    _OPERATIONS = {'checkout_trigger': _op_checkout_trigger, 'state': _op_state, 'cookie_dialog': _op_cookie_dialog,
                    'cookie_save': _op_cookie_save, 'newsletter_set': _op_newsletter_set,
                    'extras_set': _op_extras_set, 'promotion_apply': _op_promotion_apply,
                    'promotion_remove': _op_promotion_remove, 'quote': _op_quote,
