@@ -1193,7 +1193,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         output_limit_replies = output_limit_replies + 1
                         trace.event('native_reply_rejected',step=index,reason='output_limit_without_tool_call',
                             not_executed=True,tool_call_count=0,occurrence=output_limit_replies)
-                        if output_limit_replies > MAX_OUTPUT_LIMIT_REPLIES:
+                        if output_limit_replies >= MAX_OUTPUT_LIMIT_REPLIES:
                             stop_reason = 'max_output_tokens'
                             event.update(kind='output_limit',actions=[],browser_stepped=False,
                                 action_dispatch_started=False,not_executed=True)

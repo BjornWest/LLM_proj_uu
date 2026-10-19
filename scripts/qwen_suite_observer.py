@@ -383,7 +383,6 @@ class CapacityHost:
         problems = []
         if self.parent.closed:problems.append('capacity_parent_closed')
         if self.parent.stop_cause is not None:problems.append('capacity_stop_cause')
-        if self.parent.cleanup_failures:problems.append('capacity_cleanup_failures')
         if self.journal.failure is not None:problems.append('telemetry_journal_failed')
         if not self.poller.thread.is_alive():problems.append('metrics_poller_dead')
         elif self.controller.status()['telemetry_fresh'] is not True:problems.append('telemetry_stale')
@@ -395,6 +394,7 @@ class CapacityHost:
         row = self.controller.status()['episodes'].get(ident)
         if row is not None and row['request_id'] is not None:problems.append('sent_request_unresolved')
         if ident in self.parent.errors:problems.append('capacity_parent_case_error')
+        if ident in self.parent.cleanup_failures:problems.append('capacity_case_cleanup_failure')
         if self.relays.get(ident, (None, []))[1]:problems.append('capacity_relay_error')
         return problems
 
