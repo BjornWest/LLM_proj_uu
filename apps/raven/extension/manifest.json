@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Raven",
+  "version": "0.1.0",
+  "description": "Raven in your shared demo browser window",
+  "permissions": ["sidePanel", "tabs"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "side_panel": {"default_path": "sidepanel.html"},
+  "action": {"default_title": "Open Raven"},
+  "background": {"service_worker": "background.js"},
+  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'self'; frame-src http://127.0.0.1:*"}
+}
