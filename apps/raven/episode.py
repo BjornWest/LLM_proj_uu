@@ -178,6 +178,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
 
     options = options or {}
     sources, seen_tabs, captured_texts = {}, {}, {}
+    handover_notices = set()
     current_step = 0
     last_site = None
     final = None
@@ -197,6 +198,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
                 current_step = int(data['call_id'].rsplit('-', 1)[-1])
             if kind == 'environment_reset_completed':
                 initial_chat_count = len(env_holder[0].raven_chat.messages)
+            if kind == 'human_tab_wait_ui_notice':
+                handover_notices.add(data['text'])
             if kind in ('tool_started', 'batch_call_started', 'raven_tab_tool_started'):
                 args = data.get('arguments', {})
                 name = data.get('tool', '')
@@ -419,7 +422,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
         # The authoritative BrowserGym chat also handles batched terminal actions.
         if env_holder:
             messages = getattr(getattr(env_holder[0], 'raven_chat', None), 'messages', [])
-            answers = [m['message'] for m in messages[initial_chat_count:] if m['role'] == 'assistant']
+            answers = [m['message'] for m in messages[initial_chat_count:]
+                       if m['role'] == 'assistant' and m['message'] not in handover_notices]
             if answers:
                 final = answers[-1]
         if final:
