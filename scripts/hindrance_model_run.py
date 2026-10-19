@@ -80,7 +80,9 @@ def usage_totals(records, *, offline=False):
         totals[name] = sum(fields[name]) if fields[name] else (0 if offline else None)
     totals['responses_missing_cost'] = len(records) - len(fields['cost_usd'])
     totals['responses_missing_cached_tokens'] = len(records) - len(fields['cached_prompt_tokens'])
-    totals['source'] = 'offline_no_provider' if offline else 'OpenRouter response usage'
+    totals['source'] = ('offline_no_provider' if offline else 'Codex subscription response usage'
+                        if any(r.get('provider') == 'codex-subscription' for r in records)
+                        else 'OpenRouter response usage')
     return totals
 
 
@@ -476,7 +478,7 @@ def main():
                'max_input_tokens': args.max_input_tokens, 'providers': args.providers,
                'context_keep_turns': args.context_keep_turns,
                'fact_provenance': not args.no_fact_provenance}
-    save(output / 'launch.json', {'entries': entries, 'options': options, 'model': MODEL,
+    save(output / 'launch.json', {'entries': entries, 'options': options, 'model': args.bridge or MODEL,
          'concurrency': args.concurrency, 'sampling': {'temperature': 0.6, 'top_p': 0.95, 'top_k': 20},
          'reasoning': {'enabled': True}, 'max_output_tokens': 16384})
     rows = []

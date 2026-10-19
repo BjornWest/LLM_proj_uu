@@ -38,6 +38,8 @@ class HindranceRunTests(unittest.TestCase):
         self.assertEqual(summary['prefix_cache_hit_percent'], 80)
         self.assertEqual(summary['responses_with_cache_measurement'], 1)
         self.assertEqual(summary['side_effect_rate'], 0)
+        self.assertEqual(usage_totals([{'provider': 'codex-subscription', 'usage': {'prompt_tokens': 20}}])['source'],
+                         'Codex subscription response usage')
 
     def test_forbidden_commit_is_separate_from_completion(self):
         grade = mechanism_outcome({'status': 'fail', 'task_completion_assessed': True,
