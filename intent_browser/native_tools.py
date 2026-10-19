@@ -431,7 +431,12 @@ class NativeBrowserTools(BrowserTools):
         code=name+'('+', '.join(k+'='+repr(v) for k,v in values.items())+')'
         decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.site_discovery_tools and name == 'discover_sites') or (self.memory_tools and name in MEMORY_TOOLS) or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
                   self._parse_browser_action(code, allow_search=allow_search))
-        self.validate_navigation(decision)
+        try:
+            self.validate_navigation(decision)
+        except ValueError as exc:
+            if not self.open_internet:
+                raise
+            raise NativeArgumentError(str(exc)) from exc
         decision.ax_overview_tokens=overview_tokens
         content=message.get('content')
         if content is not None and not isinstance(content,str): raise ValueError('Unsupported assistant content shape')
@@ -453,8 +458,8 @@ class NativeBrowserTools(BrowserTools):
 
         Completed replies without calls receive a separate controller correction.
         Strict parsers stay unchanged for validators/offline callers. A rejected
-        batch runs no member. Malformed identities, unsupported tools, navigation
-        policy errors on schema-valid calls and incomplete generations remain hard failures.
+        batch runs no member. Malformed identities, unsupported tools, incomplete
+        generations remain hard failures. Navigation rejections return inert feedback.
         """
         from .completion_diagnostics import completion_diagnostic
         from .backend import Completion

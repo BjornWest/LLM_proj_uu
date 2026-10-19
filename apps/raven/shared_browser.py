@@ -60,7 +60,9 @@ class SharedBrowserEnv(BrowserEnv):
         self.context.set_default_timeout(5000)
         pages = [p for p in self.context.pages if not p.url.startswith('chrome-extension:')]
         active = active_target(self.context)
-        self.page = next(p for p in pages if page_target(self.context, p) == active)
+        self.page = next((p for p in pages if page_target(self.context, p) == active), None)
+        if self.page is None:
+            self.page = pages[0] if pages else self.context.new_page()
         self.task = self.task_entrypoint(seed=seed, **self.task_kwargs)
         self.chat = self.raven_chat = PanelChat()
         self.goal_object = [{'type': 'text', 'text': self.task.goal}]
@@ -118,6 +120,7 @@ from intent_browser.human_browser import HumanBrowser
 class SharedHumanBrowser(HumanBrowser):
     def start(self):
         self.raven_requested_handovers = set()
+        self.raven_initial_pages = set(self.env.context.pages)
         super().start()
         # Only the current tab was assigned to Raven. Preserve all other user tabs.
         for tab_id, page in self.pages.items():
@@ -134,7 +137,23 @@ class SharedHumanBrowser(HumanBrowser):
             self.raven_requested_handovers.add(decision.arguments['tab_id'])
         if decision.name in ('handover_tab', 'tab_focus', 'new_tab', 'tab_close'):
             self.trace.event('raven_tab_tool_started', tool=decision.name, arguments=decision.arguments)
+        if decision.name == 'new_tab':
+            self.sync()
+            blank = next((p for p in self.known_agent_pages
+                          if not p.is_closed() and p.url == 'about:blank'
+                          and self.states().get(self.id_for(p), {}).get('state') == 'agent_controlled'), None)
+            if blank is not None:
+                self.select(self.id_for(blank))
+                self.emit()
+                return {'tool':'new_tab', 'execution':'call_completed', 'active_tab_id':self.active}
         return super().execute(decision)
+
+    def close(self):
+        # Only remove unused workspaces created by this episode. Human tabs survive.
+        for page in self.known_agent_pages - self.raven_initial_pages:
+            if not page.is_closed() and page.url == 'about:blank':
+                page.close()
+        super().close()
 
 
 def page_target(context, page):

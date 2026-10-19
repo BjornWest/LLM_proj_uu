@@ -142,7 +142,7 @@ async def main(args):
                         assert 'Connection to Raven was interrupted' in await page.locator('.message:not(.user)').inner_text()
                         assert cancellations == [200], cancellations
                 else:
-                    await page.get_by_text('Raven could not finish: Scripted offline error.', exact=False).wait_for(timeout=60000)
+                    await page.get_by_text('I couldn’t finish that: Scripted offline error.', exact=False).wait_for(timeout=60000)
                     await page.wait_for_function('window.landed', timeout=60000)
                     assert await page.locator('.message').count() == 2
                     await page.screenshot(path=str(out / 'm1-error.png'))

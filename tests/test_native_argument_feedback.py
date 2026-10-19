@@ -136,7 +136,7 @@ def project_grade(raw,binding):
         limitations=['Synthetic state, not a benchmark outcome'])
 
 
-def exercise(tmp_path, sequence, *, batch_size=8, max_steps=None, repeat_ids=False):
+def exercise(tmp_path, sequence, *, batch_size=8, max_steps="sequence", repeat_ids=False, open_internet=False, runner_options=None):
     requests=[];responses=[];actions=[]
     class Env:
         done=False;closed=False
@@ -164,6 +164,9 @@ def exercise(tmp_path, sequence, *, batch_size=8, max_steps=None, repeat_ids=Fal
     tokenizer_path=tmp_path/'ax-tokenizer.json'
     Tokenizer(models.WordLevel({'[UNK]':0,'Fixture':1},unk_token='[UNK]')).save(str(tokenizer_path))
     profile=native_tools_profile(ax_config=AXConfig(str(tokenizer_path),incremental=True))
+    if open_internet:
+        from intent_browser.open_internet import open_profile
+        profile=open_profile(profile)
     profile=replace(profile,tools=replace(profile.tools,batch_size=batch_size),feedback_factory=SemanticFeedback)
     try:
         with patch('intent_browser.runner.observation_text',return_value='Fixture page'),\
@@ -171,7 +174,7 @@ def exercise(tmp_path, sequence, *, batch_size=8, max_steps=None, repeat_ids=Fal
                 patch('intent_browser.runner.refresh_observation',side_effect=lambda e,**kw:e.obs()),\
                 patch('intent_browser.batching.document_signature',return_value=[]):
             path,summary=run_episode(lambda _:env,backend,{'model':'offline-fixture','metadata_source':'scripted-fixture','tags':['scripted']},str(tmp_path/'runs'),
-                max_steps=max_steps or len(sequence),max_input_tokens=None,harness_profile=profile,
+                max_steps=len(sequence) if max_steps == "sequence" else max_steps,harness_profile=profile, **(runner_options or {}),
                 automatic_grading=AutomaticGrading('synthetic-argument-correction:v1',bind_grade,grade,project_grade),
                 retry_policy=None)
     finally:backend.close()
@@ -360,3 +363,32 @@ def test_rejected_proposal_display_is_inert_not_a_different_python_call(tmp_path
     assert member['action'].startswith('[Rejected, unexecuted proposal] ')
     assert member['not_executed'] is True
     with pytest.raises(SyntaxError):ast.parse(member['action'],mode='eval')
+
+
+@pytest.mark.parametrize('batch_size',[1,8])
+def test_open_web_rejected_url_is_feedback_and_episode_continues(tmp_path,batch_size):
+    _,summary,rows,requests,_,actions=exercise(tmp_path,[
+        reply([('goto',{'url':'view-source:https://example.com/'})]),
+        reply([('send_msg_to_user',{'text':'Recovered'})])],
+        batch_size=batch_size,open_internet=True)
+    assert summary['error'] is None and summary['stop_reason']=='agent_finished'
+    assert len(actions)==1 and actions[0].startswith('send_msg_to_user')
+    assert rows[0]['batch_calls'][0]['not_executed']
+    assert 'HTTP(S)' in requests[1]['messages'][-2]['content'] or any(
+        'HTTP(S)' in str(m.get('content')) for m in requests[1]['messages'] if m['role']=='tool')
+
+
+@pytest.mark.parametrize('limit_name,limit,reason',[
+    ('max_total_input_tokens',150,'max_total_input_tokens'),
+    ('max_total_output_tokens',10,'max_total_output_tokens'),
+])
+def test_cumulative_budgets_stop_before_another_request(tmp_path,limit_name,limit,reason):
+    first=reply([('noop',{'wait_ms':0})])
+    first['usage']={'prompt_tokens':100,'completion_tokens':10,'cost':0.01}
+    _,summary,rows,requests,_,actions=exercise(tmp_path,[first,
+        reply([('send_msg_to_user',{'text':'Should not run'})])],max_steps=None,runner_options={
+            'max_input_tokens':250000,'input_counter':lambda *_:{'input_tokens':100},limit_name:limit})
+    assert summary['stop_reason']==reason and summary['error'] is None
+    assert len(requests)==1 and len(actions)==1
+    assert summary['usage_totals']=={'input_tokens':100,'output_tokens':10,'cost':0.01}
+    if limit_name=='max_total_output_tokens': assert requests[0]['max_tokens']==10

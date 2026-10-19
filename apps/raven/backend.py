@@ -108,11 +108,15 @@ class UserWindow:
                             active = active_target(self.context)
                             rows = []
                             for p in self.context.pages:
-                                if p.url.startswith('chrome-extension:'):
+                                if p.is_closed() or p.url.startswith('chrome-extension:'):
                                     continue
-                                tid = target_id(self.context, p)
-                                rows.append(dict(tab_id=tid, url=p.url,
-                                    title=p.title(), owner='human', active=tid == active))
+                                try:
+                                    tid = target_id(self.context, p)
+                                    rows.append(dict(tab_id=tid, url=p.url,
+                                        title=p.title(), owner='human', active=tid == active))
+                                except Exception:
+                                    if not p.is_closed():
+                                        raise
                             response.put(rows)
                         elif action == 'focus':
                             for p in self.context.pages:
@@ -367,10 +371,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8766)
     parser.add_argument('--user-window', action='store_true')
+    parser.add_argument('--profile-dir', type=Path)
     args = parser.parse_args()
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     server.daemon_threads = True
-    server.service = Service(args.port, args.user_window)
+    server.service = Service(args.port, args.user_window, args.profile_dir)
     print(f'Raven: http://localhost:{args.port}/panel.html', flush=True)
     try:
         server.serve_forever()

@@ -59,13 +59,13 @@ window.addEventListener('DOMContentLoaded', () => {
       stream.onmessage = msg => {
         if (token !== generation) return;
         const e = JSON.parse(msg.data);
-        if (e.type === 'status') status.textContent = e.state;
+        if (e.type === 'status') status.textContent = {starting:'Starting research…',working:'Researching…',finishing:'Preparing your answer…'}[e.state] || 'Researching…';
         if (e.type === 'step') status.textContent = e.summary;
         if (e.type === 'site') {
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{url:e.url,label:e.title}}));
         }
         if (e.type === 'tab') {
-          if(e.action === 'closed') tabs.delete(e.tab_id); else tabs.set(e.tab_id,e);
+          if(e.action === 'closed') {tabs.delete(e.tab_id);handovers.delete(e.tab_id);showHandover();} else tabs.set(e.tab_id,e);
           drawTabs();
         }
         if (e.type === 'handover') {
@@ -76,16 +76,22 @@ window.addEventListener('DOMContentLoaded', () => {
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{status:'complete'}}));
         }
         if (e.type === 'error') {
-          status.textContent=e.message;c.cancelTask({announce:false});c.appendMessage(e.message,'Raven');
+          status.textContent="I couldn't finish that: "+e.message;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');
         }
         if (e.type === 'done') {
           stream.close();stream=null;run=null;stop.disabled=true;handovers.clear();showHandover();
-          status.textContent=e.stop_reason;
+          status.textContent=e.stop_reason === 'cancelled' ? 'Stopped' : e.stop_reason === 'agent_finished' ? 'Ready' : "I couldn't finish that: "+({max_total_input_tokens:'the research budget was reached',max_total_output_tokens:'the answer budget was reached',max_input_tokens:'the conversation became too long',error:'please try again'}[e.stop_reason] || 'the task ended before an answer was ready');
           if(!c.agentReply)c.cancelTask({announce:false});
         }
       };
-      stream.onerror = () => {status.textContent='Reconnecting…';};
-    }).catch(e => {status.textContent=e.message;stop.disabled=true;c.cancelTask({announce:false});});
+      stream.onerror = () => {
+        const id=run;generation++;stream?.close();stream=null;run=null;stop.disabled=true;
+        handovers.clear();showHandover();c.cancelTask({announce:false});
+        status.textContent="I couldn't finish that: the connection was interrupted. Please try again.";
+        c.appendMessage(status.textContent,'Raven');
+        if(id)post('/api/tasks/'+id+'/cancel').catch(()=>{});
+      };
+    }).catch(e => {status.textContent="I couldn't finish that: "+e.message;stop.disabled=true;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');});
     return true;
   };
   stop.onclick = async () => {
@@ -102,8 +108,8 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       await post('/api/tasks/'+run+'/handback',{tab_id:tab,note:null});
       handovers.delete(tab);showHandover();status.textContent='Returned to Raven';
-    } catch(e) {status.textContent=e.message;}
+    } catch(e) {handovers.delete(tab);showHandover();status.textContent='That tab is no longer waiting for help. Raven can continue.';}
     finally {button.disabled=false;}
   };
-  fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs)tabs.set(t.tab_id,t);drawTabs();});
+  fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs || [])tabs.set(t.tab_id,t);drawTabs();});
 });

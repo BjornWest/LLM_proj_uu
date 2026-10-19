@@ -37,6 +37,7 @@ def main():
     try:
         # Independent background smoke and shared-window checks run concurrently.
         bg=svc.submit({'text':'Read the page and finish.', 'mode':'background'},[
+            action('goto',url='view-source:https://example.com/'),
             action('goto',url='https://example.com/'),
             action('send_msg_to_user',text='[Example Domain](https://example.com/) is the page heading.')])
         with sync_playwright() as pw:
@@ -91,6 +92,25 @@ def main():
             replay=urlopen(f'http://127.0.0.1:18766/api/tasks/{bg.run_id}/events').read().decode()
             assert [json.loads(s[6:]) for s in replay.splitlines() if s.startswith('data: ')]==bg.events
             results['sse_replay']=True
+            # Human closes a handed-over tab; stale handback is friendly and the
+            # agent continues in a workspace that is removed if left blank.
+            sacrificial=context.new_page()
+            sacrificial.goto('https://example.com/')
+            sacrificial.bring_to_front()
+            closed=svc.submit({'text':'Recover after a tab closes.', 'mode':'user_window'},[
+                action('handover_tab',tab_id='$initial',reason='Close this tab for acceptance'),
+                action('tab_focus',tab_id='$initial'),
+                action('send_msg_to_user',text='The tab closed; no further browser action was needed.')])
+            end=time.monotonic()+60
+            while time.monotonic()<end and not any(e['type']=='handover' for e in closed.events) and not closed.done:
+                time.sleep(.1)
+            assert any(e['type']=='handover' for e in closed.events),closed.events
+            sacrificial.close()
+            results['closed_handover']=wait_done(closed)
+            assert any(e['type']=='final' for e in closed.events),closed.events
+            assert not any(e['type']=='error' for e in closed.events),closed.events
+            assert not any(p.url=='about:blank' for p in context.pages)
+            page.bring_to_front()
             # Cancel while waiting for a human: no model calls, shared window survives.
             cancel=svc.submit({'text':'Wait for handover.', 'mode':'user_window'},[
                 action('handover_tab',tab_id='$initial',reason='Cancellation acceptance')])

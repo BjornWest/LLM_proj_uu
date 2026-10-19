@@ -69,6 +69,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 retry_policy=None, helper_env_factory=None, agent_runtime=None, agent_actor=None,
                 delegated_instructions=None, delegated_goal=None, decision_wait=None,
                 max_input_tokens=None, input_counter=None,
+                max_total_input_tokens=None, max_total_output_tokens=None,
                 clarification_callback=None, clarification_audit_id=None, memory_adapter=None,
                 site_discovery=None, site_discovery_audit_id=None,
                 observation_pipeline="auto", human_handover=None, human_handover_ui=None,
@@ -226,6 +227,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         raise ValueError('max_steps must be a positive integer or None')
     if max_input_tokens is not None and (type(max_input_tokens) is not int or max_input_tokens < 1):
         raise ValueError('max_input_tokens must be a positive integer or None')
+    for limit in (max_total_input_tokens, max_total_output_tokens):
+        if limit is not None and (type(limit) is not int or limit < 1):
+            raise ValueError("Cumulative token limits must be positive integers or None")
+    if max_total_input_tokens is not None and max_input_tokens is None:
+        raise ValueError("Cumulative input limit requires max_input_tokens")
     if max_steps is None:
         if max_input_tokens is None:
             raise ValueError('max_steps=None requires a positive max_input_tokens limit')
@@ -281,6 +287,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             agent_runtime=runtime,agent_actor=actor,delegated_instructions=delegated_instructions,
             delegated_goal=delegated_goal,decision_wait=decision_wait,
             max_input_tokens=max_input_tokens,input_counter=input_counter,
+            max_total_input_tokens=max_total_input_tokens,max_total_output_tokens=max_total_output_tokens,
             clarification_callback=clarification_callback,clarification_audit_id=clarification_audit_id,
             site_discovery=site_discovery,site_discovery_audit_id=site_discovery_audit_id,
             trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings,
@@ -489,6 +496,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     reward = 0.0
     terminated = truncated = False
     stop_reason = "max_steps" if max_steps is not None else "running"
+    usage_totals = {"input_tokens": 0, "output_tokens": 0, "cost": 0.0}
     output_limit_replies = 0
     history = []
     final_ref = None
@@ -1113,6 +1121,18 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         event['model_dispatch_skipped'] = True
                         # No HTTP call, reservation, action or policy acknowledgment.
                         break
+                if max_total_input_tokens is not None and usage_totals['input_tokens'] + count['input_tokens'] > max_total_input_tokens:
+                    stop_reason = 'max_total_input_tokens'
+                    event.update(kind='input_limit', model_dispatch_skipped=True)
+                    break
+                if max_total_output_tokens is not None:
+                    remaining_output = max_total_output_tokens - usage_totals['output_tokens']
+                    if remaining_output <= 0:
+                        stop_reason = 'max_total_output_tokens'
+                        event.update(kind='output_limit', model_dispatch_skipped=True)
+                        break
+                    if hasattr(backend, 'max_tokens'):
+                        backend.max_tokens = min(backend.max_tokens or remaining_output, remaining_output)
                 if checkpoint_control is not None:
                     phase='checkpoint_boundary'
                     if checkpoint_control.boundary(env,trace,conversation,ax_explorer,delivery,
@@ -1149,6 +1169,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 trace.event("model_completed", call_id=f"model-{index:03d}",
                             model_output=completion.text, model_response=completion.raw,
                             model_request=completion.request)
+                usage = completion.raw.get('usage') or {}
+                usage_totals['input_tokens'] += usage.get('prompt_tokens', event.get('input_budget', {}).get('input_tokens', 0))
+                usage_totals['output_tokens'] += usage.get('completion_tokens', 0)
+                usage_totals['cost'] += usage.get('cost') or 0.0
+                event['usage_totals'] = dict(usage_totals)
                 if callable(getattr(input_counter, 'observe_completion', None)):
                     input_counter.observe_completion(completion.request, completion.raw)
                 phase = "policy_input_evidence"
@@ -1564,7 +1589,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 error=error or f'Memory evidence finalization failed: {type(exc).__name__}: {exc}'
                 trace.event('memory_finalization_failed',error=str(exc))
         if agent_runtime and agent_actor['parent'] is None:agent_runtime.finish_children()
-        outcome = {"terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens"),
+        outcome = {"terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens", "max_total_input_tokens", "max_total_output_tokens"),
                    "stop_reason": stop_reason, "error": error, "final_reward": reward}
         trace.event("evaluation_started", reset_complete=reset_complete)
         try:
@@ -1710,11 +1735,14 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         summary = {"final_reward": reward, "success": evaluation_data['safe_success'],
                    "grading": grading_gate.record, "grading_error": grading_error,
                    "infrastructure_completed": grading_gate.record['infrastructure_complete'],
-                   "terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens"),
+                   "terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens", "max_total_input_tokens", "max_total_output_tokens"),
                    "stop_reason": stop_reason, "error": error, "step_count": steps,
                    "execution_error":execution_error,"cleanup_errors":cleanup_errors,
                    "evaluation_before_close_file":"evaluation-before-close.json",
                    "max_input_tokens": max_input_tokens,
+                   "max_total_input_tokens": max_total_input_tokens,
+                   "max_total_output_tokens": max_total_output_tokens,
+                   "usage_totals": usage_totals,
                    "browser_step_count": browser_steps,
                    "action_error_count": action_errors, "timing_totals": timing_totals,
                    "search_request_count": search_backend.calls if search_backend else 0,
