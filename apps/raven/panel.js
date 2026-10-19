@@ -85,8 +85,9 @@ window.addEventListener('DOMContentLoaded', () => {
   stop.onclick = async () => {
     generation++;
     const id=run;run=null;stream?.close();stream=null;stop.disabled=true;handover.hidden=true;
+    const cancelled = id ? post('/api/tasks/'+id+'/cancel') : Promise.resolve();
     c.cancelTask({announce:false});status.textContent='Cancelled';
-    if(id)await post('/api/tasks/'+id+'/cancel');
+    try {await cancelled;} catch(e) {status.textContent=e.message;}
   };
   document.querySelector('#handback').onclick = async () => {
     try {

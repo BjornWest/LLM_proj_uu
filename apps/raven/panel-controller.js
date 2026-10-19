@@ -157,6 +157,19 @@
       return a;
     }
     updateHint(){if(!this.ready)return;const seconds=this.longPatrol?.checked?60:10;const hint=document.getElementById('demo-reply-time');if(hint)hint.textContent='Demo reply: '+seconds+' seconds.';if(this.started===null&&this.state==='idle')this.countdown.textContent='A '+seconds+'-second demo';}
+    cancelTask({announce=true}={}){
+      this.agentReply=null;
+      clearTimeout(this.replyTimer);this.replyTimer=null;this.assetGeneration++;
+      this.started=null;this.director=null;this.preparing=false;this.pendingReturn=false;
+      this.gesture=null;this.settling=null;this.diveStartClock=null;this.diveStartPoint=null;
+      this.diveStartWorld=null;this.diveStartDepthScale=1;this.lastFlightAction=null;this.replyAdded=false;
+      this.invalidateBuffer();this.lastSample=null;this.drawBounds=null;this.head=null;
+      this.wasTypingAfterReply=false;this.clearPointer();this.lastDrawKey='';
+      window.RavenCitations?.hide?.();window.RavenMessages?.hidePreview?.();
+      document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{status:'complete'}}));
+      if(this.ready){this.resetIdle();this.setState('idle');this.updateHint();this.draw(performance.now(),true);}
+      if(announce)this.scene.dispatchEvent(new CustomEvent('raven-chat-cancel',{bubbles:true}));
+    }
     start({replyMs}={}){
       if(!this.ready||this.loading||this.preparing||this.started!==null||!this.input.value.trim()){this.input.focus();return false;}
       const base=this.timing.replyMs;replyMs??=60000;

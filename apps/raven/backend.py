@@ -47,8 +47,9 @@ def target_id(context, page):
 
 class UserWindow:
     """All persistent Playwright objects belong to one service thread."""
-    def __init__(self, port):
+    def __init__(self, port, profile_dir=None):
         self.port = port
+        self.profile_dir = profile_dir
         self.commands = queue.Queue()
         self.ready = threading.Event()
         self.error = None
@@ -70,13 +71,15 @@ class UserWindow:
             with sync_playwright() as pw:
                 extension = APP / 'extension'
                 self.context = pw.chromium.launch_persistent_context(
-                    str(ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
+                    str(self.profile_dir or ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
                     no_viewport=True, env={**os.environ, 'DISPLAY': os.getenv('DISPLAY', ':0')},
                     args=[f'--load-extension={extension}', f'--disable-extensions-except={extension}',
                           f'--remote-debugging-port={debug_port}', '--remote-debugging-address=127.0.0.1',
-                          '--window-size=1440,1000'],
+                          '--window-size=1440,1000', '--hide-crash-restore-bubble'],
                     ignore_default_args=['--disable-extensions'],
                     accept_downloads=False, service_workers='allow')
+                from apps.raven.shared_browser import disable_focus_emulation
+                self.context.on('page', lambda p: disable_focus_emulation(self.context, p))
                 page = self.context.pages[0] if self.context.pages else self.context.new_page()
                 page.goto('https://example.com/')
                 worker = self.context.service_workers[0] if self.context.service_workers else self.context.wait_for_event('serviceworker')
@@ -107,6 +110,7 @@ class UserWindow:
                             for p in self.context.pages:
                                 if p.url.startswith('chrome-extension:'):
                                     continue
+                                disable_focus_emulation(self.context, p)
                                 rows.append(dict(tab_id=target_id(self.context, p), url=p.url,
                                     title=p.title(), owner='human', active=p.evaluate('document.visibilityState === "visible"')))
                             response.put(rows)
@@ -159,11 +163,11 @@ class Run:
 
 
 class Service:
-    def __init__(self, port, user_window=False):
+    def __init__(self, port, user_window=False, profile_dir=None):
         self.port = port
         self.runs = {}
         self.lock = threading.RLock()
-        self.window = UserWindow(port) if user_window else None
+        self.window = UserWindow(port, profile_dir) if user_window else None
         self.context = mp.get_context('spawn')
 
     def submit(self, payload, scripted=None):

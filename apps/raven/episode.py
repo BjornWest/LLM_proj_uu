@@ -2,12 +2,28 @@
 from datetime import datetime, timezone
 import json
 import os
+import re
 from pathlib import Path
 import threading
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
 MODEL = 'qwen/qwen3.8-27b'
+
+
+def evidence_excerpt(captured, answer):
+    lines = captured.splitlines()
+    plain_answer = re.sub(r'[*_`]', '', answer).casefold()
+    matched = [i for i, line in enumerate(lines) if len(line.strip()) >= 3 and line.strip().casefold() in plain_answer]
+    matched.sort(key=lambda i: not bool(re.search(r'\d', lines[i])))
+    selected, used = [], set()
+    for i in matched:
+        for j in range(max(0, i-1), min(len(lines), i+2)):
+            if j not in used:
+                selected.append(lines[j]); used.add(j)
+        if len('\n'.join(selected)) >= 10000:
+            break
+    return ('\n'.join(selected) if selected else captured)[:12000]
 
 
 def episode_main(payload, output, events, controls, cdp_url=None, scripted=None):
@@ -23,7 +39,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
     from intent_browser.openrouter import provider_options, DEFAULT_PROVIDERS
     from intent_browser.actions import make_action_set
 
-    sources, seen_tabs = {}, {}
+    sources, seen_tabs, captured_texts = {}, {}, {}
+    current_step = 0
     last_site = None
     final = None
     initial_chat_count = 0
@@ -35,8 +52,10 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
 
     class LiveTrace(Trace):
         def event(self, kind, **data):
-            nonlocal initial_chat_count
+            nonlocal initial_chat_count, current_step
             super().event(kind, **data)
+            if kind == 'model_started':
+                current_step = int(data['call_id'].rsplit('-', 1)[-1])
             if kind == 'environment_reset_completed':
                 initial_chat_count = len(env_holder[0].raven_chat.messages)
             if kind in ('tool_started', 'batch_call_started'):
@@ -45,7 +64,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                 summary = name.replace('_', ' ')
                 if args.get('url'):
                     summary += ': ' + args['url']
-                emit('step', index=data.get('step', 0), summary=summary[:240])
+                emit('step', index=data.get('step', current_step), summary=summary[:240])
             if kind == 'human_tab_transition':
                 t = data['transition']
                 events.put({'_controller': controller.snapshot()})
@@ -64,6 +83,9 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
             active = human.get('active_tab_id')
             if not active:
                 active = f"tab-{int(obs.get('active_page_index', [0])[0])+1}"
+            url = obs.get('url', '')
+            nodes = obs.get('axtree_object', {}).get('nodes', [])
+            root_title = next((n.get('name', {}).get('value', '') for n in nodes if n.get('role', {}).get('value') == 'RootWebArea'), '')
             current = {}
             for t in tabs:
                 if t.get('state') == 'closed':
@@ -71,10 +93,13 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                 tid = t['tab_id']
                 row = dict(tab_id=tid, url=t['url'], title=t.get('title') or '',
                            owner='agent' if t.get('state') == 'agent_controlled' else 'human', active=tid == active)
+                if row['active']:
+                    row['url'] = url
+                    row['title'] = root_title or (t.get('title') if t['url'] == url else '') or urlsplit(url).hostname or url
                 current[tid] = row
                 if tid not in seen_tabs:
                     emit('tab', action='opened', **{k: v for k, v in row.items() if k != 'active'})
-                elif row['active'] and not seen_tabs[tid].get('active'):
+                elif row['active'] and row != seen_tabs[tid]:
                     emit('tab', action='focused', **{k: v for k, v in row.items() if k != 'active'})
             for tid, row in seen_tabs.items():
                 if tid not in current:
@@ -84,14 +109,15 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
             events.put({'_tabs': list(current.values())})
             url = obs.get('url', '')
             title = current.get(active, {}).get('title') or urlsplit(url).hostname or url
-            if (url, active) != last_site:
+            if (url, active, title) != last_site:
                 emit('site', url=url, title=title, favicon=None, tab_id=active)
-                last_site = (url, active)
+                last_site = (url, active, title)
             if url.startswith(('http://', 'https://')):
                 # Store only text actually present in the recorded native AX capture.
                 nodes = obs.get('axtree_object', {}).get('nodes', [])
                 excerpt = '\n'.join(n.get('name', {}).get('value', '') for n in nodes if n.get('name', {}).get('value'))
                 if excerpt.strip():
+                    captured_texts[url] = excerpt
                     sources[url] = dict(id='source-' + str(list(sources).index(url)+1 if url in sources else len(sources)+1),
                         kind='offer', url=url, title=title, siteName=urlsplit(url).hostname,
                         evidence=excerpt[:12000], checkedAt=datetime.now(timezone.utc).isoformat())
@@ -126,7 +152,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
     threading.Thread(target=control_loop, daemon=True).start()
     profile = open_profile(standard_profile(helpers=False, data_tools=False))
     if cdp_url:
-        profile = with_human_handover(profile, wait_for_human=True, compact_tabs=True,
+        profile = with_human_handover(profile, wait_for_human=False, compact_tabs=True,
                                      stable_frames=True, capture_timeout_mode='bounded')
     history = '\n'.join(f"{m['who']}: {m['text']}" for m in payload.get('history', []))
     goal = (('Previous conversation (context):\n' + history + '\n\n') if history else '') + payload['text']
@@ -134,7 +160,9 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
     task = OpenInternetTask('https://www.google.com/', goal, headless=not bool(cdp_url))
     task.supported_harness_profiles = (profile.name,)
     if cdp_url:
-        from apps.raven.shared_browser import SharedBrowserEnv, SharedWebTask
+        from apps.raven.shared_browser import SharedBrowserEnv, SharedWebTask, SharedHumanBrowser
+        from intent_browser import human_browser
+        human_browser.HumanBrowser = SharedHumanBrowser
         original_prepare = task.prepare
         def prepare(trace):
             record = original_prepare(trace)
@@ -158,12 +186,22 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
         return env
     if scripted is not None:
         class ScriptedBackend:
+            initial_tab = None
             supports_background_completion = True
             supports_images = True
             supports_native_tools = True
             def configure_tools(self, options): pass
             def complete(self, messages):
                 action = scripted.pop(0)
+                if controller:
+                    if self.initial_tab is None:
+                        self.initial_tab = next(t['tab_id'] for t in controller.snapshot()['tabs'] if t['state']=='agent_controlled')
+                    action = {**action, 'arguments':action['arguments'].replace('$initial', self.initial_tab)}
+                if action['name'] == 'tab_focus' and controller:
+                    import time
+                    tid = json.loads(action['arguments'])['tab_id']
+                    while any(t['tab_id'] == tid and t['state'] in ('awaiting_human', 'human_active') for t in controller.snapshot()['tabs']):
+                        time.sleep(0.05)
                 return Completion('', {'choices': [{'message': {'role': 'assistant', 'content': None,
                     'tool_calls': [{'id': 'call-' + str(len(scripted)), 'type': 'function', 'function': action}]}, 'finish_reason': 'tool_calls'}]})
             def close(self): pass
@@ -194,6 +232,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
         if final:
             captured = list(sources.values())
             for source in captured:
+                source['evidence'] = evidence_excerpt(captured_texts[source['url']], final)
                 if source['url'] in final:
                     final = final.replace('](' + source['url'] + ')', '](' + source['url'] + ') [[' + source['id'] + ']]')
             emit('final', markdown=final, sources=captured)

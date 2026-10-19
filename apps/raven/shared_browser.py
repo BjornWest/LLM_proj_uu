@@ -58,6 +58,8 @@ class SharedBrowserEnv(BrowserEnv):
         self.browser = pw.chromium.connect_over_cdp(self.cdp_url)
         self.context = WebContext(self.browser.contexts[0])
         self.context.set_default_timeout(5000)
+        for page in self.context.pages:
+            disable_focus_emulation(self.context, page)
         pages = [p for p in self.context.pages if not p.url.startswith('chrome-extension:')]
         visible = [p for p in pages if p.evaluate('document.visibilityState === "visible"')]
         self.page = (visible or pages)[-1] if pages else self.context.new_page()
@@ -108,5 +110,32 @@ class WebContext:
     def pages(self):
         return [p for p in self._context.pages if not p.url.startswith('chrome-extension:')]
 
+    def new_page(self):
+        page = self._context.new_page()
+        disable_focus_emulation(self._context, page)
+        return page
+
     def __getattr__(self, name):
         return getattr(self._context, name)
+
+
+from intent_browser.human_browser import HumanBrowser
+
+
+class SharedHumanBrowser(HumanBrowser):
+    def start(self):
+        super().start()
+        # Only the current tab was assigned to Raven. Preserve all other user tabs.
+        for tab_id, page in self.pages.items():
+            if page is not self.env.page and self.states()[tab_id]['state'] == 'agent_controlled':
+                self.controller.handover(tab_id, 'Existing user tab; human control retained.')
+        self.emit()
+
+
+def disable_focus_emulation(context, page):
+    # Playwright otherwise reports every attached tab as visible/focused over CDP.
+    session = context.new_cdp_session(page)
+    try:
+        session.send('Emulation.setFocusEmulationEnabled', {'enabled': False})
+    finally:
+        session.detach()

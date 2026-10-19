@@ -45,3 +45,11 @@ The requested shared-tree log/screenshots conflict with the instruction to keep 
 ## Integration status
 
 Coordination ID: WEB-A-RAVEN-01. Owner WEB-A; scope `apps/raven/`, missing bounded launcher copy and this document. Open: reviewed candidate handoff to the coordinated publisher and WEB-B; no integration approval or commit adoption inferred. The shared-tree contract remains authoritative. Do not cherry-pick the untracked design inventory as part of this backend change.
+
+## Acceptance and review outcome
+
+- M1: real background run `da2e5d55288b47429f7b70027ee0b648`, episode `20261019T182339Z-94156a7d`, finished after 16 decisions. Model found an advertised 2,149 SEK Electrokit price, navigated from the supplied 404 URL using site search, and returned the product link and 3 sources. SSE: `.local/coordination/demo-sprint/m1-background-events.json`.
+- An initial real panel Python-release episode navigated the visible tab but stalled during a provider request and was cancelled. Its SSE and working-window screenshot remain recorded. Two other startup submissions failed before inference; they are distinct from model episodes.
+- Final scripted acceptance also covers opening/navigating/closing a new tab in the same persistent context, two initial pages with identical URLs but distinct CDP target IDs, initial human custody of the other page, actual panel Stop dispatch and composer reset, and failed-POST recovery. Verification uses its own port 18766 and fresh profile, so it can run independently of the demo window.
+- Source excerpts now prefer exact captured lines matching the answer, including numeric claims. Applying the final selector to the recorded M1 native AX artifact captures the price/VAT text in a 561-character excerpt; this adapter check does not rewrite the historical recording or make a new model call. Evidence: `.local/coordination/demo-sprint/m1-evidence-adapter.json`.
+- Independent review of `9a84977` identified and drove correction of missing v40 cancellation, the wait-only profile disabling tab tools, and initial noncurrent-tab custody. Final fix commit and review disposition are recorded in `.local/coordination/demo-sprint/review-web-a.md`.
