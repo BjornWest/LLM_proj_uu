@@ -204,8 +204,8 @@ python3 scripts/run_bounded_job.py --memory-mib 3072 --tasks 512 -- \
   tests/test_raven_demo_ui.py
 ```
 
-The browser test runs six independent scripted cases with concurrency two:
-recovery, permanent failure and dropped-stream recovery in each layout. Evidence:
+The browser test runs eight independent scripted cases with concurrency two:
+recovery, permanent failure, dropped-stream recovery and budget exhaustion in each layout. Evidence:
 `.local/coordination/demo-sprint/web-g-ui/`. Unit coverage includes provider/capture/
 worker errors, abnormal process exit, exhausted retries, cancellation, retained raw
 diagnostics when demo mode is off, indexed replay and duplicate stream-drop reports.
@@ -246,3 +246,10 @@ The 84-file asset integrity check passed after refreshing the two changed bundle
 hashes (`python3 design/raven/tools/verify_bundle.py`). The panel now renders its
 friendly failure sentence once in the answer bubble and returns the status line
 to Ready. Raw-mode error detail remains available when `--no-demo-mode` is used.
+
+Final polish review also found that the panel's done-only budget path needed its
+own friendly answer bubble after returning the status to Ready. The correction
+tracks whether an error answer was already rendered and appends one only when
+needed; budget stops now have browser coverage in both layouts. Cancellation
+still produces no failure answer. See the final review disposition for the exact
+four-commit candidate.

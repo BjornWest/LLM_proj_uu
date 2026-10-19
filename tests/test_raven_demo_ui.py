@@ -37,7 +37,10 @@ class FailureService(Service):
             events.put({'type': 'step', 'index': 1, 'summary': 'Reading the sample page'})
             if stopped.wait(.4):
                 return
-            if attempt == 0 or 'permanent' in run.payload['text']:
+            if 'budget' in run.payload['text']:
+                events.put({'type': 'error', 'message': 'The episode ended before the agent supplied an answer.'})
+                events.put({'type': 'done', 'stop_reason': 'max_total_input_tokens'})
+            elif attempt == 0 or 'permanent' in run.payload['text']:
                 events.put({'type': 'error', 'message': 'Worker.evaluate: private stack trace'})
                 events.put({'type': 'done', 'stop_reason': 'error'})
             else:
@@ -52,9 +55,9 @@ def test_recovery_and_friendly_errors_in_both_layouts(tmp_path):
     output.mkdir(parents=True, exist_ok=True)
     results = []
 
-    def case(layout, permanent, drop):
+    def case(layout, permanent, drop, budget=False):
         from playwright.sync_api import sync_playwright
-        name = f'{layout}-{"permanent" if permanent else "recover"}{"-sse-drop" if drop else ""}'
+        name = f'{layout}-{"budget-" if budget else ""}{"permanent" if permanent else "recover"}{"-sse-drop" if drop else ""}'
         server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
         server.daemon_threads = True
         service = FailureService(server.server_port, tmp_path / name)
@@ -76,20 +79,20 @@ def test_recovery_and_friendly_errors_in_both_layouts(tmp_path):
                         seen.append(1)
                         route.abort('failed') if len(seen) == 1 else route.continue_()
                     page.route('**/events', interrupt)
-                page.locator('#message-input').fill('permanent failure' if permanent else 'recover fixture')
+                page.locator('#message-input').fill('budget stop' if budget else 'permanent failure' if permanent else 'recover fixture')
                 page.locator('#send-button').click()
-                message = FRIENDLY_ERROR if permanent else 'Recovered answer.'
+                message = FRIENDLY_ERROR if permanent or budget else 'Recovered answer.'
                 page.locator('.message:not(.user)').filter(has_text=message).wait_for(timeout=30000)
                 page.wait_for_function('!document.querySelector("#send-button").disabled', timeout=15000)
                 page.locator('.raven-steps summary').click()
                 text = page.locator('body').inner_text()
                 assert 'Worker.evaluate' not in text and 'private stack trace' not in text
-                assert 'Taking another look…' in text
-                if permanent:
+                assert ('Taking another look…' in text) is (not budget)
+                if permanent or budget:
                     assert text.count(FRIENDLY_ERROR) == 1
                 assert not errors, errors
                 page.screenshot(path=str(output / f'{name}.png'))
-                assert all(run.attempt == 1 and run.done for run in service.runs.values())
+                assert all(run.attempt == (0 if budget else 1) and run.done for run in service.runs.values())
                 results.append({'case': name, 'pass': True})
             finally:
                 browser.close()
@@ -101,6 +104,7 @@ def test_recovery_and_friendly_errors_in_both_layouts(tmp_path):
     # Separate browsers and traces for independent cases, bounded concurrency two.
     cases = [(layout, permanent, False) for layout in ['panel', 'fullpage'] for permanent in [False, True]]
     cases += [(layout, False, True) for layout in ['panel', 'fullpage']]
+    cases += [(layout, False, False, True) for layout in ['panel', 'fullpage']]
     with ThreadPoolExecutor(max_workers=2) as pool:
         list(pool.map(lambda args: case(*args), cases))
     (output / 'results.json').write_text(json.dumps({'metadata': {'tags': ['scripted']}, 'cases': results}, indent=2) + '\n')

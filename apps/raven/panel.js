@@ -63,6 +63,7 @@ window.addEventListener('DOMContentLoaded', () => {
     history.push({who:'You', text});
     steps.reset();mode.disabled=true;
     const token = ++generation;
+    let errorShown = false;
     stop.disabled = false;
     status.textContent = 'Starting…';
     post('/api/tasks', {text, conversation_id:conversation, mode:mode.value, history:prior}).then(data => {
@@ -90,13 +91,18 @@ window.addEventListener('DOMContentLoaded', () => {
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{status:'complete'}}));
         }
         if (e.type === 'error') {
+          errorShown = true;
           status.textContent=window.ravenTransport.errorMessage(e);c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');if(window.ravenTransport.demoMode)status.textContent='Ready';
         }
         if (e.type === 'done') {
           steps.stop();mode.disabled=false;
           stream.close();stream=null;run=null;stop.disabled=true;handovers.clear();showHandover();
           status.textContent=window.ravenTransport.demoMode ? (e.stop_reason === 'cancelled' ? 'Stopped' : 'Ready') : e.stop_reason === 'cancelled' ? 'Stopped' : e.stop_reason === 'agent_finished' ? 'Ready' : "I couldn't finish that: "+({max_total_input_tokens:'the research budget was reached',max_total_output_tokens:'the answer budget was reached',max_input_tokens:'the conversation became too long',error:'please try again'}[e.stop_reason] || 'the task ended before an answer was ready');
-          if(!c.agentReply)c.cancelTask({announce:false});
+          if(!c.agentReply){
+            c.cancelTask({announce:false});
+            if(window.ravenTransport.demoMode && !errorShown && e.stop_reason !== 'cancelled')
+              c.appendMessage(window.ravenTransport.errorMessage(e),'Raven');
+          }
         }
       }, onError:error => {
         steps.stop();mode.disabled=false;
