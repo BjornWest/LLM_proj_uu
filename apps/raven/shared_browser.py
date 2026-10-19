@@ -248,9 +248,27 @@ def raven_worker(context):
 def active_target(context):
     # CDP emulates focus/visibility for every attached Page. Chrome's own tab API
     # supplies actual active identity, including two tabs with identical URLs.
-    worker = raven_worker(context)
-    return worker.evaluate("""async () => {
+    # MV3 workers are stopped when idle and restarted on demand, so a cached handle
+    # can be dead or not yet bound: retry on any live Raven worker, then fall back
+    # to the most recently opened page rather than failing the episode.
+    import time
+    script = """async () => {
+      if (!(globalThis.chrome && chrome.debugger && chrome.tabs)) return null;
       const [tab] = await chrome.tabs.query({active:true, lastFocusedWindow:true});
       const targets = await chrome.debugger.getTargets();
-      return targets.find(target => target.tabId === tab.id).id;
-    }""")
+      const found = targets.find(target => target.tabId === tab.id);
+      return found ? found.id : null;
+    }"""
+    for attempt in range(12):
+        workers = [w for w in context.service_workers
+                   if w.url.startswith('chrome-extension://') and w.url.endswith('/background.js')]
+        for worker in workers:
+            try:
+                value = worker.evaluate(script)
+            except Exception:
+                continue
+            if value:
+                return value
+        time.sleep(0.25)
+    pages = [p for p in context.pages if not p.is_closed() and not p.url.startswith('chrome-extension:')]
+    return page_target(context, pages[-1]) if pages else None

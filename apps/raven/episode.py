@@ -60,7 +60,9 @@ class DemoBackend(ChatCompletionsBackend):
 
 
 DEMO_POLICY = (
-    "Raven live demo policy: You may research public information and compare products. "
+    "Raven live demo policy: You may research public information, compare products, and use websites "
+    "interactively on the user's behalf or together with them: play browser games, try code in online "
+    "editors, use calculators and other web tools, fill search boxes and filters. Be helpful and playful. "
     "Never buy, order, pay, bid, log in, create accounts, send messages, submit personal data, "
     "or change user/account settings on real websites, even if the user asks. "
     "For those requests, finish immediately with a short explanation and offer research help. "
@@ -339,7 +341,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
     history = '\n'.join(f"{m['who']}: {m['text']}" for m in payload.get('history', []))
     goal = (('Previous conversation (context):\n' + history + '\n\n') if history else '') + payload['text']
     goal += ('\n\nFor research answers, link to pages you actually inspected. '
-             'For requests outside the demo policy, give a short refusal without browsing. '
+             'Only refuse what the demo policy forbids (purchases, payments, logins, accounts, messages, personal data); help with everything else. '
              'Do not purchase or create accounts.')
     task = OpenInternetTask('https://www.google.com/', goal, headless=False)
     task.supported_harness_profiles = (profile.name,)
