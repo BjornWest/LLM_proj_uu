@@ -251,7 +251,11 @@ class Service:
                 run.trace = event['_trace']
             else:
                 if event['type'] == 'handover' and run.payload['mode'] == 'background_window':
-                    self.focus(run.run_id + ':' + event['tab_id'])
+                    try:
+                        self.focus(run.run_id + ':' + event['tab_id'])
+                    except Exception:
+                        event = {**event, 'message': event['message'] +
+                            ' Please open the tab yourself; Raven could not bring it to the front.'}
                 run.emit(event)
         run.process.join()
         if not run.done:

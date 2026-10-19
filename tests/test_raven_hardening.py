@@ -67,3 +67,31 @@ def test_price_excerpt_matches_localized_currency_and_spacing():
     excerpt=evidence_excerpt(captured,'Raspberry Pi med 8 GB kostar **2 149 kr**.')
     assert '2 149 SEK' in excerpt and 'Pris' in excerpt and 'Inkl. 25% moms' in excerpt
     assert excerpt.index('2 149 SEK') < excerpt.index('8 GB')
+
+
+def test_demo_launch_removes_marker_and_pins_invisible_display(monkeypatch):
+    from apps.raven.browser_launch import demo_launch_options
+    monkeypatch.setenv('DISPLAY', ':0')
+    options = demo_launch_options(args=['--start-minimized'],
+        ignore_default_args=['--hide-scrollbars'], env={'DISPLAY': ':0'})
+    assert options['env']['DISPLAY'] == ':99'
+    assert options['ignore_default_args'] == ['--hide-scrollbars', '--enable-automation']
+    assert options['args'] == ['--start-minimized', '--disable-blink-features=AutomationControlled']
+
+
+def test_background_handover_focus_failure_still_delivers_terminal_events():
+    import queue
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+    from apps.raven.backend import Run, Service
+    events = queue.Queue()
+    events.put({'type': 'handover', 'tab_id': 'tab-1', 'message': 'Please verify the site.'})
+    events.put({'type': 'done', 'stop_reason': 'error'})
+    run = Run('test', {'mode': 'background_window'}, process=SimpleNamespace(
+        is_alive=lambda: False, join=lambda: None))
+    service = SimpleNamespace(focus=Mock(side_effect=ValueError('Tab no longer exists')))
+    Service.collect(service, run, events)
+    assert run.done
+    assert run.events[0]['type'] == 'handover'
+    assert 'Please open the tab yourself' in run.events[0]['message']
+    assert run.events[-1] == {'type': 'done', 'stop_reason': 'error'}
