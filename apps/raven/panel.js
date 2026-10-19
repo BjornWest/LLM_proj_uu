@@ -97,10 +97,13 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   document.querySelector('#handback').onclick = async () => {
     const tab = pendingTab;
+    const button = document.querySelector('#handback');
+    button.disabled=true;
     try {
       await post('/api/tasks/'+run+'/handback',{tab_id:tab,note:null});
       handovers.delete(tab);showHandover();status.textContent='Returned to Raven';
     } catch(e) {status.textContent=e.message;}
+    finally {button.disabled=false;}
   };
   fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs)tabs.set(t.tab_id,t);drawTabs();});
 });

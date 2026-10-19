@@ -152,6 +152,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
             if command.get('action') == 'handback' and controller:
                 try:
                     tab = next(t for t in controller.snapshot()['tabs'] if t['tab_id'] == command['tab_id'])
+                    if tab['state'] in ('returned', 'agent_controlled'):
+                        continue  # Duplicate handback after the first return is already accepted.
                     if tab['state'] == 'awaiting_human':
                         controller.signal(tab['tab_id'], 'start')
                     if command.get('note'):

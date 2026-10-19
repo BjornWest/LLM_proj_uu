@@ -240,7 +240,10 @@ class Service:
         for row in rows:
             row['tab_id'] = reverse.get(row['tab_id'], row['tab_id'])
             tid = row['tab_id']
-            row['owner'] = ('agent' if states[tid] == 'agent_controlled' else 'human') if tid in states else ownership.get(tid, 'human')
+            if run.done:
+                row['owner'] = 'human'
+            else:
+                row['owner'] = ('agent' if states[tid] == 'agent_controlled' else 'human') if tid in states else ownership.get(tid, 'human')
         return rows
 
     def focus(self, tab_id):

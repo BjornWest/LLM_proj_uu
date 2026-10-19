@@ -74,8 +74,10 @@ def main():
                 data=json.dumps({'tab_id':pending['tab_id'],'note':'Checked by scripted acceptance'}).encode(),
                 headers={'Content-Type':'application/json'},method='POST')
             assert urlopen(req).status==200
+            sw.controls.put({'action':'handback','tab_id':pending['tab_id'],'note':None})
             results['shared']=wait_done(sw)
             assert any(e['type']=='final' for e in sw.events), sw.events
+            assert not any(e['type']=='error' for e in sw.events),sw.events
             transitions=[json.loads(line) for line in (Path(sw.trace)/'events.jsonl').read_text().splitlines()]
             assert any(e['event']=='human_chat_queued_for_policy' for e in transitions)
             assert len([e for e in sw.events if e['type']=='handover'])==1
