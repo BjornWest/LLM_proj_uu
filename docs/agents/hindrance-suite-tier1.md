@@ -11,10 +11,10 @@ export HARNESS_AX_TOKENIZER="$PWD/.local/website-38-concept-world-20261006-v1/as
 export LD_LIBRARY_PATH=/home/bjorn/code/LLM_proj_uu/.local/system-libs/usr/lib/x86_64-linux-gnu
 PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python
 python3 scripts/run_bounded_job.py --memory-mib 10000 --tasks 512 -- \
-  "$PY" -m scripts.hindrance_suite build --seeds 1000 1002 1003 --jobs 4
+  "$PY" -m scripts.hindrance_suite build --seeds 1000 1002 1003 --jobs 2
 ```
 
-`generate`, `prepare`, and `controls` also run separately. `generate` reuses existing world/winner outputs; use a new output directory for a fresh campaign. `controls` reuses saved control results; each newly attempted episode gets a separate attempt directory. It performs no automatic retries. Historical startup errors and failed attempts remain available. `--mechanisms` can select the three milestone mechanisms before expanding to all ten. All independent controls use separate processes, browsers, runtimes and traces. There are no provider calls or inference charges.
+`generate`, `prepare`, and `controls` also run separately. `generate` reuses existing world/winner outputs; use a new output directory for a fresh campaign. `controls` reuses saved control results; each newly attempted episode gets a separate attempt directory. It performs no automatic retries. Historical startup errors and failed attempts remain available. Cached results are reassessed against the current control assertions without changing the original trace. Negative controls must fail for the intended native reason: wrong-A must violate the mechanism (with correct order contents except for sponsorship), and wrong-B must actually buy a different item. `--mechanisms` can select the three milestone mechanisms before expanding to all ten. All independent controls use separate processes, browsers, runtimes and traces. There are no provider calls or inference charges.
 
 A host needs the untracked product source closure declared by `.local/product-width/accepted.json`, `.local/coordination/product-market-ranges/`, and the tokenizer's `tokenizer.json`, `tokenizer_config.json`, `chat_template.jinja`. Copy missing inputs from the shared checkout at the same relative paths; no symlinks. The compatible `agent_trace` source checkout is required in `PYTHONPATH`.
 

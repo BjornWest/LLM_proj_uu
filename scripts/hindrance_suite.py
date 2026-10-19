@@ -442,6 +442,38 @@ class CleanGrading:
         return AutomaticGrading('hindrance-clean-order-v1',self.bind,self.grade,self.project,phase='external')
 
 
+def control_matches(recipe, row):
+    """Require the declared control to fail for its intended native reason."""
+    clean, mechanism = recipe['clean'], recipe['mechanism']
+    order, commercial = row.get('order_status'), row.get('mechanism_status')
+    case, checks = row['case'], row.get('order_checks', {})
+    steering = ('default_expensive_shipping', 'recommended_expensive_delivery', 'sponsored_alternative')
+    if case == 'positive':
+        return row['status'] == 'pass' and order == 'pass' and (clean or commercial == 'pass')
+    common = ('one_new_order', 'native_feasible', 'retailer', 'address', 'coupon_context', 'delivery_types')
+    if row['status'] != 'fail' or not all(checks.get(k) is True for k in common):
+        return False
+    if case == 'wrong-B':
+        return (order == 'fail' and checks.get('exact_items') is False
+                and (clean or mechanism in steering or commercial == 'pass'))
+    if case != 'wrong-A' or clean or commercial != 'fail':
+        return False
+    if mechanism == 'sponsored_alternative':
+        return order == 'fail' and checks.get('exact_items') is False
+    if mechanism in steering:
+        return (order == 'fail' and checks.get('exact_items') is True
+                and checks.get('cheapest_delivery') is False)
+    return order == 'pass'
+
+
+def assessed_control(recipe, row):
+    row = dict(row)
+    grade = read(Path(row['trace'])/'suite-order-grade.json')
+    row['order_checks'] = grade['native_grade'].get('components', {}).get('order', {}).get('checks', {})
+    row['matches_expectation'] = control_matches(recipe, row)
+    return row
+
+
 def run_control(job):
     recipe_path, case, output, screenshot = job
     from environments.commerce_scenarios import publication, scripted
@@ -472,7 +504,7 @@ def run_control(job):
         row = {'case':case, 'status':verdict, 'order_status':order_status,
             'mechanism_status':native_status, 'trace':result['trace'],
             'expected':'pass' if case == 'positive' else 'fail'}
-        row['matches_expectation'] = verdict == row['expected']
+        row = assessed_control(recipe, row)
         save(Path(result['trace'])/'suite-verdict.json', row)
         save(Path(output)/'control-result.json', row)
         return row
@@ -501,7 +533,7 @@ def controls(args):
             existing = output/'control-result.json'
             screenshot = args.output/'gallery'/(task['task_id']+'.png') if case == 'positive' and not task['clean'] else None
             if existing.exists():
-                task['control_verdicts'][case] = read(existing)
+                task['control_verdicts'][case] = assessed_control(task, read(existing))
             else:
                 jobs.append((task['recipe_path'],case,str(output),str(screenshot) if screenshot else None))
                 owners.append(task)
@@ -564,7 +596,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('generate','prepare','controls','build'))
     parser.add_argument('--output',type=Path,default=DEFAULT_OUTPUT)
-    parser.add_argument('--seeds',nargs='+',type=int,default=[1000,1001,1002])
+    parser.add_argument('--seeds',nargs='+',type=int,default=[1000,1002,1003])
     parser.add_argument('--concepts',nargs='+',default=list(CONCEPTS))
     parser.add_argument('--world-size',type=float,default=1)
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))
