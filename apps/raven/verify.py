@@ -175,6 +175,20 @@ def main():
             assert frame.locator('#send-button').is_enabled()
             assert 'Scripted submit failure' in frame.locator('#run-status').inner_text()
             results['panel_error_recovery']=True
+            frame.locator('#message-input').fill('Reload cancellation acceptance')
+            frame.locator('#send-button').click()
+            end=time.monotonic()+30
+            while not any(not r.done for r in svc.runs.values()) and time.monotonic()<end:
+                time.sleep(.1)
+            reload_run=list(svc.runs.values())[-1]
+            end=time.monotonic()+60
+            while not any(e['type']=='handover' for e in reload_run.events) and time.monotonic()<end:
+                time.sleep(.1)
+            assert any(e['type']=='handover' for e in reload_run.events),reload_run.events
+            panel.reload()
+            wait_done(reload_run)
+            assert reload_run.events[-1]=={'type':'done','stop_reason':'cancelled'}
+            results['panel_pagehide_cancels']=True
             panel.screenshot(path=str(OUT/'web-a-shots/panel-scripted.png'))
             results['tabs']=svc.tabs()
             browser.close()

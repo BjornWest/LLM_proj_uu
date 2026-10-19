@@ -71,3 +71,5 @@ python3 scripts/run_bounded_job.py --memory-mib 1024 -- python3 design/raven/too
 The check uses port 18766, fails if it is occupied, and stops only the server it starts.
 
 Follow the repository's [`AGENTS.md`](../../AGENTS.md) for any subsequent implementation. In particular, later implementation commits need independent review from the other agent family before adoption handoff or dev/prod integration: Codex-authored commits require Claude Code review; a same-family subagent is not sufficient. This file export creates no commits and does not claim that review or integration approval has occurred.
+
+The integrated WEB-C demo hides the development helper-raven and animation controls described above; the underlying imported visual assets and programmatic controls remain. See [demo hardening](raven-demo-hardening.md) for the live presentation entry points.

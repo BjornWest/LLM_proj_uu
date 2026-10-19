@@ -244,13 +244,15 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
                 break
             env_holder[0].raven_chat._js_user_message_received_callback(msg=note)
     profile = open_profile(standard_profile(helpers=False, data_tools=False))
-    profile = replace(profile, instructions=profile.instructions + '\n' + DEMO_POLICY)
     if cdp_url:
         profile = with_human_handover(profile, wait_for_human=False, compact_tabs=True,
                                      stable_frames=True, capture_timeout_mode='bounded')
+    profile = replace(profile, instructions=profile.instructions + '\n' + DEMO_POLICY)
     history = '\n'.join(f"{m['who']}: {m['text']}" for m in payload.get('history', []))
     goal = (('Previous conversation (context):\n' + history + '\n\n') if history else '') + payload['text']
-    goal += '\n\nAnswer with Markdown links to the pages you actually inspected. Do not purchase or create accounts.'
+    goal += ('\n\nFor research answers, link to pages you actually inspected. '
+             'For requests outside the demo policy, give a short refusal without browsing. '
+             'Do not purchase or create accounts.')
     task = OpenInternetTask('https://www.google.com/', goal, headless=not bool(cdp_url))
     task.supported_harness_profiles = (profile.name,)
     if cdp_url:
