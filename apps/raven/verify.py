@@ -5,6 +5,7 @@ from pathlib import Path
 import threading
 import time
 import subprocess
+import re
 from urllib.request import Request, urlopen
 
 from apps.raven.backend import Service, Handler, ThreadingHTTPServer, target_id
@@ -53,7 +54,8 @@ def main():
             page.bring_to_front()
             page.wait_for_timeout(300)
             human_focus=subprocess.check_output(['xprop','-root','_NET_ACTIVE_WINDOW'],text=True)
-            results['os_focus_probe_available']=int(human_focus.strip().rsplit(' ',1)[-1],16)>0
+            focus_id=re.search(r'0x[0-9a-fA-F]+',human_focus)
+            results['os_focus_probe_available']=bool(focus_id and int(focus_id.group(),16)>0)
             # Separate minimized context: agent research preserves the human's
             # selected tab, URL and JavaScript state. Independent of bg above.
             bw=svc.submit({'text':'Read in background then finish.', 'mode':'background_window'},[
