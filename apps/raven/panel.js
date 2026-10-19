@@ -142,3 +142,11 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs || [])tabs.set(t.tab_id,t);drawTabs();});
 });
+
+// Enter sends; Shift+Enter (or IME composition) keeps a newline.
+document.getElementById('message-input')?.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+  event.preventDefault();
+  const send = document.getElementById('send-button');
+  if (send && !send.disabled && event.target.value.trim()) event.target.form.requestSubmit();
+});
