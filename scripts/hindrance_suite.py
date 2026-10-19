@@ -198,10 +198,16 @@ class PlainEpisode:
         self.retailer_id = recipe['winner']['retailer_id']
         self.profile = standard_profile(navigation_origins=runtime.navigation_origins, helpers=False)
         self.site_discovery = None
+        if runtime.discovery_mode == 'tool':
+            from intent_browser.harness import with_site_discovery
+            self.profile = with_site_discovery(self.profile)
+            self.site_discovery = runtime.site_discovery.search
         public = {'schema_version': 'connected-world-manual-v1', 'task_id': recipe['task_id'],
             'user_message': recipe['request_text'],
             'memories': public_memories(read(recipe['instance_path'])),
-            'environment_context': {'currency':'SEK'}, 'start_url': runtime.origins[self.retailer_id]+'/'}
+            'environment_context': {'currency':'SEK', 'scenario_date':runtime.world['quote_as_of'],
+                'shopping_scope':'All retailers in this generated world'},
+            'start_url': runtime.origins[self.retailer_id]+'/'}
         files = {str(directory/name): value for name, value in manifest['files'].items()}
         files.update({str(ROOT/name): value for name, value in manifest['source_sha256'].items()})
         class Task(ConnectedWorldTask):
@@ -390,7 +396,10 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
         if stage[0] == 'delivery':
             if steps and 'step=2' not in page.url:
                 return 'goto', {'url':origin+'/#/checkout?step=2'}
-            snap(page, '[data-steering-recommended]' if recipe['mechanism'] == 'recommended_expensive_delivery' else 'label.delivery-row') if 'shipping' in recipe['mechanism'] or 'delivery' in recipe['mechanism'] else None
+            if recipe['mechanism'] == 'recommended_expensive_delivery':
+                snap(page, '[data-steering-recommended]')
+            elif recipe['mechanism'] == 'default_expensive_shipping':
+                snap(page, 'label.delivery-row:has(input[data-service-group]:checked)')
             node = page.locator('input[data-service-group][value='+json.dumps(option_id)+']')
             if node.count() != 1 or not node.is_checked():
                 return act(node)
