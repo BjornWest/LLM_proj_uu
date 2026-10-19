@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-19",
+  "status": "passed",
+  "destination": "/home/bjorn/code/LLM_proj_uu/design/raven",
+  "documentation": [
+    "docs/agents/raven-assets.md",
+    "docs/agents/raven-integration.md",
+    "docs/agents/raven-authoring.md"
+  ],
+  "metadata": {"tags": ["scripted"]},
+  "checks": {
+    "destinationIntegrity": {
+      "status": "passed",
+      "hashedFiles": 77,
+      "htmlPages": 3,
+      "bankClips": 40,
+      "bankArrays": 7623,
+      "binaryBytes": 6167440,
+      "vendorLicenses": "verified",
+      "localHtmlReferences": "all present; no duplicate IDs"
+    },
+    "offlineSyntax": {"javascriptParsed": 15, "pythonParsed": 18},
+    "metadataRebuild": {
+      "status": "passed",
+      "outputs": "All four live-*-meta-v34.json files reproduced byte-for-byte",
+      "originalVsDerivedDirectorSamples": 2410,
+      "report": "work/live-metadata-v34-report.json"
+    },
+    "wslHttpSmoke": {
+      "status": "passed",
+      "httpAssets": 30,
+      "scope": "Local server startup and byte-identical HTTP delivery of HTML, JS, CSS and required runtime JSON/BIN",
+      "resourceWrapper": "scripts/run_bounded_job.py --memory-mib 1024",
+      "receipt": "/home/bjorn/code/LLM_proj_uu/.local/bounded-jobs/llmjob-992ad3cbf8744a2f",
+      "serverLifecycle": "Only the test server on port 18766 was started and stopped"
+    },
+    "independentReadOnlyAudit": {
+      "scope": "Runtime dependency closure, local links, source dependencies, and documentation accuracy",
+      "disposition": "No remaining defects; required manifest and validation records included",
+      "reviewType": "Same-family export audit, not repository cross-family commit review"
+    }
+  },
+  "scopeLimits": [
+    "Uncommitted asset and documentation import; no application integration or deployment",
+    "No new model episode, provider call, automated browser acceptance or performance benchmark",
+    "No Blender render or live geometry re-extraction was run for this transfer",
+    "Runtime geometry and scripts preserve the accepted source bytes; only five extension HTML navigation links were adapted",
+    "Subsequent implementation commits and release adoption must follow repository review policy"
+  ],
+  "repositoryChanges": {
+    "newPaths": ["design/raven/", "docs/agents/raven-assets.md", "docs/agents/raven-integration.md", "docs/agents/raven-authoring.md"],
+    "appendedIndexLink": "docs/agents/README.md",
+    "gitIndexOrBranchChanged": false
+  }
+}

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Raven · shopping citations</title>
+  <script src="chat-flight-director-live-v36.js?v=36-live-1" defer></script>
+  <script src="vendor-v33/marked-17.0.5.umd.js" defer></script>
+  <script src="vendor-v33/dompurify-3.4.16.min.js" defer></script>
+  <script src="chat-messages-v33.js?v=33-b60006235205" defer></script>
+  <script type="module" src="raven-live-v38.js?v=38-live-1"></script>
+  <script src="raven-idle-gaze-v38.js?v=38-live-1" defer></script>
+  <script src="raven-web-activity-v39.js?v=39-live-2" defer></script>
+  <script src="raven-web-activity-demo-v39.js?v=39-live-2" defer></script>
+  <link rel="stylesheet" href="raven-citations-v40.css?v=40-live-1">
+  <script src="raven-citations-v40.js?v=40-live-1" defer></script>
+  <script src="shopping-demo-v40.js?v=40-live-1" defer></script>
+  <script src="chat-demo-live-v40.js?v=40-live-1" defer></script>
+  <style>
+    :root{color-scheme:light;--ink:#202b35;--muted:#74808b;--line:#e2e7ec;--blue:#3377ed;--paper:#fff}
+    *{box-sizing:border-box}body{margin:0;background:#f7f9fb;color:var(--ink);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:clip}
+    main{width:min(100% - 48px,760px);margin:0 auto;padding:26px 0 30px}header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:18px;border-bottom:1px solid var(--line)}header b{font-size:17px;font-weight:600;letter-spacing:-.025em}header span{color:var(--muted);font-weight:400}a{color:#4c6b93;text-decoration:none}a:hover{text-decoration:underline}nav{display:flex;gap:18px;font-size:12px}
+    .scene{position:relative;isolation:isolate}.sky{height:160px;position:relative}.sky-caption{position:absolute;top:8px;line-height:1.2;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:11px;color:var(--muted);z-index:3;pointer-events:none}.status{display:flex;align-items:center;gap:8px}.status::before{content:"";width:6px;height:6px;border-radius:50%;background:#79a088}.scene[data-state="working"] .status::before,.scene[data-state="takeoff"] .status::before,.scene[data-state="entering"] .status::before{background:var(--blue)}.scene[data-state="diving"] .status::before,.scene[data-state="cawing"] .status::before{background:#b68c58}
+    .chat-window{height:298px;position:relative;padding-top:49px;border-radius:16px}.chat-window::before{content:"";position:absolute;inset:0;background:var(--paper);border:1px solid var(--line);border-radius:16px;z-index:0;box-shadow:0 5px 24px #1a344e05}.chat-heading{position:absolute;left:22px;right:22px;top:16px;font-size:12px;display:flex;justify-content:space-between;color:var(--muted)}.chat-heading>*{position:relative;z-index:3}.chat-heading strong{font-weight:550;color:#52616f}.chat-divider{position:absolute;top:48px;left:0;right:0;height:1px;background:#edf0f4;z-index:1}.messages{height:100%;overflow-y:auto;padding:20px 22px 23px;display:flex;flex-direction:column;gap:15px;scrollbar-width:thin;scrollbar-color:#dce3eb transparent}.message{position:relative;max-width:85%;padding:10px 14px;align-self:flex-start;flex-shrink:0;min-width:105px}.message::before{content:"";position:absolute;inset:0;background:white;border:1px solid #e8edf2;border-radius:12px 12px 12px 3px;z-index:1}.message.user{align-self:flex-end}.message.user::before{border-color:#dce8fa;border-radius:12px 12px 3px 12px}.message-label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8291a0;margin-bottom:3px;position:relative;z-index:3}.message.user .message-label{color:#6486b3}.message-copy{position:relative;z-index:3;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.message.pending .message-copy{color:#8b98a5;font-size:13px}
+    form{position:relative;margin-top:18px}.input-label{display:block;font-size:12px;color:#6d7c89;margin:0 0 8px;position:relative;z-index:3}.input-wrap{position:relative;border-radius:12px}.input-wrap::before{content:"";position:absolute;inset:0;background:white;border-radius:12px;z-index:1}textarea{position:relative;z-index:3;display:block;width:100%;height:86px;resize:vertical;min-height:72px;max-height:180px;border:1px solid #d9e1e9;border-radius:12px;padding:15px 17px;font:inherit;font-size:14px;color:var(--ink);background:transparent;outline:none}textarea:focus{border-color:#8fb3ef;box-shadow:0 0 0 3px #3377ed13}textarea::placeholder{color:#98a3ad}.send-row{height:149px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px}.hint{font-size:11px;color:#85929e;max-width:370px;margin:0 0 12px;position:relative;z-index:3}.send{position:relative;min-width:132px;height:45px;border:0;background:transparent;cursor:pointer;color:white;font:inherit;font-size:13px;font-weight:550;border-radius:9px;flex-shrink:0;padding:0 22px}.send::before{content:"";position:absolute;inset:0;background:var(--blue);border-radius:9px;z-index:1;box-shadow:0 3px 7px #3377ed1c}.send:hover::before{background:#2868d8}.send span{position:relative;z-index:3}.send:focus-visible{outline:2px solid #2054a5;outline-offset:4px}.send:disabled{cursor:default}.send:disabled::before{background:#769ee3}.send:disabled span{opacity:.8}.bird-overlay{position:absolute;top:0;left:calc((100% - 100vw)/2);width:100vw;height:100%;z-index:2;pointer-events:none}.settings{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:11px;color:var(--muted)}.settings label{display:flex;align-items:center;gap:7px;cursor:pointer}.settings input{accent-color:#3377ed}.links{display:flex;flex-wrap:wrap;gap:14px}.error{color:#a54343}
+    @media(max-width:580px){main{width:calc(100% - 32px);padding-top:18px}header{gap:12px}header b{font-size:15px}header span{display:none}nav{gap:12px;font-size:11px}.sky{height:144px}.sky-caption{top:8px;font-size:11px}.chat-window{height:268px}.messages{padding:17px 15px}.message{max-width:92%;padding:9px 11px}.message-copy{font-size:13px}textarea{height:79px}.send-row{height:130px}.hint{font-size:10px;max-width:190px;margin-bottom:8px}.send{min-width:120px;height:43px}.settings{align-items:flex-start;flex-wrap:wrap;gap:14px}.settings .links{width:100%}}
+    @media(max-height:800px){main{padding:14px 0}header{padding-bottom:12px}header b{font-size:15px}nav{font-size:11px}.sky{height:160px}.sky-caption{top:8px;font-size:11px}.chat-window{height:244px;padding-top:39px}.chat-heading{top:11px;font-size:11px}.chat-divider{top:38px}.messages{padding:12px 16px;gap:10px}.message{padding:8px 12px}.message-label{font-size:9px}.message-copy{font-size:12px}form{margin-top:12px}.input-label{font-size:11px;margin-bottom:5px}textarea{height:54px;min-height:54px;padding:12px 14px;font-size:12px}.send-row{height:90px}.send{height:40px;min-width:124px;font-size:12px}.hint{font-size:10px;margin-bottom:9px}.settings{margin-top:14px;padding-top:10px;font-size:10px;gap:12px}.links{gap:12px}}
+    @media(max-height:800px) and (max-width:580px){.sky{height:144px}} .flight-guides{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}.flight-guides[hidden]{display:none}.settings{flex-wrap:wrap}.frame-rate{font:inherit;color:#4c6b93;background:white;border:1px solid #d9e1e9;border-radius:5px;padding:3px 6px;cursor:pointer}.frame-rate:disabled{opacity:.5;cursor:default}.pet-action{font:inherit;color:#4c6b93;padding:0;background:transparent;border:0;cursor:pointer}.pet-action:hover{text-decoration:underline}.pet-action:focus-visible{outline:2px solid #3377ed;outline-offset:4px}.pet-action:disabled{opacity:.45;cursor:default;text-decoration:none}
+
+    /* Compact full-width conversation; the perched raven uses the open
+       column beside the composer instead of needing another empty row. */
+    main{width:100%;height:100svh;min-height:560px;margin:0;padding:8px 0 10px;display:flex;flex-direction:column}
+    header{flex:none;padding:4px 12px 10px;gap:12px}
+    .scene{flex:1;min-height:auto;display:flex;flex-direction:column}
+    .sky{flex:none;height:100px}
+    .sky-caption{top:6px;left:12px;right:12px;z-index:1}
+    .chat-window{flex:1 1 0;min-height:160px;height:0;width:100%;border-radius:12px}
+    .chat-window::before{border-radius:12px}
+    .message{max-width:96%}
+    .message:not(.user)::before{background:#111;border-color:#111}
+    .message:not(.user) .message-copy{color:#fff}
+    .message:not(.user) .message-label{color:#c2c9d2}
+    form{flex:none;margin:12px 12px 0;--perch-space:154px}
+    .input-wrap{width:calc(100% - var(--perch-space))}
+    textarea{height:58px;min-height:58px;max-height:160px;padding:12px 14px}
+    .send-row{height:56px;gap:12px}
+    .hint{font-size:10px;line-height:1.25;margin:0 0 7px;max-width:calc(100% - 146px)}
+    .send{min-width:132px;height:42px}
+    .settings{flex:none;margin:10px 12px 0;padding:10px 0 0;gap:10px;font-size:10px}
+    @media(max-width:580px){main{width:100%;padding:8px 0 10px}form{--perch-space:138px}.send{min-width:124px}.hint{max-width:calc(100% - 136px)}.settings .links{width:auto}.settings{align-items:center}.chat-heading{left:14px;right:14px}.messages{padding-left:12px;padding-right:12px}}
+
+    .tracking-zone{position:absolute;z-index:2;border:1px dashed #3377ed80;background:#3377ed04;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+    .tracking-zone[data-active="true"]{border-color:#3377ed;background:#3377ed0c}
+    .tracking-zone[hidden]{display:none}
+    .message-copy.raven-markdown{white-space:normal;min-width:0}
+    .raven-markdown>:first-child{margin-top:0}.raven-markdown>:last-child{margin-bottom:0}
+    .raven-markdown p{margin:.55em 0}.raven-markdown h1,.raven-markdown h2,.raven-markdown h3,.raven-markdown h4{line-height:1.3;margin:.8em 0 .4em;font-weight:650}
+    .raven-markdown h1{font-size:1.5em}.raven-markdown h2{font-size:1.3em}.raven-markdown h3{font-size:1.15em}.raven-markdown ul,.raven-markdown ol{padding-left:1.6em;margin:.6em 0}
+    .raven-markdown blockquote{margin:.6em 0;padding:.1em .8em;border-left:3px solid #77879a;color:inherit;opacity:.85}
+    .raven-markdown code{font: .92em ui-monospace,Consolas,monospace;background:#8797aa22;padding:.1em .3em;border-radius:4px}
+    .raven-markdown pre{max-width:100%;overflow:auto;background:#8797aa16;border:1px solid #8797aa33;padding:10px;border-radius:6px;line-height:1.45}.raven-markdown pre code{background:none;padding:0;white-space:pre}
+    .raven-markdown-table{max-width:100%;overflow-x:auto;margin:.65em 0}.raven-markdown table{border-collapse:collapse;font-size:.95em;min-width:220px}.raven-markdown th,.raven-markdown td{padding:5px 9px;border:1px solid #8797aa55;text-align:left}.raven-markdown th{background:#8797aa20;font-weight:600}
+    .raven-markdown a{color:#2663bd;text-decoration:underline;text-underline-offset:2px}.message:not(.user) .raven-markdown a{color:#9fc5ff}.raven-markdown a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+    .raven-markdown hr{border:0;border-top:1px solid #8797aa55;margin:1em 0}
+    .raven-link-preview{position:fixed;z-index:100;max-width:min(340px,calc(100vw - 24px));width:320px;background:#fff;color:#202b35;border:1px solid #dbe2ea;border-radius:12px;box-shadow:0 8px 32px #152a4429;overflow:hidden;font:13px/1.4 system-ui,sans-serif;pointer-events:auto}
+    .raven-link-preview[hidden]{display:none}.raven-link-preview-image{display:block;width:100%;max-height:150px;object-fit:cover;background:#eef2f6}.raven-link-preview-image[hidden]{display:none}
+    .raven-link-preview-title{display:block;font-size:14px;font-weight:650;margin:12px 14px 4px}.raven-link-preview-description{margin:4px 14px 10px;color:#637181;font-size:12px}.raven-link-preview-site{margin:10px 14px;font-size:11px;color:#74808b;display:flex;align-items:center;gap:6px}.raven-link-preview-favicon{width:16px;height:16px}.raven-link-preview-status{display:block;margin:6px 14px 12px;color:#74808b;font-size:11px}.raven-markdown img{max-width:100%;height:auto}
+
+    .web-activity{position:absolute;left:14px;right:14px;bottom:5px;z-index:3;display:flex;align-items:center;gap:7px;min-width:0;height:20px;font-size:11px;line-height:1.3;color:#73808b}
+    .web-activity[hidden]{display:none}
+    .activity-dot{flex:none;width:5px;height:5px;margin-right:2px;border-radius:50%;background:#78828b}
+    .web-activity[data-active="true"] .activity-dot{animation:activity-pulse 1.6s ease-in-out infinite}
+    .activity-icon,.activity-globe{flex:none;width:13px;height:13px;object-fit:contain}
+    .activity-globe{display:inline-flex;align-items:center;justify-content:center;color:#8b959e}
+    .activity-globe svg{display:block;width:13px;height:13px}
+    .activity-icon[hidden],.activity-globe[hidden]{display:none}
+    .activity-label{flex:none;color:#85909a}
+    .activity-site{color:#606f7d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:calc(100% - 115px)}
+    .activity-site:focus-visible{outline:2px solid #3377ed;outline-offset:3px;border-radius:2px}
+    @keyframes activity-pulse{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:.95;transform:scale(1.2)}}
+    @media(prefers-reduced-motion:reduce){.web-activity[data-active="true"] .activity-dot{animation:none;opacity:.7}}
+
+    .messages{overscroll-behavior:contain;overflow-anchor:none}
+    .new-reply{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);z-index:8;white-space:nowrap;font:500 12px/1.4 system-ui,sans-serif;background:#fff;color:#235cbe;border:1px solid #cdd9ed;border-radius:20px;padding:8px 15px;box-shadow:0 3px 15px #203d6920;cursor:pointer}
+    .new-reply[hidden]{display:none}.new-reply:focus-visible{outline:2px solid #3377ed;outline-offset:3px}
+    @media(pointer:coarse){.new-reply{min-height:44px}}
+  </style>
+</head>
+<body>
+<main>
+  <header><b>Raven <span>/ shopping citations</span></b><nav aria-label="Other previews"><a href="chat-fullpage-v42.html">Full-page chat ↗</a><a href="index.html">Asset index ↗</a></nav></header>
+  <section class="scene" id="chat-scene" data-state="loading" aria-label="Raven chat demo">
+    <div class="sky" id="sky"><canvas class="flight-guides" id="flight-guides" aria-hidden="true" hidden></canvas><div class="sky-caption"><span class="status" id="raven-status" role="status">Loading raven…</span><span id="countdown">A ten-second demo</span></div><div class="web-activity" id="web-activity" role="status" aria-live="polite" aria-atomic="true" hidden>
+      <span class="activity-dot" data-activity-dot aria-hidden="true"></span>
+      <span class="activity-label" data-activity-label>Exploring</span>
+      <img class="activity-icon" data-activity-icon alt="" width="13" height="13" referrerpolicy="no-referrer" hidden>
+      <span class="activity-globe" data-activity-globe aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="8" cy="8" r="6"/><ellipse cx="8" cy="8" rx="2.7" ry="6"/><path d="M2 8h12M3 4.8h10M3 11.2h10"/></svg></span>
+      <a class="activity-site" data-activity-site target="_blank" rel="noopener noreferrer"></a>
+    </div></div>
+    <section class="chat-window" aria-label="Conversation"><div class="chat-heading"><strong>Your shopping agent</strong><span>Demo · illustrative data</span></div><div class="chat-divider"></div><div class="messages" id="messages" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions"><article class="message"><span class="message-label">Raven</span><div class="message-copy" data-shopping-welcome>Preparing shopping evidence example…</div></article></div><button class="new-reply" id="new-reply" type="button" aria-label="Jump to the new reply" hidden>New reply ↓</button></section>
+    <form id="chat-form">
+      <label class="input-label" for="message-input">New message</label>
+      <div class="input-wrap"><textarea id="message-input" name="message" rows="3" aria-describedby="demo-hint" placeholder="Write something for the raven…">Find the best delivered price for the Aster H2 in black.</textarea></div>
+      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info">Live mesh · smooth head tracking.</span><br><span id="demo-reply-time">Demo reply: 10 seconds.</span><br>Click the raven to pet it.</p><button class="send" id="send-button" type="submit" disabled><span>Send message ↗</span></button></div>
+    </form>
+    <div id="tracking-zone" class="tracking-zone" aria-hidden="true" hidden></div>
+    <canvas class="bird-overlay" id="raven-sounds" aria-hidden="true"></canvas>
+    <canvas class="bird-overlay" id="raven-canvas" role="img" aria-label="Raven perched on the send button"></canvas>
+  </section>
+  <footer class="settings"><label for="frame-rate">Frame rate<select id="frame-rate" class="frame-rate" disabled><option value="144">144 fps</option><option value="120" selected>120 fps</option><option value="60">60 fps</option><option value="24">24 fps</option><option value="8">8 fps · stepped</option></select></label><label><input type="checkbox" id="mouse-tracking" checked title="Move inside the dotted circle to guide its gaze. Circle its head for a playful tilt.">Mouse tracking · dotted circle</label><label><input type="checkbox" id="dark-palette" checked>Darker feathers</label><label><input type="checkbox" id="long-patrol">Long patrol (60 seconds)</label><label><input type="checkbox" id="show-flight-path">Show flight paths</label><button type="button" id="pet-raven" class="pet-action" disabled>Pet the raven</button><div class="links"><a href="chat-fullpage-v42.html">Full-page chat</a><a href="index.html">Asset index</a><a href="index.html#integration">Integration notes</a></div></footer>
+</main>
+</body>
+</html>
