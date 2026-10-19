@@ -1,0 +1,48 @@
+/* Citation controls are inline; their one body portal never occupies message space. */
+.raven-citation{appearance:none;display:inline-block;vertical-align:1px;min-width:22px;padding:1px 6px;margin:0 1px;border:0;border-radius:4px;background:#eaf0fa;color:#2358a4;font:600 11px/1.7 system-ui,sans-serif;white-space:nowrap;cursor:pointer}
+.message:not(.user) .raven-citation{background:#343a44;color:#dce8ff}
+.raven-citation:hover,.raven-citation[aria-expanded="true"],.message:not(.user) .raven-citation:hover,.message:not(.user) .raven-citation[aria-expanded="true"]{background:#e4edff;color:#173865}
+.raven-citation:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.raven-citation-card{position:fixed;left:12px;top:12px;z-index:110;width:336px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;contain:layout style;box-sizing:border-box;border:1px solid #dbe2ea;border-radius:12px;background:#fff;color:#17212d;box-shadow:0 8px 30px #152a4429;font:13px/1.5 system-ui,sans-serif;overflow-wrap:anywhere;pointer-events:auto;text-align:left}
+.raven-citation-card[hidden],.raven-citation-card [hidden]{display:none!important}
+.raven-citation-card *{box-sizing:border-box}
+.raven-citation-card button,.raven-citation-card a,.raven-citation-card summary{touch-action:manipulation}
+.raven-citation-header{display:flex;align-items:center;gap:10px;padding:14px 15px 11px}
+.raven-citation-brand{display:grid;place-items:center;position:relative;flex:0 0 30px;width:30px;height:30px;border-radius:7px;background:#f0f3f7;color:#293541;font-size:14px;font-weight:650;overflow:hidden}
+.raven-citation-favicon{position:absolute;width:18px;height:18px;object-fit:contain}
+.raven-citation-identity{min-width:0;flex:1}
+.raven-citation-kind{display:block;font-size:11px;color:#657181;line-height:1.5}
+.raven-citation-site{display:block;font-size:13px;font-weight:650;line-height:1.4}
+.raven-citation-close{appearance:none;border:0;border-radius:5px;background:transparent;color:#667281;display:grid;place-items:center;flex:none;width:28px;height:28px;font:400 23px/1 system-ui,sans-serif;cursor:pointer}
+.raven-citation-close:hover{background:#f0f3f7}
+.raven-citation-content{padding:0 15px 14px}
+.raven-citation-title{margin:0 0 7px;font-size:13px;line-height:1.5;font-weight:650;letter-spacing:0}
+.raven-citation-title:focus{outline:none}
+.raven-citation-context{margin:0 0 10px;color:#637181;font-size:12px;line-height:1.5}
+.raven-citation-metric{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px;margin:0 0 10px;font-size:26px;line-height:1.2;font-weight:650;font-variant-numeric:tabular-nums}
+.raven-citation-metric small{font-size:12px;line-height:1.5;font-weight:400;color:#667281}
+.raven-citation-facts{display:grid;gap:6px;margin:0;font-size:12px;line-height:1.5}
+.raven-citation-facts>div{display:flex;justify-content:space-between;gap:13px}
+.raven-citation-facts dt{color:#657181;flex:1}
+.raven-citation-facts dd{margin:0;text-align:right;max-width:64%}
+.raven-citation-history{margin:9px 0 12px;color:#235cbe}
+.raven-citation-history svg{display:block;width:100%;height:58px}
+.raven-citation-chart-labels{display:flex;justify-content:space-between;gap:10px;font-size:11px;line-height:1.5;color:#657181;margin-top:4px}
+.raven-citation-chart-labels span:last-child{text-align:right}
+.raven-citation-calculation{display:grid;gap:8px;margin:10px 0 0;font-size:12px;line-height:1.5}
+.raven-citation-calculation-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.raven-citation-calculation-value{font-variant-numeric:tabular-nums}
+.raven-citation-input{appearance:none;background:#edf2fa;color:#2358a4;border:0;border-radius:4px;padding:1px 7px;margin:0 0 0 5px;min-width:22px;font:600 11px/1.8 system-ui,sans-serif;cursor:pointer}
+.raven-citation-input:hover{background:#dfe9fc}
+.raven-citation-derived{color:#657181;font-size:11px;line-height:1.5;margin:10px 0 0}
+.raven-citation-evidence{border-top:1px solid #e1e6ed;padding-top:10px;margin-top:13px}
+.raven-citation-evidence summary{color:#2358a4;font-weight:550;font-size:12px;line-height:1.5;cursor:pointer;list-style-position:inside}
+.raven-citation-excerpt{white-space:pre-wrap;margin:10px 0 0;border-radius:6px;background:#f3f5f8;padding:10px 11px;font-size:12px;line-height:1.6;color:#394655}
+.raven-citation-footer{display:grid;gap:7px;border-top:1px solid #e1e6ed;padding:10px 15px;font-size:11px;line-height:1.5;color:#657181}
+.raven-citation-check,.raven-citation-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.raven-citation-pinned{font-size:11px;color:#657181}
+.raven-citation-illustrative{font-size:11px;color:#6a7583}
+.raven-citation-open{color:#2358a4;text-decoration:none;font-size:12px;font-weight:550;margin-left:auto}
+.raven-citation-open:hover{text-decoration:underline;text-underline-offset:2px}
+.raven-citation-card button:focus-visible,.raven-citation-card a:focus-visible,.raven-citation-card summary:focus-visible{outline:2px solid #235cbe;outline-offset:3px}
+@media(pointer:coarse){.raven-citation{min-width:44px;min-height:44px;padding:11px 8px;vertical-align:middle}.raven-citation-close{width:44px;height:44px}.raven-citation-input{min-width:44px;min-height:44px;padding:10px 8px}.raven-citation-evidence summary{min-height:44px;display:flex;align-items:center}.raven-citation-open{min-height:44px;display:inline-flex;align-items:center}}
