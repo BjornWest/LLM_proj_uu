@@ -310,12 +310,14 @@ def execute_one(entry, options, directory):
     metadata = {'tags': ['scripted' if options['offline'] else 'model', 'hindrance-suite', entry['mechanism'],
                          entry['variant']], 'training_eligible': False, 'manifest_entry_id': entry['id']}
     pooled = None
-    if options.get('chromium_descriptor'):
+    if options.get('chromium_descriptors'):
         # Shared Chromium: task + chat browsers become fresh contexts in pooled
         # Chromium servers instead of two private Chromium processes per episode.
         from intent_browser.chromium_pool import PoolClient
         import uuid
-        pooled = PoolClient.from_file(options['chromium_descriptor']).episode(
+        descriptors = options['chromium_descriptors']
+        descriptor = descriptors[int(directory.name.rsplit('-', 1)[-1]) % len(descriptors)]
+        pooled = PoolClient.from_file(descriptor).episode(
             (entry['id'] + '/' + uuid.uuid4().hex[:8])[-128:])
     def capture_factory(factory):
         if pooled is not None:
@@ -470,6 +472,7 @@ def main():
     parser.add_argument('--no-fact-provenance', action='store_true')
     parser.add_argument('--episode-timeout-seconds', type=int, default=3600)
     parser.add_argument('--action-timeout-ms', type=int, default=30000)
+    parser.add_argument('--pool-group-size', type=int, default=5, help='episodes per Chromium pool supervisor')
     parser.add_argument('--shared-tokenizer', action='store_true', help='one tokenizer service process for all episodes')
     parser.add_argument('--shared-chromium', action='store_true', help='one pooled Chromium for all episodes (fresh contexts per episode)')
     parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
@@ -506,14 +509,20 @@ def main():
          'concurrency': args.concurrency, 'sampling': {'temperature': 0.6, 'top_p': 0.95, 'top_k': 20},
          'reasoning': {'enabled': True}, 'max_output_tokens': 16384})
     rows = []
-    supervisor = None
+    supervisors = []
     if args.shared_chromium:
+        # One Node supervisor relays all CDP traffic of its episodes; at ~20 episodes a
+        # single supervisor saturated (observations 0.5 s -> 9 s). Run one supervisor
+        # per ~args.pool_group_size episodes and spread episodes across them.
         from intent_browser.chromium_pool import PoolSupervisor
-        leases = min(128, 2 * args.concurrency + 8)
-        supervisor = PoolSupervisor(output / 'chromium-pool', max_servers=4, max_leases=leases,
-                                    per_server=min(64, -(-leases // 4)))
-        supervisor.start()
-        options['chromium_descriptor'] = str(supervisor.descriptor_path)
+        groups = max(1, -(-args.concurrency // args.pool_group_size))
+        for g in range(groups):
+            leases = min(128, 2 * args.pool_group_size + 6)
+            sup = PoolSupervisor(output / f'chromium-pool-{g}', max_servers=2, max_leases=leases,
+                                 per_server=min(64, -(-leases // 2)))
+            sup.start()
+            supervisors.append(sup)
+        options['chromium_descriptors'] = [str(sup.descriptor_path) for sup in supervisors]
     tokenizer_service = tokenizer_dir = None
     if args.shared_tokenizer:
         # One process holds the tokenizers; episodes query it over a Unix socket
@@ -538,8 +547,8 @@ def main():
     try:
         run_pool(args, entries, options, output, rows)
     finally:
-        if supervisor is not None:
-            supervisor.close()
+        for sup in supervisors:
+            sup.close()
         if tokenizer_service is not None:
             tokenizer_service.terminate()
     return rows
