@@ -96,3 +96,30 @@ def test_background_handover_focus_failure_still_delivers_terminal_events():
     assert run.events[0]['type'] == 'handover'
     assert 'Please open the tab yourself' in run.events[0]['message']
     assert run.events[-1] == {'type': 'done', 'stop_reason': 'error'}
+
+
+def test_raven_worker_skips_chrome_component_extension_workers():
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+    from apps.raven.shared_browser import active_target, raven_worker
+    component = SimpleNamespace(url='chrome-extension://component/thunk.js', evaluate=Mock())
+    raven = SimpleNamespace(url='chrome-extension://raven/background.js', evaluate=Mock(return_value='human-target'))
+    context = Mock(service_workers=[component, raven])
+    assert raven_worker(context) is raven
+    assert active_target(context) == 'human-target'
+    component.evaluate.assert_not_called()
+    context.wait_for_event.assert_not_called()
+
+
+def test_raven_worker_waits_for_matching_extension_on_startup():
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+    from apps.raven.shared_browser import raven_worker
+    component = SimpleNamespace(url='chrome-extension://component/thunk.js')
+    raven = SimpleNamespace(url='chrome-extension://raven/background.js')
+    context = Mock(service_workers=[component])
+    context.wait_for_event.return_value = raven
+    assert raven_worker(context) is raven
+    args, kwargs = context.wait_for_event.call_args
+    assert args == ('serviceworker',)
+    assert not kwargs['predicate'](component) and kwargs['predicate'](raven)

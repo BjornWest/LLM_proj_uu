@@ -90,14 +90,8 @@ class UserWindow:
                         accept_downloads=False, service_workers='allow'))
                 page = self.context.pages[0] if self.context.pages else self.context.new_page()
                 page.goto('https://example.com/')
-                worker = self.context.service_workers[0] if self.context.service_workers else self.context.wait_for_event('serviceworker')
-                # On a Windows profile restart CDP can expose the worker before
-                # Chrome has installed its extension API bindings.
-                if self.windows_browser:
-                    for _ in range(100):
-                        if worker.evaluate("typeof chrome !== 'undefined' && !!chrome.sidePanel"):
-                            break
-                        page.wait_for_timeout(100)
+                from apps.raven.shared_browser import raven_worker
+                worker = raven_worker(self.context)
                 worker.evaluate("port => chrome.sidePanel.setOptions({path:'sidepanel.html?port='+port})", self.port)
                 extension_origin = worker.url.rsplit('/', 1)[0]
                 welcome = next((p for p in self.context.pages if p.url.endswith('/welcome.html')), None)

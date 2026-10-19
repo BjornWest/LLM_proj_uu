@@ -236,10 +236,19 @@ def page_target(context, page):
         session.detach()
 
 
+def raven_worker(context):
+    # CfT also runs component extension workers (e.g. Cast's thunk.js).
+    # Only Raven's background.js has the tabs/debugger/sidePanel permissions.
+    def matches(worker):
+        return worker.url.startswith('chrome-extension://') and worker.url.endswith('/background.js')
+    return next((w for w in context.service_workers if matches(w)), None) or context.wait_for_event(
+        'serviceworker', predicate=matches)
+
+
 def active_target(context):
     # CDP emulates focus/visibility for every attached Page. Chrome's own tab API
     # supplies actual active identity, including two tabs with identical URLs.
-    worker = next(w for w in context.service_workers if w.url.startswith('chrome-extension:'))
+    worker = raven_worker(context)
     return worker.evaluate("""async () => {
       const [tab] = await chrome.tabs.query({active:true, lastFocusedWindow:true});
       const targets = await chrome.debugger.getTargets();
