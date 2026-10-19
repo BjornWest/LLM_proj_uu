@@ -141,13 +141,23 @@ class WebContext:
         # Playwright 1.43 CDP attachments group pre-existing incognito targets
         # into the default wrapper. Filter by Chromium's actual context identity.
         selected = []
+        from playwright.sync_api import Error as PlaywrightError
         for page in pages:
-            session = self._context.new_cdp_session(page)
+            session = None
             try:
+                session = self._context.new_cdp_session(page)
                 if session.send('Target.getTargetInfo')['targetInfo'].get('browserContextId') == self.browser_context_id:
                     selected.append(page)
+            except PlaywrightError:
+                if not page.is_closed():
+                    raise
             finally:
-                session.detach()
+                if session:
+                    try:
+                        session.detach()
+                    except PlaywrightError:
+                        if not page.is_closed():
+                            raise
         return selected
 
     def new_page(self):
