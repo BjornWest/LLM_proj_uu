@@ -65,7 +65,7 @@ class SharedBrowserEnv(BrowserEnv):
         session = self.browser.new_browser_cdp_session()
         context_id = session.send('Target.getTargetInfo', {'targetId':active})['targetInfo']['browserContextId']
         session.detach()
-        self.context = WebContext(context, context_id)
+        self.context = WebContext(context, context_id, background=bool(self.initial_target))
         self.context.set_default_timeout(5000)
         pages = [p for p in self.context.pages if not p.url.startswith('chrome-extension:')]
         self.page = next((p for p in pages if page_target(self.context, p) == active), None)
@@ -111,9 +111,10 @@ class BackgroundBrowserEnv(BrowserEnv):
 
 class WebContext:
     """Keep Raven's own extension surfaces outside the agent's task tab list."""
-    def __init__(self, context, browser_context_id=None):
+    def __init__(self, context, browser_context_id=None, background=False):
         self._context = context
         self.browser_context_id = browser_context_id
+        self.background = background
 
     @property
     def pages(self):
@@ -133,18 +134,17 @@ class WebContext:
         return selected
 
     def new_page(self):
-        if not self.browser_context_id:
+        if not self.background:
             return self._context.new_page()
         session = self._context.browser.new_browser_cdp_session()
         try:
-            target = session.send('Target.createTarget', dict(url='about:blank',
-                browserContextId=self.browser_context_id, background=True))['targetId']
+            target = None
+            with self._context.expect_page(predicate=lambda p: page_target(self._context, p) == target) as created:
+                target = session.send('Target.createTarget', dict(url='about:blank',
+                    browserContextId=self.browser_context_id, background=True))['targetId']
+            return created.value
         finally:
             session.detach()
-        for page in self.pages:
-            if page_target(self._context, page) == target:
-                return page
-        return self._context.wait_for_event('page', predicate=lambda p: page_target(self._context, p) == target)
 
     def __getattr__(self, name):
         return getattr(self._context, name)
@@ -189,6 +189,7 @@ class SharedHumanBrowser(HumanBrowser):
         for page in self.known_agent_pages - self.raven_initial_pages:
             if not page.is_closed() and page.url == 'about:blank':
                 page.close()
+        self.raven_closing = True
         super().close()
 
 

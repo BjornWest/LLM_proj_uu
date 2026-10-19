@@ -191,9 +191,9 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
             if kind == 'human_tab_transition':
                 t = data['transition']
                 events.put({'_controller': controller.snapshot()})
-                if t.get('event') == 'closed':
-                    emit('tab', action='closed', tab_id=t['tab_id'], url='', title='', owner='human')
                 custody = getattr(env_holder[0]._active_page_check, '__self__', None) if env_holder else None
+                if t.get('event') == 'closed' and not getattr(custody, 'raven_closing', False):
+                    emit('tab', action='closed', tab_id=t['tab_id'], url='', title='', owner='human')
                 if t['event'] == 'handover' and t['tab_id'] in getattr(custody, 'raven_requested_handovers', set()):
                     emit('handover', tab_id=t['tab_id'], message=t.get('reason') or 'Your help is needed.')
 
@@ -236,7 +236,14 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
             url = obs.get('url', '')
             title = current.get(active, {}).get('title') or urlsplit(url).hostname or url
             if (url, active, title) != last_site:
-                emit('site', url=url, title=title, favicon=None, tab_id=active)
+                favicon = None
+                if env_holder:
+                    from playwright.sync_api import Error as PlaywrightError
+                    try:
+                        favicon = env_holder[0].page.evaluate("document.querySelector('link[rel~=icon]')?.href || null")
+                    except PlaywrightError:
+                        pass  # The page can navigate or close after the captured observation.
+                emit('site', url=url, title=title, favicon=favicon, tab_id=active)
                 last_site = (url, active, title)
             if url.startswith(('http://', 'https://')):
                 # Store only text actually present in the recorded native AX capture.

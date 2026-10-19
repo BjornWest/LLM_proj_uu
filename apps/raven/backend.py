@@ -92,7 +92,22 @@ class UserWindow:
                 page.bring_to_front()
                 self.cdp_url = f'http://127.0.0.1:{debug_port}'
                 self.browser = pw.chromium.connect_over_cdp(self.cdp_url)
-                self.background_contexts = []
+                # Create the separate agent window during startup, before the
+                # user's window is presented. WSL can focus newly mapped windows
+                # even when Target.createTarget requests background:true.
+                session = self.browser.new_browser_cdp_session()
+                before = set(session.send('Target.getBrowserContexts')['browserContextIds'])
+                background = self.browser.new_context(accept_downloads=False, service_workers='block', no_viewport=True)
+                after = set(session.send('Target.getBrowserContexts')['browserContextIds'])
+                context_id = (after - before).pop()
+                self.background_target = session.send('Target.createTarget', dict(url='about:blank',
+                    browserContextId=context_id, newWindow=True, background=True))['targetId']
+                page.wait_for_timeout(300)
+                window_id = session.send('Browser.getWindowForTarget', {'targetId':self.background_target})['windowId']
+                session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'minimized'}})
+                session.detach()
+                self.background_contexts = [background]
+                page.bring_to_front()
                 self.ready.set()
                 while True:
                     try:
@@ -109,19 +124,10 @@ class UserWindow:
                             response.put(True)
                             break
                         if action == 'background':
-                            browser = self.browser
-                            session = browser.new_browser_cdp_session()
-                            before = set(session.send('Target.getBrowserContexts')['browserContextIds'])
-                            context = browser.new_context(accept_downloads=False, service_workers='block', no_viewport=True)
-                            self.background_contexts.append(context)
-                            after = set(session.send('Target.getBrowserContexts')['browserContextIds'])
-                            context_id = (after - before).pop()
-                            target = session.send('Target.createTarget', dict(url='about:blank',
-                                browserContextId=context_id, newWindow=True, background=True))['targetId']
-                            window_id = session.send('Browser.getWindowForTarget', {'targetId':target})['windowId']
-                            session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'minimized'}})
-                            session.detach()
-                            response.put(target)
+                            pages = self.background_contexts[0].pages
+                            if not pages:
+                                raise ValueError('Agent window was closed; restart the demo service')
+                            response.put(target_id(pages[0].context, pages[0]))
                         elif action == 'tabs':
                             from apps.raven.shared_browser import active_target
                             active = active_target(self.context)
@@ -206,6 +212,8 @@ class Service:
             if payload['mode'] == 'background_window':
                 if not self.window:
                     raise ValueError('Start the backend with --user-window')
+                if any(not r.done and r.payload['mode'] == 'background_window' for r in self.runs.values()):
+                    raise ValueError('The background window already has an active task')
                 payload['_background_target'] = self.window.call('background')
             if payload['mode'] == 'user_window':
                 if not self.window:

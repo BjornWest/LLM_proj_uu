@@ -37,7 +37,7 @@ window.addEventListener('DOMContentLoaded', () => {
       let site;try {site=new URL(tab.url);} catch {}
       button.textContent = site?.hostname.replace(/^www\./,'') || tab.title || 'New tab';
       if (site && ['http:','https:'].includes(site.protocol)) {
-        const icon=document.createElement('img');icon.src=site.origin+'/favicon.ico';icon.alt='';icon.width=14;icon.height=14;icon.onerror=()=>icon.remove();button.prepend(icon);
+        const icon=document.createElement('img');icon.src=tab.favicon || site.origin+'/favicon.ico';icon.alt='';icon.width=14;icon.height=14;icon.onerror=()=>icon.remove();button.prepend(icon);
       }
       button.title = tab.url;
       button.onclick = () => post('/api/tabs/'+encodeURIComponent(tab.focus_id || tab.tab_id)+'/focus').catch(e => status.textContent=e.message);
@@ -76,7 +76,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (e.type === 'status') status.textContent = {starting:'Starting research…',working:'Researching…',finishing:'Preparing your answer…'}[e.state] || 'Researching…';
         if (e.type === 'step') status.textContent = e.summary;
         if (e.type === 'site') {
-          const tab=tabs.get(e.tab_id);if(tab){Object.assign(tab,{url:e.url,title:e.title});drawTabs();}
+          const tab=tabs.get(e.tab_id);if(tab){Object.assign(tab,{url:e.url,title:e.title,favicon:e.favicon});drawTabs();}
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{url:e.url,label:e.title}}));
         }
         if (e.type === 'tab') {
