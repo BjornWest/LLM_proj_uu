@@ -370,7 +370,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
     def policy(page):
-        if not recipe['clean'] and page.evaluate('document.documentElement.dataset.commerceScenario') != 'ready':
+        if not recipe['clean'] and page.url.startswith(origin+'/') and page.evaluate('document.documentElement.dataset.commerceScenario') != 'ready':
             return 'noop', {'wait_ms':100}
         dialog = page.locator('#commerce-scenario-consent')
         if dialog.count():
