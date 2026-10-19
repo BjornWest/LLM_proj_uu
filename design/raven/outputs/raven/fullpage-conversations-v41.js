@@ -152,6 +152,7 @@
     }
     function selectConversation(id, { focusInput = false } = {}) {
       if (!threads.some(thread => thread.id === id)) return;
+      if (id === activeId) { setDrawer(false, mobile.matches); return; }
       saveDraft(); activeId = id;
       const thread = active();
       restoring = true;

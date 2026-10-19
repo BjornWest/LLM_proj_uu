@@ -22,6 +22,11 @@ async def main(args):
             await context.tracing.start(screenshots=True, snapshots=True)
             page = await context.new_page()
             errors, requests, cancellations = [], [], []
+            run_ids=[]
+            async def capture_creation(response):
+                if response.request.method=='POST' and response.url.endswith('/api/tasks') and response.status==200:
+                    run_ids.append((await response.json())['run_id'])
+            page.on('response',capture_creation)
             page.on('pageerror', lambda error: errors.append(str(error)))
             page.on('request', lambda request: requests.append(request.post_data_json) if request.method == 'POST' and request.url.endswith('/api/tasks') else None)
             page.on('response', lambda response: cancellations.append(response.status) if response.url.endswith('/cancel') else None)
@@ -34,12 +39,19 @@ async def main(args):
                   document.getElementById('chat-scene').addEventListener('raven-chat-land',()=>window.landed=true);
                   new MutationObserver(()=>observedStates.push(document.getElementById('chat-scene').dataset.state)).observe(document.getElementById('chat-scene'),{attributes:true,attributeFilter:['data-state']});
                 }''')
+                if name=='cancel-error':
+                    async def delayed_cancel_error(route):
+                        await route.fetch()
+                        await asyncio.sleep(1.5)
+                        await route.fulfill(status=503,content_type='application/json',body='{}')
+                    await page.route('**/cancel',delayed_cancel_error)
                 if name in ('early-final', 'dropped-stream'):
+
                     async def fixed_stream(route):
                         events = [{'type':'status','state':'working'}] if name == 'dropped-stream' else [{'type':'final','markdown':'## Early answer','sources':[{'id':'early-1','title':'Example','url':'https://example.com/','evidence':'Captured example evidence','illustrative':True}]}]
                         await route.fulfill(status=200,content_type='text/event-stream',body=''.join('data: '+json.dumps(event)+'\n\n' for event in events))
                     await page.route('**/events', fixed_stream)
-                if name == 'creation-race':
+                if name in ('creation-race','pending-pagehide'):
                     async def slow_create(route):
                         response = await route.fetch()
                         await asyncio.sleep(2)
@@ -49,7 +61,38 @@ async def main(args):
                 await page.locator('#chat-form').evaluate('(form)=>form.requestSubmit()')
                 await page.wait_for_function("ravenChatDemo.state==='takeoff'")
                 assert requests[0]['mode'] == 'background' and requests[0]['history'] == []
-                if name == 'full':
+                if name=='cancel-error':
+                    await page.locator('#stop-task').click()
+                    await page.locator('#message-input').fill('A new question in the same conversation')
+                    await page.locator('#chat-form').evaluate('(form)=>form.requestSubmit()')
+                    await page.wait_for_timeout(2000)
+                    assert 'Could not confirm cancellation' not in await page.locator('#raven-status').inner_text()
+                    await page.unroute('**/cancel')
+                    await page.locator('#stop-task').click()
+                elif name in ('active-reselect','pagehide','pending-pagehide'):
+
+                    if name=='active-reselect':
+                        await page.locator('.conversation-item.active').click()
+                        await page.wait_for_timeout(500)
+                        assert await page.evaluate('ravenChatDemo.task!==null && ravenChatDemo.started!==null')
+                        assert not cancellations
+                        await page.locator('#stop-task').click()
+                    elif name=='pagehide':
+                        await page.wait_for_function('window.observedSites.length>=1',timeout=60000)
+                        await page.goto(args.url.rsplit('/',1)[0]+'/index.html')
+                    else:
+                        # BFCache/surviving-document path: pending create still resolves.
+                        await page.evaluate("window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}))")
+                        await page.wait_for_timeout(3000)
+                        assert await page.evaluate('ravenChatDemo.started===null')
+                        assert await page.locator('#stop-task').is_hidden()
+                    for _ in range(30):
+                        if run_ids:break
+                        await asyncio.sleep(.1)
+                    assert len(run_ids)==1,run_ids
+                    stream=await context.request.get(args.url.rsplit('/',1)[0]+f'/api/tasks/{run_ids[0]}/events')
+                    assert '"stop_reason": "cancelled"' in await stream.text()
+                elif name == 'full':
                     await page.screenshot(path=str(out / 'm1-takeoff.png'))
                     for index in range(1, 4):
                         await page.wait_for_function('(count)=>window.observedSites.length>=count', arg=index, timeout=60000)
@@ -114,7 +157,7 @@ async def main(args):
         async def bounded(name):
             async with semaphore:
                 await run_case(name)
-        await asyncio.gather(*(bounded(name) for name in ['full', 'cancel', 'error', 'creation-race', 'switch', 'early-final', 'dropped-stream']))
+        await asyncio.gather(*(bounded(name) for name in args.cases))
         await browser.close()
     (out / 'm1-results.json').write_text(json.dumps(results, indent=2) + '\n')
     print(json.dumps({name: row['passed'] for name, row in results['cases'].items()}, indent=2))
@@ -126,4 +169,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--url', default='http://localhost:8767/chat-fullpage-v42.html')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--cases', nargs='+', default=['full','cancel','error','creation-race','switch','early-final','dropped-stream','active-reselect','pagehide','pending-pagehide','cancel-error'])
     asyncio.run(main(parser.parse_args()))

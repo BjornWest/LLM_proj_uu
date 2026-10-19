@@ -1,6 +1,6 @@
 # Raven full-page backend chat (WEB-B)
 
-The v42 full-page entry uses the Raven API v1 transport. Submission includes the current local conversation ID, prior turns and `mode: "background"`. There are no automatic reply timers or canned replies. Captured sources render as inline citation cards, with a source footer for evidence not explicitly marked in the answer. Stop, conversation switching and stream failure cancel the backend run. Creation/cancellation races ignore late output.
+The v42 full-page entry uses the Raven API v1 transport. Submission includes the current local conversation ID, prior turns and `mode: "background"`. There are no automatic reply timers or canned replies. Captured sources render as inline citation cards, with a source footer for evidence not explicitly marked in the answer. Stop, conversation switching, stream failure and pagehide cancel the backend run. Selecting the already active conversation preserves its task. Pagehide sends a keepalive cancellation immediately when the run ID is known, and resets the visual state for back/forward-cache restoration. Creation/cancellation races ignore late output.
 
 Conversation history remains an explicit localStorage adapter, `window.RavenConversations.getContext()`, rather than a backend conversation store. Replay uses the existing restoration flag so messages are saved once. Existing browser conversations are preserved; a fresh browser starts empty.
 
@@ -26,11 +26,11 @@ python3 scripts/run_bounded_job.py --memory-mib 4096 -- \
 --output /home/bjorn/code/LLM_proj_uu/.local/coordination/demo-sprint/web-b-shots
 ```
 
-Cases use two independent browser contexts concurrently and save Playwright traces, screenshots and `m1-results.json`, classified with `metadata.tags=["scripted"]`. Cases cover full flight/three site changes/landing/Markdown/citations; reload without duplicates and follow-up history; cancellation; error; cancel before creation response; conversation switching; early completion during takeoff; and dropped-stream cancellation. The full case's third site arrives after the old ten-second completion deadline.
+Cases use two independent browser contexts concurrently and save Playwright traces, screenshots and `m1-results.json`, classified with `metadata.tags=["scripted"]`. Cases cover full flight/three site changes/landing/Markdown/citations; reload without duplicates and follow-up history; cancellation; error; cancel before creation response; conversation switching; early completion during takeoff; dropped-stream cancellation; active-conversation reselect; known-run page navigation; and a pending-create pagehide in a surviving document. Use `--cases NAME...` for focused checks. The full case's third site arrives after the old ten-second completion deadline.
 
 ## Backend integration
 
-`raven-transport.js` is a standalone browser client with `start(payload, {onEvent,onError})`, returning `{runId,ready,close,cancel}`. It also implements `focusTab`, `tabs` and `handback`. Task streams close at the first terminal event. A lost SSE stream fails visibly and cancels the run rather than reconnecting to a replay and duplicating output. Backend request errors are shown in the conversation and return the Raven to its perch.
+`raven-transport.js` is a standalone browser client with `start(payload, {onEvent,onError})`, returning `{runId,ready,close,cancel}`. It also implements `focusTab`, `tabs` and `handback`. Task streams close at the first terminal event. A lost SSE stream fails visibly and cancels the run rather than reconnecting to a replay and duplicating output. If a page is destroyed before task creation returns its run ID, API v1 provides no client-known cancellation identity; the client cannot guarantee cancellation in that narrow race. A surviving document cancels when the pending response arrives. Fully covering destroyed-document creation requires backend support and is not claimed here. Backend request errors are shown in the conversation and return the Raven to its perch.
 
 WEB-A owns `apps/raven/` in its separate worktree. Serve these `design/raven/outputs/raven/` assets with that backend after integration. No API key reaches the client.
 

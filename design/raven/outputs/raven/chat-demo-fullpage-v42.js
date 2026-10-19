@@ -31,6 +31,7 @@
       this.pathToggle?.addEventListener('change',()=>{this.guideLast=null;this.drawGuides(performance.now(),true);});
       this.motion.addEventListener?.('change',()=>{this.clearPointer();if(this.motion.matches){this.gesture=null;this.settling=null;if(this.state==='petting'||this.state==='settling')this.setState('idle');}this.draw(performance.now(),true);});
       this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(this.scene);this.resizeObserver.observe(this.form);window.addEventListener('resize',()=>this.resize());
+      window.addEventListener('pagehide',()=>this.cancelTask({keepalive:true}));
       this.tick=this.tick.bind(this);this.raf=requestAnimationFrame(this.tick);this.load();
     }
     async modelAssets(rate){
@@ -146,8 +147,8 @@
     }
     isNearBottom(){return this.messages.scrollHeight-this.messages.clientHeight-this.messages.scrollTop<=48;}
     followLatest(){window.RavenCitations?.hide?.();this.messages.scrollTop=this.messages.scrollHeight;if(this.newReply)this.newReply.hidden=true;}
-    cancelTask({announce=true}={}){
-      const task=this.task;this.task=null;task?.transport?.cancel().catch(error=>{this.status.textContent='Could not confirm cancellation: '+error.message;});this.assetGeneration++;
+    cancelTask({announce=true,keepalive=false}={}){
+      const task=this.task;this.task=null;const generation=++this.assetGeneration;task?.transport?.cancel({keepalive}).catch(error=>{if(generation===this.assetGeneration)this.status.textContent='Could not confirm cancellation: '+error.message;});
       this.started=null;this.director=null;this.preparing=false;this.pendingReturn=false;
       this.gesture=null;this.settling=null;this.diveStartClock=null;this.diveStartPoint=null;
       this.diveStartWorld=null;this.diveStartDepthScale=1;this.lastFlightAction=null;this.replyAdded=false;
@@ -197,6 +198,7 @@
       this.launch(task);return true;
     }
     launch(task){
+      this.assetGeneration++;
       this.started=performance.now();this.stepMotion(this.started);this.taskStartClock=this.motionClock;this.replyAdded=false;this.pendingReturn=false;this.wasTypingAfterReply=false;this.rollStartRaw=null;this.lastPatrolRaw=null;this.rollQueued=false;this.nextRollAt=Infinity;
       this.send.disabled=true;this.setState(this.motion.matches?'working':'takeoff');
       this.task=task;

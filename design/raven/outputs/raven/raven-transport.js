@@ -3,8 +3,8 @@
   'use strict';
   class RavenTransport {
     constructor({baseURL=''}={}) { this.baseURL=baseURL.replace(/\/$/,''); }
-    async request(path,body) {
-      const response=await fetch(this.baseURL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+    async request(path,body,{keepalive=false}={}) {
+      const response=await fetch(this.baseURL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{}),keepalive});
       if(!response.ok)throw new Error(`Backend request failed (${response.status})`);
       return response.json();
     }
@@ -13,7 +13,12 @@
       const session={
         runId:null,
         close:()=>{closed=true;stream?.close();},
-        cancel:async()=>{cancelled=true;session.close();await session.ready;if(session.runId)return this.request(`/api/tasks/${encodeURIComponent(session.runId)}/cancel`);}
+        cancel:({keepalive=false}={})=>{
+          cancelled=true;session.close();
+          const send=()=>session.runId?this.request(`/api/tasks/${encodeURIComponent(session.runId)}/cancel`,{},{keepalive}):undefined;
+          // Dispatch immediately when the ID is known, including during pagehide.
+          return session.runId?send():session.ready.then(send);
+        }
       };
       session.ready=this.request('/api/tasks',payload).then(({run_id})=>{
         session.runId=run_id;

@@ -17,7 +17,7 @@
   "status": "Full-page backend API v1 client and offline mock; local acceptance; compact demo preserved",
   "sourceWorkspace": "C:\\Users\\bpfwe\\Documents\\Codex\\2026-10-02\\hey-x20",
   "fileCount": 83,
-  "totalBytes": 82965883,
+  "totalBytes": 82969329,
   "runtimeAndVendorBytes": 26421230,
   "integrityExclusions": [
     "design/raven/manifest.json",
@@ -138,12 +138,12 @@
     },
     {
       "path": "design/raven/outputs/raven/chat-demo-fullpage-v42.js",
-      "bytes": 50764,
-      "sha256": "06f6885fb43ef60de42e7088ec94e2a9564f4a13effabe3ca0b736f13d3ab264",
+      "bytes": 50956,
+      "sha256": "e4e4edd1510a9ba26873bd0ac6c9bc7cc873bdaf0162b66faf41fae6f20f5ae4",
       "role": "runtime",
       "source": "outputs/raven/chat-demo-fullpage-v42.js",
       "sourceSha256": "69c7ac0809ebd6a62db71df4516a35473d2811bb42dc1873ee11b8a76448674b",
-      "modifiedFor": "Raven backend API v1 client"
+      "modifiedFor": "Raven backend API v1 lifecycle review fixes"
     },
     {
       "path": "design/raven/outputs/raven/chat-demo-live-v40.js",
@@ -302,12 +302,12 @@
     },
     {
       "path": "design/raven/outputs/raven/fullpage-conversations-v41.js",
-      "bytes": 14016,
-      "sha256": "111bf5c350a4b935a141511fb8d7aad9a42556aeae5e7044c9a735ee574253ab",
+      "bytes": 14089,
+      "sha256": "f695bdbf826c76ab9aabe405e5afc4af7ed1e4a7359138ec2f0bae3ec782789d",
       "role": "runtime",
       "source": "outputs/raven/fullpage-conversations-v41.js",
       "sourceSha256": "ba67e181662aa01edea123e0ebe7975810e3062aac065fa470ee05f63ba8e244",
-      "modifiedFor": "Raven backend API v1 client"
+      "modifiedFor": "Raven backend API v1 lifecycle review fixes"
     },
     {
       "path": "design/raven/outputs/raven/index.html",
@@ -633,9 +633,10 @@
     },
     {
       "path": "design/raven/outputs/raven/raven-transport.js",
-      "bytes": 2318,
-      "sha256": "74e786f165bfc791de2ad535065f7379721611517e1c9b218fad20ca117b215a",
-      "role": "backend-client"
+      "bytes": 2552,
+      "sha256": "190db88d0043052a4b23e9b821d37ae83e49c9493d9af7cf1d474073c68e26e7",
+      "role": "backend-client",
+      "modifiedFor": "Raven backend API v1 lifecycle review fixes"
     },
     {
       "path": "design/raven/outputs/raven/raven-web-activity-backend.js",
@@ -647,13 +648,13 @@
       "path": "design/raven/outputs/raven/vendor-v33/manifest.json",
       "bytes": 1230,
       "sha256": "070d077bae932b2eceee75d7367880e6b10134dd0f996dc2515bec35c23b907c",
-      "role": "offline-backend"
+      "role": "vendor-provenance"
     },
     {
       "path": "design/raven/outputs/raven/vendor-v34/manifest.json",
       "bytes": 976,
       "sha256": "799477553485c9731143697e0c0a8fcfcaf5138a257e27e61a35704954992425",
-      "role": "offline-backend"
+      "role": "vendor-provenance"
     },
     {
       "path": "design/raven/tools/mock_backend.py",
@@ -663,9 +664,10 @@
     },
     {
       "path": "design/raven/tools/test_backend_chat.py",
-      "bytes": 8801,
-      "sha256": "fd0ac7c448f710c4357bfd38bcc13babdae6bc254903c1476c3cd41ab5649718",
-      "role": "scripted-acceptance"
+      "bytes": 11748,
+      "sha256": "371ae26ddeadffc55f835b89425278aca11dac36d3dd24da990cf7a45ef9e876",
+      "role": "scripted-acceptance",
+      "modifiedFor": "Raven backend API v1 lifecycle review fixes"
     }
   ]
 }
