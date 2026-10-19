@@ -111,3 +111,87 @@ def test_historical_grade_recovery_keeps_error_and_does_not_rewrite_evidence(tmp
     (trace/'automatic-grade.json').write_text('{}')
     with pytest.raises(ValueError, match='intact completed grade'):
         recover({'variant': 'clean'}, tmp_path)
+
+
+def test_windowed_profile_repeats_omitted_same_document_ax_text(monkeypatch):
+    from types import SimpleNamespace
+    from scripts.hindrance_model_run import core_profile
+    from intent_browser.ax_context import AXContext
+    from tests.test_ax_explorer import node, observation
+    path = Path(__file__).resolve().parents[1]/'.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json'
+    if not path.exists():
+        pytest.skip('Local tokenizer assets required')
+    monkeypatch.setenv('HARNESS_AX_TOKENIZER', str(path))
+    episode = SimpleNamespace(runtime=SimpleNamespace(navigation_origins=('http://localhost:8000',)), site_discovery=None)
+    core_profile(episode, {'context_keep_turns': 2})
+    assert episode.profile.tools.context_repeat
+    context = AXContext(episode.profile.ax_config)
+    conversation = WindowedConversation(1)
+    text = 'Detailed product description ' * 100
+    obs = observation([node(0, 'RootWebArea', 'Store', [1]), node(1, 'StaticText', text)])
+    overview = context.prepare_observation(obs)
+    conversation.request('system', 'buy P', overview, observation_source='obs0')
+    context.acknowledge()
+    first = context.read(context.ref(1), view='node')
+    context.acknowledge()
+    conversation.record_batch(assistant(1), [(first, 'read1')])
+    conversation.request('system', 'buy P', context.prepare_observation(obs), observation_source='obs1')
+    context.acknowledge()
+    conversation.record_batch(assistant(2), [({'ok': True}, 'result2')])
+    conversation.request('system', 'buy P', context.prepare_observation(obs), observation_source='obs2')
+    assert 'read1' not in [b['content_id'] for b in conversation.bindings()]
+    # Even after the earlier message is omitted, default rereads return text,
+    # not an unchanged marker based on the old acknowledged text_ranges.
+    again = context.read(context.ref(1), view='node')
+    assert again['text'] == first['text']
+    assert 'Detailed product description' in again['text']
+    page = json.loads(context.prepare_observation(obs))
+    assert not page.get('visited_content_unchanged')
+    assert any('name' in item for item in page['items'])
+
+
+@pytest.mark.parametrize('failure', ['clean_preamble', 'trapped_order', 'missing_order_artifact'])
+def test_post_run_grading_failures_are_precise_results(tmp_path, failure):
+    from contextlib import ExitStack
+    from types import SimpleNamespace
+    from unittest.mock import Mock, patch
+    from scripts import hindrance_model_run as run, hindrance_suite as build
+    trace = tmp_path/'runs'/'saved-trace'
+    trace.mkdir(parents=True)
+    (trace/'episode.json').write_text(json.dumps({'step_count': 2, 'error': None}))
+    (trace/'automatic-grade.json').write_text(json.dumps({'raw_grade': {'native_grade': {'status': 'pass'}}}))
+    class Episode:
+        runtime = Mock()
+        task = SimpleNamespace(files={}, make_env=Mock())
+        profile = object()
+        site_discovery = None
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+    episode = Episode()
+    adapter = Mock()
+    prepared = Mock(adapter=adapter) if failure == 'trapped_order' else None
+    with ExitStack() as stack:
+        stack.enter_context(patch.object(build, 'prepare_task', return_value=({}, episode, prepared, Mock(), {})))
+        stack.enter_context(patch.object(build, 'CleanGrading', return_value=adapter))
+        stack.enter_context(patch.object(build, 'browser_policy', return_value=Mock()))
+        stack.enter_context(patch.object(run, 'core_profile'))
+        stack.enter_context(patch.object(run, 'backend_for', return_value=Mock()))
+        stack.enter_context(patch.object(run, 'recording_runner', return_value=lambda *a, **k: (trace, {})))
+        stack.enter_context(patch.object(build, 'finish_order', side_effect=ValueError('Native order capture did not seal')))
+        stack.enter_context(patch('intent_browser.automatic_grading.finalize_external',
+            side_effect=ValueError('No matching pending external automatic grader') if failure == 'clean_preamble' else None,
+            return_value={'grading': {'status': 'graded'}, 'grading_error': None}))
+        row = run.execute_one({'id': 'fixture', 'mechanism': 'paid_warranty', 'variant': 'clean',
+                               'recipe_path': 'fixture.json'},
+                              {'offline': True, 'fact_provenance': False, 'max_steps': 2, 'max_input_tokens': 150000}, tmp_path)
+    assert row['status'] == 'grading_error'
+    assert row['grade']['status'] == 'inconclusive'
+    assert row['grading_error']
+    assert row['trace'] == str(trace)
+    assert row['turns'] == 2
+    if failure == 'clean_preamble':
+        assert 'No matching pending external automatic grader' in row['grading_error']
+    elif failure == 'trapped_order':
+        assert 'Native order capture did not seal' in row['grading_error']
+    else:
+        assert 'suite-order-grade.json' in row['grading_error']

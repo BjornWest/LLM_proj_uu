@@ -57,7 +57,7 @@ Offline controls use the actual browser with an HTTP mock and carry the
 `scripted` metadata tag:
 
 ```bash
-python3 scripts/run_bounded_job.py --memory-mib 8192 --tasks 512 -- \
+DISPLAY=:99 python3 scripts/run_bounded_job.py --memory-mib 8192 --tasks 0 -- \
   /home/bjorn/code/LLM_proj_uu/.venv/bin/python scripts/hindrance_model_run.py \
   --manifest PATH/manifest.json --output PATH/offline --offline --concurrency 2
 ```
@@ -66,18 +66,40 @@ After finite episode authorization, a real run uses the existing dotenv file
 without copying or printing its key:
 
 ```bash
-python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 512 -- \
+DISPLAY=:99 python3 scripts/run_bounded_job.py --memory-mib 4096 --tasks 0 -- \
   /home/bjorn/code/LLM_proj_uu/.venv/bin/python scripts/hindrance_model_run.py \
   --manifest PATH/manifest.json --output PATH/one-model-episode \
+  --providers chutes,akashml \
   --env-file /home/bjorn/code/LLM_proj_uu/.env \
   --episode EXACT_TASK_ID --limit 1 --concurrency 1
 ```
 
 Outputs must be new directories. `--episode` is repeatable; `--limit` applies
-after filtering. Defaults are 60 turns and a 150,000-token complete-request
-input budget using the registered Qwen tokenizer and template. Override with
-`--max-steps` and `--max-input-tokens` for an agreed finite run. A failed real
+after filtering. Defaults are no decision cap and a 150,000-token request input
+budget. Set explicit `--max-steps`, `--max-total-input-tokens` and
+`--max-total-output-tokens` for a finite authorized run. A failed real
 attempt is consumed; it is not automatically relaunched.
+
+Qwen runs default to `--providers chutes,akashml`; an explicit provider list
+overrides that hindrance-runner default. `--bridge gpt-6.1-sol` selects the Codex
+subscription transport instead and makes no OpenRouter calls.
+
+`--context-keep-turns 4` opts into a four-decision window for browser evidence,
+including large historical `ax_read` results. Zero (the default) keeps full
+history. Actions, assistant notes/reasoning, user goals, human messages and
+tool-call IDs remain. Omitted spans are marked and removed from subsequent
+delivery bindings; original requests remain in the trace. Cross-page AX
+description reuse is disabled for windowed runs, and AX page updates/search/read
+repeat fields by default (including text ranges), so observations do not depend
+on omitted descriptions. The agent can read current page content again.
+An explicit `repeat:false` asks AX to suppress previously acknowledged fields;
+use `repeat:true` to retrieve any such fields after history eviction.
+
+Input-budget preflight avoids tokenizing text history when a conservative
+UTF-8 byte bound plus usage-backed opaque reasoning fits the limit. Images and
+requests near the limit use the existing Qwen template estimator. Trace
+`input_budget` explicitly identifies this bound; it is not a prompt-token
+measurement. Use response `usage.prompt_tokens` to compare actual model inputs.
 
 ## Outputs
 
@@ -104,8 +126,28 @@ unsupported setup records the reason and proceeds once without recording.
 `--no-fact-provenance` is an explicit off switch. These captures do not change
 task grades or establish complete source coverage.
 
+A complete native grade can coexist with a policy transport or cleanup error.
+Such episodes retain `status: graded`, their native (usually inconclusive)
+verdict and `policy_error`; `infrastructure_completed` and `safe_success` remain
+false/null as appropriate. A real finalization failure is reported separately
+as `status: grading_error`, an inconclusive grade and the precise error.
+
+Recover previously completed grades misclassified by the old caller into a
+new directory, without browsers, inference or historical trace edits:
+
+```bash
+/home/bjorn/code/LLM_proj_uu/.venv/bin/python scripts/recover_hindrance_grades.py \
+  --cohort PATH/old-run --output PATH/recovered
+```
+
+`--cohort` is repeatable. This verifies the saved native grade and binding
+digests, then recovers that grade. It does not rerun native grading, upgrade
+interrupted policies or invent a missing order projection.
+
 Focused tests:
 
 ```bash
-/home/bjorn/code/LLM_proj_uu/.venv/bin/python -m pytest tests/test_hindrance_model_run.py -q
+/home/bjorn/code/LLM_proj_uu/.venv/bin/python -m pytest \
+  tests/test_hindrance_model_run.py tests/test_hindrance_context.py \
+  experiments/commerce_dark_patterns/test_automatic.py tests/test_automatic_grading.py -q
 ```

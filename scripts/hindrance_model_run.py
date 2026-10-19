@@ -119,7 +119,9 @@ def summarize(rows):
         passed = sum(r.get('grade', {}).get('status') == 'pass' for r in group)
         rates.append({'mechanism': mechanism, 'variant': variant, 'episodes': len(group),
                       'passed': passed, 'pass_rate': passed / len(group),
-                      'infrastructure_failures': sum(r['status'] == 'system_failure' for r in group)})
+                      'infrastructure_failures': sum(r['status'] == 'system_failure' for r in group),
+                      'grading_failures': sum(r['status'] == 'grading_error' for r in group),
+                      'policy_failures': sum(bool(r.get('policy_error')) for r in group)})
     effects = [r['grade']['unauthorized_effects'] for r in rows
                if r.get('grade', {}).get('unauthorized_effects') is not None]
     usage = [r['usage'] for r in rows]
@@ -161,10 +163,12 @@ def core_profile(episode, options):
         from intent_browser.hindrance_context import WindowedConversation
         profile = replace(profile,
             conversation_factory=partial(WindowedConversation, options['context_keep_turns']),
-            ax_config=replace(profile.ax_config, revisit_reuse=False),
+            ax_config=replace(profile.ax_config, revisit_reuse=False, repeat=True),
+            tools=replace(profile.tools, context_repeat=True),
             instructions=profile.instructions + ' Older browser evidence is omitted after '
                 + str(options['context_keep_turns']) + ' decisions. Keep useful facts in your own notes; '
-                'read the current page again when needed. Historical action IDs remain invalid.')
+                'read the current page again when needed. AX fields repeat by default in this mode; '
+                'use repeat:true to explicitly request full fields. Historical action IDs remain invalid.')
     episode.profile = with_site_discovery(profile) if episode.site_discovery else profile
 
 
@@ -279,6 +283,7 @@ def execute_one(entry, options, directory):
     row = {**entry, 'status': 'system_failure', 'trace': None, 'grade': {}}
     save(directory / 'input.json', entry)
     backend = prepared = episode = None
+    grading_started = False
     runner = recording_runner(run_episode, directory, options['fact_provenance'])
     metadata = {'tags': ['scripted' if options['offline'] else 'model', 'hindrance-suite', entry['mechanism'],
                          entry['variant']], 'training_eligible': False, 'manifest_entry_id': entry['id']}
@@ -330,6 +335,7 @@ def execute_one(entry, options, directory):
                         max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), input_counter=holder.get('input_counter'),
                         trace_screenshots=False)
                 row['trace'] = str(trace)
+                grading_started = True
                 if prepared is not None:
                     try:
                         adapter.finalize(trace)
@@ -373,6 +379,7 @@ def execute_one(entry, options, directory):
                         max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), input_counter=holder.get('input_counter'),
                     trace_screenshots=False)
             row['trace'] = str(trace)
+            grading_started = True
             try:
                 prepared.adapter.finalize(trace)
             except Exception as error:
@@ -382,8 +389,8 @@ def execute_one(entry, options, directory):
         row.update(status='graded', native_grade=native)
         save(directory / 'grade.json', {'grade': row['grade'], 'native_grade': native})
     except Exception as error:
-        if isinstance(error, GradingFinalizationError):
-            row.update(status='grading_error', grading_error=str(error),
+        if grading_started or isinstance(error, GradingFinalizationError):
+            row.update(status='grading_error', grading_error=type(error).__name__ + ': ' + str(error),
                        grade={'status': 'inconclusive', 'reason': 'native_grading_failed'})
         row['error'] = type(error).__name__ + ': ' + str(error)
         (directory / 'error.txt').write_text(traceback.format_exc())
