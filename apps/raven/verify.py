@@ -152,6 +152,16 @@ def main():
             for i in range(2):
                 matching.nth(i).click()
             results['panel_duplicate_url_tabs']=True
+            # Transient handback failures must retain the button for retry.
+            def unavailable_handback(route):
+                route.fulfill(status=503,content_type='application/json',body='{"error":"Temporary outage"}')
+            context.route('**/handback',unavailable_handback)
+            frame.locator('#handback').click()
+            assert frame.locator('#handover').is_visible()
+            assert frame.locator('#handback').is_enabled()
+            assert 'Please try again' in frame.locator('#run-status').inner_text()
+            context.unroute('**/handback',unavailable_handback)
+            results['handback_transient_retry']=True
             frame.locator('#stop').click()
             wait_done(ui_run)
             assert ui_run.events[-1]=={'type':'done','stop_reason':'cancelled'},ui_run.events

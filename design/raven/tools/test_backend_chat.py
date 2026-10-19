@@ -69,7 +69,7 @@ async def main(args):
                     await page.locator('#message-input').fill('A new question in the same conversation')
                     await page.locator('#chat-form').evaluate('(form)=>form.requestSubmit()')
                     await page.wait_for_timeout(2000)
-                    assert 'Could not confirm cancellation' not in await page.locator('#raven-status').inner_text()
+                    assert 'Could not confirm cancellation' not in await page.locator('#countdown').inner_text()
                     await page.unroute('**/cancel')
                     await page.locator('#stop-task').click()
                 elif name in ('active-reselect','pagehide','pending-pagehide'):

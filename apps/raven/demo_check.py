@@ -46,7 +46,7 @@ async def main(args):
                     surface = page
                 else:
                     # Each request gets fresh chat history; the visible task tab persists.
-                    await panel_frame.goto(args.url + 'panel.html')
+                    await panel_frame.goto(panel_frame.url)
                     page, surface = panel, panel_frame
                 await surface.wait_for_function('window.ravenChatDemo?.ready', timeout=60000)
                 errors=[]
@@ -106,10 +106,12 @@ async def main(args):
                     (args.output/'results.json').write_text(json.dumps(results,indent=2)+'\n')
                     print(json.dumps({'case':name,'completed':result['completed'],'seconds':result.get('time_to_answer_seconds'),'usage':result.get('usage_totals'),'error':result.get('error')}),flush=True)
 
+        selected=[p for p in PROMPTS if p[0] in args.cases]
         async def panels():
-            for prompt in PROMPTS[3:]: await case(*prompt)
+            for prompt in selected:
+                if prompt[1]=='user_window': await case(*prompt)
         try:
-            await asyncio.gather(*(case(*prompt) for prompt in PROMPTS[:3]),panels())
+            await asyncio.gather(*(case(*prompt) for prompt in selected if prompt[1]=='background'),panels())
         finally:
             await browser.close()
             await shared.close()
@@ -120,4 +122,5 @@ if __name__ == '__main__':
     parser.add_argument('--url',default='http://localhost:8770/')
     parser.add_argument('--cdp',required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--cases',nargs='+',choices=[p[0] for p in PROMPTS],default=[p[0] for p in PROMPTS])
     asyncio.run(main(parser.parse_args()))

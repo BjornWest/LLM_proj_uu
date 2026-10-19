@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const post = async (url, body = {}) => {
     const r = await fetch(url, {method: 'POST', headers: {'Content-Type':'application/json'}, body:JSON.stringify(body)});
     const data = await r.json();
-    if (!r.ok) throw new Error(data.error || 'Request failed');
+    if (!r.ok) {const error=new Error(data.error || 'Request failed');error.status=r.status;throw error;}
     return data;
   };
   const tabs = new Map();
@@ -108,7 +108,11 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       await post('/api/tasks/'+run+'/handback',{tab_id:tab,note:null});
       handovers.delete(tab);showHandover();status.textContent='Returned to Raven';
-    } catch(e) {handovers.delete(tab);showHandover();status.textContent='That tab is no longer waiting for help. Raven can continue.';}
+    } catch(e) {
+      if(e.status===400 || e.status===404) {
+        handovers.delete(tab);showHandover();status.textContent='That tab is no longer waiting for help. Raven can continue.';
+      } else status.textContent='I couldn’t return the tab yet. Please try again.';
+    }
     finally {button.disabled=false;}
   };
   fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs || [])tabs.set(t.tab_id,t);drawTabs();});

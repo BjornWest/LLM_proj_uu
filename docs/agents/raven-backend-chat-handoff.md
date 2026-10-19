@@ -4,7 +4,7 @@ The v42 full-page entry uses the Raven API v1 transport. Submission includes the
 
 Conversation history remains an explicit localStorage adapter, `window.RavenConversations.getContext()`, rather than a backend conversation store. Replay uses the existing restoration flag so messages are saved once. Existing browser conversations are preserved; a fresh browser starts empty.
 
-Navigation events update the site name, captured favicon and progress indicator above the chat. The current site link opens a new tab. Clicking elsewhere on the indicator toggles the visited-sites disclosure; its links remain accessible after completion. Background mode never embeds the agent browser. Manual helper-raven controls still demonstrate visuals; they do not create backend subagents.
+Navigation events update the site name, captured favicon and progress indicator above the chat. The current site link opens a new tab. Clicking elsewhere on the indicator toggles the visited-sites disclosure; its links remain accessible after completion. Background mode never embeds the agent browser. Development animation controls are hidden in the integrated demo.
 
 ## Offline demo and acceptance
 
@@ -41,3 +41,5 @@ M1 passed all seven browser cases. M2 used both authorized attempts: first faile
 ## Asset provenance
 
 The native geometry, motion banks, compact demo and vendor licenses remain the imported assets. `manifest.json` retains source snapshot hashes while updating current-byte hashes for the backend client changes and recording added files. `validation.json` describes the historical import checks; it is not rewritten as new browser/model evidence. Use `python3 design/raven/tools/verify_bundle.py` for current asset integrity.
+
+WEB-C serves the integrated layout at `/` through `apps/raven/backend.py`; see [Raven demo hardening](raven-demo-hardening.md) for current budgets, request retries and acceptance. Earlier M2 failures above remain historical evidence.

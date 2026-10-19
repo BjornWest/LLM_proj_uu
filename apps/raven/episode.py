@@ -1,5 +1,6 @@
 """One harness episode per child process; trace events cross a queue to HTTP/SSE."""
 from datetime import datetime, timezone
+from copy import copy
 import json
 import os
 import re
@@ -17,16 +18,45 @@ class DemoBackend(ChatCompletionsBackend):
     supports_background_completion = True
     supports_native_tools = True
 
-    def __init__(self, *args, on_retry, **kwargs):
-        super().__init__(*args, timeout=120, **kwargs)
+    def __init__(self, *args, on_retry, request_timeout=120, **kwargs):
+        super().__init__(*args, timeout=request_timeout, **kwargs)
         self.on_retry = on_retry
+        self.request_timeout = request_timeout
+
+    def _request_client(self):
+        return httpx.Client(timeout=self.request_timeout,
+                            headers=dict(self.client.headers), trust_env=False)
 
     def complete(self, messages):
-        try:
-            return super().complete(messages)
-        except httpx.TimeoutException:
-            self.on_retry()
-            return super().complete(messages)
+        # Each attempt owns its connection. A daemon reader cannot hold up the
+        # episode if a provider keeps its HTTP response alive with whitespace.
+        for ordinal in range(2):
+            attempt = copy(self)
+            attempt.client = self._request_client()
+            result = queue.Queue(maxsize=1)
+            def request(attempt=attempt, result=result):
+                try:
+                    result.put((True, ChatCompletionsBackend.complete(attempt, messages)))
+                except Exception as exc:
+                    result.put((False, exc))
+                finally:
+                    attempt.client.close()
+            threading.Thread(target=request, daemon=True).start()
+            try:
+                succeeded, value = result.get(timeout=self.request_timeout)
+            except queue.Empty:
+                succeeded = False
+                value = httpx.ReadTimeout(f'Provider did not finish within {self.request_timeout:g} seconds')
+                # Interrupt the old connection without putting socket cleanup on
+                # the UI deadline. The episode process also owns all readers.
+                threading.Thread(target=attempt.client.close, daemon=True).start()
+            self.last_request = getattr(attempt, 'last_request', None)
+            if succeeded:
+                return value
+            if ordinal == 0 and isinstance(value, httpx.TimeoutException):
+                self.on_retry()
+                continue
+            raise value
 
 
 DEMO_POLICY = (
@@ -39,6 +69,8 @@ DEMO_POLICY = (
     "Use only absolute HTTP(S) URLs. A rejected call did nothing; correct it and continue. "
     "Give a concise answer in the user’s language with links to inspected sources; "
     "say clearly when a price or fact could not be verified. Reuse the current tab for navigation. "
+    "If a site blocks access or still fails after one retry, use another public source or "
+    "finish with that limitation. Do not keep waiting or reloading the same blocked page. "
     "After handing over a tab, wait for its return or finish explaining what help is needed; "
     "do not repeatedly poll using model calls."
 )
