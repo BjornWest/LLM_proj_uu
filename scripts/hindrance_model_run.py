@@ -12,6 +12,7 @@ import json
 import multiprocessing
 import os
 from pathlib import Path
+import sys
 import time
 import traceback
 
@@ -171,6 +172,10 @@ def core_profile(episode, options):
                 + str(options['context_keep_turns']) + ' decisions. Keep useful facts in your own notes; '
                 'read the current page again when needed. AX fields repeat by default in this mode; '
                 'use repeat:true to explicitly request full fields. Historical action IDs remain invalid.')
+    if options.get('tokenizer_socket'):
+        from intent_browser.shared_tokenizer import SharedTokenizerConfig
+        profile = replace(profile, ax_config=replace(profile.ax_config,
+            shared_tokenizer=SharedTokenizerConfig(options['tokenizer_socket'])))
     episode.profile = with_site_discovery(profile) if episode.site_discovery else profile
 
 
@@ -193,8 +198,12 @@ def backend_for(options, directory, records, holder, policy=None):
     if not options['offline']:
         from intent_browser.hindrance_context import PreflightInputCounter
         from intent_browser.input_budget import QwenInputCounter
+        shared = None
+        if options.get('tokenizer_socket'):
+            from intent_browser.shared_tokenizer import SharedTokenizerConfig
+            shared = SharedTokenizerConfig(options['tokenizer_socket'])
         holder['input_counter'] = PreflightInputCounter(QwenInputCounter(
-            str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')),
+            str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json'), shared_tokenizer=shared),
             options.get('max_input_tokens', 150000))
     if options['offline']:
         backend = ChatCompletionsBackend('https://offline.invalid/v1', 'scripted-hindrance', supports_images=True)
@@ -448,6 +457,7 @@ def main():
     parser.add_argument('--context-keep-turns', type=int, default=0,
                         help='Opt in: retain browser evidence for N decisions; 0 preserves full history')
     parser.add_argument('--no-fact-provenance', action='store_true')
+    parser.add_argument('--shared-tokenizer', action='store_true', help='one tokenizer service process for all episodes')
     parser.add_argument('--shared-chromium', action='store_true', help='one pooled Chromium for all episodes (fresh contexts per episode)')
     parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
     parser.add_argument('--reasoning-effort', default='medium')
@@ -490,11 +500,34 @@ def main():
                                     per_server=min(64, -(-leases // 4)))
         supervisor.start()
         options['chromium_descriptor'] = str(supervisor.descriptor_path)
+    tokenizer_service = tokenizer_dir = None
+    if args.shared_tokenizer:
+        # One process holds the tokenizers; episodes query it over a Unix socket
+        # instead of loading ~150-200 MB of tokenizer state each.
+        import subprocess, tempfile, select
+        tokenizer_dir = tempfile.mkdtemp(prefix='hind-tok-')
+        options['tokenizer_socket'] = os.path.join(tokenizer_dir, 'tokenizer.sock')
+        assets = {str(Path(os.environ['HARNESS_AX_TOKENIZER']).resolve()),
+                  str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')}
+        manifest = os.path.join(tokenizer_dir, 'assets.json')
+        Path(manifest).write_text(json.dumps([{'path': a, 'sha256': sha256(Path(a).read_bytes()).hexdigest(),
+                                               'normalization': 'raw'} for a in sorted(assets)]))
+        tokenizer_service = subprocess.Popen([sys.executable, '-I', '-B', '-c',
+            "import sys;sys.path.insert(0,sys.argv[1]);from intent_browser.tokenizer_service import main;"
+            "sys.argv=sys.argv[1:];sys.argv[0]='tokenizer_service';main()", str(ROOT),
+            '--socket', options['tokenizer_socket'], '--manifest', manifest,
+            '--max-clients', str(4 * args.concurrency + 8)],
+            stdout=subprocess.PIPE, stderr=(output / 'tokenizer-stderr.log').open('x'), text=True)
+        if (not select.select([tokenizer_service.stdout], [], [], 60)[0]
+                or json.loads(tokenizer_service.stdout.readline()).get('ready') is not True):
+            raise RuntimeError('Shared tokenizer service not ready')
     try:
         run_pool(args, entries, options, output, rows)
     finally:
         if supervisor is not None:
             supervisor.close()
+        if tokenizer_service is not None:
+            tokenizer_service.terminate()
     return rows
 
 
