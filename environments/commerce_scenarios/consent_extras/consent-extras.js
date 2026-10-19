@@ -71,7 +71,7 @@ export function attach(api) {
       upsellShown = true;
       modal('upsell');
     }
-    if (lineExtra && api.page.state().cart.length && !root.querySelector('[data-scenario-part="totals"]') && !location.hash.includes('product')) {
+    if (lineExtra && api.page.state().cart.length && !root.querySelector('[data-scenario-part="totals"]') && ['cart', 'checkout'].includes(api.page.route().role)) {
       const main = root.querySelector('main');
       if (main) { main.insertAdjacentHTML('beforeend', '<section data-scenario-part="totals" aria-label="Order total"></section>'); api.refresh(); }
     }
