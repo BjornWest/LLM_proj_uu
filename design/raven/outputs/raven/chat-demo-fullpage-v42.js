@@ -207,7 +207,7 @@
       this.scene.dispatchEvent(new CustomEvent('raven-chat-submit',{detail:{text:task.text,conversationId:task.conversationId},bubbles:true}));
       task.transport=window.ravenTransport.start({text:task.text,conversation_id:task.conversationId,mode:'background',history:task.history},{
         onEvent:event=>{if(this.task!==task)return;this.handleTaskEvent(event);},
-        onError:error=>{if(this.task===task)this.completeTask({markdown:'I couldn’t finish that: '+error.message,sources:[]});}
+        onError:error=>{if(this.task===task)this.completeTask({markdown:window.ravenTransport.errorMessage(error),sources:[]});}
       });
       this.draw(this.started,true);
     }
@@ -218,8 +218,8 @@
       else if(event.type==='step')this.countdown.textContent=event.summary;
       else if(event.type==='status')this.countdown.textContent=event.state==='starting'?'Starting research…':event.state==='finishing'?'Preparing your answer…':'Researching…';
       else if(event.type==='final')this.completeTask(event);
-      else if(event.type==='error')this.completeTask({markdown:'I couldn’t finish that: '+event.message,sources:[]});
-      else if(event.type==='done')this.completeTask({markdown:event.stop_reason==='cancelled'?'Research stopped.':'I couldn’t finish that: '+({max_total_input_tokens:'the research budget was reached.',max_total_output_tokens:'the answer budget was reached.',max_input_tokens:'the conversation became too long.'}[event.stop_reason]||'the task ended before an answer was ready.'),sources:[]});
+      else if(event.type==='error')this.completeTask({markdown:window.ravenTransport.errorMessage(event),sources:[]});
+      else if(event.type==='done')this.completeTask({markdown:event.stop_reason==='cancelled'?'Research stopped.':window.ravenTransport.demoMode?window.ravenTransport.errorMessage(event):'I couldn’t finish that: '+({max_total_input_tokens:'the research budget was reached.',max_total_output_tokens:'the answer budget was reached.',max_input_tokens:'the conversation became too long.'}[event.stop_reason]||'the task ended before an answer was ready.'),sources:[]});
     }
     completeTask({markdown,sources=[]}){if(this.started===null||this.replyAdded)return;this.stepMotion(performance.now());this.replyAdded=true;
       this.task?.transport?.close();this.task=null;

@@ -166,6 +166,19 @@ def evidence_excerpt(captured, answer):
 
 def episode_main(payload, output, events, controls, cdp_url=None, scripted=None, options=None):
     os.setsid()
+    import traceback
+    try:
+        _episode_attempt(payload, output, events, controls, cdp_url, scripted, options)
+    except Exception as exc:
+        Path(output).mkdir(parents=True, exist_ok=True)
+        detail = traceback.format_exc()
+        print(detail, file=__import__('sys').stderr, flush=True)
+        (Path(output) / 'error.log').write_text(detail)
+        events.put({'type': 'error', 'message': f'{type(exc).__name__}: {exc}'})
+        events.put({'type': 'done', 'stop_reason': 'error'})
+
+
+def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=None, options=None):
     from dotenv import load_dotenv
     load_dotenv('/home/bjorn/code/LLM_proj_uu/.env', override=False)
     from intent_browser import runner
@@ -442,6 +455,10 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
         events.put({'_trace': str(directory)})
         emit('done', stop_reason=summary['stop_reason'])
     except Exception as exc:
+        import traceback
+        detail = traceback.format_exc()
+        print(detail, file=__import__('sys').stderr, flush=True)
+        (Path(output) / 'error.log').write_text(detail)
         emit('error', message=f'{type(exc).__name__}: {exc}')
         emit('done', stop_reason='error')
     finally:

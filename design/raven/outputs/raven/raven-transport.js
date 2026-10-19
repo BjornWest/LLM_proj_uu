@@ -2,10 +2,36 @@
 (() => {
   'use strict';
   class RavenTransport {
-    constructor({baseURL=''}={}) { this.baseURL=baseURL.replace(/\/$/,''); }
+    constructor({baseURL=''}={}) {
+      this.baseURL=baseURL.replace(/\/$/,'');this.demoMode=true;
+      this.ready=fetch(this.baseURL+'/api/health').then(r=>r.json()).then(h=>{this.demoMode=h.demo_mode!==false;}).catch(()=>{});
+    }
+    errorMessage(error) {return this.demoMode ? "Sorry — I couldn't finish that. Could you try again or rephrase?" : (error.message || String(error));}
+    events(runId,{onEvent,onError}) {
+      const stream=new EventSource(this.baseURL+`/api/tasks/${encodeURIComponent(runId)}/events`);
+      let closed=false,recovering=false,timer=null,lastId=0;
+      const connection={close:()=>{closed=true;clearTimeout(timer);stream.close();}};
+      const fail=error=>{if(closed)return;connection.close();onError(error);};
+      stream.onmessage=message=>{
+        if(closed)return;
+        clearTimeout(timer);lastId=Number(message.lastEventId)||lastId;
+        try {onEvent(JSON.parse(message.data));} catch(error) {fail(error);}
+      };
+      stream.onopen=()=>{recovering=false;};
+      stream.onerror=()=>{
+        if(closed||recovering)return;
+        if(!this.demoMode){fail(new Error('Connection to Raven was interrupted. Please try again.'));return;}
+        recovering=true;
+        // EventSource reconnects using Last-Event-ID; the backend owns the one retry allowance.
+        timer=setTimeout(()=>fail(new Error('Stream recovery timed out')),15000);
+        this.request(`/api/tasks/${encodeURIComponent(runId)}/retry`,{after_event_id:lastId}).catch(fail);
+      };
+      return connection;
+    }
     async request(path,body,{keepalive=false}={}) {
+      await this.ready;
       const response=await fetch(this.baseURL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{}),keepalive});
-      if(!response.ok)throw new Error(`Backend request failed (${response.status})`);
+      if(!response.ok){const data=await response.json();throw new Error(data.error || `Backend request failed (${response.status})`);}
       return response.json();
     }
     start(payload,{onEvent,onError}) {
@@ -23,18 +49,14 @@
       session.ready=this.request('/api/tasks',payload).then(({run_id})=>{
         session.runId=run_id;
         if(cancelled||closed)return;
-        stream=new EventSource(this.baseURL+`/api/tasks/${encodeURIComponent(run_id)}/events`);
-        stream.onmessage=message=>{
-          if(closed)return;
-          try {
-            const event=JSON.parse(message.data);
+        stream=this.events(run_id,{
+          onEvent:event=>{
+            if(closed)return;
             if(['final','error','done'].includes(event.type))session.close();
             onEvent(event);
-          } catch(error) { session.cancel().catch(()=>{});onError(error); }
-        };
-        // Reconnection replays the whole run. Surface a dropped stream once,
-        // instead of replaying site visits or appending a second answer.
-        stream.onerror=()=>{if(closed)return;session.cancel().catch(()=>{});onError(new Error('Connection to Raven was interrupted. Please try again.'));};
+          },
+          onError:error=>{if(closed)return;session.cancel().catch(()=>{});onError(error);}
+        });
       }).catch(error=>{if(!cancelled&&!closed){session.close();onError(error);}});
       return session;
     }

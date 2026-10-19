@@ -133,3 +133,95 @@ Final WEB-D evidence is in this worktree under `.local/coordination/demo-sprint/
 Eight real model episodes completed: all six full-page low/medium runs plus two Swedish background-panel runs. Subscription requested priority and returned default in all 44 provider responses; dollar charges remain unreported. 64 unit tests passed, a focused final rerun passed 23, and the 84-file bundle passed. The exact WEB-D scripted acceptance passed context isolation, preserved human document/tab identity, actual tab closure recovery, handover/handback, cancellation, SSE replay, duplicate-tab controls, transient handback errors, panel Stop/error/reload recovery and plain-URL citations. Scripted traces carry the `scripted` tag. A separate labeled visual replay verifies readable final step text without a model call.
 
 Concurrent WEB-E commits were interleaved on the branch. WEB-D acceptance loads the reviewed `ae67faa` runtime plus the isolated `836ce35` test correction and `776b3ab` close-race fix; the final panel color comes from `0d9df96`. Frozen module/asset hashes are recorded in `web-d-frozen-binding.json`; no concurrent source was replaced. Review/adoption must identify the selected commits explicitly and treat WEB-E review separately. OS focus remains unverified on Xvfb/WSL where the window manager focus property is absent or zero; Chrome tab identity and context isolation are separately verified.
+
+## WEB-G: presentation mode and no-model preflight
+
+`apps/raven/start_demo.sh PORT` now passes `--demo-mode` by default. The backend
+also accepts `--demo-mode` directly and `--no-demo-mode` to retain raw diagnostic
+errors. The owner service on port 8770 was not restarted by this change.
+
+In demo mode an episode infrastructure failure retries once with the same text,
+history and mode. The UI shows **Taking another look…** while retrying. A second
+failure shows exactly **Sorry — I couldn't finish that. Could you try again or
+rephrase?** Both layouts use the same transport and friendly error formatting;
+internal status codes and completion reasons stay out of the presentation UI.
+Stop/cancellation does not retry. A completed answer is not repeated for a late
+cleanup failure. Budget exhaustion is friendly but does not trigger another model
+episode.
+
+Window modes reconnect to the last captured active tab when its target is known,
+preserving its current document. A destroyed browser/closed tab cannot be restored
+by this retry; full-page background episodes start a fresh browser. Retry is the
+same user request, not a restored model conversation. Streams carry event IDs so
+reconnection resumes after the last received event. Server and browser reports of
+the same stream drop share the same retry allowance. A failed reconnect has a
+15-second client deadline, then shows the friendly line and cancels the run.
+
+Full errors remain in server stderr and
+`.local/raven-runs/RUN_ID/attempt-N/service-events.jsonl`; uncaught setup/runtime
+exceptions also write `error.log`. Runner traces and provider `usage.jsonl` remain
+inside each attempt directory. The model and provider settings are unchanged.
+
+### No-model smoke
+
+Use the shared virtualenv and run browser checks under the resource wrapper:
+
+```sh
+DISPLAY=:99 TASK_SOURCE_BINDING=current OPENBLAS_NUM_THREADS=1 \
+PYTHONPATH="$PWD:/home/bjorn/code/cau-merge-20261016" \
+LD_LIBRARY_PATH=/home/bjorn/code/LLM_proj_uu/.local/system-libs/usr/lib/x86_64-linux-gnu \
+python3 scripts/run_bounded_job.py --memory-mib 2048 --tasks 512 -- \
+/home/bjorn/code/LLM_proj_uu/.venv/bin/python -m apps.raven.smoke \
+  --url http://127.0.0.1:8770
+```
+
+Add `--windows-browser` when the target service uses native Windows Chrome. This
+checks `/api/worker-health`, which evaluates extension API reachability in the
+service-owned browser thread. It does not start another Windows browser or touch
+the owner's tabs. The smoke opens its own Linux test browsers on DISPLAY=:99.
+
+The command prints PASS/FAIL for backend health, panel load, full-page load and a
+mock run through each UI. The mock uses an isolated ephemeral HTTP server and
+explicit `scripted` metadata; **no task is submitted to the live model service**.
+The two layouts run concurrently in independent browsers. The exit code is 1 if
+any check fails. Default evidence is
+`.local/coordination/demo-sprint/web-g-smoke/results.json` plus four screenshots;
+`--output PATH` selects another directory. This is presentation preflight, not a
+live-model quality test.
+
+### Focused recovery tests
+
+```sh
+PYTHONPATH="$PWD:/home/bjorn/code/cau-merge-20261016" \
+/home/bjorn/code/LLM_proj_uu/.venv/bin/python -m pytest -q \
+  tests/test_raven_demo.py tests/test_raven_hardening.py
+
+DISPLAY=:99 TASK_SOURCE_BINDING=current OPENBLAS_NUM_THREADS=1 \
+PYTHONPATH="$PWD:/home/bjorn/code/cau-merge-20261016" \
+LD_LIBRARY_PATH=/home/bjorn/code/LLM_proj_uu/.local/system-libs/usr/lib/x86_64-linux-gnu \
+python3 scripts/run_bounded_job.py --memory-mib 3072 --tasks 512 -- \
+/home/bjorn/code/LLM_proj_uu/.venv/bin/python -m pytest -q \
+  tests/test_raven_demo_ui.py
+```
+
+The browser test runs six independent scripted cases with concurrency two:
+recovery, permanent failure and dropped-stream recovery in each layout. Evidence:
+`.local/coordination/demo-sprint/web-g-ui/`. Unit coverage includes provider/capture/
+worker errors, abnormal process exit, exhausted retries, cancellation, retained raw
+diagnostics when demo mode is off, indexed replay and duplicate stream-drop reports.
+
+WEB-G validation on the isolated Linux service at port 8778: the five smoke checks
+passed. Twenty-three focused unit checks passed. Two Sol attempts (one injected
+failure after a real response, then one automatic retry) returned **Raven retry
+works.** with the original tab target and JavaScript document marker preserved.
+No OpenRouter calls were made. Provider-reported usage was 12,680 input tokens
+and 48 output tokens across both responses; subscription dollar charges were
+unreported (`null`), and served service tier was `default`. The first runner
+summary reports zero usage because the injected exception occurs after receipt;
+`usage.jsonl` is the authoritative evidence for that response.
+
+Model driver and result:
+`.local/coordination/demo-sprint/web_g_model_retry.py`,
+`web-g-model-retry.json`, `web-g-model-retry.log`.
+Traces: `.local/raven-runs/a457314142df4a3fb8efb0af9828f9ef/attempt-{1,2}/`.
+This finite check used two of the four authorized real episode attempts.

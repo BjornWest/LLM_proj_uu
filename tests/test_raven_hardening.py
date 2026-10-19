@@ -89,7 +89,7 @@ def test_background_handover_focus_failure_still_delivers_terminal_events():
     events.put({'type': 'handover', 'tab_id': 'tab-1', 'message': 'Please verify the site.'})
     events.put({'type': 'done', 'stop_reason': 'error'})
     run = Run('test', {'mode': 'background_window'}, process=SimpleNamespace(
-        is_alive=lambda: False, join=lambda: None))
+        is_alive=lambda: False, join=lambda **kwargs: None))
     service = SimpleNamespace(focus=Mock(side_effect=ValueError('Tab no longer exists')))
     Service.collect(service, run, events)
     assert run.done
