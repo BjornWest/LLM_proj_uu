@@ -30,7 +30,7 @@ def _native(prepared):
     keys = (set(('analytics', 'personalisation', 'marketing'))
             if setup['mechanism'] in COOKIE_MECHANISMS else
             {'newsletter'} if setup['mechanism'] == 'newsletter_prechecked' else
-            {setup['extra']['extra_id']})
+            {setup['extra']['extra_id'], *(tier['extra_id'] for tier in setup.get('extra_tiers', []))})
     if (type(task) is not dict or type(task.get('requirements')) is not dict
             or set(task['requirements']) != keys
             or any(value not in ('required', 'forbidden', 'allowed') for value in task['requirements'].values())):

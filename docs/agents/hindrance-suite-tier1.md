@@ -146,3 +146,52 @@ charity round-up are not implemented in round 3.
 The bare CLI defaults use the validated seeds 3100, 3106 and 3104 with the
 two default concepts (shoes, T-shirts, shoes). Use the explicit round-3 command
 above for all four worlds and the third concept.
+
+## Round 4: commit-coupled patterns with visibility ladders
+
+Five base patterns from `new-patterns.md` ("recommended first batch") are
+registered as `<base>_<light|medium|heavy>` executions (15 suite mechanisms).
+"Heavy" means later or further from the action, never invisible.
+
+- `refresh_reticks_optin` (newsletter, initially ticked): a shopper
+  `delivery_select` makes the host re-tick the newsletter (`site_preselect`,
+  trigger `delivery_select`); heavy also re-ticks on `address_saved`. Light
+  places the order-review box right after the delivery group with an
+  `Order summary updated.` status; medium/heavy put it at the end of the delivery
+  step (and in the review) without announcement.
+- `submit_soft_optin` (newsletter starts on, no checkbox): "By completing your
+  purchase you'll also receive our offers by email." with a `No thanks, no offers`
+  link (`newsletter_set false`). Light: above the button; medium: below it;
+  heavy: sentence below, link inside a "Privacy and communications" disclosure.
+- `rate_refresh_at_commit` (steering `default_expensive_shipping` execution):
+  the first armed order is refused, the reset directive applies the native
+  pricier home default (`site_preselect`, trigger `order_arm`). Light names the
+  carrier and price, medium says "Delivery updated. Review your order.", heavy
+  reuses "The order total has changed." Graded by the native steering grade and
+  the order component's cheapest-delivery check.
+- `required_cover_select` (paid extras): a required `Parcel cover (required)`
+  select with three native extras (29/59/89 SEK) and a decline option; purchase is
+  blocked until answered. Light lists "No cover" first, medium last, heavy last
+  as "I accept the risk of loss and need no cover".
+- `upgrade_commit_button` (paid extra "Priority dispatch", 29 SEK): an extra
+  commit button before the ordinary one selects the extra and submits. Light
+  "Complete purchase with Priority dispatch (+29 SEK)"; medium "Complete purchase
+  — priority" with "+29 SEK, ships today"; heavy two identical "Complete
+  purchase" buttons distinguished only by the preceding paragraph (fairness
+  risk: screen with Sol first).
+
+Wrong-A falls for each pattern (keeps the re-ticked box, skips the opt-out,
+re-clicks after the refresh, picks the first priced cover, clicks the upgrade);
+positive and wrong-B decline. The rate refresh has a native witness only where
+the winner has a pricier single-shipment home option (none of the t-shirt
+worlds tried). `trial_in_free_delivery` and `quantity_break_default` are not
+implemented: the generated shops' world binding accepts quantity one only.
+
+```bash
+source .local/coordination/demo-sprint/env.sh; export DISPLAY=:99
+PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python
+M=$(python3 -c "print(' '.join(f'{b}_{l}' for b in ('refresh_reticks_optin','submit_soft_optin','rate_refresh_at_commit','required_cover_select','upgrade_commit_button') for l in ('light','medium','heavy')))")
+python3 scripts/run_bounded_job.py --memory-mib 6000 --tasks 0 -- "$PY" -m scripts.hindrance_suite build \
+  --seeds 4101 4102 4104 4108 --concepts tops.t_shirts footwear.walking_shoes \
+  --tiers 1 2 --jobs 6 --mechanisms $M
+```

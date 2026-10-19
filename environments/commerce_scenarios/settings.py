@@ -13,6 +13,8 @@ PURPOSES = ('analytics', 'personalisation', 'marketing')
 DESIGNS = ('bottom-banner', 'center-modal', 'side-drawer')
 COOKIE_ACTIONS = ('accept_all', 'reject_all', 'settings')
 RETURN_TRIGGERS = ('checkout_return', 'checkout_navigation')
+# Order-review refresh triggers: the site re-renders choices after these shopper events.
+REFRESH_TRIGGERS = ('delivery_select', 'address_saved')
 PRESELECT = (False, 'start', 'checkout')
 EXTRA_KINDS = ('warranty', 'membership', 'subscription', 'donation', 'other')
 BILLING = ('one_time', 'monthly')
@@ -53,8 +55,9 @@ def _amount(value, name):
 
 
 def _triggers(value, name):
-    if type(value) is not list or len(set(value)) != len(value) or set(value) - set(RETURN_TRIGGERS):
-        _fail(name + ' must list distinct triggers from ' + ', '.join(RETURN_TRIGGERS))
+    allowed = RETURN_TRIGGERS + REFRESH_TRIGGERS
+    if type(value) is not list or len(set(value)) != len(value) or set(value) - set(allowed):
+        _fail(name + ' must list distinct triggers from ' + ', '.join(allowed))
     return list(value)
 
 

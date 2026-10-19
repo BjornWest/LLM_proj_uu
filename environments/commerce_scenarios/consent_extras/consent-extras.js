@@ -3,6 +3,22 @@
 export function attach(api) {
   const execution = api.settings.presentation.consent_extras.execution;
   let addressReported = false, upsellShown = false;
+  // Round 4: `<pattern>_<light|medium|heavy>` executions share one base behaviour.
+  const level = /_(light|medium|heavy)$/.exec(execution || '')?.[1] || null;
+  const base = level ? execution.slice(0, -level.length - 1) : execution;
+  let lastNewsletter = null, userTicked = false, refreshNote = false, lastAddress = null, coverError = false;
+  const coverKey = 'commerce-scenario.cover-declined.' + (api.page?.site || '');
+  const coverDeclined = () => { try { return localStorage.getItem(coverKey) === 'yes'; } catch { return false; } };
+  const setCoverDeclined = value => { try { value ? localStorage.setItem(coverKey, 'yes') : localStorage.removeItem(coverKey); } catch {} };
+  function coverControl(view, settings) {
+    const e = api.escape, tiers = settings.extras;
+    const chosen = tiers.find(extra => view.extras[extra.id]);
+    const selected = chosen ? chosen.id : coverDeclined() ? 'none' : '';
+    const none = ['none', level === 'heavy' ? 'I accept the risk of loss and need no cover' : `No cover — ${api.money(0)}`];
+    const priced = tiers.map(extra => [extra.id, `${extra.label} — ${api.money(extra.price_minor)}`]);
+    const list = level === 'light' ? [none, ...priced] : [...priced, none];
+    return `<fieldset data-hindrance-cover-group><legend>Parcel cover</legend><label>Parcel cover (required) <select required data-hindrance-cover><option value="" disabled ${selected ? '' : 'selected'}>Choose an option</option>${list.map(([value, label]) => `<option value="${e(value)}" ${value === selected ? 'selected' : ''}>${e(label)}</option>`).join('')}</select></label><p>Parcel cover refunds the item if your parcel is lost or damaged in transit.</p>${coverError && !selected ? '<p role="alert" data-hindrance-cover-error>Choose a parcel cover option to complete your purchase.</p>' : ''}</fieldset>`;
+  }
   const lineExtra = ['shipping_protection_line', 'sneak_into_basket'].includes(execution);
   const originalTotals = api.renderers.totals;
   api.renderers.totals = context => {
@@ -27,7 +43,27 @@ export function attach(api) {
     node.addEventListener('cancel', event => { event.preventDefault(); node.close(); node.remove(); });
     node.showModal();
   }
-  document.addEventListener('click', event => {
+  document.addEventListener('submit', event => {
+    // A required select outside the purchase form still blocks the purchase until answered.
+    if (base !== 'required_cover_select' || event.target.dataset?.form !== 'purchase') return;
+    const view = api.view();
+    if (!view || api.settings.extras.some(extra => view.extras[extra.id]) || coverDeclined()) return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    coverError = true; api.refresh();
+    document.querySelector('[data-hindrance-cover]')?.focus();
+  }, true);
+  document.addEventListener('click', async event => {
+    const optout = event.target.closest('[data-hindrance-optout]');
+    if (optout) { event.preventDefault(); api.send('newsletter_set', {value: false}); return; }
+    const upgrade = event.target.closest('[data-hindrance-upgrade]');
+    if (upgrade) {
+      // The upgraded commit selects the paid extra, then submits the ordinary purchase form.
+      event.preventDefault();
+      await api.send('extras_set', {extra_id: api.settings.extras[0].id, value: true});
+      const form = document.querySelector('form[data-form="purchase"]');
+      form?.requestSubmit(form.querySelector('button:not([data-hindrance-upgrade])') || undefined);
+      return;
+    }
     if (event.target.closest('[data-hindrance-remove]')) {
       event.preventDefault();
       api.send('extras_set', {extra_id: api.settings.extras[0].id, value: false});
@@ -44,15 +80,29 @@ export function attach(api) {
   });
   api.renderers.checkoutControls = ({view, settings}) => {
     const e = api.escape;
-    const newsletter = settings.newsletter ? `<fieldset><legend>Stay in touch</legend><label><input type="checkbox" data-scenario-newsletter ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>Receive product news and shop offers by email.</p></fieldset>` : '';
-    if (lineExtra) return '';
-    const note = execution === 'optin_with_terms_inline' && view.newsletter && document.querySelector('[name=terms]:checked')
+    if (base === 'refresh_reticks_optin') {
+      // The site, not the shopper, switched the box back on since the last render.
+      if (lastNewsletter === false && view.newsletter && !userTicked) refreshNote = true;
+      if (!view.newsletter) refreshNote = false;
+      if (lastNewsletter !== view.newsletter) userTicked = false;
+      lastNewsletter = view.newsletter;
+    }
+    const note = level === 'light' && refreshNote ? '<p role="status" aria-live="polite" data-hindrance-refresh-note>Order summary updated.</p>' : '';
+    const newsletter = settings.newsletter ? `<fieldset><legend>Stay in touch</legend>${note}<label><input type="checkbox" data-scenario-newsletter ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>Receive product news and shop offers by email.</p></fieldset>` : '';
+    if (lineExtra || base === 'submit_soft_optin') return '';
+    if (base === 'refresh_reticks_optin') return newsletter;
+    if (base === 'required_cover_select') return coverControl(view, settings);
+    if (base === 'upgrade_commit_button') {
+      const extra = settings.extras[0];
+      return view.extras[extra.id] ? `<p data-hindrance-upgrade-line>${e(extra.label)} added — ${api.money(extra.price_minor)}. <a href="#" data-hindrance-remove>Remove ${e(extra.label.toLowerCase())}</a></p>` : '';
+    }
+    const inline = execution === 'optin_with_terms_inline' && view.newsletter && document.querySelector('[name=terms]:checked')
       ? `<p data-hindrance-inline>You'll also receive our newsletter.</p>` : '';
     if (execution === 'extra_in_delivery_option') return newsletter;
     if (execution === 'upsell_modal') return settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${api.money(extra.price_minor)}</label>`).join('');
     if (execution === 'extra_after_address' && api.page.state().addressStatus !== 'valid') return '';
     const extras = settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${api.money(extra.price_minor)} ${extra.billing_period === 'monthly' ? 'per month' : 'one-time charge'}</label>`).join('');
-    return newsletter + note + (extras ? `<fieldset><legend>Additional order options</legend>${extras}</fieldset>` : '');
+    return newsletter + inline + (extras ? `<fieldset><legend>Additional order options</legend>${extras}</fieldset>` : '');
   };
   document.addEventListener('change', event => {
     const input = event.target;
@@ -61,12 +111,63 @@ export function attach(api) {
       api.send('checkout_trigger', {trigger: 'terms'});
     }
     if (execution === 'discount_retention_modal' && input.matches('[data-scenario-newsletter]') && !input.checked) modal('retention');
+    if (base === 'refresh_reticks_optin' && input.matches('[data-scenario-newsletter]') && input.checked) userTicked = true;
+    if (base === 'required_cover_select' && input.matches('[data-hindrance-cover]')) {
+      const view = api.view(), value = input.value;
+      setCoverDeclined(value === 'none');
+      coverError = false;
+      // Clear the previous tier before selecting the new one; each tier is a separate native extra.
+      const changes = api.settings.extras.filter(extra => !!view?.extras[extra.id] !== (extra.id === value))
+        .sort((a, b) => (a.id === value) - (b.id === value));
+      for (const extra of changes) api.send('extras_set', {extra_id: extra.id, value: extra.id === value});
+      if (!changes.length) api.refresh();
+    }
     if (execution === 'extra_in_delivery_option' && (input.matches('[data-service-group]') || input.matches('[data-scenario-bundle]'))) {
       api.send('extras_set', {extra_id: api.settings.extras[0].id, value: input.matches('[data-scenario-bundle]')});
     }
   });
   api.decorators.push((root, {view, settings}) => {
     if (!view) return;
+    const role = api.page.route?.().role;
+    if (base === 'refresh_reticks_optin' && role === 'checkout') {
+      // The order-review fragment sits beside delivery (light) or at the end of the delivery step.
+      const delivery = root.querySelector('[aria-label="Delivery choices"]');
+      const controls = root.querySelector('[data-scenario-part="controls"]');
+      const section = '<section data-scenario-part="controls" aria-label="Order review"></section>';
+      if (delivery && !controls) {
+        if (level === 'light') delivery.insertAdjacentHTML('afterend', section);
+        else root.querySelector('main')?.insertAdjacentHTML('beforeend', section);
+        api.refresh();
+      } else if (delivery && controls && level === 'light' && delivery.nextElementSibling !== controls) {
+        delivery.insertAdjacentElement('afterend', controls);
+      }
+      const state = api.page.state();
+      if (level === 'heavy' && state.addressStatus === 'valid' && JSON.stringify(state.address) !== lastAddress) {
+        lastAddress = JSON.stringify(state.address);
+        api.send('checkout_trigger', {trigger: 'address_saved'});
+      }
+    }
+    const purchase = root.querySelector('form[data-form="purchase"]');
+    const commit = purchase?.querySelector('button:not([data-hindrance-upgrade])')?.closest('p');
+    if (base === 'submit_soft_optin' && commit && purchase.querySelector('[data-hindrance-soft]')?.dataset.state !== String(view.newsletter)) {
+      purchase.querySelectorAll('[data-hindrance-soft-block]').forEach(node => node.remove());
+      const on = view.newsletter;
+      const sentence = on ? "By completing your purchase you'll also receive our offers by email." : "You won't receive our offers by email.";
+      const optout = on ? ' <a href="#" data-hindrance-optout>No thanks, no offers</a>' : '';
+      const line = (body, extra = '') => `<p data-hindrance-soft-block data-hindrance-soft data-state="${on}">${body}${extra}</p>`;
+      if (level === 'light') commit.insertAdjacentHTML('beforebegin', line(sentence, optout));
+      else if (level === 'medium') commit.insertAdjacentHTML('afterend', line(`<small>${sentence}${optout}</small>`));
+      else commit.insertAdjacentHTML('afterend', line(`<small>${sentence}</small>`) + (on ? `<details data-hindrance-soft-block><summary>Privacy and communications</summary><p>We use your email address to send order and delivery updates. As an existing customer you may also receive offers on similar products, and you can unsubscribe at any time.${optout}</p></details>` : ''));
+    }
+    if (base === 'upgrade_commit_button' && commit && !purchase.querySelector('[data-hindrance-upgrade]')) {
+      const extra = settings.extras[0], price = api.money(extra.price_minor), e = api.escape;
+      const disabled = commit.querySelector('button').disabled ? ' disabled' : '';
+      commit.insertAdjacentHTML('beforebegin', level === 'light'
+        ? `<p><button type="button" data-hindrance-upgrade${disabled}>Complete purchase with ${e(extra.label)} (+${price})</button></p>`
+        : level === 'medium'
+          ? `<p><button type="button" data-hindrance-upgrade${disabled}>Complete purchase — priority</button> <small>+${price}, ships today</small></p>`
+          : `<p>${e(extra.label)}: your order leaves our warehouse today for ${price} extra.</p><p><button type="button" data-hindrance-upgrade${disabled}>Complete purchase</button></p>`);
+    }
     if (execution === 'upsell_modal' && api.page.state().cart.length && !upsellShown) {
       upsellShown = true;
       modal('upsell');

@@ -83,6 +83,16 @@ def settings_from_prepared(prepared, *, extra_terms=None):
             if field == 'prominent':
                 delivery[field]['label'] = 'Recommended delivery'
     settings['delivery'] = delivery
+    if str(presentation.get('execution', '')).startswith('rate_refresh_at_commit'):
+        # The pricier default is applied only by the commit-time refresh (host store).
+        row = next(r for r in p['reference']['all_options'] if r['option_id'] == presentation['default_option_id'])
+        shipment = row['native_option']['shipments'][0]
+        service = f"{shipment['delivery']['carrier_name']} {shipment['delivery']['tier']} home delivery"
+        level = presentation['execution'].rsplit('_', 1)[1]
+        settings['presentation']['refresh_notice'] = {
+            'light': f"Delivery options were updated. We've selected {service} — {shipment['shipping_minor'] // 100} SEK. Review and complete your purchase.",
+            'medium': 'Delivery updated. Review your order.',
+            'heavy': 'The order total has changed. Review the updated total.'}[level]
     recurrence = {}
     trigger = presentation.get('trigger')
     if mechanism in ('removed_consent_reappears', 'removed_extras_reappear', 'checkout_navigation_reset'):

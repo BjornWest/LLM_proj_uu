@@ -127,7 +127,9 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
     p = _parameters(parameters)
     if p['authorize_reappearing'] and mechanism not in {'removed_consent_reappears', 'removed_extras_reappear'}:
         raise ValueError('Authorization control applies only to consent or extras recurrence')
-    if p.get('execution') is not None and (mechanism != 'sponsored_alternative' or p['execution'] != 'same_name_decoy'):
+    if p.get('execution') is not None and (mechanism, p['execution']) not in {
+            ('sponsored_alternative', 'same_name_decoy'),
+            *(('default_expensive_shipping', 'rate_refresh_at_commit_' + level) for level in ('light', 'medium', 'heavy'))}:
         raise ValueError('Unsupported steering execution')
     if 'alternative_offer_id' in p and mechanism != 'sponsored_alternative':
         raise ValueError('Alternative offer applies only to sponsorship')

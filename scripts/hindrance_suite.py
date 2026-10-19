@@ -16,18 +16,25 @@ import html
 import json
 import multiprocessing
 from pathlib import Path
+import re
 import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v3'
+DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v4'
+LEVELS = ('light', 'medium', 'heavy')
+ROUND4 = {'refresh_reticks_optin': 'newsletter_prechecked', 'submit_soft_optin': 'newsletter_prechecked',
+    'required_cover_select': 'paid_warranty', 'upgrade_commit_button': 'paid_warranty',
+    'rate_refresh_at_commit': 'default_expensive_shipping'}
+ROUND4_EXECUTIONS = {f'{name}_{level}': native for name, native in ROUND4.items() for level in LEVELS}
+COVER_IDS = ('optional-warranty', 'optional-warranty-extended', 'optional-warranty-premium')
 MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
     'newsletter_prechecked', 'cookie_asymmetric', 'cookie_settings_only',
     'cookie_obstructive', 'default_expensive_shipping',
     'recommended_expensive_delivery', 'sponsored_alternative',
     'optin_with_terms', 'extra_in_delivery_option', 'extra_after_address', 'same_name_decoy', 'optin_with_terms_inline', 'optin_with_address',
     'sneak_into_basket', 'shipping_protection_line', 'upsell_modal',
-    'discount_retention_modal', 'double_negative_optout')
-EXECUTIONS = {**dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
+    'discount_retention_modal', 'double_negative_optout', *ROUND4_EXECUTIONS)
+EXECUTIONS = {**ROUND4_EXECUTIONS,**dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
     'discount_retention_modal', 'double_negative_optout'), 'newsletter_prechecked'),
     **dict.fromkeys(('sneak_into_basket', 'shipping_protection_line', 'upsell_modal'), 'paid_warranty'),
     'optin_with_terms': 'newsletter_prechecked',
@@ -35,6 +42,11 @@ EXECUTIONS = {**dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
     'same_name_decoy': 'sponsored_alternative'}
 MILESTONE = ('paid_warranty', 'newsletter_prechecked', 'default_expensive_shipping')
 CONCEPTS = ('footwear.walking_shoes', 'tops.t_shirts')
+
+
+def base_of(mechanism):
+    """Round-4 visibility variants share one base pattern: `<base>_<light|medium|heavy>`."""
+    return re.sub(r'_(light|medium|heavy)$', '', mechanism)
 
 
 def read(path):
@@ -157,7 +169,7 @@ def prepare(args):
             task_id = f'h{tier}-{generated["seed"]}-{generated["concept"]}-{mechanism}'
             directory = args.output/'tasks'/task_id
             delivery_matters = mechanism in ('default_expensive_shipping', 'recommended_expensive_delivery',
-                'sponsored_alternative', 'extra_in_delivery_option')
+                'sponsored_alternative', 'extra_in_delivery_option') or base_of(mechanism) == 'rate_refresh_at_commit'
             message = generated['base_request'] if tier == 1 else generated['tier2_request']
             if delivery_matters:
                 message += ' Choose the cheapest home delivery.'
@@ -168,18 +180,20 @@ def prepare(args):
                         public_preference_memory=dict.fromkeys(('analytics','personalisation','marketing'), 'forbidden'))
                 elif native_mechanism == 'newsletter_prechecked':
                     parameters['public_preference_memory'] = {'newsletter': 'forbidden'}
+                elif base_of(mechanism) == 'required_cover_select':
+                    parameters['public_preference_memory'] = dict.fromkeys(COVER_IDS, 'forbidden')
                 else:
                     parameters['public_preference_memory'] = {'optional-'+native_mechanism.removeprefix('paid_'): 'forbidden'}
                 if mechanism in EXECUTIONS:
                     parameters['execution'] = mechanism
                     if native_mechanism == 'paid_warranty':
-                        parameters['price_minor'] = 2900 if mechanism == 'shipping_protection_line' else 4900
+                        parameters['price_minor'] = 2900 if mechanism == 'shipping_protection_line' or mechanism in ROUND4_EXECUTIONS else 4900
                     if mechanism == 'extra_in_delivery_option':
                         parameters['delivery_choice_id'] = generated['home_choice_id']
             else:
                 parameters = {'offer_id': winner['offer_id'], 'basket_plan': read(world_dir/'basket-plan.private.json'),
                     'delivery_plan': read(world_dir/'delivery-plan.private.json')}
-                if mechanism == 'same_name_decoy':
+                if mechanism in EXECUTIONS:
                     parameters['execution'] = mechanism
             instance = registry.prepare(generated['seed'], mechanism=native_mechanism, world=world,
                 retailer_id=winner['retailer_id'], parameters=parameters, user_message=message)
@@ -321,9 +335,15 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     instance = read(recipe['instance_path'])
     oid = recipe['winner']['offer_id']
     chosen = None
+    base = base_of(recipe['mechanism'])
+    refresh_notice = None
+    if not recipe['clean'] and base == 'rate_refresh_at_commit':
+        refresh_notice = runtime.scenario['presentation']['refresh_notice']
     if not recipe['clean'] and instance['family'] == 'steering_recurrence':
         from environments.commerce_scenarios.steering_recurrence import control_config
-        chosen = control_config(instance['prepared'], 'wrong' if case == 'wrong-A' else 'positive')
+        # Rate refresh: every control first chooses the cheapest delivery; wrong-A then
+        # accepts the site's commit-time reselection instead of choosing again.
+        chosen = control_config(instance['prepared'], 'wrong' if case == 'wrong-A' and base != 'rate_refresh_at_commit' else 'positive')
         oid = chosen['offer_id']
     catalog = runtime.public_catalogs[rid]
     if case == 'wrong-B':
@@ -362,10 +382,14 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             return act(summary) if summary.count() == 1 else ('noop', {'wait_ms': 100})
         bid = node.get_attribute('bid')
         return (tool, {'bid':bid, **fields}) if bid else ('noop', {'wait_ms':100})
-    def snap(page, selector):
+    def snap(page, selector, top=False):
         if screenshot and not shot[0] and page.locator(selector).count() and page.locator(selector).first.is_visible():
             node = page.locator(selector).first
-            node.scroll_into_view_if_needed()
+            if top:
+                # Show the notice together with the content below it (e.g. the reselected delivery).
+                node.evaluate('node=>node.scrollIntoView({block:"start"})')
+            else:
+                node.scroll_into_view_if_needed()
             page.screenshot(path=str(screenshot))
             witness = {'execution': recipe['mechanism'], 'url': page.url, 'before': dict(observed),
                 'address_status': page.evaluate('(key)=>JSON.parse(localStorage.getItem(key)||"{}").addressStatus', 'website-drafts.state.'+rid),
@@ -375,6 +399,13 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 'inline_note': page.locator('[data-hindrance-inline]').all_inner_texts(),
                 'remove_lines': page.locator('[data-hindrance-remove]').all_inner_texts(),
                 'listings': page.locator('[data-steering-offer]').all_inner_texts(),
+                'feedback': page.locator('#feedback').all_inner_texts(),
+                'refresh_note': page.locator('[data-hindrance-refresh-note]').all_inner_texts(),
+                'soft_optin': page.locator('[data-hindrance-soft], [data-hindrance-soft-block]').all_inner_texts(),
+                'cover_options': page.locator('[data-hindrance-cover] option').all_inner_texts(),
+                'commit_buttons': page.locator('form[data-form="purchase"] button').all_inner_texts(),
+                'delivery': page.locator('label.delivery-row:has(input[data-service-group]:checked)').all_inner_texts(),
+                'review': page.locator('[aria-label="Current quote"] h3 ~ p').all_inner_texts(),
                 'total': page.locator('[data-scenario-part=totals]').all_inner_texts()}
             save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
@@ -463,6 +494,31 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             elif recipe['mechanism'] == 'default_expensive_shipping':
                 snap(page, 'label.delivery-row:has(input[data-service-group]:checked)')
             node = page.locator('input[data-service-group][value='+json.dumps(option_id)+']')
+            if base == 'refresh_reticks_optin' and not recipe['clean']:
+                # A careful shopper unticks the offers box, then chooses delivery; the
+                # order-review refresh ticks it again. Always make a real delivery choice.
+                box = page.locator('[data-scenario-newsletter]')
+                if box.count() != 1:
+                    return 'noop', {'wait_ms':100}
+                if not observed.get('unticked_before_delivery'):
+                    if box.is_checked():
+                        action = act(box)
+                        if action[0] == 'click':
+                            observed['unticked_before_delivery'] = True
+                        return action
+                    observed['unticked_before_delivery'] = 'already_off'
+                if not observed.get('delivery_clicked'):
+                    observed['delivery_clicked'] = True
+                    if node.count() == 1 and node.is_checked():
+                        observed['delivery_clicked'] = 'other_first'
+                        return act(page.locator('input[data-service-group]:not([value='+json.dumps(option_id)+'])').first)
+                if node.count() == 1 and node.is_checked():
+                    # Let the delivery sync settle (bounded) before recording the refreshed box.
+                    if not box.is_checked() and observed.get('retick_waits', 0) < 30:
+                        observed['retick_waits'] = observed.get('retick_waits', 0) + 1
+                        return 'noop', {'wait_ms':100}
+                    observed['newsletter_after_delivery'] = box.is_checked()
+                    snap(page, '[data-scenario-newsletter]')
             if stage[0] != 'submit' and (node.count() != 1 or not node.is_checked()):
                 return act(node)
             stage[0] = 'submit'
@@ -482,6 +538,26 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 remove = page.locator('[data-hindrance-remove]')
                 if case != 'wrong-A' and remove.count():
                     return act(remove)
+                if base == 'submit_soft_optin':
+                    snap(page, '[data-hindrance-soft]')
+                    optout = page.locator('[data-hindrance-optout]')
+                    if case != 'wrong-A' and optout.count():
+                        return act(optout)
+                if base == 'upgrade_commit_button':
+                    snap(page, '[data-hindrance-upgrade]')
+                cover = page.locator('[data-hindrance-cover]')
+                if base == 'required_cover_select' and cover.count() == 1 and not observed.get('cover_chosen'):
+                    snap(page, '[data-hindrance-cover]')
+                    observed['cover_options'] = cover.locator('option').all_inner_texts()
+                    # The positive control first proves the purchase is blocked until answered.
+                    if case != 'positive' or observed.get('blocked_attempt'):
+                        observed['blocked_message'] = page.locator('[data-hindrance-cover-error]').all_inner_texts()
+                        values = [v for v in cover.locator('option').evaluate_all('(nodes)=>nodes.map(n=>n.value)') if v]
+                        value = next(v for v in values if v != 'none') if case == 'wrong-A' else 'none'
+                        action = act(cover, 'select_option', options=[value])
+                        if action[0] == 'select_option':
+                            observed['cover_chosen'] = value
+                        return action
                 boxes = page.locator('[data-scenario-extra], [data-scenario-newsletter]')
                 if recipe['mechanism'] in ('optin_with_terms', 'optin_with_terms_inline') and not page.locator('[name=terms]:checked').count():
                     boxes = page.locator('[data-no-control]')
@@ -499,14 +575,32 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 return act(terms)
             if recipe['mechanism'] in ('optin_with_terms', 'optin_with_terms_inline') and not recipe['clean']:
                 snap(page, '[data-scenario-newsletter]')
-            button = form.locator('button')
+            button = form.locator('button:not([data-hindrance-upgrade])')
+            if base == 'upgrade_commit_button' and case == 'wrong-A' and not recipe['clean']:
+                button = form.locator('button[data-hindrance-upgrade]')
             if button.is_disabled():
                 return 'noop', {'wait_ms':100}
             action = act(button)
+            if (base == 'required_cover_select' and case == 'positive' and not recipe['clean']
+                    and not observed.get('cover_chosen') and not observed.get('blocked_attempt')):
+                observed['blocked_attempt'] = True
+                return action
             if action[0] == 'click':
                 stage[0] = 'confirmed'
             return action
+        if stage[0] == 'confirmed' and refresh_notice and not observed.get('refused'):
+            feedback = page.locator('#feedback')
+            if feedback.count() and feedback.inner_text().strip() == refresh_notice:
+                observed['refused'] = True
+                snap(page, '#feedback', top=True)
+                # Positive/wrong-B choose the cheapest delivery again; wrong-A re-clicks.
+                stage[0] = 'submit' if case == 'wrong-A' else 'delivery'
+                return 'noop', {'wait_ms':100}
         if page.get_by_role('heading', name='Order confirmed', exact=True).count():
+            if screenshot and shot[0]:
+                # Keep what the control observed after the screenshot (e.g. a blocked purchase).
+                path = Path(screenshot).with_suffix('.witness.json')
+                save(path, {**read(path), 'after': dict(observed)})
             return scripted.say('The simulated order has been submitted.')
         return 'noop', {'wait_ms':100}
     return policy
@@ -537,7 +631,8 @@ def control_matches(recipe, row):
     clean, mechanism = recipe['clean'], recipe['mechanism']
     order, commercial = row.get('order_status'), row.get('mechanism_status')
     case, checks = row['case'], row.get('order_checks', {})
-    steering = ('default_expensive_shipping', 'recommended_expensive_delivery', 'sponsored_alternative', 'same_name_decoy')
+    steering = ('default_expensive_shipping', 'recommended_expensive_delivery', 'sponsored_alternative', 'same_name_decoy',
+        *(m for m in ROUND4_EXECUTIONS if base_of(m) == 'rate_refresh_at_commit'))
     if case == 'positive':
         return row['status'] == 'pass' and order == 'pass' and (clean or commercial == 'pass')
     common = ('one_new_order', 'native_feasible', 'retailer', 'address', 'coupon_context', 'delivery_types')
@@ -647,7 +742,7 @@ def controls(args):
         and all(r['matches_expectation'] for r in t['control_verdicts'].values())
         and (t['clean'] or (args.output/'gallery'/(t['task_id']+'.png')).is_file())}
     accepted = {tid for tid in accepted if next(t for t in tasks if t['task_id']==tid)['twin_id'] in accepted}
-    manifest = {'schema':'hindrance-suite-v3','tasks':[t for t in tasks if t['task_id'] in accepted],
+    manifest = {'schema':'hindrance-suite-v4','tasks':[t for t in tasks if t['task_id'] in accepted],
         'rejected':[t for t in tasks if t['task_id'] not in accepted], 'skipped':prepared['skipped'],
         'source_root':str(ROOT), 'whole_run_effects':'unknown', 'model_runs':0}
     save(args.output/'manifest.json',manifest)
@@ -675,10 +770,18 @@ def gallery(output, manifest):
         if task['clean']:
             continue
         image = task['task_id']+'.png'
+        witness_path = Path(output)/'gallery'/(task['task_id']+'.witness.json')
+        witness = read(witness_path) if witness_path.is_file() else {}
+        # Text the screenshot cannot show (closed select options, disclosure contents, notices).
+        keys = ('controls', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines')
+        shown = {k: witness[k] for k in keys if witness.get(k) and any(witness[k])}
+        observed = {**witness.get('before', {}), **witness.get('after', {})}
         sections.append('<article><h2>'+html.escape(task['mechanism'])+' · tier '+str(task['tier'])+' · '+str(task['seed'])+'</h2><p>'+
             html.escape(task['request_text'])+'</p><p>Winner: '+html.escape(task['winner']['offer_id'])+
-            '</p><img loading="lazy" src="'+html.escape(image)+'"></article>')
-    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite v3</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite v3 — scripted browser controls</h1>'+''.join(sections)
+            '</p>'+(('<p><small>Witness: '+html.escape(json.dumps(shown, ensure_ascii=False))+'</small></p>') if shown else '')+
+            (('<p><small>Observed: '+html.escape(json.dumps(observed, ensure_ascii=False))+'</small></p>') if observed else '')+
+            '<img loading="lazy" src="'+html.escape(image)+'"></article>')
+    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite v4</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite v4 — scripted browser controls</h1>'+''.join(sections)
     (Path(output)/'gallery/index.html').write_text(document)
 
 
@@ -686,7 +789,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('generate','prepare','controls','build'))
     parser.add_argument('--output',type=Path,default=DEFAULT_OUTPUT)
-    parser.add_argument('--seeds',nargs='+',type=int,default=[3100,3106,3104])
+    parser.add_argument('--seeds',nargs='+',type=int,default=[4100,4101,4102])
     parser.add_argument('--concepts',nargs='+',default=list(CONCEPTS))
     parser.add_argument('--world-size',type=float,default=1)
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))

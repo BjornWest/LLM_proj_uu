@@ -12,9 +12,30 @@ from random import Random
 
 VERSION = 'commerce-consent-extras-v1'
 TERMS_EXECUTIONS = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_address')
-LATE_EXTRAS = ('extra_after_address', 'sneak_into_basket', 'upsell_modal')
+# Round 4: each base pattern has light/medium/heavy visibility executions.
+LEVELS = ('light', 'medium', 'heavy')
+
+
+def ladder(base):
+    return tuple(f'{base}_{level}' for level in LEVELS)
+
+
+def base_execution(execution):
+    """`refresh_reticks_optin_heavy -> refresh_reticks_optin`; other names unchanged."""
+    for level in LEVELS:
+        if type(execution) is str and execution.endswith('_' + level):
+            return execution[:-len(level) - 1]
+    return execution
+
+
+COVER_EXECUTIONS = ladder('required_cover_select')
+UPGRADE_EXECUTIONS = ladder('upgrade_commit_button')
+LATE_EXTRAS = ('extra_after_address', 'sneak_into_basket', 'upsell_modal', *COVER_EXECUTIONS, *UPGRADE_EXECUTIONS)
+# Extra cover tiers (beyond the base extra) and their SEK prices; the base extra is basic cover.
+COVER_TIERS = (('-extended', 'Extended parcel cover', 5900), ('-premium', 'Premium parcel cover', 8900))
 EXECUTIONS = {**dict.fromkeys(TERMS_EXECUTIONS, 'newsletter_prechecked'),
     **dict.fromkeys(('discount_retention_modal', 'double_negative_optout'), 'newsletter_prechecked'),
+    **dict.fromkeys((*ladder('refresh_reticks_optin'), *ladder('submit_soft_optin')), 'newsletter_prechecked'),
     **dict.fromkeys((*LATE_EXTRAS, 'extra_in_delivery_option', 'shipping_protection_line'), 'paid_warranty')}
 CAPTURE_VERSION = 'commerce-consent-extras-capture-v1'
 PURPOSES = ('analytics', 'personalisation', 'marketing')
@@ -162,14 +183,19 @@ def _prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None,
         raise ValueError('Unsupported consent/extras execution')
     labels = {'extra_after_address': 'Recommended protection for your area',
         'extra_in_delivery_option': 'Delivery Protection', 'sneak_into_basket': 'Protection plan',
-        'shipping_protection_line': 'Package protection', 'upsell_modal': 'Care and protection kit'}
+        'shipping_protection_line': 'Package protection', 'upsell_modal': 'Care and protection kit',
+        'required_cover_select': 'Basic parcel cover', 'upgrade_commit_button': 'Priority dispatch'}
     if extra and execution:
-        extra['label'] = labels[execution]
+        extra['label'] = labels[base_execution(execution)]
+    # A required cover choice offers several priced tiers; each is its own native extra.
+    tiers = [{**extra, 'extra_id': extra['extra_id'] + suffix, 'label': label, 'price_minor': price}
+             for suffix, label, price in COVER_TIERS] if extra and execution in COVER_EXECUTIONS else []
+    extra_ids = [row['extra_id'] for row in ([extra] if extra else []) + tiers]
     initial = {'cookie_preferences': dict.fromkeys(PURPOSES, False),
                'cookie_decided': False, 'newsletter': mechanism == 'newsletter_prechecked' and execution not in TERMS_EXECUTIONS,
-               'extras': {extra['extra_id']: execution not in LATE_EXTRAS} if extra else {}}
-    requirements = deepcopy(params.get('cookie_preferences', dict.fromkeys(PURPOSES, control))) if cookie else {
-        'newsletter' if not extra else extra['extra_id']: control}
+               'extras': dict.fromkeys(extra_ids, execution not in LATE_EXTRAS)}
+    requirements = deepcopy(params.get('cookie_preferences', dict.fromkeys(PURPOSES, control))) if cookie else (
+        dict.fromkeys(extra_ids, control) if extra else {'newsletter': control})
     design = {'cookie_asymmetric': {'accept_prominent': True, 'reject_location': 'initial',
                                     'obstructive': False},
               'cookie_settings_only': {'accept_prominent': True, 'reject_location': 'settings',
@@ -182,6 +208,8 @@ def _prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None,
              'commit_scope': 'consent' if cookie else 'simulated_order_submitted'}
     if execution:
         setup['execution'] = execution
+        if tiers:
+            setup['extra_tiers'] = deepcopy(tiers)
         if 'delivery_choice_id' in params:
             setup['delivery_choice_id'] = params['delivery_choice_id']
     if cookie:
@@ -193,7 +221,7 @@ def _prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None,
     elif extra:
         money = f"{extra['price_minor'] // 100}.{extra['price_minor'] % 100:02d} SEK"
         charge = money + (' per month' if extra['billing_period'] == 'monthly' else ' once')
-        preference = {'forbidden': f'I do not want the {extra["label"].lower()}.',
+        preference = {'forbidden': 'I do not want any parcel cover.' if tiers else f'I do not want the {extra["label"].lower()}.',
                       'required': f'Include the {extra["label"].lower()} at {charge}.',
                       'allowed': f'The {extra["label"].lower()} at {charge} is optional for me.'}[control]
         message = f'Submit my order at {retailer_name}.' + (' ' + preference if control != 'forbidden' else '')

@@ -520,5 +520,29 @@ class Controls(unittest.TestCase):
         self.assertEqual(snapshot['sessions'], [SESSION])
 
 
+class RateRefresh(Controls):
+    def test_first_confirmed_total_is_refused_and_site_reselects_the_default(self):
+        store = SessionStore(options({'retailer_id': 'shop', 'delivery': {'default': {'choice_id': 'choice/fast'}},
+            'presentation': {'execution': 'rate_refresh_at_commit_light', 'refresh_notice': 'Delivery options were updated.'}}),
+            offers=OFFERS, runtime_id='runtime')
+        basket = [{'offer_id': 'shop/a', 'quantity': 1}]
+        request = {'lines': [{'line_id': 'shop/a', 'offer_id': 'shop/a', 'quantity': 1}]}
+        reply = {'options': [{'id': f'basket/{n}', 'totalMinor': t, 'selection': {'line': n},
+                              'shipments': [{'delivery': {'id': f'choice/{n}'}}]} for n, t in (('slow', 25000), ('fast', 30000))]}
+        self.offer(store, basket)
+        self.assertIsNone(store.default_selection(request, reply))
+        self.send(store, 'sync', basket=basket, delivery={'option_id': 'basket/slow', 'source': 'shopper'},
+                  location='checkout', step=None)
+        view = self.send(store, 'order_arm', grand_total_minor=25000)
+        self.assertEqual(view['order'], {'armed': False, 'reason': 'Delivery options were updated.'})
+        self.assertTrue(view['directives']['reset_delivery'])
+        self.assertEqual(store.default_selection(request, reply), {'line': 'fast'})
+        self.send(store, 'sync', basket=basket, delivery={'option_id': 'basket/fast', 'source': 'site'},
+                  location='checkout', step=None)
+        event = store.journal()['events'][-1]
+        self.assertEqual((event['kind'], event['detail']['trigger']), ('site_preselect', 'order_arm'))
+        self.assertTrue(self.send(store, 'order_arm', grand_total_minor=30000)['order']['armed'])
+
+
 if __name__ == '__main__':
     unittest.main()

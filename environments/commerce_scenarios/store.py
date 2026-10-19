@@ -154,6 +154,7 @@ class SessionStore:
         self._overlay_errors = []
         self._scope_reason = None
         self._order_ids = set()
+        self._rate_refreshed = False
 
     # Episode lifecycle (trusted callers only).
 
@@ -295,6 +296,9 @@ class SessionStore:
             overlay = self._overlay(basket, self._state['promotion_codes'])
             if overlay is not None and overlay.get('native_option_id'):
                 wanted = {'option_id': overlay['native_option_id']}
+            if self._refresh_notice() is not None and not self._rate_refreshed:
+                # The site's own rate refresh has not happened yet: the shop's native default applies.
+                return None
             wanted = wanted or self._settings['delivery']['default']
             if wanted is None:
                 return None
@@ -499,6 +503,13 @@ class SessionStore:
         if trigger in recurrence['delivery']:
             self._reset_trigger, self._reset_directive = trigger, True
 
+    def _refresh_notice(self):
+        """Shopper-facing text of a declared commit-time rate refresh, else None."""
+        presentation = self._settings['presentation']
+        if str(presentation.get('execution', '')).startswith('rate_refresh_at_commit') and self._settings['delivery']['default']:
+            return presentation.get('refresh_notice') or 'The order total has changed. Review the updated total.'
+        return None
+
     def _op_checkout_trigger(self, request):
         """Apply the site's declared silent side effect at its checkout trigger."""
         _fields(request, 'trigger')
@@ -508,6 +519,9 @@ class SessionStore:
                 or execution == 'optin_with_address' and trigger == 'address_saved'):
             self._state['newsletter'] = True
             self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
+        elif trigger == 'address_saved' and trigger in self._settings['recurrence']['newsletter']:
+            # The order-review fragment re-renders with the server default after an address save.
+            self._site_rules(trigger)
         elif execution == 'extra_after_address' and trigger == 'address_saved':
             if not getattr(self, '_address_extra_shown', False):
                 self._address_extra_shown = True
@@ -630,6 +644,12 @@ class SessionStore:
             self._arm_reply = {'armed': False, 'reason': self._quote_reason or 'Return to checkout to order.'}
         elif sum(row['amount_minor'] for row in charges) != shown:
             self._arm_reply = {'armed': False, 'reason': 'The order total has changed. Review the updated total.'}
+        elif self._refresh_notice() is not None and not self._rate_refreshed:
+            # Action-triggered rate refresh: the first confirmed total is refused and the
+            # site's configured delivery default is selected for the shopper (reset directive).
+            self._rate_refreshed = True
+            self._reset_trigger, self._reset_directive = 'order_arm', True
+            self._arm_reply = {'armed': False, 'reason': self._refresh_notice()}
         else:
             self._armed = {'charges': charges, 'grand_total_minor': shown}
             self._arm_reply = {'armed': True, 'reason': None}
@@ -709,6 +729,7 @@ class SessionStore:
             elif changed:
                 self._event('delivery_select', 'user', {'option_id': option_id})
                 self._reset_trigger = None
+                self._site_rules('delivery_select')
 
     _OPERATIONS = {'checkout_trigger': _op_checkout_trigger, 'state': _op_state, 'cookie_dialog': _op_cookie_dialog,
                    'cookie_save': _op_cookie_save, 'newsletter_set': _op_newsletter_set,
