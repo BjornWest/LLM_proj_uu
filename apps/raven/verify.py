@@ -109,6 +109,7 @@ def main():
             results['closed_handover']=wait_done(closed)
             assert any(e['type']=='final' for e in closed.events),closed.events
             assert not any(e['type']=='error' for e in closed.events),closed.events
+            page.title()  # Pump this independent CDP client's pending tab-close events.
             assert not any(p.url=='about:blank' for p in context.pages)
             page.bring_to_front()
             # Cancel while waiting for a human: no model calls, shared window survives.
