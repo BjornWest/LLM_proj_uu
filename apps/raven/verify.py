@@ -189,6 +189,16 @@ def main():
             wait_done(reload_run)
             assert reload_run.events[-1]=={'type':'done','stop_reason':'cancelled'}
             results['panel_pagehide_cancels']=True
+            frame.locator('#send-button').wait_for()
+            frame.locator('#messages').evaluate('node=>node.replaceChildren()')
+            frame.locator('body').evaluate('''()=>ravenChatDemo.appendMessage(
+                'A recorded source: https://example.com/','Raven',{sources:[{
+                id:'plain-url',url:'https://example.com/',title:'Plain URL evidence',
+                evidence:'Captured example evidence',illustrative:true}]})''')
+            assert frame.locator('button.raven-citation').count()==1
+            frame.locator('button.raven-citation').click()
+            assert frame.locator('.raven-citation-card').is_visible()
+            results['panel_plain_url_citation']=True
             panel.screenshot(path=str(OUT/'web-a-shots/panel-scripted.png'))
             results['tabs']=svc.tabs()
             browser.close()

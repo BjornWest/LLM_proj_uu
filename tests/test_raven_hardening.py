@@ -59,3 +59,11 @@ def test_keepalive_whitespace_cannot_extend_request_deadline():
         assert len(calls)==2 and progress==['retry']
     finally:
         backend.close();server.shutdown();server.server_close()
+
+
+def test_price_excerpt_matches_localized_currency_and_spacing():
+    from apps.raven.episode import evidence_excerpt
+    captured='\n'.join(['RAM Minne','8 GB']+['Other product text']*200+['Pris','2 149 SEK','Inkl. 25% moms'])
+    excerpt=evidence_excerpt(captured,'Raspberry Pi med 8 GB kostar **2 149 kr**.')
+    assert '2 149 SEK' in excerpt and 'Pris' in excerpt and 'Inkl. 25% moms' in excerpt
+    assert excerpt.index('2 149 SEK') < excerpt.index('8 GB')

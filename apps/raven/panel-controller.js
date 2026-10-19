@@ -150,7 +150,12 @@
       const l=document.createElement('span');l.className='message-label';l.textContent=who;
       const t=document.createElement('div');t.className='message-copy';
       if(window.RavenMessages)window.RavenMessages.renderMessage(t,text);else t.textContent=text;
-      if(sources.length)window.RavenCitations?.enhance(t,sources);
+      if(sources.length){
+        window.RavenCitations?.enhance(t,sources);
+        const cited=new Set([...t.querySelectorAll('button.raven-citation')].map(button=>button.dataset.sourceId));
+        const uncited=sources.filter(source=>!cited.has(source.id));
+        if(uncited.length){const footer=document.createElement('div');footer.className='message-sources';window.RavenMessages.renderMessage(footer,'Sources: '+uncited.map(source=>'[['+source.id+']]').join(' '));window.RavenCitations?.enhance(footer,sources);t.append(footer);}
+      }
       a.append(l,t);this.messages.append(a);
       if(shouldFollow){this.messages.scrollTop=this.messages.scrollHeight;if(this.newReply)this.newReply.hidden=true;}
       else {this.messages.scrollTop=previousTop;if(this.newReply)this.newReply.hidden=false;}

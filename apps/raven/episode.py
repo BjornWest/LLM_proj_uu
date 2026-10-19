@@ -83,7 +83,11 @@ def evidence_excerpt(captured, answer):
     lines = captured.splitlines()
     plain_answer = re.sub(r'[*_`]', '', answer).casefold()
     matched = [i for i, line in enumerate(lines) if len(line.strip()) >= 3 and line.strip().casefold() in plain_answer]
-    matched.sort(key=lambda i: not bool(re.search(r'\d', lines[i])))
+    amounts = [re.sub(r'\D', '', value) for value in re.findall(r'\d[\d\s.,]*\d', plain_answer)
+               if len(re.sub(r'\D', '', value)) >= 3]
+    amount_lines = [i for i, line in enumerate(lines) if any(
+        re.search(r'[\s,.]*'.join(amount), line) for amount in amounts)]
+    matched = amount_lines + [i for i in matched if i not in amount_lines]
     selected, used = [], set()
     for i in matched:
         for j in range(max(0, i-1), min(len(lines), i+2)):
@@ -329,7 +333,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None)
             if answers:
                 final = answers[-1]
         if final:
-            captured = [s for s in sources.values() if s['url'] in final] or list(sources.values())
+            captured = [s for s in sources.values() if s['url'] in final]
             for source in captured:
                 source['evidence'] = evidence_excerpt(captured_texts[source['url']], final)
                 if source['url'] in final:
