@@ -259,7 +259,17 @@ def execute_one(entry, options, directory):
     runner = recording_runner(run_episode, directory, options['fact_provenance'])
     metadata = {'tags': ['scripted' if options['offline'] else 'model', 'hindrance-suite', entry['mechanism'],
                          entry['variant']], 'training_eligible': False, 'manifest_entry_id': entry['id']}
+    pooled = None
+    if options.get('chromium_descriptor'):
+        # Shared Chromium: task + chat browsers become fresh contexts in pooled
+        # Chromium servers instead of two private Chromium processes per episode.
+        from intent_browser.chromium_pool import PoolClient
+        import uuid
+        pooled = PoolClient.from_file(options['chromium_descriptor']).episode(
+            (entry['id'] + '/' + uuid.uuid4().hex[:8])[-128:])
     def capture_factory(factory):
+        if pooled is not None:
+            factory = pooled.wrap(factory)
         def make_env(video=None):
             holder['env'] = factory(video)
             return holder['env']
@@ -349,6 +359,11 @@ def execute_one(entry, options, directory):
     finally:
         if backend is not None:
             backend.close()
+        if pooled is not None:
+            try:
+                pooled.close()
+            except Exception as error:
+                row.setdefault('cleanup_errors', []).append('pool: ' + repr(error))
         if holder.get('bridge'):
             raw, server = holder['bridge']
             try:
@@ -390,6 +405,7 @@ def main():
     parser.add_argument('--max-input-tokens', type=int, default=150000)
     parser.add_argument('--providers', help='Existing OpenRouter provider slugs, comma separated')
     parser.add_argument('--no-fact-provenance', action='store_true')
+    parser.add_argument('--shared-chromium', action='store_true', help='one pooled Chromium for all episodes (fresh contexts per episode)')
     parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
     parser.add_argument('--reasoning-effort', default='medium')
     args = parser.parse_args()
@@ -422,7 +438,24 @@ def main():
          'concurrency': args.concurrency, 'sampling': {'temperature': 0.6, 'top_p': 0.95, 'top_k': 20},
          'reasoning': {'enabled': True}, 'max_output_tokens': 16384})
     rows = []
-    with ProcessPoolExecutor(max_workers=min(args.concurrency, len(entries)),
+    supervisor = None
+    if args.shared_chromium:
+        from intent_browser.chromium_pool import PoolSupervisor
+        leases = min(128, 2 * args.concurrency + 8)
+        supervisor = PoolSupervisor(output / 'chromium-pool', max_servers=4, max_leases=leases,
+                                    per_server=min(64, -(-leases // 4)))
+        supervisor.start()
+        options['chromium_descriptor'] = str(supervisor.descriptor_path)
+    try:
+        run_pool(args, entries, options, output, rows)
+    finally:
+        if supervisor is not None:
+            supervisor.close()
+    return rows
+
+
+def run_pool(args, entries, options, output, rows):
+    with ProcessPoolExecutor(max_workers=min(args.concurrency, len(entries)), max_tasks_per_child=1,
                              mp_context=multiprocessing.get_context('spawn')) as pool:
         futures = {pool.submit(run_one, e, options, str(output / f'episode-{i:04d}')): e
                    for i, e in enumerate(entries)}
