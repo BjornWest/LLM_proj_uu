@@ -92,6 +92,12 @@ class UserWindow:
                 page.goto('https://example.com/')
                 from apps.raven.shared_browser import raven_worker
                 worker = raven_worker(self.context)
+                # Native Windows CfT can expose the worker before its extension APIs are bound.
+                for attempt in range(40):
+                    if worker.evaluate("() => !!(globalThis.chrome && chrome.sidePanel)"):
+                        break
+                    time.sleep(0.25)
+                    worker = raven_worker(self.context)
                 worker.evaluate("port => chrome.sidePanel.setOptions({path:'sidepanel.html?port='+port})", self.port)
                 extension_origin = worker.url.rsplit('/', 1)[0]
                 welcome = next((p for p in self.context.pages if p.url.endswith('/welcome.html')), None)
