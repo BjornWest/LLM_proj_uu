@@ -330,7 +330,7 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
     profile = open_profile(standard_profile(helpers=False, data_tools=False))
     if cdp_url:
         profile = with_human_handover(profile, wait_for_human=False, compact_tabs=True,
-                                     stable_frames=True, capture_timeout_mode='bounded')
+                                     stable_frames=True, capture_timeout_mode='diagnostic')  # no capture deadline: slow pages wait instead of ending the episode
         profile = replace(profile, instructions=profile.instructions.replace(
             HUMAN_VERIFICATION_TEST_POLICY, HUMAN_VERIFICATION_WAIT_POLICY).replace(
             'Use handover_tab when human intervention is needed, then continue in another tab.',
