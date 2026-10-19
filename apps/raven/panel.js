@@ -33,7 +33,7 @@ window.addEventListener('DOMContentLoaded', () => {
     root.replaceChildren();
     for (const tab of tabs.values()) {
       const button = document.createElement('button');
-      if(tab.owner !== 'agent') continue;
+      if(mode.value === 'background_window' && tab.owner !== 'agent') continue;
       let site;try {site=new URL(tab.url);} catch {}
       button.textContent = site?.hostname.replace(/^www\./,'') || tab.title || 'New tab';
       if (site && ['http:','https:'].includes(site.protocol)) {
