@@ -118,7 +118,9 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('pagehide',()=>{
     generation++;stream?.close();stream=null;
     const id=run;run=null;
-    if(id)fetch('/api/tasks/'+id+'/cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',keepalive:true}).catch(()=>{});
+    if(id){const url='/api/tasks/'+id+'/cancel';
+      if(!navigator.sendBeacon?.(url,'{}'))fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',keepalive:true}).catch(()=>{});
+    }
   });
   fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs || [])tabs.set(t.tab_id,t);drawTabs();});
 });

@@ -149,6 +149,7 @@ class Run:
     condition: threading.Condition = field(default_factory=threading.Condition)
     done: bool = False
     cancelled: bool = False
+    subscribers: int = 0
     tabs: list = field(default_factory=list)
     targets: dict = field(default_factory=dict)
     controller: dict = field(default_factory=dict)
@@ -310,11 +311,13 @@ class Handler(preview.Handler):
             self.send_header('X-Accel-Buffering', 'no')
             self.end_headers()
             cursor = 0
+            with run.condition:
+                run.subscribers += 1
             try:
                 while True:
                     with run.condition:
                         if cursor == len(run.events) and not run.done:
-                            run.condition.wait(10)
+                            run.condition.wait(2)
                         pending = run.events[cursor:]
                         cursor = len(run.events)
                         done = run.done
@@ -327,6 +330,13 @@ class Handler(preview.Handler):
                         break
             except (BrokenPipeError, ConnectionResetError):
                 pass
+            finally:
+                with run.condition:
+                    run.subscribers -= 1
+                    if run.subscribers == 0 and not run.done and run.payload['mode'] == 'user_window':
+                        # Extension iframe teardown can drop unload fetch/beacon.
+                        # Its last SSE connection is the remaining lifecycle signal.
+                        service.cancel(run)
             self.close_connection = True
             return
         return super().do_GET()

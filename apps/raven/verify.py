@@ -185,6 +185,13 @@ def main():
             while not any(e['type']=='handover' for e in reload_run.events) and time.monotonic()<end:
                 time.sleep(.1)
             assert any(e['type']=='handover' for e in reload_run.events),reload_run.events
+            frame.locator('#handover').wait_for(state='visible',timeout=30000)
+            extra=urlopen(f'http://127.0.0.1:18766/api/tasks/{reload_run.run_id}/events')
+            assert extra.readline().startswith(b'data: ')
+            extra.close()
+            time.sleep(5)
+            assert not reload_run.done, 'Other SSE reader must not cancel the live panel'
+            results['multiple_sse_preserves_panel']=True
             panel.reload()
             wait_done(reload_run)
             assert reload_run.events[-1]=={'type':'done','stop_reason':'cancelled'}
