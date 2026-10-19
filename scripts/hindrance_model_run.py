@@ -283,8 +283,19 @@ def run_one(entry, options, directory):
     """One process owns the Runtime, Chromium, HTTP client and usage journal."""
     directory = Path(directory)
     directory.mkdir()
-    with (directory / 'runner.log').open('x') as log, redirect_stdout(log), redirect_stderr(log):
-        return execute_one(entry, options, directory)
+    import signal
+    def expired(signum, frame):
+        raise TimeoutError('Episode wall-clock limit reached (hung browser action or provider)')
+    if options.get('episode_timeout_seconds'):
+        # A Playwright call can hang forever (seen: a delivery-radio click stuck >1 h);
+        # end the episode as a recorded failure instead of blocking the round.
+        signal.signal(signal.SIGALRM, expired)
+        signal.alarm(int(options['episode_timeout_seconds']))
+    try:
+        with (directory / 'runner.log').open('x') as log, redirect_stdout(log), redirect_stderr(log):
+            return execute_one(entry, options, directory)
+    finally:
+        signal.alarm(0)
 
 
 def execute_one(entry, options, directory):
@@ -343,7 +354,7 @@ def execute_one(entry, options, directory):
                         site_discovery=episode.site_discovery, observation_pipeline='native',
                         automatic_grading=contract, retry_policy=None,
                         max_steps=options['max_steps'] or None, max_input_tokens=options['max_input_tokens'],
-                        max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), input_counter=holder.get('input_counter'),
+                        max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), action_timeout_ms=options.get('action_timeout_ms'), input_counter=holder.get('input_counter'),
                         trace_screenshots=False)
                 row['trace'] = str(trace)
                 grading_started = True
@@ -387,7 +398,7 @@ def execute_one(entry, options, directory):
                     harness_profile=prepared.episode.profile, site_discovery=prepared.episode.site_discovery,
                     observation_pipeline='native', automatic_grading=contract, retry_policy=None,
                     max_steps=options['max_steps'] or None, max_input_tokens=options['max_input_tokens'],
-                        max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), input_counter=holder.get('input_counter'),
+                        max_total_input_tokens=options.get('max_total_input_tokens'), max_total_output_tokens=options.get('max_total_output_tokens'), action_timeout_ms=options.get('action_timeout_ms'), input_counter=holder.get('input_counter'),
                     trace_screenshots=False)
             row['trace'] = str(trace)
             grading_started = True
@@ -457,6 +468,8 @@ def main():
     parser.add_argument('--context-keep-turns', type=int, default=0,
                         help='Opt in: retain browser evidence for N decisions; 0 preserves full history')
     parser.add_argument('--no-fact-provenance', action='store_true')
+    parser.add_argument('--episode-timeout-seconds', type=int, default=3600)
+    parser.add_argument('--action-timeout-ms', type=int, default=30000)
     parser.add_argument('--shared-tokenizer', action='store_true', help='one tokenizer service process for all episodes')
     parser.add_argument('--shared-chromium', action='store_true', help='one pooled Chromium for all episodes (fresh contexts per episode)')
     parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
@@ -482,6 +495,7 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     options = {'offline': args.offline, 'max_steps': args.max_steps,
                'bridge': args.bridge, 'reasoning_effort': args.reasoning_effort,
+               'episode_timeout_seconds': args.episode_timeout_seconds, 'action_timeout_ms': args.action_timeout_ms,
                'suite_id': 'hindrance/' + args.output.resolve().name, 'concurrency': args.concurrency,
                'suite_episodes': len(entries),
                'max_total_input_tokens': args.max_total_input_tokens, 'max_total_output_tokens': args.max_total_output_tokens,
