@@ -480,13 +480,36 @@ def _pair_size_price_step(generated, world, option, output):
                    f'{sek(truth["delivered_minor"])} at {b["retailer_name"]}.'}
 
 
+def _pair_remote_area_surcharge(generated, world, option, output):
+    a, b = option['a'], option['b']
+    gap = b['delivered_minor'] - a['delivered_minor']
+    surcharge = next((x for x in SURCHARGES if x > gap + 1000), None)
+    if surcharge is None:
+        raise Skip(f'total gap {sek(gap)} exceeds the largest realistic surcharge')
+    def mutate(value):
+        retailer = next(r for r in value['retailers'] if r['retailer_id'] == a['retailer_id'])
+        for contract in retailer['contracts']:
+            contract['home_delta_minor'] += surcharge
+    derived = derive_world(generated['world_dir'],
+        output/'worlds'/f'{generated["seed"]}-{generated["concept"]}--pair-remote_area_surcharge', mutate)
+    apparent, truth = _pair_trapped(generated, option, derived,
+                                    {'home_shipping_minor': a['home_shipping_minor'] + surcharge})
+    return {'trapped_world_dir': str(derived), 'true_winner': truth, 'apparent_winner': apparent,
+        'trapped_candidates': [apparent, truth], 'surcharge_minor': surcharge,
+        'witness': f'{a["retailer_name"]} lists the item at {sek(a["price_minor"])} (below {sek(b["price_minor"])}), but home delivery '
+                   f'costs {sek(apparent["home_shipping_minor"])} incl. a {sek(surcharge)} remote-area surcharge: '
+                   f'{sek(apparent["delivered_minor"])} delivered vs {sek(truth["delivered_minor"])} at {b["retailer_name"]}.'}
+
+
 # Runtime overlays -----------------------------------------------------------
 
 def scenario_for(recipe):
     """ScenarioRuntime settings and page pieces for a trapped recipe, or (None, None)."""
     answer, mechanism = recipe['answer'], recipe['mechanism']
     base, level = base_of(mechanism), level_of(mechanism)
-    if recipe['clean'] or base == 'stale_comparison' or base == 'size_price_step' and level == 'heavy':
+    # Tier 1.5 heavy surcharge changes only the delivery figure (no note anywhere).
+    pair_heavy = recipe['tier'] == PAIR_TIER and level == 'heavy'
+    if recipe['clean'] or base == 'stale_comparison' or (base == 'size_price_step' or pair_heavy) and level == 'heavy':
         return None, None
     apparent = answer['apparent_winner']
     presentation = {'execution': mechanism, 'offer_id': apparent['offer_id']}

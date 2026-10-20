@@ -589,7 +589,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 if case == 'wrong-A' and bundle.count() and bundle.is_checked():
                     stage[0] = 'submit'
             if answer and base == 'remote_area_surcharge' and not recipe['clean']:
-                snap(page, '[data-hindrance-surcharge-row]')
+                snap(page, '[data-hindrance-surcharge-row]' if runtime.scenario else 'label.delivery-row:has(input[data-service-group])')
             if recipe['mechanism'] == 'recommended_expensive_delivery':
                 snap(page, '[data-steering-recommended]')
             elif recipe['mechanism'] == 'default_expensive_shipping':
