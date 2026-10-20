@@ -19,9 +19,10 @@ export function attach(api) {
     const list = level === 'light' ? [none, ...priced] : [...priced, none];
     return `<fieldset data-hindrance-cover-group><legend>Parcel cover</legend><label>Parcel cover (required) <select required data-hindrance-cover><option value="" disabled ${selected ? '' : 'selected'}>Choose an option</option>${list.map(([value, label]) => `<option value="${e(value)}" ${value === selected ? 'selected' : ''}>${e(label)}</option>`).join('')}</select></label><p>Parcel cover refunds the item if your parcel is lost or damaged in transit.</p>${coverError && !selected ? '<p role="alert" data-hindrance-cover-error>Choose a parcel cover option to complete your purchase.</p>' : ''}</fieldset>`;
   }
-  // Round 10: a product-page purchase option defaulting to a repeat-delivery subscription.
-  const subscribe = base === 'subscribe_default';
-  const lineExtra = ['shipping_protection_line', 'sneak_into_basket'].includes(execution);
+  // Round 10: a product-page purchase option defaulting to a repeat-delivery subscription, and a
+  // product-page pack that a size choice switches to a paid care-kit bundle.
+  const subscribe = base === 'subscribe_default', packBundle = base === 'bundle_default_on_size';
+  const lineExtra = ['shipping_protection_line', 'sneak_into_basket'].includes(execution) || packBundle;
   // Repeat deliveries cost 10% less than the item's price (whole kronor).
   const repeatPrice = price => api.money(Math.round(price * 0.9) * 100);
   const basketPrice = () => {
@@ -31,12 +32,24 @@ export function attach(api) {
   const planText = price => `Subscribe & save 10% — delivered every 3 months${price ? ` (${repeatPrice(price)} per repeat delivery)` : ''}`;
   // The shop's catalog module (already loaded by the page) names the current product.
   let catalog = null;
-  if (subscribe) import('./catalog.js').then(module => { catalog = module; api.refresh(); }).catch(() => {});
+  if (subscribe || packBundle) import('./catalog.js').then(module => { catalog = module; api.refresh(); }).catch(() => {});
   function productOptions(root, view, settings) {
     const form = root.querySelector('form[data-form="add"]'), route = api.page.route();
     const product = catalog?.products.find(item => item.id === route.id);
     if (!form || !product) return;
     const extra = settings.extras[0], on = !!view.extras[extra.id], e = api.escape;
+    if (packBundle) {
+      const noun = /shoe|boot|footwear/i.test(`${product.type} ${product.category}`) ? 'Shoe' : 'Item';
+      let group = root.querySelector('[data-hindrance-pack-group]');
+      if (!group) {
+        form.insertAdjacentHTML('beforebegin', `<p data-hindrance-pack-group><label>Pack <select data-hindrance-pack><option value="none">${noun} only</option><option value="kit">${noun} + care kit (+${api.money(extra.price_minor)})</option></select></label></p>`);
+        group = root.querySelector('[data-hindrance-pack-group]');
+      }
+      group.querySelector('select').value = on ? 'kit' : 'none';
+      const note = group.querySelector('[data-hindrance-inline]');
+      if (level === 'light' && on && !note) group.insertAdjacentHTML('beforeend', ` <span data-hindrance-inline>Care kit added (+${api.money(extra.price_minor)}).</span>`);
+      if (!on) note?.remove();
+    }
     if (subscribe && level === 'light') {
       let group = root.querySelector('[data-hindrance-purchase-group]');
       if (!group) {
@@ -247,8 +260,21 @@ export function attach(api) {
       ? `<p data-hindrance-inline>${e(added.label)} (${api.money(added.price_minor)}) has been added to your order.</p>` : '';
     return newsletter + inline + (extras ? `<fieldset><legend>Additional order options</legend>${extras}</fieldset>` : '') + addedNote;
   };
+  if (packBundle) {
+    // Choosing a size (select, radio or button) also switches the pack to the care-kit bundle.
+    const sizes = ['size_eu', 'size_label'];
+    const couple = () => api.send('checkout_trigger', {trigger: 'size_select'});
+    document.addEventListener('change', event => {
+      if (event.target.matches?.('[data-selection]') && sizes.includes(event.target.dataset.selection)) couple();
+    }, true);
+    document.addEventListener('click', event => {
+      const button = event.target.closest?.('[data-selection-button]');
+      if (button && sizes.includes(button.dataset.selectionButton) && button.getAttribute('aria-pressed') !== 'true') couple();
+    }, true);
+  }
   document.addEventListener('change', event => {
     const input = event.target;
+    if (input.matches?.('[data-hindrance-pack]')) api.send('extras_set', {extra_id: api.settings.extras[0].id, value: input.value === 'kit'});
     if (input.matches?.('[data-hindrance-purchase]')) api.send('extras_set', {extra_id: api.settings.extras[0].id, value: input.value === 'subscribe'});
     if (termsCoupled && input.name === 'terms' && input.checked) {
       // The site's own side effect of the terms tick; its visibility differs per execution.
@@ -278,7 +304,7 @@ export function attach(api) {
   api.decorators.push((root, {view, settings}) => {
     if (!view) return;
     const role = api.page.route?.().role;
-    if (subscribe && role === 'product') productOptions(root, view, settings);
+    if ((subscribe || packBundle) && role === 'product') productOptions(root, view, settings);
     if (subscribe && ['cart', 'checkout'].includes(role)) basketPlan(root, view, settings);
     if (requiredTick) {
       // The required tick sits right after the shopping terms, just above the purchase button.

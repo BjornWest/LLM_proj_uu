@@ -30,6 +30,8 @@ COUPLED_TRIGGERS = {
     **dict.fromkeys(('paid_addon_with_terms', 'paid_addon_with_terms_inline'), ('terms', 'extras')),
     **dict.fromkeys(('optin_with_delivery_conditions', 'optin_with_delivery_conditions_inline'),
                     ('delivery_conditions', 'newsletter')),
+    # Round 10: choosing a size on the product page switches the pack to the paid care-kit bundle.
+    **dict.fromkeys(('bundle_default_on_size_light', 'bundle_default_on_size_heavy'), ('size_select', 'extras')),
 }
 _SESSION = re.compile(r'[0-9a-f-]{8,64}')
 
