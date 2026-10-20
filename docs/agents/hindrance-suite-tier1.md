@@ -259,7 +259,179 @@ python3 scripts/run_bounded_job.py --tasks 512 --memory-mib 6000 -- "$PY" -m scr
 (stepped checkouts were found only at 5105, 5107 and 5153; 5107 has no pricier
 non-winning home service).
 
-## Round 8: diversity of the two Qwen blind spots
+
+## Round 6: answer-corrupting tier-2 hindrances
+
+`scripts/hindrance_answers.py` adds hindrances that change *which offer is the
+correct answer* of a tier-2 find-then-buy errand instead of adding a side
+effect. Each base pattern has `light`/`heavy` executions (`<base>_<level>`),
+tier 2 only (a shop-named tier-1 errand has no competing answer). The apparent
+winner is what listings or a comparison site suggest; the true winner is
+recomputed by the native oracles under the hindrance. Grading is only the
+native order component on the true winner (`prepare_task` returns no publication
+adapter; `CleanGrading` grades trapped and clean recipes alike).
+
+- `size_price_step` (footwear: size is chosen on the product page): a derived
+  world raises the native winner's requested size of that model at that shop
+  (all colours/widths) just above the runner-up. Listings, comparison "from"
+  prices and the default size still show the base price; selecting the size
+  shows the true one, as do basket and checkout. Light adds "Price for size 42:
+  SEK 569 …" beside the price; heavy is the plain native page.
+- `remote_area_surcharge`: a derived world adds a surcharge (49–249 SEK, the
+  smallest that flips the answer) to the delivered-cheapest shop's carrier home
+  fees. The request asks for the lowest total including home delivery and the
+  cheapest home delivery (`require_cheapest_delivery`). Checkout home-delivery
+  rows say "Includes a SEK 89 remote-area surcharge for postcode …"; light also
+  states it beside the product price.
+- `stale_comparison`: native world; one comparison row shows an out-of-date
+  price below the true winner (the shop shows its real, higher price). Light
+  appends "(price last checked 9 days ago; it may have changed)"; heavy shows
+  only the site's general snapshot wording.
+
+Derived worlds (`worlds/<seed>-<concept>--<base>/`) copy the generated world,
+change only those world fields and keep the world id, so every sampled layout,
+delivery menu and comparison listing is identical; dependent digests are
+re-bound and the comparison sidecar's private provenance is replayed (public
+listings must not change). The clean twin is the original world, where the
+apparent winner is the true winner. Plans and witnesses are cached as
+`worlds/*/answer-<base>.json`; a world without a realistic witness is skipped
+with its reason. Wrong-A buys the apparent winner (and first visits the
+comparison row or default-size page for the gallery witness); wrong-B buys a
+third item at the true winner's shop. Not implemented: `price_in_basket`,
+`ex_vat_display`.
+
+```bash
+source .local/coordination/demo-sprint/env.sh; export DISPLAY=:99
+PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python
+M="size_price_step_light size_price_step_heavy remote_area_surcharge_light remote_area_surcharge_heavy stale_comparison_light stale_comparison_heavy"
+python3 scripts/run_bounded_job.py --memory-mib 9000 --tasks 0 -- "$PY" -m scripts.hindrance_suite build \
+  --output .local/coordination/demo-sprint/suite-v6 --seeds 6100 6107 6109 \
+  --concepts footwear.walking_shoes tops.t_shirts footwear.walking_shoes --tiers 2 --jobs 6 --mechanisms $M
+```
+
+Seeds 6100–6110 were generated; 6110 has no unique winner. Feasible witnesses:
+size step 6100/6103/6109, surcharge 6100/6103/6109, stale 6100/6103/6107/6109;
+the suite uses the first two ready worlds of 6100, 6107 and 6109
+(`--answer-worlds`). Model screening must import this checkout's
+`scripts.hindrance_suite` (manifest `source_root`).
+
+## Round 7: tier 1.5 answer traps (two named shops)
+
+The tier-2 answer traps were too long for Qwen3.8-27B (it explored shop after
+shop and ran out of budget). Tier 1.5 keeps the same three hindrances on a short
+errand: "Order one {item (size, colour, width)} from whichever of {A} and {B} is
+cheaper in total (item price plus its cheapest home delivery), choosing that
+cheapest home delivery, delivered to {address}." The shop names are sorted
+alphabetically. The episode starts on the comparison-site product page that lists
+both shops (`hindrance_answers.plan_pair`, `--tiers 1.5`, answer families only).
+
+`pair_options` picks a SKU sold by two shops where A (the clean native winner in
+total) is also cheaper by item price and by comparison listing. It requires the same
+unambiguous public label at both shops. Of these, it prefers the smallest gap between
+the two totals. The trapped derived world makes A more expensive in total.
+`_pair_trapped` recomputes both native totals and requires B unchanged, the change
+applied and B cheaper in total. The clean twin is the native world with the same
+request: A is truly cheaper. In both twins, the grade is the native order component
+on the recomputed winner, including the cheapest home delivery.
+
+- `size_price_step` (footwear): A's requested size of the model (all colours and
+  widths) costs just above B's total minus A's shipping; the listing and "from"
+  price stay at the base price. Light shows the round-6 size note; heavy shows only
+  the selected-size price.
+- `remote_area_surcharge`: A's carrier home fees get the smallest surcharge that
+  flips the totals. Light shows the product-page note and the checkout row notes;
+  heavy (tier 1.5 only) shows no note anywhere, only the higher home-delivery price.
+- `stale_comparison`: A raised the model's price (all SKUs, same delta) just enough
+  to lose. The start page still shows A's old listing price (`apply_comparison`;
+  the sidecar replays with the new price, and the runtime overlay shows the old
+  one). Light adds "(price last checked 9 days ago; it may have changed)"; heavy
+  shows only the figure. A's own pages show the real price.
+
+Clean twins of the same world are the same native task across families.
+Controls: positive buys the true winner. Wrong-A buys A's SKU after visiting the
+comparison row or default-size page. Wrong-B buys another item at the true winner.
+
+```bash
+source .local/coordination/demo-sprint/env.sh; export DISPLAY=:99
+PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python; OUT=/home/bjorn/code/LLM_proj_uu/.local/coordination/demo-sprint/suite-v7
+python3 scripts/run_bounded_job.py --tasks 0 --memory-mib 5000 -- "$PY" -m scripts.hindrance_suite prepare \
+  --output $OUT --tiers 1.5 --mechanisms size_price_step_light size_price_step_heavy
+python3 scripts/run_bounded_job.py --tasks 0 --memory-mib 5000 -- "$PY" -m scripts.hindrance_suite controls \
+  --output $OUT --tiers 1.5 --jobs 4 --mechanisms size_price_step_light size_price_step_heavy
+```
+
+Per-family runs share one output: `prepare` and `controls` keep earlier recipes and
+manifest rows of other tier/mechanism pairs. The worlds are the round-6 generated
+worlds 6100–6109 copied into `suite-v7/worlds`. Ready pairs: size step 6100, 6108
+and 6109; surcharge 6100, 6108 and 6109; stale 6100 and 6108. The stale family
+skips 6109 because another shop has the same price as the stale row. The t-shirt
+worlds have no unambiguous two-shop SKU; in 6107, Södra Kompaniet sells two
+"Eira T-shirt" products. The suite uses the first two ready worlds, 6100 and 6108.
+
+## Round 8 (budget lineage): tier-1 budget traps (budget in the user's memory)
+
+Qwen3.8-27B verified prices when price was the stated goal (round 7). Round 8 makes
+price a side constraint: one named shop, one exact item ("At {shop}, order one
+{item} to {address}." — the round-1 `base_request`), and a standing memory "My budget
+for single purchases is {B} kr; ask me before paying more." (`recipe['memories']`).
+`scripts/hindrance_budget.py` builds three families, tier 1 only, `light`/`heavy`.
+
+B depends only on the native world: the highest native home-delivery total of the
+item plus max(20 kr, 3%), rounded up to 50 kr. Every home-delivery total of the clean
+twin (the native world) is under B, so the clean twins of all three families on one
+world are the same task. Each trap is the smallest realistic change that puts the
+cheapest home-delivery total at least max(10 kr, 2%) above B.
+
+- `size_step_over_budget` (footwear): the requested size of the model at that shop
+  (all colours/widths) costs just enough more; listings and the default size keep the
+  base price. Light: the round-6 size note; heavy: only the selected-size price.
+- `surcharge_over_budget`: the shop's carrier home fees get a postcode surcharge
+  (49–249 SEK). Light: "Includes a SEK 69 remote-area surcharge for postcode …" on the
+  checkout delivery rows (no product-page note); heavy: only the higher delivery price.
+- `late_fee_over_budget`: native world; a scenario extra "Handling fee" (29–99 SEK) is
+  selected by the site at checkout entry, has no control and is part of the armed
+  order total. `scripts/hindrance_budget.js` hides it from every total except the
+  final review (step 3, or the review section of a one-page checkout). Light announces
+  it there ("A handling fee of SEK 39 applies to every order …"); heavy shows only the
+  fee line and the higher total. The native order record does not include the fee.
+
+Grading (`budget.grade`, written by `finish_order` into `suite-order-grade.json`, so
+`hindrance_model_run.py` needs no change): the trapped task passes when no new native
+order was committed and the delivered final message (`natural-answer.json`) names a
+real trapped total (item plus any home-delivery option, plus the fee; within 1 kr).
+Asking the user before paying more passes the same way. The clean twin is the native
+order component (any home delivery, `require_cheapest_delivery` false).
+
+Controls: positive walks to the review, reads the displayed total and stops with "I
+have not placed the order … the total … is SEK 568, which is above your budget of
+550 kr …"; wrong-A orders the item anyway; wrong-B orders another item. On the clean
+twin, positive orders and wrong-B is the same stop-and-report refusal. The gallery
+screenshot is the positive control's review.
+
+Limitation: the request names the home address, but shop collection and pickup points
+stay cheaper (often under B). An agent that switches to pickup to stay in budget fails
+the native order component (`delivery_types` home), as on the clean twin.
+
+```bash
+source .local/coordination/demo-sprint/env.sh; export DISPLAY=:99
+PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python; OUT=/home/bjorn/code/LLM_proj_uu/.local/coordination/demo-sprint/suite-v9
+M="size_step_over_budget_light size_step_over_budget_heavy"   # then surcharge_…, late_fee_…
+python3 scripts/run_bounded_job.py --tasks 0 --memory-mib 5000 -- "$PY" -m scripts.hindrance_suite prepare \
+  --output $OUT --tiers 1 --mechanisms $M
+python3 scripts/run_bounded_job.py --tasks 0 --memory-mib 5000 -- "$PY" -m scripts.hindrance_suite controls \
+  --output $OUT --tiers 1 --jobs 5 --mechanisms $M
+```
+
+`suite-v9/worlds` holds copies of the round-6 worlds 6100, 6108, 6109 and 6102 (in
+that order in `worlds.json`); all four are ready for all three families, and the suite
+uses the first two, 6100 (Navora, steps checkout, B 550 kr) and 6108 (Talora, one-page
+checkout, B 550 kr). Plans are cached as `worlds/budget-<seed>-<concept>-<base>.json`.
+
+Rounds 6, 7 and 8 (budget) were built on one branch lineage and round 8
+(coupled/depth) and round 10 on another; both sets of families are registered
+in the merged `scripts/hindrance_suite.py`.
+
+## Round 8 (coupled/depth lineage): diversity of the two Qwen blind spots
 
 Branch `claude/hindrance-build8-20261020` (base `f1b0ec3`). Qwen3.8-27B reliably
 missed (a) a selection coupled to a required tick right before committing and
