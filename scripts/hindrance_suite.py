@@ -610,7 +610,9 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     keys = {v['key']: v['offerId'] for p in catalog['products'] for v in p['variants']}
     variant_keys = {v['offerId']: v['key'] for p in catalog['products'] for v in p['variants']}
     level = recipe['mechanism'].rsplit('_', 1)[-1]
-    substitute = runtime.scenario['presentation'].get('substitute_offer_id') if not recipe['clean'] else None
+    # Only substitution recipes name a substitute; answer/budget traps may run without a scenario.
+    substitute = (runtime.scenario['presentation'].get('substitute_offer_id')
+                  if recipe['mechanism'] in SUBSTITUTION and not recipe['clean'] and runtime.scenario else None)
     options = {}
     def option_for(offer):
         # The native home option of the offer actually in the basket (a substitution changes it).
@@ -1320,8 +1322,10 @@ def main():
     parser.add_argument('--tiers',nargs='+',type=tier_of,default=[1])
     parser.add_argument('--jobs',type=int,default=2)
     parser.add_argument('--worlds-per-mechanism',type=int,default=0,
-        help='Build each mechanism on at most this many suitable worlds (0: all)')
-    parser.add_argument('--answer-worlds',type=int,default=2,help='ready worlds per answer-corrupting execution')
+        help='Build each native-family mechanism on at most this many suitable worlds (0: all); '
+             'answer and budget families ignore it and use --answer-worlds')
+    parser.add_argument('--answer-worlds',type=int,default=2,
+        help='ready worlds per answer-corrupting or budget execution (not limited by --worlds-per-mechanism)')
     args = parser.parse_args()
     args.output = args.output.resolve()
     if args.command in ('generate','build'):generate(args)
