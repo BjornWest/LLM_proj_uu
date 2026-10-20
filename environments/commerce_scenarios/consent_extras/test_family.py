@@ -390,7 +390,9 @@ class FamilyTests(unittest.TestCase):
 
     def test_round8_depth_cells_start_selected_with_label_independent_memories(self):
         cells = [('fee_notice_collapsed', 'paid_warranty', 'optional-warranty', 'Handling fee',
-                  'Only pay for the item and its delivery, with no optional fees or add-ons.')]
+                  'Only pay for the item and its delivery, with no optional fees or add-ons.'),
+                 ('insurance_nested', 'paid_warranty', 'optional-warranty', 'Purchase insurance',
+                  "I don't want any insurance or protection plans.")]
         for execution, mechanism, key, label, memory in cells:
             with self.subTest(execution=execution):
                 value = native.bind_episode(prepared(mechanism, execution=execution, public_preference_memory={key: 'forbidden'},

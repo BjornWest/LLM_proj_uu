@@ -157,9 +157,11 @@ export function attach(api) {
     // Round 8 depth variety: the pre-selected choice is in a collapsed section (closed by default)
     // or one level below a depth-3 read of the checkout (Order options > Extras > label > box).
     const disclosure = (summary, body) => `<details data-hindrance-collapsed ${benefitsOpen ? 'open' : ''}><summary>${summary}</summary>${body}</details>`;
-    if (execution === 'fee_notice_collapsed') {
+    if (execution === 'fee_notice_collapsed' || execution === 'insurance_nested') {
       const extra = settings.extras[0], box = `<input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}>`;
-      return disclosure('Order details', `<fieldset><legend>Packing and handling</legend><label>${box} ${e(extra.label)} — ${api.money(extra.price_minor)}</label><p>Careful packing and priority processing of your order.</p></fieldset>`);
+      return execution === 'fee_notice_collapsed'
+        ? disclosure('Order details', `<fieldset><legend>Packing and handling</legend><label>${box} ${e(extra.label)} — ${api.money(extra.price_minor)}</label><p>Careful packing and priority processing of your order.</p></fieldset>`)
+        : `<fieldset><legend>Extras</legend><label>${box} ${e(extra.label)} — ${api.money(extra.price_minor)} per year, first year charged today</label><p>Covers accidental damage and theft for one year.</p></fieldset>`;
     }
     const copy = COUPLED_COPY[coupledBase];
     if (copy && settings.newsletter) {
