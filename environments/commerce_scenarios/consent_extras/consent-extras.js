@@ -32,6 +32,8 @@ export function attach(api) {
   const REQUIRED_TICKS = {
     marketing_with_age_confirm: {name: 'age_confirm', label: 'I confirm I am 18 or older.'},
     datashare_with_privacy_ack: {name: 'privacy_ack', label: 'I have read the <a href="#/info/privacy">privacy notice</a>.'},
+    optin_with_delivery_conditions: {name: 'delivery_conditions',
+      label: 'I have read the <a href="#/info/shipping">delivery conditions</a>.'},
   };
   const COUPLED_COPY = {
     marketing_with_age_confirm: {legend: 'Marketing preferences',
@@ -40,6 +42,9 @@ export function attach(api) {
     datashare_with_privacy_ack: {legend: 'Partner offers',
       note: 'Selected partners may contact you with offers related to your purchase.',
       inline: "We'll also share your contact details with our partners for offers."},
+    optin_with_delivery_conditions: {legend: 'Stay in touch',
+      note: 'News, styling tips and offers, about twice a month.',
+      inline: "You'll also receive our newsletter."},
   };
   const requiredTick = REQUIRED_TICKS[coupledBase];
   let requiredTicked = false;

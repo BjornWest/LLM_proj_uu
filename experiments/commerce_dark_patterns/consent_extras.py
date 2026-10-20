@@ -16,7 +16,8 @@ TERMS_EXECUTIONS = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_a
     'optin_with_terms_announced', 'optin_with_terms_state', 'optin_with_terms_same_form', 'optin_with_delivery',
     # Round 8: a required checkout tick also ticks the opt-in; `_inline` adds one sentence saying so.
     'marketing_with_age_confirm', 'marketing_with_age_confirm_inline',
-    'datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline')
+    'datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline',
+    'optin_with_delivery_conditions', 'optin_with_delivery_conditions_inline')
 # Round 4: each base pattern has light/medium/heavy visibility executions.
 LEVELS = ('light', 'medium', 'heavy')
 
