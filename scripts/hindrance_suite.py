@@ -251,6 +251,10 @@ def prepare_answer(args, generated, tier, mechanism, task_id, directory, tasks, 
         return
     used.append(generated['seed'])
     message = generated['tier2_request']
+    if base == 'remote_area_surcharge':
+        message = (message.replace('Order the cheapest in-stock ', 'Order the in-stock ', 1)
+                   .replace(' delivered to ', ' that costs least in total, including home delivery, to ', 1)
+                   + ' Choose the cheapest home delivery.')
     instance_path = directory/'instance.json'
     save(instance_path, {'family': 'answer_hindrance', 'mechanism': mechanism, 'plan': plan, 'memories': []})
     for clean in (False, True):
@@ -266,7 +270,7 @@ def prepare_answer(args, generated, tier, mechanism, task_id, directory, tasks, 
             'answer': plan,
             'order_spec': {**generated['order_spec'], 'retailer_id': winner['retailer_id'],
                 'offer_id': winner['offer_id'], 'public_request': message,
-                'require_cheapest_delivery': False},
+                'require_cheapest_delivery': base == 'remote_area_surcharge'},
             'runner': 'scripts.hindrance_suite.run_control',
             'prepare_callable': 'scripts.hindrance_suite.prepare_task',
             'grading_scope': 'native simulated-order order component against the recomputed true winner; '
@@ -468,6 +472,8 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 'total': page.locator('[data-scenario-part=totals]').all_inner_texts(),
                 'amount': page.locator('[data-product-part=buying] .amount').all_inner_texts(),
                 'size_note': page.locator('[data-hindrance-size-note]').all_inner_texts(),
+                'surcharge_note': page.locator('[data-hindrance-surcharge-note]').all_inner_texts(),
+                'surcharge_rows': page.locator('label.delivery-row:has([data-hindrance-surcharge-row])').all_inner_texts(),
                 'answer': recipe['answer']['witness'] if answer else None}
             save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
@@ -509,6 +515,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             if answer and not recipe['clean'] and 'selected_amount' not in observed and form.get_attribute('data-key') == variant['key']:
                 observed['selected_amount'] = page.locator('[data-product-part=buying] .amount').all_inner_texts()
                 observed['selected_size_note'] = page.locator('[data-hindrance-size-note]').all_inner_texts()
+                observed['product_surcharge_note'] = page.locator('[data-hindrance-surcharge-note]').all_inner_texts()
             for key,value in variant['selection'].items():
                 select = page.locator('select[data-selection='+json.dumps(key)+']')
                 if select.count() and select.input_value() != value:
@@ -556,6 +563,8 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                     return act(page.locator('[data-scenario-plain-delivery] input'))
                 if case == 'wrong-A' and bundle.count() and bundle.is_checked():
                     stage[0] = 'submit'
+            if answer and base == 'remote_area_surcharge' and not recipe['clean']:
+                snap(page, '[data-hindrance-surcharge-row]')
             if recipe['mechanism'] == 'recommended_expensive_delivery':
                 snap(page, '[data-steering-recommended]')
             elif recipe['mechanism'] == 'default_expensive_shipping':
@@ -877,7 +886,7 @@ def gallery(output, manifest):
         witness = read(witness_path) if witness_path.is_file() else {}
         # Text the screenshot cannot show (closed select options, disclosure contents, notices).
         keys = ('controls', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines',
-                'answer', 'amount', 'size_note')
+                'answer', 'amount', 'size_note', 'surcharge_note', 'surcharge_rows')
         shown = {k: witness[k] for k in keys if witness.get(k) and any(witness[k])}
         observed = {**witness.get('before', {}), **witness.get('after', {})}
         sections.append('<article><h2>'+html.escape(task['mechanism'])+' · tier '+str(task['tier'])+' · '+str(task['seed'])+'</h2><p>'+

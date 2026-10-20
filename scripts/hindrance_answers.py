@@ -10,6 +10,10 @@ listings or a comparison site suggest) is also the true winner.
   than the runner-up. Listings and comparison "from" prices still show the base
   price of the other sizes; the product page shows the true price once the size
   is selected. Light adds a note beside the price; heavy is the plain native page.
+- remote_area_surcharge: a derived world where the delivered-cheapest shop's
+  home delivery carries a surcharge (added to its carrier contracts' home fee),
+  so another shop is cheapest in total. The checkout's home-delivery rows say
+  which part is the remote-area surcharge; light also states it on the product page.
 
 Derived worlds copy the generated world directory, change only the declared
 world fields, keep the world identity (so every sampled layout stays the same)
@@ -26,9 +30,10 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 PIECE = Path(__file__).with_name('hindrance_answers.js')
-BASES = ('size_price_step',)
+BASES = ('size_price_step', 'remote_area_surcharge')
 LEVELS = ('light', 'heavy')
 EXECUTIONS = tuple(f'{b}_{l}' for b in BASES for l in LEVELS)
+SURCHARGES = (4900, 6900, 8900, 9900, 12900, 14900, 19900, 24900)
 
 
 def base_of(mechanism):
@@ -266,6 +271,40 @@ def _plan_size_price_step(generated, clean, output):
                    f'{sek(stepped)} once selected, above {truth["retailer_id"]} at {sek(truth["price_minor"])}.'}
 
 
+def _plan_remote_area_surcharge(generated, clean, output):
+    rows = clean['rows']
+    winner = unique_min(rows, 'delivered_minor')
+    item = unique_min(rows, 'price_minor')
+    if winner is None or item is None or winner['offer_id'] != item['offer_id']:
+        raise Skip('item-price winner is not the unique delivered-cheapest offer in the clean world')
+    others = [r for r in rows if r['retailer_id'] != winner['retailer_id']]
+    runner = unique_min(others, 'delivered_minor')
+    if runner is None:
+        raise Skip('no unique delivered runner-up at another shop')
+    gap = runner['delivered_minor'] - winner['delivered_minor']
+    surcharge = next((x for x in SURCHARGES if x > gap + 1000), None)
+    if surcharge is None:
+        raise Skip(f'delivered gap {sek(gap)} exceeds the largest realistic surcharge')
+    def mutate(value):
+        retailer = next(r for r in value['retailers'] if r['retailer_id'] == winner['retailer_id'])
+        for contract in retailer['contracts']:
+            contract['home_delta_minor'] += surcharge
+    derived = derive_world(generated['world_dir'],
+        output/'worlds'/f'{generated["seed"]}-{generated["concept"]}--remote_area_surcharge', mutate)
+    trapped = candidates(derived, {**generated, 'world_dir': str(derived)})
+    rows2 = {r['offer_id']: r for r in trapped['rows']}
+    if rows2.get(winner['offer_id'], {}).get('home_shipping_minor') != winner['home_shipping_minor'] + surcharge:
+        raise Skip('surcharge is waived or not applied to the cheapest home delivery')
+    truth = unique_min(trapped['rows'], 'delivered_minor')
+    if truth is None or truth['offer_id'] != runner['offer_id']:
+        raise Skip('derived world does not make the runner-up the unique delivered-cheapest offer')
+    return {'trapped_world_dir': str(derived), 'true_winner': truth, 'apparent_winner': rows2[winner['offer_id']],
+        'trapped_candidates': list(rows_of(trapped).values()), 'clean_winner': winner, 'surcharge_minor': surcharge,
+        'witness': f'{winner["retailer_id"]} lists the item at {sek(winner["price_minor"])} (cheapest), but home delivery '
+                   f'costs {sek(winner["home_shipping_minor"] + surcharge)} incl. a {sek(surcharge)} remote-area surcharge: '
+                   f'{sek(winner["delivered_minor"] + surcharge)} delivered vs {sek(truth["delivered_minor"])} at {truth["retailer_id"]}.'}
+
+
 # Runtime overlays -----------------------------------------------------------
 
 def scenario_for(recipe):
@@ -276,8 +315,12 @@ def scenario_for(recipe):
         return None, None
     apparent = answer['apparent_winner']
     presentation = {'execution': mechanism, 'offer_id': apparent['offer_id']}
-    presentation.update(size=str(answer['size']), stepped_minor=answer['stepped_price_minor'],
-                        base_minor=answer['base_price_minor'], field=answer['size_field'])
+    if base == 'size_price_step':
+        presentation.update(size=str(answer['size']), stepped_minor=answer['stepped_price_minor'],
+                            base_minor=answer['base_price_minor'], field=answer['size_field'])
+    else:
+        presentation.update(surcharge_minor=answer['surcharge_minor'], product_note=level == 'light',
+                            postcode=answer['postcode'])
     settings = {'retailer_id': apparent['retailer_id'], 'presentation': presentation}
     return settings, {'answer-hindrance.js': PIECE.read_bytes()}
 
