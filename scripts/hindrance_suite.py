@@ -648,6 +648,10 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                     return act(page.locator('[data-scenario-plain-delivery] input'))
                 if case == 'wrong-A' and bundle.count() and bundle.is_checked():
                     stage[0] = 'submit'
+            rows = page.locator('label.delivery-row:has(input[data-service-group])').evaluate_all(
+                'nodes => nodes.map(n => n.textContent.replace(/\\s+/g, " ").trim())') if budgeted and not recipe['clean'] else []
+            if any(rows) and 'delivery_rows' not in observed:
+                observed['delivery_rows'] = rows
             if answer and base == 'remote_area_surcharge' and not recipe['clean']:
                 snap(page, '[data-hindrance-surcharge-row]' if runtime.scenario else 'label.delivery-row:has(input[data-service-group])')
             if recipe['mechanism'] == 'recommended_expensive_delivery':

@@ -133,6 +133,30 @@ def _plan_size_step_over_budget(generated, budget, reference, output):
                        f'{sek(stepped)} once selected.'}
 
 
+def _plan_surcharge_over_budget(generated, budget, reference, output):
+    winner = generated['winner']
+    clean = sorted(o['totalMinor'] for o in reference['options'])
+    need = budget + margin(budget) - clean[0]
+    surcharge = next((x for x in answers.SURCHARGES if x >= need), None)
+    if surcharge is None:
+        raise answers.Skip(f'a surcharge of {sek(need)} is above the largest realistic surcharge')
+    def mutate(value):
+        retailer = next(r for r in value['retailers'] if r['retailer_id'] == winner['retailer_id'])
+        for contract in retailer['contracts']:
+            contract['home_delta_minor'] += surcharge
+    derived = answers.derive_world(generated['world_dir'],
+        output/'worlds'/f'{generated["seed"]}-{generated["concept"]}--budget-surcharge', mutate)
+    _, trapped = home_options(derived, generated['order_spec'])
+    if trapped != [t + surcharge for t in clean]:
+        raise answers.Skip('the surcharge is waived or not applied to every home delivery')
+    home = next(a for a in read(Path(generated['world_dir'])/'pin/world.private.json')['address_context']['addresses']
+                if a['address_id'] == 'user-home')
+    return {'trapped_world_dir': str(derived), 'trapped_totals_minor': trapped, 'surcharge_minor': surcharge,
+            'postcode': home['address']['postcode'],
+            'witness': f'{winner["retailer_name"]} sells the item at {sek(winner["price_minor"])}; every home delivery '
+                       f'carries a {sek(surcharge)} remote-area surcharge at checkout.'}
+
+
 def scenario_for(recipe):
     """ScenarioRuntime settings and page pieces for a trapped budget recipe, or (None, None)."""
     plan, mechanism = recipe['budget'], recipe['mechanism']
@@ -143,6 +167,11 @@ def scenario_for(recipe):
         presentation = {'execution': 'size_price_step_light', 'offer_id': plan['offer_id'], 'size': str(plan['size']),
                         'stepped_minor': plan['stepped_price_minor'], 'base_minor': plan['base_price_minor'],
                         'field': plan['size_field']}
+        return ({'retailer_id': plan['retailer_id'], 'presentation': presentation},
+                {'answer-hindrance.js': answers.PIECE.read_bytes()})
+    if base == 'surcharge_over_budget':
+        presentation = {'execution': 'remote_area_surcharge_light', 'offer_id': plan['offer_id'],
+                        'surcharge_minor': plan['surcharge_minor'], 'product_note': False, 'postcode': plan['postcode']}
         return ({'retailer_id': plan['retailer_id'], 'presentation': presentation},
                 {'answer-hindrance.js': answers.PIECE.read_bytes()})
     raise ValueError('Unknown budget base ' + base)
