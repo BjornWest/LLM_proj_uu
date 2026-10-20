@@ -6,7 +6,7 @@ browser policy through an HTTP mock; it makes no provider requests.
 import argparse
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from hashlib import sha256
 import json
 import multiprocessing
@@ -32,6 +32,20 @@ def require_finalized(summary):
 
 def read(path):
     return json.loads(Path(path).read_text())
+
+
+def json_object(response):
+    """A response body as a dict; a non-JSON or non-object body (e.g. an error list) is {}."""
+    try:
+        value = response.json()
+    except ValueError:
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def retryable_status(status):
+    """Rate limiting and every server error (5xx) are endpoint conditions, not request rejections."""
+    return status == 429 or status is not None and 500 <= status <= 599
 
 
 def save(path, value):
@@ -248,10 +262,7 @@ def backend_for(options, directory, records, holder, policy=None):
             timeout=260, max_tokens=16384, supports_images=True)
         def received_bridge(response):
             response.read()
-            try:
-                value = response.json()
-            except ValueError:
-                value = {}
+            value = json_object(response)
             record = {'http_status': response.status_code, 'model': model, 'provider': 'codex-subscription',
                       'usage': value.get('usage')}
             records.append(record)
@@ -270,7 +281,12 @@ def backend_for(options, directory, records, holder, policy=None):
                 try:
                     return original_complete(messages)
                 except BackendResponseError as error:
-                    if getattr(error, 'http_status', None) not in (429, 500, 502, 503, 504) or attempt == 5:
+                    if not retryable_status(getattr(error, 'http_status', None)):
+                        raise
+                    if attempt == 5:
+                        # Exhausted retries: a bridge/provider outage, not a model verdict.
+                        holder['infrastructure_error'] = (f'Codex bridge failed {attempt + 1} attempts: '
+                                                          f'HTTP {error.http_status}: {error}')
                         raise
                     with (directory / 'bridge-retries.jsonl').open('a') as stream:
                         stream.write(json.dumps({'attempt': attempt + 1, 'status': error.http_status,
@@ -290,10 +306,7 @@ def backend_for(options, directory, records, holder, policy=None):
     backend.sampling = {'temperature': 0.6}
     def received(response):
         response.read()
-        try:
-            value = response.json()
-        except ValueError:
-            value = {}
+        value = json_object(response)
         record = {'http_status': response.status_code, 'response_id': value.get('id'),
                   'model': value.get('model'), 'provider': value.get('provider'), 'usage': value.get('usage')}
         records.append(record)
@@ -307,13 +320,17 @@ class SelfHostedEndpointUnavailable(RuntimeError):
     """The self-hosted endpoint stayed unreachable: an infrastructure failure, never a task verdict."""
 
 
+MIN_RETRY_ATTEMPT_SECONDS = 5  # A retry needs at least this much of the retry budget left.
+
+
 def self_hosted_backend(options, directory, records, holder):
     """Same Qwen sampling against an OpenAI-compatible server (e.g. vLLM over an SSH tunnel).
 
     Transient failures (connection refused/reset, timeouts, HTTP 429/5xx) are resent
-    unchanged with backoff for up to options['retry_seconds'] per request; each retry is
-    logged to endpoint-retries.jsonl. If they persist, holder['infrastructure_error'] is
-    set and the episode is recorded as a system_failure, not graded as a model outcome.
+    unchanged with backoff for up to options['retry_seconds'] per request (retry attempts
+    and backoffs are bounded by that budget); each retry is logged to endpoint-retries.jsonl.
+    If they persist, holder['infrastructure_error'] is set and the episode is recorded as
+    a system_failure, not graded as a model outcome.
     Episode start waits up to options['endpoint_wait_seconds'] for the endpoint.
 
     The server's context is max_model_len; a request whose input leaves less than the
@@ -327,6 +344,8 @@ def self_hosted_backend(options, directory, records, holder):
     base_url = options['openai_base_url'].rstrip('/')
     model = options['model']
     retry_seconds = options.get('retry_seconds') or 600
+    request_timeout = options.get('request_timeout') or 900
+    api_key = os.environ.get('SELF_HOSTED_API_KEY')
     def log(name, value):
         with (directory / name).open('a') as stream:
             stream.write(json.dumps({'utc': time.time(), **value}) + '\n')
@@ -334,7 +353,13 @@ def self_hosted_backend(options, directory, records, holder):
     waited, delay, context = time.monotonic(), 5.0, None
     while True:
         try:
-            response = httpx.get(base_url + '/models', timeout=30, trust_env=False)
+            response = httpx.get(base_url + '/models', timeout=30, trust_env=False,
+                                 headers={'Authorization': 'Bearer ' + api_key} if api_key else {})
+            if 400 <= response.status_code < 500 and response.status_code not in (408, 429):
+                # A rejected probe (401/403/404...) is a configuration error, not an outage.
+                raise ValueError(f'Self-hosted endpoint {base_url}/models answered HTTP {response.status_code} '
+                                 f'(not retried; check --openai-base-url and SELF_HOSTED_API_KEY): '
+                                 f'{response.text[:200]}')
             response.raise_for_status()
             rows = response.json()['data']
             if not any(r.get('id') == model for r in rows):
@@ -350,16 +375,13 @@ def self_hosted_backend(options, directory, records, holder):
             log('endpoint-retries.jsonl', {'phase': 'episode_start', 'error': repr(error)[:300], 'sleep': delay})
             time.sleep(delay)
             delay = min(delay * 2, 60.0)
-    backend = ChatCompletionsBackend(base_url, model, os.environ.get('SELF_HOSTED_API_KEY'),
-        timeout=options.get('request_timeout') or 900, max_tokens=16384, supports_images=True,
+    backend = ChatCompletionsBackend(base_url, model, api_key,
+        timeout=request_timeout, max_tokens=16384, supports_images=True,
         request_options={'top_p': 0.95, 'top_k': 20})
     backend.sampling = {'temperature': 0.6}
     def received(response):
         response.read()
-        try:
-            value = response.json()
-        except ValueError:
-            value = {}
+        value = json_object(response)
         record = {'http_status': response.status_code, 'response_id': value.get('id'),
                   'model': value.get('model'), 'provider': 'self-hosted', 'base_url': base_url,
                   'usage': value.get('usage')}
@@ -369,25 +391,34 @@ def self_hosted_backend(options, directory, records, holder):
     backend.client.event_hooks = {'response': [received]}
     original_complete = backend.complete
     def complete_with_retry(messages):
+        # The first attempt has the full request timeout; every backoff (with jitter) and
+        # retry attempt must fit in the retry budget, so a request ends within
+        # max(request_timeout, retry_seconds).
         first, delay, attempt = time.monotonic(), 5.0, 0
-        while True:
-            attempt += 1
-            try:
-                return original_complete(messages)
-            except (httpx.TransportError, BackendResponseError) as error:
-                status = getattr(error, 'http_status', None)
-                if isinstance(error, BackendResponseError) and status not in (429, 500, 502, 503, 504):
-                    raise  # A rejected request is not an endpoint outage.
-                if time.monotonic() - first + delay > retry_seconds:
-                    holder['infrastructure_error'] = (f'Self-hosted endpoint failed {attempt} attempts over '
-                        f'{time.monotonic() - first:.0f} s: {type(error).__name__}: {error}')
-                    log('endpoint-retries.jsonl', {'phase': 'request', 'attempt': attempt, 'gave_up': True,
-                                                   'error': repr(error)[:300], 'status': status})
-                    raise SelfHostedEndpointUnavailable(holder['infrastructure_error']) from error
-                log('endpoint-retries.jsonl', {'phase': 'request', 'attempt': attempt, 'status': status,
-                                               'error': repr(error)[:300], 'sleep': round(delay, 1)})
-                time.sleep(delay + random.uniform(0, delay / 2))
-                delay = min(delay * 2, 120.0)
+        deadline = first + retry_seconds
+        try:
+            while True:
+                attempt += 1
+                try:
+                    return original_complete(messages)
+                except (httpx.TransportError, BackendResponseError) as error:
+                    status = getattr(error, 'http_status', None)
+                    if isinstance(error, BackendResponseError) and not retryable_status(status):
+                        raise  # A rejected request is not an endpoint outage.
+                    pause = delay + random.uniform(0, delay / 2)
+                    if deadline - time.monotonic() - pause < MIN_RETRY_ATTEMPT_SECONDS:
+                        holder['infrastructure_error'] = (f'Self-hosted endpoint failed {attempt} attempts over '
+                            f'{time.monotonic() - first:.0f} s: {type(error).__name__}: {error}')
+                        log('endpoint-retries.jsonl', {'phase': 'request', 'attempt': attempt, 'gave_up': True,
+                                                       'error': repr(error)[:300], 'status': status})
+                        raise SelfHostedEndpointUnavailable(holder['infrastructure_error']) from error
+                    log('endpoint-retries.jsonl', {'phase': 'request', 'attempt': attempt, 'status': status,
+                                                   'error': repr(error)[:300], 'sleep': round(pause, 1)})
+                    time.sleep(pause)
+                    delay = min(delay * 2, 120.0)
+                    backend.client.timeout = min(request_timeout, deadline - time.monotonic())
+        finally:
+            backend.client.timeout = request_timeout
     def complete_within_context(messages):
         try:
             return complete_with_retry(messages)
@@ -586,14 +617,14 @@ def execute_one(entry, options, directory):
     row.update(usage=usage_totals(records, offline=options['offline']), provider_usage=records,
                turns=summary.get('step_count'), wall_time_seconds=time.monotonic() - started,
                stop_reason=summary.get('stop_reason'), policy_error=summary.get('error'), automatic_retries=0)
-    if (options.get('openai_base_url') and not holder.get('infrastructure_error')
+    if (not holder.get('infrastructure_error')
             and 'episode_infrastructure_failure' in ((row.get('native_grade') or {}).get('reasons') or [])):
-        # Self-hosted rounds: a grader-declared infrastructure failure (e.g. a crashed
-        # browser) is a system_failure of this episode, not a graded outcome.
+        # Any backend: a grader-declared infrastructure failure (e.g. a crashed browser
+        # or an exhausted provider) is a system_failure of this episode, not a graded outcome.
         holder['infrastructure_error'] = ('Native grade reports episode_infrastructure_failure: '
                                           + str(row.get('policy_error') or row.get('error')))
     if holder.get('infrastructure_error'):
-        # Endpoint outage: whatever the grader saw afterwards is not a model verdict.
+        # Endpoint/bridge outage: whatever the grader saw afterwards is not a model verdict.
         row.update(status='system_failure', infrastructure_error=holder['infrastructure_error'],
                    error=row.get('error') or holder['infrastructure_error'],
                    grade_not_a_verdict=row.get('grade') or None, grade={})
@@ -639,7 +670,9 @@ def main():
     parser.add_argument('--model', help='served model name for --openai-base-url, e.g. Qwen/Qwen3.8-27B-FP8')
     parser.add_argument('--request-timeout', type=int, default=900, help='--openai-base-url request timeout (s)')
     parser.add_argument('--retry-seconds', type=int, default=600,
-                        help='--openai-base-url: retry transient errors (refused/reset/timeout/429/5xx) this long per request')
+                        help='--openai-base-url: retry transient errors (refused/reset/timeout/429/5xx) for at most '
+                        'this long per request (backoffs and retry attempts fit in it; the first attempt keeps '
+                        '--request-timeout)')
     parser.add_argument('--endpoint-wait-seconds', type=int, default=900,
                         help='--openai-base-url: wait this long for the endpoint at episode start before a system_failure')
     parser.add_argument('--worker-start', choices=('spawn', 'forkserver'), default='spawn',
@@ -762,6 +795,18 @@ def shared_concurrency(path, default):
     return cap, active
 
 
+@contextmanager
+def admission_lock(path):
+    """Interprocess lock for the shared concurrency file: count check plus slot reservation."""
+    import fcntl
+    with open(str(path) + '.lock', 'a') as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle, fcntl.LOCK_UN)
+
+
 def start_forkserver(output):
     """--worker-start forkserver: one server preloads scripts/hindrance_worker_preload.py.
 
@@ -827,7 +872,9 @@ def run_dynamic_pool(args, entries, options, output, rows):
     """--concurrency-file: start an episode only while all runners' active < the file's cap.
 
     --concurrency is the fixed process ceiling. Running episodes are never stopped;
-    lowering the cap only delays new starts. Several runners may share one file.
+    lowering the cap only delays new starts. Several runners may share one file: each
+    start reserves its slot (publishes its raised count) under an interprocess lock
+    before spawning, so two runners cannot take the same last slot.
     Each episode is its own spawned process (no shared executor), so a crashed or
     killed episode process becomes that episode's system_failure only.
     """
@@ -846,8 +893,12 @@ def run_dynamic_pool(args, entries, options, output, rows):
         publish(0)
         with (output / 'results.jsonl').open('x') as stream:
             while pending or running:
-                cap, active = shared_concurrency(args.concurrency_file, args.concurrency)
-                while pending and len(running) < args.concurrency and active < cap:
+                while pending and len(running) < args.concurrency:
+                    with admission_lock(args.concurrency_file):
+                        cap, active = shared_concurrency(args.concurrency_file, args.concurrency)
+                        if active >= cap:
+                            break
+                        publish(len(running) + 1)  # Reserve the slot before releasing the lock.
                     if preloaded is not None:
                         changed = preload_changed(preloaded)
                         if changed:
@@ -858,11 +909,14 @@ def run_dynamic_pool(args, entries, options, output, rows):
                                                       'reason': 'preloaded source changed', 'changed': changed[:20]}) + '\n')
                     i, e = pending.pop(0)
                     directory = output / f'episode-{i:04d}'
-                    process = context.Process(target=run_one, args=(e, options, str(directory)), daemon=False)
-                    process.start()
+                    try:
+                        process = context.Process(target=run_one, args=(e, options, str(directory)), daemon=False)
+                        process.start()
+                    except BaseException:
+                        publish(len(running))  # Release the reserved slot.
+                        raise
                     running[process] = (e, directory)
                     active += 1
-                    publish(len(running))
                     with (output / 'dispatch.jsonl').open('a') as log:
                         log.write(json.dumps({'utc': time.time(), 'started': e['id'], 'episode': i, 'pid': process.pid,
                                               'cap': cap, 'active_all_runners': active,
