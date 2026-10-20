@@ -83,6 +83,8 @@ def usage_totals(records, *, offline=False):
     totals['responses_missing_cached_tokens'] = len(records) - len(fields['cached_prompt_tokens'])
     totals['source'] = ('offline_no_provider' if offline else 'Codex subscription response usage'
                         if any(r.get('provider') == 'codex-subscription' for r in records)
+                        else 'Self-hosted OpenAI-compatible response usage'
+                        if any(r.get('provider') == 'self-hosted' for r in records)
                         else 'OpenRouter response usage')
     return totals
 
@@ -277,6 +279,8 @@ def backend_for(options, directory, records, holder, policy=None):
                     delay = min(delay * 2, 120.0)
         backend.complete = complete_with_retry
         return backend
+    if options.get('openai_base_url'):
+        return self_hosted_backend(options, directory, records, holder)
     from intent_browser.openrouter import provider_options
     request = provider_options(options.get('providers') or 'chutes,akashml')
     request.update(top_p=0.95, top_k=20)
@@ -296,6 +300,114 @@ def backend_for(options, directory, records, holder, policy=None):
         with (directory / 'usage.jsonl').open('a') as stream:
             stream.write(json.dumps(record) + '\n')
     backend.client.event_hooks = {'response': [received]}
+    return backend
+
+
+class SelfHostedEndpointUnavailable(RuntimeError):
+    """The self-hosted endpoint stayed unreachable: an infrastructure failure, never a task verdict."""
+
+
+def self_hosted_backend(options, directory, records, holder):
+    """Same Qwen sampling against an OpenAI-compatible server (e.g. vLLM over an SSH tunnel).
+
+    Transient failures (connection refused/reset, timeouts, HTTP 429/5xx) are resent
+    unchanged with backoff for up to options['retry_seconds'] per request; each retry is
+    logged to endpoint-retries.jsonl. If they persist, holder['infrastructure_error'] is
+    set and the episode is recorded as a system_failure, not graded as a model outcome.
+    Episode start waits up to options['endpoint_wait_seconds'] for the endpoint.
+
+    The server's context is max_model_len; a request whose input leaves less than the
+    16384-token output ceiling is rejected by vLLM before prefill. Only then is the
+    output ceiling clipped to the remaining context and the same request resent once.
+    """
+    import random
+    import re
+    import httpx
+    from intent_browser.backend import BackendResponseError, ChatCompletionsBackend
+    base_url = options['openai_base_url'].rstrip('/')
+    model = options['model']
+    retry_seconds = options.get('retry_seconds') or 600
+    def log(name, value):
+        with (directory / name).open('a') as stream:
+            stream.write(json.dumps({'utc': time.time(), **value}) + '\n')
+    # Wait for the endpoint before starting (a tunnel/server outage pauses new episodes).
+    waited, delay, context = time.monotonic(), 5.0, None
+    while True:
+        try:
+            response = httpx.get(base_url + '/models', timeout=30, trust_env=False)
+            response.raise_for_status()
+            rows = response.json()['data']
+            if not any(r.get('id') == model for r in rows):
+                raise ValueError('Endpoint does not serve ' + model + ': ' + str([r.get('id') for r in rows]))
+            context = next(r.get('max_model_len') for r in rows if r.get('id') == model)
+            break
+        except ValueError:
+            raise
+        except Exception as error:
+            if time.monotonic() - waited > (options.get('endpoint_wait_seconds') or 900):
+                holder['infrastructure_error'] = 'Self-hosted endpoint unavailable at episode start: ' + repr(error)
+                raise SelfHostedEndpointUnavailable(holder['infrastructure_error']) from error
+            log('endpoint-retries.jsonl', {'phase': 'episode_start', 'error': repr(error)[:300], 'sleep': delay})
+            time.sleep(delay)
+            delay = min(delay * 2, 60.0)
+    backend = ChatCompletionsBackend(base_url, model, os.environ.get('SELF_HOSTED_API_KEY'),
+        timeout=options.get('request_timeout') or 900, max_tokens=16384, supports_images=True,
+        request_options={'top_p': 0.95, 'top_k': 20})
+    backend.sampling = {'temperature': 0.6}
+    def received(response):
+        response.read()
+        try:
+            value = response.json()
+        except ValueError:
+            value = {}
+        record = {'http_status': response.status_code, 'response_id': value.get('id'),
+                  'model': value.get('model'), 'provider': 'self-hosted', 'base_url': base_url,
+                  'usage': value.get('usage')}
+        records.append(record)
+        with (directory / 'usage.jsonl').open('a') as stream:
+            stream.write(json.dumps(record) + '\n')
+    backend.client.event_hooks = {'response': [received]}
+    original_complete = backend.complete
+    def complete_with_retry(messages):
+        first, delay, attempt = time.monotonic(), 5.0, 0
+        while True:
+            attempt += 1
+            try:
+                return original_complete(messages)
+            except (httpx.TransportError, BackendResponseError) as error:
+                status = getattr(error, 'http_status', None)
+                if isinstance(error, BackendResponseError) and status not in (429, 500, 502, 503, 504):
+                    raise  # A rejected request is not an endpoint outage.
+                if time.monotonic() - first + delay > retry_seconds:
+                    holder['infrastructure_error'] = (f'Self-hosted endpoint failed {attempt} attempts over '
+                        f'{time.monotonic() - first:.0f} s: {type(error).__name__}: {error}')
+                    log('endpoint-retries.jsonl', {'phase': 'request', 'attempt': attempt, 'gave_up': True,
+                                                   'error': repr(error)[:300], 'status': status})
+                    raise SelfHostedEndpointUnavailable(holder['infrastructure_error']) from error
+                log('endpoint-retries.jsonl', {'phase': 'request', 'attempt': attempt, 'status': status,
+                                               'error': repr(error)[:300], 'sleep': round(delay, 1)})
+                time.sleep(delay + random.uniform(0, delay / 2))
+                delay = min(delay * 2, 120.0)
+    def complete_within_context(messages):
+        try:
+            return complete_with_retry(messages)
+        except BackendResponseError as error:
+            text = json.dumps(error.response_payload)
+            found = re.search(r'(\d+) (?:input tokens|tokens in the messages|prompt tokens)', text)
+            if error.http_status != 400 or not context or not found or 'context' not in text:
+                raise
+            remaining = int(context) - int(found.group(1))
+            if not 1 <= remaining < backend.max_tokens:
+                raise
+            log('context-clip.jsonl', {'input_tokens': int(found.group(1)), 'context': context,
+                                       'max_tokens': remaining})
+            ceiling = backend.max_tokens
+            backend.max_tokens = remaining
+            try:
+                return complete_with_retry(messages)
+            finally:
+                backend.max_tokens = ceiling
+    backend.complete = complete_within_context
     return backend
 
 
@@ -474,6 +586,19 @@ def execute_one(entry, options, directory):
     row.update(usage=usage_totals(records, offline=options['offline']), provider_usage=records,
                turns=summary.get('step_count'), wall_time_seconds=time.monotonic() - started,
                stop_reason=summary.get('stop_reason'), policy_error=summary.get('error'), automatic_retries=0)
+    if (options.get('openai_base_url') and not holder.get('infrastructure_error')
+            and 'episode_infrastructure_failure' in ((row.get('native_grade') or {}).get('reasons') or [])):
+        # Self-hosted rounds: a grader-declared infrastructure failure (e.g. a crashed
+        # browser) is a system_failure of this episode, not a graded outcome.
+        holder['infrastructure_error'] = ('Native grade reports episode_infrastructure_failure: '
+                                          + str(row.get('policy_error') or row.get('error')))
+    if holder.get('infrastructure_error'):
+        # Endpoint outage: whatever the grader saw afterwards is not a model verdict.
+        row.update(status='system_failure', infrastructure_error=holder['infrastructure_error'],
+                   error=row.get('error') or holder['infrastructure_error'],
+                   grade_not_a_verdict=row.get('grade') or None, grade={})
+        save(directory / 'infrastructure-failure.json', {'error': holder['infrastructure_error'],
+             'grade_not_a_verdict': row['grade_not_a_verdict']})
     fact_path = directory / 'fact-recording.json'
     row['fact_provenance'] = read(fact_path) if fact_path.exists() else {
         'enabled': False, 'reason': 'Episode failed before recording setup'}
@@ -487,6 +612,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--env-file', type=Path)
     parser.add_argument('--concurrency', type=int, default=8)
+    parser.add_argument('--concurrency-file', type=Path,
+                        help='live episode cap shared by runners (integer; fallback --concurrency, which stays the ceiling)')
     parser.add_argument('--limit', type=int)
     parser.add_argument('--episode', action='append', help='Exact manifest entry ID; repeatable')
     parser.add_argument('--offline', action='store_true')
@@ -507,11 +634,21 @@ def main():
     parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
     parser.add_argument('--reasoning-effort', default='medium')
     parser.add_argument('--service-tier', default='priority', help='Codex bridge service tier (priority = fast mode); "none" to omit')
+    parser.add_argument('--openai-base-url', help='OpenAI-compatible endpoint, e.g. http://127.0.0.1:18000/v1 '
+                        '(self-hosted vLLM over an SSH tunnel) instead of OpenRouter; requires --model')
+    parser.add_argument('--model', help='served model name for --openai-base-url, e.g. Qwen/Qwen3.8-27B-FP8')
+    parser.add_argument('--request-timeout', type=int, default=900, help='--openai-base-url request timeout (s)')
+    parser.add_argument('--retry-seconds', type=int, default=600,
+                        help='--openai-base-url: retry transient errors (refused/reset/timeout/429/5xx) this long per request')
+    parser.add_argument('--endpoint-wait-seconds', type=int, default=900,
+                        help='--openai-base-url: wait this long for the endpoint at episode start before a system_failure')
     args = parser.parse_args()
+    if bool(args.openai_base_url) != bool(args.model) or (args.openai_base_url and args.bridge):
+        parser.error('--openai-base-url and --model go together, without --bridge')
     if args.env_file:
         from dotenv import load_dotenv
         load_dotenv(args.env_file, override=False)
-    if not args.offline and not args.bridge and not os.environ.get('OPENROUTER_API_KEY'):
+    if not args.offline and not args.bridge and not args.openai_base_url and not os.environ.get('OPENROUTER_API_KEY'):
         parser.error('Use --env-file with the existing OPENROUTER_API_KEY')
     os.environ['TASK_SOURCE_BINDING'] = 'current'
     os.environ.setdefault('HARNESS_AX_TOKENIZER', str(ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json'))
@@ -536,7 +673,11 @@ def main():
                'max_input_tokens': args.max_input_tokens, 'providers': args.providers,
                'context_keep_turns': args.context_keep_turns,
                'fact_provenance': not args.no_fact_provenance}
-    save(output / 'launch.json', {'entries': entries, 'options': options, 'model': args.bridge or MODEL,
+    if args.openai_base_url:
+        options.update(openai_base_url=args.openai_base_url, model=args.model,
+                       request_timeout=args.request_timeout, retry_seconds=args.retry_seconds,
+                       endpoint_wait_seconds=args.endpoint_wait_seconds)
+    save(output / 'launch.json', {'entries': entries, 'options': options, 'model': args.bridge or args.model or MODEL,
          'concurrency': args.concurrency, 'sampling': {'temperature': 0.6, 'top_p': 0.95, 'top_k': 20},
          'reasoning': {'enabled': True}, 'max_output_tokens': 16384})
     rows = []
@@ -595,7 +736,85 @@ def start_and_run(args, entries, options, output, rows, supervisors):
     run_pool(args, entries, {k: v for k, v in options.items() if k != '_tokenizer_service'}, output, rows)
 
 
+def shared_concurrency(path, default):
+    """Cap from the shared file (fallback default) and active episodes over all live runners."""
+    try:
+        cap = int(Path(path).read_text().split()[0])
+    except (OSError, ValueError, IndexError):
+        cap = default
+    active = 0
+    for marker in Path(path).parent.glob(Path(path).name + '.active.*'):
+        try:
+            pid = int(marker.name.rsplit('.', 1)[-1])
+            os.kill(pid, 0)
+            active += int(marker.read_text() or 0)
+        except ProcessLookupError:
+            marker.unlink(missing_ok=True)  # A finished/crashed runner holds no episodes.
+        except (OSError, ValueError):
+            pass
+    return cap, active
+
+
+def run_dynamic_pool(args, entries, options, output, rows):
+    """--concurrency-file: start an episode only while all runners' active < the file's cap.
+
+    --concurrency is the fixed process ceiling. Running episodes are never stopped;
+    lowering the cap only delays new starts. Several runners may share one file.
+    Each episode is its own spawned process (no shared executor), so a crashed or
+    killed episode process becomes that episode's system_failure only.
+    """
+    context = multiprocessing.get_context('spawn')
+    marker = Path(str(args.concurrency_file) + '.active.' + str(os.getpid()))
+    def publish(count):
+        tmp = marker.with_name(marker.name + '.tmp')
+        tmp.write_text(str(count))
+        tmp.replace(marker)
+    pending = list(enumerate(entries))
+    running = {}
+    try:
+        publish(0)
+        with (output / 'results.jsonl').open('x') as stream:
+            while pending or running:
+                cap, active = shared_concurrency(args.concurrency_file, args.concurrency)
+                while pending and len(running) < args.concurrency and active < cap:
+                    i, e = pending.pop(0)
+                    directory = output / f'episode-{i:04d}'
+                    process = context.Process(target=run_one, args=(e, options, str(directory)), daemon=False)
+                    process.start()
+                    running[process] = (e, directory)
+                    active += 1
+                    publish(len(running))
+                    with (output / 'dispatch.jsonl').open('a') as log:
+                        log.write(json.dumps({'utc': time.time(), 'started': e['id'], 'episode': i, 'pid': process.pid,
+                                              'cap': cap, 'active_all_runners': active}) + '\n')
+                time.sleep(5)
+                for process in [p for p in running if not p.is_alive()]:
+                    process.join()
+                    entry, directory = running.pop(process)
+                    publish(len(running))
+                    try:
+                        row = read(directory / 'result.json')
+                    except (OSError, ValueError) as error:
+                        row = {**entry, 'status': 'system_failure', 'grade': {},
+                               'error': f'Episode process exited with code {process.exitcode} without a result ({error!r})',
+                               'usage': usage_totals([], offline=args.offline)}
+                        if directory.exists():
+                            save(directory / 'result.json', row)
+                    rows.append(row)
+                    stream.write(json.dumps(row, ensure_ascii=False) + '\n')
+                    stream.flush()
+                    save(output / 'summary.json', summarize(rows))
+                    print(json.dumps({'id': row['id'], 'status': row['status'],
+                                      'grade': row.get('grade'), 'cost_usd': row['usage']['cost_usd']}), flush=True)
+    finally:
+        marker.unlink(missing_ok=True)
+    if any(r['status'] in ('system_failure', 'grading_error') for r in rows):
+        raise SystemExit(1)
+
+
 def run_pool(args, entries, options, output, rows):
+    if getattr(args, 'concurrency_file', None):
+        return run_dynamic_pool(args, entries, options, output, rows)
     with ProcessPoolExecutor(max_workers=min(args.concurrency, len(entries)), max_tasks_per_child=1,
                              mp_context=multiprocessing.get_context('spawn')) as pool:
         futures = {pool.submit(run_one, e, options, str(output / f'episode-{i:04d}')): e
