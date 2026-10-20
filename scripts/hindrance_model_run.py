@@ -284,8 +284,12 @@ def run_one(entry, options, directory):
     directory = Path(directory)
     directory.mkdir()
     import signal
+    class EpisodeWallClockExpired(BaseException):
+        # BaseException: BrowserGym converts Exception raised inside actions into action
+        # feedback, which would swallow a one-shot alarm and let the episode continue.
+        pass
     def expired(signum, frame):
-        raise TimeoutError('Episode wall-clock limit reached (hung browser action or provider)')
+        raise EpisodeWallClockExpired('Episode wall-clock limit reached (hung browser action or provider)')
     if options.get('episode_timeout_seconds'):
         # A Playwright call can hang forever (seen: a delivery-radio click stuck >1 h);
         # end the episode as a recorded failure instead of blocking the round.
@@ -294,6 +298,11 @@ def run_one(entry, options, directory):
     try:
         with (directory / 'runner.log').open('x') as log, redirect_stdout(log), redirect_stderr(log):
             return execute_one(entry, options, directory)
+    except EpisodeWallClockExpired as error:
+        row = {**entry, 'status': 'system_failure', 'error': str(error), 'grade': {}, 'trace': None,
+               'usage': usage_totals([], offline=options['offline'])}
+        save(directory / 'result.json', row)
+        return row
     finally:
         signal.alarm(0)
 
@@ -524,6 +533,22 @@ def main():
             supervisors.append(sup)
         options['chromium_descriptors'] = [str(sup.descriptor_path) for sup in supervisors]
     tokenizer_service = tokenizer_dir = None
+    try:
+        start_and_run(args, entries, options, output, rows, supervisors)
+    finally:
+        for sup in supervisors:
+            try:
+                sup.close()
+            except Exception as error:
+                print('supervisor close failed:', repr(error), file=sys.stderr)
+        service = options.get('_tokenizer_service')
+        if service is not None:
+            service.terminate()
+    return rows
+
+
+def start_and_run(args, entries, options, output, rows, supervisors):
+    tokenizer_service = None
     if args.shared_tokenizer:
         # One process holds the tokenizers; episodes query it over a Unix socket
         # instead of loading ~150-200 MB of tokenizer state each.
@@ -539,19 +564,13 @@ def main():
             "import sys;sys.path.insert(0,sys.argv[1]);from intent_browser.tokenizer_service import main;"
             "sys.argv=sys.argv[1:];sys.argv[0]='tokenizer_service';main()", str(ROOT),
             '--socket', options['tokenizer_socket'], '--manifest', manifest,
-            '--max-clients', str(4 * args.concurrency + 8)],
+            '--max-clients', str(min(128, 4 * args.concurrency + 8))],
             stdout=subprocess.PIPE, stderr=(output / 'tokenizer-stderr.log').open('x'), text=True)
+        options['_tokenizer_service'] = tokenizer_service
         if (not select.select([tokenizer_service.stdout], [], [], 60)[0]
                 or json.loads(tokenizer_service.stdout.readline()).get('ready') is not True):
             raise RuntimeError('Shared tokenizer service not ready')
-    try:
-        run_pool(args, entries, options, output, rows)
-    finally:
-        for sup in supervisors:
-            sup.close()
-        if tokenizer_service is not None:
-            tokenizer_service.terminate()
-    return rows
+    run_pool(args, entries, {k: v for k, v in options.items() if k != '_tokenizer_service'}, output, rows)
 
 
 def run_pool(args, entries, options, output, rows):
