@@ -642,6 +642,11 @@ def main():
                         help='--openai-base-url: retry transient errors (refused/reset/timeout/429/5xx) this long per request')
     parser.add_argument('--endpoint-wait-seconds', type=int, default=900,
                         help='--openai-base-url: wait this long for the endpoint at episode start before a system_failure')
+    parser.add_argument('--worker-start', choices=('spawn', 'forkserver'), default='spawn',
+                        help='forkserver (with --concurrency-file): episode processes fork from one server that '
+                        'preloaded the heavy modules (scripts/hindrance_worker_preload.py), sharing those pages '
+                        'copy-on-write. Still one process per episode. Falls back to spawn if a preloaded '
+                        'source file changes on disk. Default spawn (fresh interpreter per episode).')
     args = parser.parse_args()
     if bool(args.openai_base_url) != bool(args.model) or (args.openai_base_url and args.bridge):
         parser.error('--openai-base-url and --model go together, without --bridge')
@@ -657,6 +662,8 @@ def main():
         entries = [e for e in entries if e['id'] in args.episode]
         if set(args.episode) != {e['id'] for e in entries}:
             parser.error('Unknown --episode ID')
+    if args.worker_start == 'forkserver' and not args.concurrency_file:
+        parser.error('--worker-start forkserver requires --concurrency-file (per-episode dispatch)')
     if args.limit is not None:
         entries = entries[:args.limit]
     if not entries or args.concurrency < 1 or args.max_steps < 0 or args.context_keep_turns < 0:
@@ -755,6 +762,67 @@ def shared_concurrency(path, default):
     return cap, active
 
 
+def start_forkserver(output):
+    """--worker-start forkserver: one server preloads scripts/hindrance_worker_preload.py.
+
+    Returns (context, preload report) or (spawn context, None) when the preload did not
+    complete; the reason is saved in worker-start.json either way.
+    """
+    import multiprocessing.forkserver as forkserver
+    report = output / 'forkserver-preload.json'
+    saved = {name: os.environ.get(name) for name in ('PYTHONPATH', 'HINDRANCE_WORKER_PRELOAD_REPORT')}
+    os.environ['HINDRANCE_WORKER_PRELOAD_REPORT'] = str(report)
+    os.environ['PYTHONPATH'] = os.pathsep.join([str(ROOT)] + ([saved['PYTHONPATH']] if saved['PYTHONPATH'] else []))
+    context = multiprocessing.get_context('forkserver')
+    context.set_forkserver_preload(['scripts.hindrance_worker_preload'])
+    try:
+        forkserver.ensure_running()
+    finally:
+        for name, value in saved.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value
+    deadline = time.monotonic() + 300
+    while not report.exists() and time.monotonic() < deadline:
+        time.sleep(0.5)
+    try:
+        preloaded = read(report)
+    except (OSError, ValueError) as error:
+        save(output / 'worker-start.json', {'worker_start': 'spawn', 'reason': 'forkserver preload incomplete: ' + repr(error)})
+        return multiprocessing.get_context('spawn'), None
+    save(output / 'worker-start.json', {'worker_start': 'forkserver', 'preload_pid': preloaded['pid'],
+         'preload_seconds': preloaded['seconds'], 'preload_errors': preloaded['errors'],
+         'preload_memory': preloaded['memory'], 'preloaded_files': len(preloaded['files'])})
+    return context, preloaded
+
+
+def preload_changed(preloaded):
+    changed = []
+    for path, (mtime, size) in preloaded['files'].items():
+        try:
+            stat = os.stat(path)
+        except OSError:
+            changed.append(path)
+            continue
+        if stat.st_mtime_ns != mtime or stat.st_size != size:
+            changed.append(path)
+    return changed
+
+
+def still_running(process):
+    """A forkserver child's exit is reported through the server; if the server itself died,
+    is_alive() turns False for children that are still running. Trust /proc for those."""
+    from multiprocessing import popen_forkserver
+    if not isinstance(process._popen, popen_forkserver.Popen):
+        return False
+    try:
+        state = Path(f'/proc/{process.pid}/stat').read_text().rsplit(')', 1)[1].split()[0]
+    except (OSError, IndexError):
+        return False
+    return state not in ('Z', 'X')
+
+
 def run_dynamic_pool(args, entries, options, output, rows):
     """--concurrency-file: start an episode only while all runners' active < the file's cap.
 
@@ -764,6 +832,9 @@ def run_dynamic_pool(args, entries, options, output, rows):
     killed episode process becomes that episode's system_failure only.
     """
     context = multiprocessing.get_context('spawn')
+    preloaded = None
+    if getattr(args, 'worker_start', 'spawn') == 'forkserver':
+        context, preloaded = start_forkserver(output)
     marker = Path(str(args.concurrency_file) + '.active.' + str(os.getpid()))
     def publish(count):
         tmp = marker.with_name(marker.name + '.tmp')
@@ -777,6 +848,14 @@ def run_dynamic_pool(args, entries, options, output, rows):
             while pending or running:
                 cap, active = shared_concurrency(args.concurrency_file, args.concurrency)
                 while pending and len(running) < args.concurrency and active < cap:
+                    if preloaded is not None:
+                        changed = preload_changed(preloaded)
+                        if changed:
+                            # Never run new episodes on stale preloaded code: back to fresh interpreters.
+                            context, preloaded = multiprocessing.get_context('spawn'), None
+                            with (output / 'dispatch.jsonl').open('a') as log:
+                                log.write(json.dumps({'utc': time.time(), 'worker_start': 'spawn',
+                                                      'reason': 'preloaded source changed', 'changed': changed[:20]}) + '\n')
                     i, e = pending.pop(0)
                     directory = output / f'episode-{i:04d}'
                     process = context.Process(target=run_one, args=(e, options, str(directory)), daemon=False)
@@ -786,9 +865,10 @@ def run_dynamic_pool(args, entries, options, output, rows):
                     publish(len(running))
                     with (output / 'dispatch.jsonl').open('a') as log:
                         log.write(json.dumps({'utc': time.time(), 'started': e['id'], 'episode': i, 'pid': process.pid,
-                                              'cap': cap, 'active_all_runners': active}) + '\n')
+                                              'cap': cap, 'active_all_runners': active,
+                                              **({'worker_start': 'forkserver'} if preloaded is not None else {})}) + '\n')
                 time.sleep(5)
-                for process in [p for p in running if not p.is_alive()]:
+                for process in [p for p in running if not p.is_alive() and not still_running(p)]:
                     process.join()
                     entry, directory = running.pop(process)
                     publish(len(running))
