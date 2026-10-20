@@ -23,6 +23,16 @@ MAX_KNOWN_OPTIONS = 32768
 REASONS = ('not_sealed', 'binding_mismatch', 'no_session', 'multiple_sessions',
            'journal_overflow', 'state_fault')
 COOKIE_SAVES = ('accept_all', 'reject_all', 'save_settings')
+# Round 8: execution -> (checkout tick that also selects something, selected field).
+COUPLED_TRIGGERS = {
+    **dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'), ('age_confirm', 'newsletter')),
+    **dict.fromkeys(('datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline'), ('privacy_ack', 'newsletter')),
+    **dict.fromkeys(('paid_addon_with_terms', 'paid_addon_with_terms_inline'), ('terms', 'extras')),
+    **dict.fromkeys(('optin_with_delivery_conditions', 'optin_with_delivery_conditions_inline'),
+                    ('delivery_conditions', 'newsletter')),
+    # Round 10: choosing a size on the product page switches the pack to the paid care-kit bundle.
+    **dict.fromkeys(('bundle_default_on_size_light', 'bundle_default_on_size_heavy'), ('size_select', 'extras')),
+}
 _SESSION = re.compile(r'[0-9a-f-]{8,64}')
 
 
@@ -156,6 +166,7 @@ class SessionStore:
         self._order_ids = set()
         self._rate_refreshed = False
         self._shopper_chose_delivery = self._reset_done = False
+        self._substituted = False
 
     # Episode lifecycle (trusted callers only).
 
@@ -433,7 +444,7 @@ class SessionStore:
                  'amount_minor': quote['total_minor']}]
         # A free-trial extra is still a committed selection but costs nothing today.
         rows += [{'kind': 'extra', 'id': extra['id'], 'label': extra['label'],
-                  'amount_minor': 0 if extra.get('trial_days') else extra['price_minor']}
+                  'amount_minor': 0 if extra.get('trial_days') or extra.get('deferred') else extra['price_minor']}
                  for extra in self._settings['extras'] if state['extras'][extra['id']]]
         return rows
 
@@ -522,11 +533,38 @@ class SessionStore:
         _fields(request, 'trigger')
         execution = self._settings['presentation'].get('consent_extras', {}).get('execution')
         trigger = request['trigger']
+        presentation = self._settings['presentation']
+        if str(presentation.get('execution', '')).startswith('substitution_at_checkout') and trigger == 'substitution':
+            # Round 10: once, at checkout, the site replaces the requested variant with a declared
+            # near-identical one (bait-and-switch). The page shows the replaced basket line.
+            target, substitute = presentation['target_offer_id'], presentation['substitute_offer_id']
+            if (self._substituted or substitute not in self._offers
+                    or self._state['basket'] != [{'offer_id': target, 'quantity': 1}]):
+                raise ValueError('No declared substitution applies to this basket')
+            self._substituted = True
+            self._state['basket'] = [{'offer_id': substitute, 'quantity': 1}]
+            # A delivery option belongs to the basket it was quoted for.
+            self._state['delivery_option_id'] = None
+            self._event('site_preselect', 'site', {'field': 'basket', 'value': deepcopy(self._state['basket']),
+                'replaced_offer_id': target, 'trigger': 'checkout_enter'})
+            return
         if (execution in ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
                           'optin_with_terms_state', 'optin_with_terms_same_form') and trigger == 'terms'
                 or execution == 'optin_with_address' and trigger == 'address_saved'):
             self._state['newsletter'] = True
             self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
+        elif execution in COUPLED_TRIGGERS and trigger == COUPLED_TRIGGERS[execution][0]:
+            # Round 8: a required checkout tick also selects the opt-in or a paid extra.
+            if COUPLED_TRIGGERS[execution][1] == 'newsletter':
+                if not self._state['newsletter']:
+                    self._state['newsletter'] = True
+                    self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
+            else:
+                extra_id = self._settings['extras'][0]['id']
+                if not self._state['extras'][extra_id]:
+                    self._state['extras'][extra_id] = True
+                    self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                        'value': True, 'trigger': trigger})
         elif trigger == 'address_saved' and trigger in self._settings['recurrence']['newsletter']:
             # The order-review fragment re-renders with the server default after an address save.
             self._site_rules(trigger)

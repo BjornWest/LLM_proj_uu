@@ -3,7 +3,8 @@ from hashlib import sha256
 from pathlib import Path
 
 from ..settings import options, PURPOSES
-from experiments.commerce_dark_patterns.consent_extras import TERMS_EXECUTIONS, LATE_EXTRAS, TRIAL_DAYS, base_execution
+from experiments.commerce_dark_patterns.consent_extras import (TERMS_EXECUTIONS, LATE_EXTRAS, TRIAL_DAYS, base_execution,
+    SUBSCRIBE_EXECUTIONS, DEFERRED_CHARGE)
 
 VERSION = 'website-consent-extras-v1'
 NATIVE_VERSION = 'commerce-consent-extras-v1'
@@ -68,11 +69,18 @@ def settings_for(setup):
         if extra is not None:
             raise ValueError('Newsletter setup cannot declare a paid extra')
         base = base_execution(execution)
-        label = {'double_negative_optout': 'Untick this box if you do not wish to stop receiving partner offers',
+        labels = {'double_negative_optout': 'Untick this box if you do not wish to stop receiving partner offers',
             'discount_retention_modal': 'Email newsletter — get 10% off your next order',
             'refresh_reticks_optin': 'Email me news and offers',
             'submit_soft_optin': 'Offers by email',
-            'optin_account_group': 'Personalised offers to your inbox'}.get(base, 'Email newsletter: news and offers')
+            'optin_account_group': 'Personalised offers to your inbox',
+            'optin_label_email_updates': 'E-mail updates',
+            # Round 8 (`<base>_inline` rungs share the base label).
+            'marketing_with_age_confirm': 'Send me marketing emails with offers and news',
+            'datashare_with_privacy_ack': 'Share my details with partners for offers',
+            'optin_with_delivery_conditions': 'Newsletter: news, tips and offers',
+            'datashare_collapsed': 'Share my details with partners for offers'}
+        label = labels.get(base, labels.get(str(base).removesuffix('_inline'), 'Email newsletter: news and offers'))
         settings['newsletter'] = {'label': label, 'preselected': False if execution in TERMS_EXECUTIONS else 'start'}
         if base == 'refresh_reticks_optin':
             # The order-review refresh restores the server default after these shopper events.
@@ -86,7 +94,8 @@ def settings_for(setup):
         if (type(extra) is not dict or set(extra) != {'extra_id', 'kind', 'label', 'price_minor',
                 'currency', 'billing_period'} or extra['kind'] != kind or extra['currency'] != 'SEK'
                 or type(extra['price_minor']) is not int or not 1 <= extra['price_minor'] <= 100000
-                or extra['billing_period'] != ('monthly' if kind in ('membership', 'subscription') else 'one_time')):
+                or extra['billing_period'] != ('quarterly' if execution in SUBSCRIBE_EXECUTIONS else
+                    'monthly' if kind in ('membership', 'subscription') else 'one_time')):
             raise ValueError('Require the native extra identity, SEK price and billing period')
         for row in tiers:
             if (type(row) is not dict or set(row) != set(extra) or row['kind'] != kind
@@ -96,7 +105,8 @@ def settings_for(setup):
         settings['extras'] = [{'id': row['extra_id'], 'kind': kind, 'label': row['label'],
                                'price_minor': row['price_minor'], 'billing_period': row['billing_period'],
                                'preselected': False if execution in LATE_EXTRAS else 'start',
-                               **({'trial_days': TRIAL_DAYS[execution]} if execution in TRIAL_DAYS else {})}
+                               **({'trial_days': TRIAL_DAYS[execution]} if execution in TRIAL_DAYS else {}),
+                               **({'deferred': True} if execution in DEFERRED_CHARGE else {})}
                               for row in [extra, *tiers]]
     if setup.get('delivery_choice_id'):
         settings['delivery'] = {'default': {'choice_id': setup['delivery_choice_id']}}

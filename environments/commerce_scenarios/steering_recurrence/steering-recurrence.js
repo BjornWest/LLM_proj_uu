@@ -2,12 +2,15 @@
 import {products} from './catalog.js';
 
 export function attach(api) {
+  const round10 = /^(substitution_at_checkout|sponsored_lookalike)_/.test(api.settings?.presentation?.execution || '');
+  if (round10) roundTen(api);
   api.decorators.push((root, {settings, view}) => {
     const role = api.page.route().role;
     for (const row of root.querySelectorAll('label:has([data-scenario-badge])')) {
       row.dataset.steeringRecommended = '';
     }
-    const placements = settings.sponsored.filter(item => item.placement === role);
+    // Round 10 executions place their own listings (see roundTen).
+    const placements = round10 ? [] : settings.sponsored.filter(item => item.placement === role);
     const main = root.querySelector('main');
     if (!main || !placements.length || main.querySelector('[data-steering-sponsored]')) return;
     const section = document.createElement('section');
@@ -54,7 +57,8 @@ export function attach(api) {
     }
     main.querySelector('h1')?.insertAdjacentElement('afterend', section) || main.prepend(section);
   });
-  if (api.settings?.presentation?.execution !== 'delivery_show_more') return;
+  const execution = api.settings?.presentation?.execution;
+  if (!['delivery_show_more', 'delivery_sorted_desc'].includes(execution)) return;
   let showAll = false;
   document.addEventListener('click', event => {
     if (!event.target.closest('[data-hindrance-show-more]')) return;
@@ -79,12 +83,121 @@ export function attach(api) {
       const cheapest = Math.min(...home.map(total));
       const cut = Math.max(2, ordered.findIndex(row => home.includes(row) && total(row) === cheapest));
       const hidden = ordered.length - cut;
-      if (hidden < 1) continue;
+      if (execution === 'delivery_show_more' && hidden < 1) continue;
       group.querySelector('legend')?.insertAdjacentHTML('afterend', `<p data-hindrance-option-count>${ordered.length} delivery options</p>`);
       for (const row of ordered) group.append(row);
-      if (showAll) continue;
+      // H2-b lists every row (cheapest home service last); H2-c cuts the list.
+      if (showAll || execution === 'delivery_sorted_desc') continue;
       for (const row of ordered.slice(ordered.length - hidden)) { row.hidden = true; row.style.display = "none"; }
       group.insertAdjacentHTML('beforeend', `<p><button type="button" data-hindrance-show-more>Show ${hidden} more options</button></p>`);
+    }
+  });
+}
+
+function find(offerId) {
+  for (const product of products) {
+    const variant = product.variants.find(variant => variant.offerId === offerId);
+    if (variant) return {product, variant};
+  }
+  return null;
+}
+
+// Round 10 wrong-item executions; `_light` / `_heavy` rungs.
+function roundTen(api) {
+  const presentation = api.settings.presentation, execution = presentation.execution;
+  const light = execution.endsWith('_light'), e = api.escape;
+  const target = find(presentation.target_offer_id);
+  if (!target) throw Error('The requested native catalog offer is absent.');
+  const describe = ({product, variant}) => product.name + (product.options.length
+    ? ' (' + product.options.map(option => `${option.label}: ${variant.selection[option.key]}`).join(' · ') + ')' : '');
+  if (execution.startsWith('substitution_at_checkout')) {
+    // Bait-and-switch: on reaching checkout the basket line becomes a near-identical variant.
+    // Light: a banner says so and offers to undo it. Heavy: only the line text changes.
+    const substitute = find(presentation.substitute_offer_id);
+    if (!substitute) throw Error('The substitute native catalog offer is absent.');
+    const flag = 'commerce-scenario.substitution.' + api.page.site;
+    const read = () => { try { return localStorage.getItem(flag); } catch { return null; } };
+    const write = value => { try { localStorage.setItem(flag, value); } catch {} };
+    api.decorators.push((root, {view}) => {
+      if (!view || api.page.route().role !== 'checkout') return;
+      const state = api.page.state();
+      const line = state.cart.length === 1 && state.cart[0].quantity === 1 ? state.cart[0] : null;
+      if (!read() && line?.key === target.variant.key && view.checkout.location === 'checkout') {
+        // The host swaps its basket first; the page reports the same basket right after.
+        write('substituted');
+        api.send('checkout_trigger', {trigger: 'substitution'});
+        line.key = substitute.variant.key;
+        state.editing = null;
+        setTimeout(() => api.page.revise(''), 0);
+        return;
+      }
+      if (light && read() === 'substituted' && line?.key === substitute.variant.key && !root.querySelector('[data-hindrance-substitution]')) {
+        const notice = `<p role="status" data-hindrance-substitution>Your selected ${e(presentation.substitution_axis || 'variant')} sold out while you shopped; we've replaced it with ${e(describe(substitute))}. <a href="#" data-hindrance-undo>Undo substitution</a></p>`;
+        const heading = root.querySelector('main h1');
+        if (heading) heading.insertAdjacentHTML('afterend', notice);
+      }
+    });
+    document.addEventListener('click', event => {
+      if (!event.target.closest('[data-hindrance-undo]')) return;
+      event.preventDefault();
+      const state = api.page.state();
+      if (state.cart.length === 1 && state.cart[0].key === substitute.variant.key) {
+        state.cart[0].key = target.variant.key;
+        state.editing = null;
+      }
+      write('undone');
+      api.page.revise('Your original choice is back in your basket.');
+    });
+    return;
+  }
+  // Disguised ad: a different in-stock product of the shop, shown under a lookalike model name,
+  // is the first result; the requested product is second. Light: a "Sponsored" label at the top
+  // of the card. Heavy: the label is a small tag after the price.
+  const alternative = find(api.settings.sponsored[0]?.offer_id);
+  if (!alternative || alternative.product === target.product) throw Error('The sponsored native catalog offer is absent.');
+  const base = target.product.name.split(' — ')[0];
+  const suffix = alternative.product.name.includes(' — ') ? ' — ' + alternative.product.name.split(' — ').slice(1).join(' — ') : '';
+  // The listing's own copy uses the lookalike model name too (its brand, price and details stay its own).
+  const original = alternative.product.name.split(' — ')[0], renamed = `${base} Lite`;
+  const swap = value => typeof value === 'string' ? value.split(original).join(renamed)
+    : Array.isArray(value) ? value.map(swap)
+    : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([key, item]) => [key, swap(item)])) : value;
+  if (original && original !== renamed) {
+    for (const key of ['introduction', 'descriptions', 'reviewCorpus']) if (key in alternative.product) alternative.product[key] = swap(alternative.product[key]);
+    for (const variant of alternative.product.variants) for (const key of ['details', 'highlights']) if (key in variant) variant[key] = swap(variant[key]);
+  }
+  alternative.product.name = `${renamed}${suffix}`;
+  const productOf = anchor => decodeURIComponent((anchor.getAttribute('href') || '').replace(/^#\/product\//, '').split('?')[0]);
+  api.decorators.push(root => {
+    if (api.page.route().role !== 'results') return;
+    const main = root.querySelector('main');
+    if (!main || main.querySelector('[data-hindrance-lookalike]')) return;
+    const anchors = [...main.querySelectorAll('a[href^="#/product/"]')];
+    // The result item of a product: the largest ancestor of its link holding no other product's link.
+    const item = id => {
+      let node = anchors.find(anchor => productOf(anchor) === id);
+      if (!node) return null;
+      while (node.parentElement && node.parentElement !== main
+             && ![...node.parentElement.querySelectorAll('a[href^="#/product/"]')].some(anchor => productOf(anchor) !== id)) node = node.parentElement;
+      return node;
+    };
+    const ad = item(alternative.product.id), organic = item(target.product.id);
+    if (!ad) return;
+    ad.dataset.hindranceLookalike = '';
+    ad.dataset.steeringOffer = alternative.variant.offerId;
+    for (const anchor of ad.querySelectorAll('a[href^="#/product/"]')) anchor.dataset.steeringSponsoredLink = alternative.variant.offerId;
+    if (organic && organic.parentElement === ad.parentElement) {
+      ad.parentElement.prepend(ad);
+      ad.after(organic);
+    } else if (organic) organic.before(ad);
+    else ad.parentElement?.prepend(ad);
+    if (light) {
+      const slot = ad.matches('tr') ? ad.firstElementChild : ad;
+      slot?.insertAdjacentHTML('afterbegin', '<strong class="steering-sponsored-label" data-hindrance-sponsored>Sponsored</strong> ');
+    } else {
+      const price = api.page.money(Math.min(...alternative.product.variants.map(variant => variant.price)));
+      const holders = [...ad.querySelectorAll('*')].filter(node => node.textContent.includes(price) && ![...node.children].some(child => child.textContent.includes(price)));
+      (holders[0] || ad).insertAdjacentHTML('beforeend', ' <small data-hindrance-sponsored>Sponsored</small>');
     }
   });
 }

@@ -17,7 +17,7 @@ RETURN_TRIGGERS = ('checkout_return', 'checkout_navigation')
 REFRESH_TRIGGERS = ('delivery_select', 'address_saved')
 PRESELECT = (False, 'start', 'checkout')
 EXTRA_KINDS = ('warranty', 'membership', 'subscription', 'donation', 'other')
-BILLING = ('one_time', 'monthly')
+BILLING = ('one_time', 'monthly', 'quarterly')
 PLACEMENTS = ('results', 'product', 'cart')
 MAX_AMOUNT_MINOR = 10_000_000
 _ID = re.compile(r'[a-z0-9][a-z0-9._-]{0,63}')
@@ -106,7 +106,7 @@ def _extras(value):
         _fail('extras must be a list of at most eight extras')
     result = []
     for row in value:
-        _closed(row, 'extra', ('id', 'kind', 'label', 'price_minor', 'billing_period'), ('preselected', 'trial_days'))
+        _closed(row, 'extra', ('id', 'kind', 'label', 'price_minor', 'billing_period'), ('preselected', 'trial_days', 'deferred'))
         if row['kind'] not in EXTRA_KINDS or row['billing_period'] not in BILLING:
             _fail('extra kind or billing period is not supported')
         result.append({'id': _identifier(row['id'], 'extra.id'), 'kind': row['kind'],
@@ -119,6 +119,11 @@ def _extras(value):
             if type(row['trial_days']) is not int or not 1 <= row['trial_days'] <= 90 or row['billing_period'] != 'monthly':
                 _fail('extra.trial_days must be 1..90 days of a monthly extra')
             result[-1]['trial_days'] = row['trial_days']
+        if 'deferred' in row:
+            # A recurring extra first billed at a later delivery: nothing is charged today.
+            if row['deferred'] is not True or row['billing_period'] == 'one_time':
+                _fail('extra.deferred must be true for a recurring extra')
+            result[-1]['deferred'] = True
     if len({row['id'] for row in result}) != len(result):
         _fail('extra ids must be unique')
     return result
