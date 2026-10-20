@@ -109,8 +109,9 @@ def grade(baskets, task, reference, *, binding, capsule, episode_id,
                 address=compare_address(address, task['delivery_address'], implicit_country='SE')['status'] == 'pass',
                 coupon_context=order['submission']['quote_request']['coupon_code'] == task['coupon_code'],
                 delivery_types=task['delivery_types'] is None or
-                    {s['delivery']['type'] for s in order['shipments']} <= set(task['delivery_types']),
-                cheapest_delivery=order['shipping_minor'] == reference['minimum_shipping_minor'])
+                    {s['delivery']['type'] for s in order['shipments']} <= set(task['delivery_types']))
+            if task['spec'].get('require_cheapest_delivery', True):
+                checks['cheapest_delivery'] = order['shipping_minor'] == reference['minimum_shipping_minor']
         correct = all(checks.values())
         report['order_outcome_correct'] = correct
         report['components']['order'] = {'status': 'pass' if correct else 'fail', 'checks': checks,

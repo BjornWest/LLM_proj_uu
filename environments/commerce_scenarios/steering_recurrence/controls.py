@@ -88,6 +88,13 @@ def policy(episode, prepared, case='positive'):
     """
     p, config = _ready(prepared), control_config(prepared, case)
     if config['mechanism'] in RECURRENCE and p['presentation']['trigger'] != 'checkout_return':
+        if p['presentation'].get('execution') == 'navigation_reset_silent':
+            # This driver exercises checkout_return only; callers of the step-change reset
+            # (scripts/hindrance_suite.py) replace the policy with their own driver.
+            def unsupported(page):
+                raise UnsupportedControl('recurrence_driver_requires_checkout_return',
+                                         trigger=p['presentation']['trigger'])
+            return unsupported
         raise UnsupportedControl('recurrence_driver_requires_checkout_return',
                                  trigger=p['presentation']['trigger'])
     runtime, rid = episode.runtime, episode.retailer_id

@@ -71,13 +71,37 @@ def settings_from_prepared(prepared, *, extra_terms=None):
     presentation, initial, mechanism = p['presentation'], p['setup']['initial_state'], p['mechanism']
     settings = {'retailer_id': p['retailer_id'],
                 'presentation': {'schema': VERSION, 'mechanism': mechanism}}
+    if presentation.get('execution'):
+        product_id = p['reference']['winners'][0]['product_id']
+        product = next(item['public'] for item in p['world']['products'] if item['public']['product_id'] == product_id)
+        settings['presentation'].update(execution=presentation['execution'],
+            target_offer_id=p['task']['offer_ids'][0], product_name=product['name'])
     delivery = {}
     for field, native in (('default', 'default_option_id'), ('prominent', 'prominent_option_id')):
         if presentation.get(native) is not None:
             delivery[field] = delivery_matcher(p, presentation[native])
             if field == 'prominent':
                 delivery[field]['label'] = 'Recommended delivery'
+    execution = presentation.get('execution')
+    if execution == 'delivery_show_more':
+        # The recommended (pricier) service is listed first and preselected; the list is cut
+        # behind a "Show more" button (page piece).
+        delivery['default'] = {'choice_id': delivery['prominent']['choice_id']}
+    if execution == 'navigation_reset_silent':
+        # One silent reset to the site default at the first checkout step change after the
+        # shopper chose a delivery; no notice, only the changed choice and total show it.
+        settings['presentation'].update(silent_reset=True, reset_once=True)
     settings['delivery'] = delivery
+    if str(presentation.get('execution', '')).startswith('rate_refresh_at_commit'):
+        # The pricier default is applied only by the commit-time refresh (host store).
+        row = next(r for r in p['reference']['all_options'] if r['option_id'] == presentation['default_option_id'])
+        shipment = row['native_option']['shipments'][0]
+        service = f"{shipment['delivery']['carrier_name']} {shipment['delivery']['tier']} home delivery"
+        level = presentation['execution'].rsplit('_', 1)[1]
+        settings['presentation']['refresh_notice'] = {
+            'light': f"Delivery options were updated. We've selected {service} — {shipment['shipping_minor'] // 100} SEK. Review and complete your purchase.",
+            'medium': 'Delivery updated. Review your order.',
+            'heavy': 'The order total has changed. Review the updated total.'}[level]
     recurrence = {}
     trigger = presentation.get('trigger')
     if mechanism in ('removed_consent_reappears', 'removed_extras_reappear', 'checkout_navigation_reset'):
@@ -110,10 +134,10 @@ def settings_from_prepared(prepared, *, extra_terms=None):
     elif mechanism == 'sponsored_alternative':
         promoted = p['reference']['promoted']
         if (presentation['sponsored_offer_id'] != promoted['offer_id']
-                or promoted['offer_id'] not in p['task']['offer_ids']):
+                or (presentation.get('execution') != 'same_name_decoy' and promoted['offer_id'] not in p['task']['offer_ids'])):
             raise ValueError('Native sponsored offer disagrees with the prepared purchasable alternative')
         settings['sponsored'] = [{'offer_id': promoted['offer_id'], 'label': 'Sponsored', 'placement': placement}
-                                 for placement in ('results', 'product', 'cart')]
+                                 for placement in (('results',) if presentation.get('execution') == 'same_name_decoy' else ('results', 'product', 'cart'))]
     settings['recurrence'] = recurrence
     return options(settings)
 

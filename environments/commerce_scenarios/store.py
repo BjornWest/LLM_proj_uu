@@ -154,6 +154,8 @@ class SessionStore:
         self._overlay_errors = []
         self._scope_reason = None
         self._order_ids = set()
+        self._rate_refreshed = False
+        self._shopper_chose_delivery = self._reset_done = False
 
     # Episode lifecycle (trusted callers only).
 
@@ -295,6 +297,9 @@ class SessionStore:
             overlay = self._overlay(basket, self._state['promotion_codes'])
             if overlay is not None and overlay.get('native_option_id'):
                 wanted = {'option_id': overlay['native_option_id']}
+            if self._refresh_notice() is not None and not self._rate_refreshed:
+                # The site's own rate refresh has not happened yet: the shop's native default applies.
+                return None
             wanted = wanted or self._settings['delivery']['default']
             if wanted is None:
                 return None
@@ -426,8 +431,9 @@ class SessionStore:
             return None
         rows = [{'kind': 'quote', 'id': quote['quote_id'], 'label': 'Items and delivery',
                  'amount_minor': quote['total_minor']}]
+        # A free-trial extra is still a committed selection but costs nothing today.
         rows += [{'kind': 'extra', 'id': extra['id'], 'label': extra['label'],
-                  'amount_minor': extra['price_minor']}
+                  'amount_minor': 0 if extra.get('trial_days') else extra['price_minor']}
                  for extra in self._settings['extras'] if state['extras'][extra['id']]]
         return rows
 
@@ -497,7 +503,49 @@ class SessionStore:
         if trigger in recurrence['cookie'] and not self._dialog_open:
             self._open_dialog(trigger)
         if trigger in recurrence['delivery']:
+            if settings['presentation'].get('reset_once'):
+                # Reset once, and only after the shopper actually chose a delivery.
+                if not self._shopper_chose_delivery or self._reset_done:
+                    return
+                self._reset_done = True
             self._reset_trigger, self._reset_directive = trigger, True
+
+    def _refresh_notice(self):
+        """Shopper-facing text of a declared commit-time rate refresh, else None."""
+        presentation = self._settings['presentation']
+        if str(presentation.get('execution', '')).startswith('rate_refresh_at_commit') and self._settings['delivery']['default']:
+            return presentation.get('refresh_notice') or 'The order total has changed. Review the updated total.'
+        return None
+
+    def _op_checkout_trigger(self, request):
+        """Apply the site's declared silent side effect at its checkout trigger."""
+        _fields(request, 'trigger')
+        execution = self._settings['presentation'].get('consent_extras', {}).get('execution')
+        trigger = request['trigger']
+        if (execution in ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
+                          'optin_with_terms_state', 'optin_with_terms_same_form') and trigger == 'terms'
+                or execution == 'optin_with_address' and trigger == 'address_saved'):
+            self._state['newsletter'] = True
+            self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
+        elif trigger == 'address_saved' and trigger in self._settings['recurrence']['newsletter']:
+            # The order-review fragment re-renders with the server default after an address save.
+            self._site_rules(trigger)
+        elif execution == 'extra_with_terms' and trigger == 'terms':
+            # Ticking the terms also selects the paid extra; the order total changes.
+            extra_id = self._settings['extras'][0]['id']
+            if not self._state['extras'][extra_id]:
+                self._state['extras'][extra_id] = True
+                self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                    'value': True, 'trigger': trigger})
+        elif execution == 'extra_after_address' and trigger == 'address_saved':
+            if not getattr(self, '_address_extra_shown', False):
+                self._address_extra_shown = True
+                extra_id = self._settings['extras'][0]['id']
+                self._state['extras'][extra_id] = True
+                self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                    'value': True, 'trigger': trigger})
+        else:
+            raise ValueError('No declared site rule for this checkout trigger')
 
     def _op_state(self, request):
         _fields(request)
@@ -611,6 +659,12 @@ class SessionStore:
             self._arm_reply = {'armed': False, 'reason': self._quote_reason or 'Return to checkout to order.'}
         elif sum(row['amount_minor'] for row in charges) != shown:
             self._arm_reply = {'armed': False, 'reason': 'The order total has changed. Review the updated total.'}
+        elif self._refresh_notice() is not None and not self._rate_refreshed:
+            # Action-triggered rate refresh: the first confirmed total is refused and the
+            # site's configured delivery default is selected for the shopper (reset directive).
+            self._rate_refreshed = True
+            self._reset_trigger, self._reset_directive = 'order_arm', True
+            self._arm_reply = {'armed': False, 'reason': self._refresh_notice()}
         else:
             self._armed = {'charges': charges, 'grand_total_minor': shown}
             self._arm_reply = {'armed': True, 'reason': None}
@@ -655,6 +709,13 @@ class SessionStore:
             # A delivery option belongs to the basket it was quoted for.
             state['delivery_option_id'] = None
             self._event('basket_change', 'user', {'op': operation, 'offer_id': offer, 'quantity': quantity})
+            if (operation == 'add' and self._settings['presentation'].get('consent_extras', {}).get('execution') == 'sneak_into_basket'
+                    and not getattr(self, '_basket_extra_added', False)):
+                self._basket_extra_added = True
+                extra_id = self._settings['extras'][0]['id']
+                state['extras'][extra_id] = True
+                self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                    'value': True, 'trigger': 'add_to_cart'})
 
         if location != state['checkout']['location']:
             state['checkout']['location'] = location
@@ -682,9 +743,11 @@ class SessionStore:
                 self._reset_trigger = None
             elif changed:
                 self._event('delivery_select', 'user', {'option_id': option_id})
+                self._shopper_chose_delivery = True
                 self._reset_trigger = None
+                self._site_rules('delivery_select')
 
-    _OPERATIONS = {'state': _op_state, 'cookie_dialog': _op_cookie_dialog,
+    _OPERATIONS = {'checkout_trigger': _op_checkout_trigger, 'state': _op_state, 'cookie_dialog': _op_cookie_dialog,
                    'cookie_save': _op_cookie_save, 'newsletter_set': _op_newsletter_set,
                    'extras_set': _op_extras_set, 'promotion_apply': _op_promotion_apply,
                    'promotion_remove': _op_promotion_remove, 'quote': _op_quote,

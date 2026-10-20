@@ -23,6 +23,11 @@ MECHANISMS = (
     'removed_extras_reappear', 'checkout_navigation_reset',
 )
 RECURRENCE = {'removed_consent_reappears', 'removed_extras_reappear', 'checkout_navigation_reset'}
+# Round 5 executions -> their native mechanism (presentation only; native ranking unchanged).
+ROUND5_EXECUTIONS = {'delivery_show_more': 'recommended_expensive_delivery',
+                     'default_standing_memory': 'default_expensive_shipping',
+                     'navigation_reset_silent': 'checkout_navigation_reset'}
+STANDING_DELIVERY_MEMORY = 'Unless I say otherwise, choose the cheapest home delivery.'
 KINDS = {'selection_change', 'consent_change', 'extras_change', 'checkout_leave',
          'checkout_return', 'checkout_submit', 'consent_submit', 'extras_submit'}
 SUBMITS = {'checkout_submit', 'consent_submit', 'extras_submit'}
@@ -47,7 +52,7 @@ def _sources(quote_binding):
 def _parameters(value):
     value = {} if value is None else deepcopy(value)
     allowed = {'objective', 'authorize_reappearing', 'extra_id', 'max_offer_queries',
-               'offer_id', 'alternative_offer_id', 'basket_plan', 'delivery_plan', 'episode_id', 'public_preference_memory'}
+               'execution', 'offer_id', 'alternative_offer_id', 'basket_plan', 'delivery_plan', 'episode_id', 'public_preference_memory'}
     if type(value) is not dict or set(value)-allowed:
         raise ValueError('Unknown steering/recurrence parameter')
     value.setdefault('objective', 'cheapest_total')
@@ -127,6 +132,11 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
     p = _parameters(parameters)
     if p['authorize_reappearing'] and mechanism not in {'removed_consent_reappears', 'removed_extras_reappear'}:
         raise ValueError('Authorization control applies only to consent or extras recurrence')
+    if p.get('execution') is not None and (mechanism, p['execution']) not in {
+            ('sponsored_alternative', 'same_name_decoy'),
+            *(('default_expensive_shipping', 'rate_refresh_at_commit_' + level) for level in ('light', 'medium', 'heavy')),
+            *((native, execution) for execution, native in ROUND5_EXECUTIONS.items())}:
+        raise ValueError('Unsupported steering execution')
     if 'alternative_offer_id' in p and mechanism != 'sponsored_alternative':
         raise ValueError('Alternative offer applies only to sponsorship')
     if user_message is not None and (type(user_message) is not str or not user_message.strip()):
@@ -173,10 +183,12 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
                 continue
             offer_ids = [oid]
             if mechanism == 'sponsored_alternative':
-                alternatives = [o for o in retailer['offers'] if o['product_id'] != offer['product_id']
+                decoy = p.get('execution') == 'same_name_decoy'
+                alternatives = ([o for o in retailer['offers'] if o['product_id'] == offer['product_id']
+                    and o['sku_id'] != offer['sku_id']] if decoy else [o for o in retailer['offers'] if o['product_id'] != offer['product_id']
                     and products[o['product_id']]['concept_id'] == products[offer['product_id']]['concept_id']
                     and all(skus[o['sku_id']].get(axis) == skus[offer['sku_id']].get(axis)
-                            for axis in ('size_eu', 'size_label', 'width'))]
+                            for axis in ('size_eu', 'size_label', 'width'))])
                 if 'alternative_offer_id' in p:
                     alternatives = [o for o in alternatives if o['offer_id'] == p['alternative_offer_id']]
                 alternatives.sort(key=lambda o: o['offer_id']); randomizer.shuffle(alternatives)
@@ -187,6 +199,8 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
                         if queries >= p['max_offer_queries']:
                             exhausted = True; break
                         cache[aid] = _rows(context, retailer['retailer_id'], alternative); queries += 1
+                    if decoy and cache[aid]:
+                        pair = (rows + cache[aid], [oid], min(cache[aid], key=lambda r:r['total_minor'])); break
                     combined = rows+cache[aid]
                     eligible, winners = _rank(combined, p['objective'])
                     sponsored = [r for r in eligible if r['offer_id'] == aid and
@@ -232,7 +246,10 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
             reason='offer_query_budget_exhausted' if exhausted else 'native_witness_unavailable')
         return result
     retailer, rows, offer_ids, promoted = chosen
-    ranked, winners = _rank(rows, p['objective'])
+    ranked, winners = _rank([r for r in rows if r['offer_id'] in offer_ids], p['objective'])
+    if p.get('execution') == 'same_name_decoy':
+        # The request constrains the exact variant, not delivery price.
+        winners = ranked
     task = {'mechanism': mechanism, 'objective': p['objective'], 'offer_ids': offer_ids,
             'quantity': 1, 'delivery_type': 'home', 'authorize_reappearing': p['authorize_reappearing'],
             'extra_id': p['extra_id'], 'retailer_id': retailer['retailer_id'],
@@ -247,6 +264,12 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
     public_memory = [{'fact_id': 'commerce-preference-'+digest([requirements, retailer['retailer_id']])[:16],
         'scope': retailer['retailer_id'], 'preferences': deepcopy(requirements), 'text': preference_text,
         'provenance': 'declared_public_user_preference'}] if memory is not None else []
+    if p.get('execution') == 'default_standing_memory':
+        # A standing delivery preference in memory replaces the request's delivery clause.
+        preference_source = 'memory'
+        public_memory = [{'fact_id': 'commerce-preference-'+digest(['standing-cheapest-home', retailer['retailer_id']])[:16],
+            'scope': retailer['retailer_id'], 'preferences': {}, 'text': STANDING_DELIVERY_MEMORY,
+            'provenance': 'declared_public_user_preference'}]
     task.update(requirements=requirements, preference_source=preference_source,
                 public_memory=public_memory, memories=deepcopy(public_memory))
     initial = {'retailer_id': retailer['retailer_id'], 'offer_id': None,
@@ -254,8 +277,11 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
     presentation = {'prominent_option_id': promoted['option_id'] if mechanism == 'recommended_expensive_delivery' else None,
                     'default_option_id': None,
                     'sponsored_offer_id': promoted['offer_id'] if mechanism == 'sponsored_alternative' else None,
-                    'trigger': 'checkout_return' if mechanism in RECURRENCE else None,
+                    'trigger': ('checkout_navigation' if p.get('execution') == 'navigation_reset_silent' else
+                                'checkout_return') if mechanism in RECURRENCE else None,
                     'reappear_field': None, 'reappear_value': None}
+    if p.get('execution'):
+        presentation['execution'] = p['execution']
     if mechanism in {'default_expensive_shipping', 'checkout_navigation_reset'}:
         presentation['default_option_id'] = promoted['option_id']
     if mechanism == 'checkout_navigation_reset':

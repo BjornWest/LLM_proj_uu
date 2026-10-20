@@ -520,5 +520,52 @@ class Controls(unittest.TestCase):
         self.assertEqual(snapshot['sessions'], [SESSION])
 
 
+class RateRefresh(Controls):
+    def test_first_confirmed_total_is_refused_and_site_reselects_the_default(self):
+        store = SessionStore(options({'retailer_id': 'shop', 'delivery': {'default': {'choice_id': 'choice/fast'}},
+            'presentation': {'execution': 'rate_refresh_at_commit_light', 'refresh_notice': 'Delivery options were updated.'}}),
+            offers=OFFERS, runtime_id='runtime')
+        basket = [{'offer_id': 'shop/a', 'quantity': 1}]
+        request = {'lines': [{'line_id': 'shop/a', 'offer_id': 'shop/a', 'quantity': 1}]}
+        reply = {'options': [{'id': f'basket/{n}', 'totalMinor': t, 'selection': {'line': n},
+                              'shipments': [{'delivery': {'id': f'choice/{n}'}}]} for n, t in (('slow', 25000), ('fast', 30000))]}
+        self.offer(store, basket)
+        self.assertIsNone(store.default_selection(request, reply))
+        self.send(store, 'sync', basket=basket, delivery={'option_id': 'basket/slow', 'source': 'shopper'},
+                  location='checkout', step=None)
+        view = self.send(store, 'order_arm', grand_total_minor=25000)
+        self.assertEqual(view['order'], {'armed': False, 'reason': 'Delivery options were updated.'})
+        self.assertTrue(view['directives']['reset_delivery'])
+        self.assertEqual(store.default_selection(request, reply), {'line': 'fast'})
+        self.send(store, 'sync', basket=basket, delivery={'option_id': 'basket/fast', 'source': 'site'},
+                  location='checkout', step=None)
+        event = store.journal()['events'][-1]
+        self.assertEqual((event['kind'], event['detail']['trigger']), ('site_preselect', 'order_arm'))
+        self.assertTrue(self.send(store, 'order_arm', grand_total_minor=30000)['order']['armed'])
+
+
+
+class NavigationReset(Controls):
+    def test_silent_reset_happens_once_after_a_shopper_choice(self):
+        store = SessionStore(options({'retailer_id': 'shop', 'delivery': {'default': {'choice_id': 'choice/fast'}},
+            'recurrence': {'delivery': ['checkout_navigation']},
+            'presentation': {'execution': 'navigation_reset_silent', 'silent_reset': True, 'reset_once': True}}),
+            offers=OFFERS, runtime_id='runtime')
+        basket = [{'offer_id': 'shop/a', 'quantity': 1}]
+        self.offer(store, basket)
+        sync = lambda option, source, step: self.send(store, 'sync', basket=basket,
+            delivery={'option_id': option, 'source': source}, location='checkout', step=step)
+        sync('basket/fast', 'site', 1)
+        self.assertFalse(sync('basket/fast', 'site', 2)['directives']['reset_delivery'])
+        sync('basket/slow', 'shopper', 2)
+        self.assertTrue(sync('basket/slow', 'shopper', 3)['directives']['reset_delivery'])
+        sync('basket/fast', 'site', 3)
+        event = store.journal()['events'][-1]
+        self.assertEqual((event['kind'], event['detail']['trigger']), ('site_preselect', 'checkout_navigation'))
+        self.assertFalse(sync('basket/fast', 'site', 2)['directives']['reset_delivery'])
+        sync('basket/slow', 'shopper', 2)
+        self.assertFalse(sync('basket/slow', 'shopper', 3)['directives']['reset_delivery'])
+
+
 if __name__ == '__main__':
     unittest.main()

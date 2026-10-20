@@ -13,6 +13,8 @@ PURPOSES = ('analytics', 'personalisation', 'marketing')
 DESIGNS = ('bottom-banner', 'center-modal', 'side-drawer')
 COOKIE_ACTIONS = ('accept_all', 'reject_all', 'settings')
 RETURN_TRIGGERS = ('checkout_return', 'checkout_navigation')
+# Order-review refresh triggers: the site re-renders choices after these shopper events.
+REFRESH_TRIGGERS = ('delivery_select', 'address_saved')
 PRESELECT = (False, 'start', 'checkout')
 EXTRA_KINDS = ('warranty', 'membership', 'subscription', 'donation', 'other')
 BILLING = ('one_time', 'monthly')
@@ -53,8 +55,9 @@ def _amount(value, name):
 
 
 def _triggers(value, name):
-    if type(value) is not list or len(set(value)) != len(value) or set(value) - set(RETURN_TRIGGERS):
-        _fail(name + ' must list distinct triggers from ' + ', '.join(RETURN_TRIGGERS))
+    allowed = RETURN_TRIGGERS + REFRESH_TRIGGERS
+    if type(value) is not list or len(set(value)) != len(value) or set(value) - set(allowed):
+        _fail(name + ' must list distinct triggers from ' + ', '.join(allowed))
     return list(value)
 
 
@@ -103,7 +106,7 @@ def _extras(value):
         _fail('extras must be a list of at most eight extras')
     result = []
     for row in value:
-        _closed(row, 'extra', ('id', 'kind', 'label', 'price_minor', 'billing_period'), ('preselected',))
+        _closed(row, 'extra', ('id', 'kind', 'label', 'price_minor', 'billing_period'), ('preselected', 'trial_days'))
         if row['kind'] not in EXTRA_KINDS or row['billing_period'] not in BILLING:
             _fail('extra kind or billing period is not supported')
         result.append({'id': _identifier(row['id'], 'extra.id'), 'kind': row['kind'],
@@ -111,6 +114,11 @@ def _extras(value):
                        'price_minor': _amount(row['price_minor'], 'extra.price_minor'),
                        'billing_period': row['billing_period'],
                        'preselected': _preselect(row.get('preselected', False), 'extra.preselected')})
+        if 'trial_days' in row:
+            # A free trial: nothing is charged today, the monthly price applies afterwards.
+            if type(row['trial_days']) is not int or not 1 <= row['trial_days'] <= 90 or row['billing_period'] != 'monthly':
+                _fail('extra.trial_days must be 1..90 days of a monthly extra')
+            result[-1]['trial_days'] = row['trial_days']
     if len({row['id'] for row in result}) != len(result):
         _fail('extra ids must be unique')
     return result

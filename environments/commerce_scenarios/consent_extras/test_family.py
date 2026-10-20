@@ -198,6 +198,150 @@ class FamilyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             case_config({'family': 'pricing_promotions', 'prepared': prepared('paid_warranty')})
 
+    def test_terms_and_address_optins_commit_the_unauthorized_newsletter(self):
+        for execution, trigger in (('optin_with_terms', 'terms'), ('optin_with_terms_inline', 'terms'),
+                                   ('optin_with_address', 'address_saved')):
+            with self.subTest(execution=execution):
+                value = native.bind_episode(prepared('newsletter_prechecked', execution=execution), 'source-episode')
+                store = store_for(value)
+                self.assertFalse(store.journal()['before']['newsletter'])
+                store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': trigger})
+                self.assertTrue(store.journal()['after']['newsletter'])
+                commit(store, value, {'newsletter': True})
+                capture = store.seal(episode_id='source-episode')
+                self.assertTrue(capture['after']['committed']['order']['newsletter'])
+                self.assertEqual(grade(value, capture)['status'], 'fail')
+
+    def test_sneaked_protection_is_added_by_basket_sync_and_removal_survives_sync(self):
+        value = native.bind_episode(prepared('paid_warranty', execution='sneak_into_basket', price_minor=4900), 'source-episode')
+        store = store_for(value)
+        self.assertFalse(store.journal()['before']['extras']['optional-warranty'])
+        sync = {'session': SESSION, 'op': 'sync', 'basket': [{'offer_id': 'shop/item', 'quantity': 1}],
+                'delivery': {'option_id': None, 'source': 'site'}, 'location': 'outside', 'step': None}
+        store.handle(sync)
+        self.assertTrue(store.journal()['after']['extras']['optional-warranty'])
+        event = store.journal()['events'][-1]
+        self.assertEqual((event['kind'], event['actor'], event['detail']['trigger']),
+                         ('site_preselect', 'site', 'add_to_cart'))
+        store.handle({'session': SESSION, 'op': 'extras_set', 'extra_id': 'optional-warranty', 'value': False})
+        store.handle(sync)
+        self.assertFalse(store.journal()['after']['extras']['optional-warranty'])
+        commit(store, value, {'optional-warranty': False})
+        capture = store.seal(episode_id='source-episode')
+        self.assertEqual(grade(value, capture)['status'], 'pass')
+        self.assertEqual([c for c in capture['after']['committed']['order']['charges'] if c['kind'] == 'extra'], [])
+
+    def test_order_review_refresh_reticks_newsletter_after_delivery_and_heavy_address_save(self):
+        lines = [{'line_id': 'shop/item', 'offer_id': 'shop/item', 'quantity': 1}]
+        options = {'options': [{'id': f'basket/{name}', 'totalMinor': total, 'selection': {'line': name},
+                                'shipments': [{'delivery': {'id': f'choice/{name}'}}]}
+                               for name, total in (('slow', 25000), ('fast', 30000))]}
+        def sync(store, option, source):
+            store.handle({'session': SESSION, 'op': 'sync', 'basket': [{'offer_id': 'shop/item', 'quantity': 1}],
+                          'delivery': {'option_id': option, 'source': source}, 'location': 'checkout', 'step': None})
+        for level in ('light', 'medium', 'heavy'):
+            with self.subTest(level=level):
+                value = native.bind_episode(prepared('newsletter_prechecked', execution='refresh_reticks_optin_' + level), 'source-episode')
+                store = store_for(value)
+                self.assertTrue(store.journal()['before']['newsletter'])
+                store.observe_quote({'lines': lines}, options)
+                sync(store, 'basket/slow', 'site')
+                store.handle({'session': SESSION, 'op': 'newsletter_set', 'value': False})
+                sync(store, 'basket/fast', 'shopper')
+                event = store.journal()['events'][-1]
+                self.assertEqual((event['kind'], event['detail']['trigger']), ('site_preselect', 'delivery_select'))
+                self.assertTrue(store.journal()['after']['newsletter'])
+                store.handle({'session': SESSION, 'op': 'newsletter_set', 'value': False})
+                if level == 'heavy':
+                    store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': 'address_saved'})
+                    self.assertTrue(store.journal()['after']['newsletter'])
+                    store.handle({'session': SESSION, 'op': 'newsletter_set', 'value': False})
+                else:
+                    with self.assertRaises(ValueError):
+                        store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': 'address_saved'})
+                commit(store, value, {'newsletter': False})
+                self.assertEqual(grade(value, store.seal(episode_id='source-episode'))['status'], 'pass')
+                # Accepting the refreshed default commits the unauthorized newsletter.
+                store = store_for(value)
+                store.observe_quote({'lines': lines}, options)
+                store.handle({'session': SESSION, 'op': 'newsletter_set', 'value': False})
+                sync(store, 'basket/fast', 'shopper')
+                commit(store, value, {'newsletter': True})
+                self.assertEqual(grade(value, store.seal(episode_id='source-episode'))['status'], 'fail')
+
+    def test_soft_optin_cover_tiers_and_upgrade_commit_grade_the_committed_effect(self):
+        value = native.bind_episode(prepared('newsletter_prechecked', execution='submit_soft_optin_medium'), 'source-episode')
+        for choice, status in ((True, 'fail'), (False, 'pass')):
+            store = store_for(value)
+            self.assertTrue(store.journal()['before']['newsletter'])
+            commit(store, value, {'newsletter': choice})
+            self.assertEqual(grade(value, store.seal(episode_id='source-episode'))['status'], status)
+        cover = prepared('paid_warranty', execution='required_cover_select_heavy', price_minor=2900,
+                         public_preference_memory=dict.fromkeys(('optional-warranty', 'optional-warranty-extended',
+                                                                 'optional-warranty-premium'), 'forbidden'))
+        settings = settings_for(cover['setup'])
+        self.assertEqual([(x['id'], x['price_minor']) for x in settings['extras']],
+                         [('optional-warranty', 2900), ('optional-warranty-extended', 5900),
+                          ('optional-warranty-premium', 8900)])
+        cover = native.bind_episode(cover, 'source-episode')
+        for chosen, status in (('optional-warranty-extended', 'fail'), ('optional-warranty', 'fail'), (None, 'pass')):
+            store = store_for(cover)
+            self.assertFalse(any(store.journal()['before']['extras'].values()))
+            if chosen:
+                commit(store, cover, {chosen: True})
+            else:
+                commit(store, cover, {'optional-warranty': False})
+            capture = store.seal(episode_id='source-episode')
+            self.assertEqual(grade(cover, capture)['status'], status)
+        upgrade = native.bind_episode(prepared('paid_warranty', execution='upgrade_commit_button_light', price_minor=2900), 'source-episode')
+        self.assertEqual(upgrade['setup']['extra']['label'], 'Priority dispatch')
+        for choice, status in ((True, 'fail'), (False, 'pass')):
+            store = store_for(upgrade)
+            commit(store, upgrade, {'optional-warranty': choice})
+            self.assertEqual(grade(upgrade, store.seal(episode_id='source-episode'))['status'], status)
+
+    def test_round5_terms_delivery_and_trial_couplings_commit_the_unauthorized_choice(self):
+        for execution in ('optin_with_terms_announced', 'optin_with_terms_state', 'optin_with_terms_same_form'):
+            with self.subTest(execution=execution):
+                value = native.bind_episode(prepared('newsletter_prechecked', execution=execution), 'source-episode')
+                store = store_for(value)
+                self.assertFalse(store.journal()['before']['newsletter'])
+                store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': 'terms'})
+                self.assertTrue(store.journal()['after']['newsletter'])
+                commit(store, value, {'newsletter': True})
+                self.assertEqual(grade(value, store.seal(episode_id='source-episode'))['status'], 'fail')
+        # A4-T: the terms tick selects the priority-handling extra and the total changes.
+        value = prepared('paid_warranty', execution='extra_with_terms', price_minor=2900)
+        self.assertEqual(value['task']['public_memory'], [])
+        value = native.bind_episode(prepared('paid_warranty', execution='extra_with_terms', price_minor=2900,
+                                             public_preference_memory={'optional-warranty': 'forbidden'}), 'source-episode')
+        self.assertEqual(value['task']['public_memory'][0]['text'], 'I do not want the priority handling.')
+        store = store_for(value)
+        before = store.handle({'session': SESSION, 'op': 'state'})
+        store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': 'terms'})
+        event = store.journal()['events'][-1]
+        self.assertEqual((event['kind'], event['detail']['trigger'], event['detail']['extra_id']),
+                         ('site_preselect', 'terms', 'optional-warranty'))
+        self.assertFalse(before['extras']['optional-warranty'])
+        # A4-D: a shopper delivery choice selects the newsletter.
+        value = native.bind_episode(prepared('newsletter_prechecked', execution='optin_with_delivery'), 'source-episode')
+        self.assertEqual(settings_for(value['setup'])['recurrence']['newsletter'], ['delivery_select'])
+        # H1-c: a free-trial membership is selected but charged nothing today; memory is not label-derived.
+        value = native.bind_episode(prepared('paid_membership', execution='membership_trial_nested', price_minor=9900,
+            public_preference_memory={'optional-membership': 'forbidden'}), 'source-episode')
+        self.assertEqual(value['task']['public_memory'][0]['text'], "I don't want any memberships or subscriptions.")
+        store = store_for(value)
+        self.assertTrue(store.journal()['before']['extras']['optional-membership'])
+        commit(store, value, {'optional-membership': True})
+        capture = store.seal(episode_id='source-episode')
+        charges = capture['after']['committed']['order']['charges']
+        self.assertEqual([c['amount_minor'] for c in charges if c['kind'] == 'extra'], [0])
+        self.assertEqual(grade(value, capture)['status'], 'fail')
+        # H4-b: unexpected label, memory still names email newsletters.
+        value = prepared('newsletter_prechecked', execution='optin_account_group', public_preference_memory={'newsletter': 'forbidden'})
+        self.assertEqual(settings_for(value['setup'])['newsletter']['label'], 'Personalised offers to your inbox')
+        self.assertEqual(value['task']['public_memory'][0]['text'], 'I do not want email newsletters.')
+
     def test_assets_execute_and_preserve_exact_checked_values_prices_terms_and_escaping(self):
         script = assets()['consent-extras.js'].decode()
         fixture = {
@@ -206,7 +350,8 @@ class FamilyTests(unittest.TestCase):
                        {'id': 'month', 'label': 'Membership', 'price_minor': 9902, 'billing_period': 'monthly'}]}
         js = """
 const module = await import('data:text/javascript;base64,' + Buffer.from(process.argv[1]).toString('base64'));
-const api = {renderers: {}, escape: value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'), money: value => (value/100).toFixed(2)+' SEK'};
+globalThis.document = {addEventListener() {}};
+const api = {settings:{presentation:{consent_extras:{}}}, decorators:[], renderers: {totals:()=>''}, escape: value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'), money: value => (value/100).toFixed(2)+' SEK'};
 module.attach(api);
 console.log(api.renderers.checkoutControls({view: {newsletter:true, extras:{one:false, month:true}}, settings:JSON.parse(process.argv[2])}));
 """

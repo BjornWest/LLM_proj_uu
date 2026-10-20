@@ -249,7 +249,7 @@ for(const mode of ['all','none']) {
   const root={querySelectorAll:()=>[],querySelector:()=>main};
   const api={decorators:[],page:{route:()=>({role:'results'}),conf:{url:mode},money:x=>x+' kr'}};
   attach(api);
-  api.decorators[0](root,{settings:{sponsored:[{offer_id:'shop/b',label:'Sponsored',placement:'results'}]}});
+  api.decorators[0](root,{settings:{presentation:{},sponsored:[{offer_id:'shop/b',label:'Sponsored',placement:'results'}]}});
   const section=main.children[0], article=section.children[1], link=article.children[1].children[0];
   assert.equal(link.href,'#/product/native-model'+(mode==='all'?'?size=42':''));
   assert.equal(link.dataset.steeringSponsoredLink,'shop/b');
