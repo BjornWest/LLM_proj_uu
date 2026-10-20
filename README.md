@@ -1,5 +1,7 @@
 # Intent-preserving browser agent
 
+> **Course submission (1RT730): start with [SUBMISSION.md](SUBMISSION.md)** — it maps the code the report and demo are about.
+
 Our Uppsala University group project explores **how a browser agent can complete a user's task without making unwanted changes**. For example: buy the requested laptop and remove an automatically added warranty. If the user explicitly requests a warranty, keeping it is correct.
 
 We are building the agent's runtime, reproducible test websites, and checks of what actually happened. Current browser experiments use existing models. The training infrastructure has passed small SFT and RL learning tests; training on our browser tasks remains future work.
