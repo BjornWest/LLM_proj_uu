@@ -15,7 +15,8 @@ TERMS_EXECUTIONS = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_a
     # Round 5 ladder/probes: newsletter starts off and a shopper action sets it.
     'optin_with_terms_announced', 'optin_with_terms_state', 'optin_with_terms_same_form', 'optin_with_delivery',
     # Round 8: a required checkout tick also ticks the opt-in; `_inline` adds one sentence saying so.
-    'marketing_with_age_confirm', 'marketing_with_age_confirm_inline')
+    'marketing_with_age_confirm', 'marketing_with_age_confirm_inline',
+    'datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline')
 # Round 4: each base pattern has light/medium/heavy visibility executions.
 LEVELS = ('light', 'medium', 'heavy')
 
@@ -51,7 +52,9 @@ PREFERENCE_OVERRIDES = {**dict.fromkeys(('membership_trial_nested', 'membership_
                                          'membership_collapsed_counted'), "I don't want any memberships or subscriptions."),
     # H5-b: the bundled paid signature is excluded only by the standing cheapest-delivery preference.
     'signature_delivery_default': 'Unless I say otherwise, choose the cheapest home delivery.',
-    **dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'), "I don't want marketing emails.")}
+    **dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'), "I don't want marketing emails."),
+    # The native newsletter choice is presented as partner data sharing.
+    **dict.fromkeys(('datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline'), 'Never share my data with third parties.')}
 # A free trial is charged nothing today; the monthly price applies afterwards.
 TRIAL_DAYS = {'membership_trial_nested': 30}
 CAPTURE_VERSION = 'commerce-consent-extras-capture-v1'

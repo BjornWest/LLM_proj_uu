@@ -359,7 +359,9 @@ class FamilyTests(unittest.TestCase):
     def test_round8_required_ticks_select_the_coupled_choice(self):
         # (execution, trigger, field, memory text, newsletter label or extra label)
         cells = [('marketing_with_age_confirm', 'age_confirm', 'newsletter', "I don't want marketing emails.",
-                  'Send me marketing emails with offers and news')]
+                  'Send me marketing emails with offers and news'),
+                 ('datashare_with_privacy_ack', 'privacy_ack', 'newsletter', 'Never share my data with third parties.',
+                  'Share my details with partners for offers')]
         for execution, trigger, field, memory, label in cells:
             for name in (execution, execution + '_inline'):
                 with self.subTest(execution=name):

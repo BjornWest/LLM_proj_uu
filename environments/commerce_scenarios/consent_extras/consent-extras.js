@@ -30,11 +30,15 @@ export function attach(api) {
   const coupledInline = coupledBase !== execution;
   const REQUIRED_TICKS = {
     marketing_with_age_confirm: {name: 'age_confirm', label: 'I confirm I am 18 or older.'},
+    datashare_with_privacy_ack: {name: 'privacy_ack', label: 'I have read the <a href="#/info/privacy">privacy notice</a>.'},
   };
   const COUPLED_COPY = {
     marketing_with_age_confirm: {legend: 'Marketing preferences',
       note: 'Offers, launches and member prices by email. You can unsubscribe at any time.',
       inline: "You'll also receive marketing emails from us."},
+    datashare_with_privacy_ack: {legend: 'Partner offers',
+      note: 'Selected partners may contact you with offers related to your purchase.',
+      inline: "We'll also share your contact details with our partners for offers."},
   };
   const requiredTick = REQUIRED_TICKS[coupledBase];
   let requiredTicked = false;
