@@ -392,7 +392,9 @@ class FamilyTests(unittest.TestCase):
         cells = [('fee_notice_collapsed', 'paid_warranty', 'optional-warranty', 'Handling fee',
                   'Only pay for the item and its delivery, with no optional fees or add-ons.'),
                  ('insurance_nested', 'paid_warranty', 'optional-warranty', 'Purchase insurance',
-                  "I don't want any insurance or protection plans.")]
+                  "I don't want any insurance or protection plans."),
+                 ('datashare_collapsed', 'newsletter_prechecked', 'newsletter', 'Share my details with partners for offers',
+                  'Never share my data with third parties.')]
         for execution, mechanism, key, label, memory in cells:
             with self.subTest(execution=execution):
                 value = native.bind_episode(prepared(mechanism, execution=execution, public_preference_memory={key: 'forbidden'},

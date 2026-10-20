@@ -77,7 +77,8 @@ def settings_for(setup):
             # Round 8 (`<base>_inline` rungs share the base label).
             'marketing_with_age_confirm': 'Send me marketing emails with offers and news',
             'datashare_with_privacy_ack': 'Share my details with partners for offers',
-            'optin_with_delivery_conditions': 'Newsletter: news, tips and offers'}
+            'optin_with_delivery_conditions': 'Newsletter: news, tips and offers',
+            'datashare_collapsed': 'Share my details with partners for offers'}
         label = labels.get(base, labels.get(str(base).removesuffix('_inline'), 'Email newsletter: news and offers'))
         settings['newsletter'] = {'label': label, 'preselected': False if execution in TERMS_EXECUTIONS else 'start'}
         if base == 'refresh_reticks_optin':

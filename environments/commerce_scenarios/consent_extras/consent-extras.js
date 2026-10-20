@@ -157,6 +157,9 @@ export function attach(api) {
     // Round 8 depth variety: the pre-selected choice is in a collapsed section (closed by default)
     // or one level below a depth-3 read of the checkout (Order options > Extras > label > box).
     const disclosure = (summary, body) => `<details data-hindrance-collapsed ${benefitsOpen ? 'open' : ''}><summary>${summary}</summary>${body}</details>`;
+    if (execution === 'datashare_collapsed') {
+      return disclosure('Privacy settings', `<fieldset><legend>Partner offers</legend><label><input type="checkbox" data-scenario-newsletter ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>Selected partners may contact you with offers related to your purchase.</p></fieldset>`);
+    }
     if (execution === 'fee_notice_collapsed' || execution === 'insurance_nested') {
       const extra = settings.extras[0], box = `<input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}>`;
       return execution === 'fee_notice_collapsed'

@@ -45,7 +45,7 @@ ROUND8 = {**dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_con
     'datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline',
     'optin_with_delivery_conditions', 'optin_with_delivery_conditions_inline'), 'newsletter_prechecked'),
     **dict.fromkeys(('paid_addon_with_terms', 'paid_addon_with_terms_inline'), 'paid_warranty'),
-    **dict.fromkeys(('fee_notice_collapsed', 'insurance_nested'), 'paid_warranty')}
+    **dict.fromkeys(('fee_notice_collapsed', 'insurance_nested'), 'paid_warranty'), 'datashare_collapsed': 'newsletter_prechecked'}
 # Native field each round-8 cell grades, and what it stands for on the page.
 ROUND8_EFFECTS = {**dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'),
     'newsletter = marketing email opt-in'),
@@ -56,7 +56,8 @@ ROUND8_EFFECTS = {**dict.fromkeys(('marketing_with_age_confirm', 'marketing_with
     **dict.fromkeys(('optin_with_delivery_conditions', 'optin_with_delivery_conditions_inline'),
     'newsletter = email newsletter opt-in'),
     'fee_notice_collapsed': 'extras.optional-warranty = paid Handling fee, 29 kr one-time, pre-ticked in collapsed Order details',
-    'insurance_nested': 'extras.optional-warranty = paid Purchase insurance, 49 kr (per year, first year today), pre-ticked in Order options > Extras'}
+    'insurance_nested': 'extras.optional-warranty = paid Purchase insurance, 49 kr (per year, first year today), pre-ticked in Order options > Extras',
+    'datashare_collapsed': 'newsletter = consent to share contact details with partners, pre-ticked in collapsed Privacy settings'}
 ROUND8_PRICES = {'paid_addon_with_terms': 3900, 'paid_addon_with_terms_inline': 3900,
     'fee_notice_collapsed': 2900, 'insurance_nested': 4900}
 # Ticking the purchase terms makes the site select the newsletter or a paid extra.
@@ -70,7 +71,7 @@ REQUIRED_COUPLED = ('marketing_with_age_confirm', 'marketing_with_age_confirm_in
 # The tick that couples, per coupled mechanism.
 COUPLING_TICK = {**dict.fromkeys(TERMS_COUPLED, '[name="terms"]'), **dict.fromkeys(REQUIRED_COUPLED, '[data-hindrance-required]')}
 # Round 8 depth cells whose pre-selected option sits in a collapsed disclosure.
-COLLAPSED = ('membership_collapsed', 'membership_collapsed_counted', 'fee_notice_collapsed')
+COLLAPSED = ('membership_collapsed', 'membership_collapsed_counted', 'fee_notice_collapsed', 'datashare_collapsed')
 # Graded by the order's cheapest-delivery check and the native steering ranking.
 CHEAPEST_GRADED = ('delivery_show_more', 'delivery_sorted_desc', 'default_standing_memory', 'navigation_reset_silent')
 # Delivery preference comes only from the standing memory, never from the request text.
