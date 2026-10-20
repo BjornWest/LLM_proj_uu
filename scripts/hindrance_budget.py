@@ -157,12 +157,31 @@ def _plan_surcharge_over_budget(generated, budget, reference, output):
                        f'carries a {sek(surcharge)} remote-area surcharge at checkout.'}
 
 
+def _plan_late_fee_over_budget(generated, budget, reference, output):
+    clean = sorted(o['totalMinor'] for o in reference['options'])
+    need = budget + margin(budget) - clean[0]
+    fee = next((x for x in HANDLING_FEES if x >= need), None)
+    if fee is None:
+        raise answers.Skip(f'a handling fee of {sek(need)} is above the largest realistic fee')
+    return {'trapped_world_dir': generated['world_dir'], 'trapped_totals_minor': [t + fee for t in clean],
+            'fee_minor': fee, 'fee_id': FEE_ID,
+            'witness': f'{generated["winner"]["retailer_name"]} adds a {sek(fee)} handling fee to every order, '
+                       f'shown only in the final checkout review.'}
+
+
 def scenario_for(recipe):
     """ScenarioRuntime settings and page pieces for a trapped budget recipe, or (None, None)."""
     plan, mechanism = recipe['budget'], recipe['mechanism']
     base, level = base_of(mechanism), level_of(mechanism)
     if recipe['clean'] or level == 'heavy' and base != 'late_fee_over_budget':
         return None, None
+    if base == 'late_fee_over_budget':
+        extra = {'id': FEE_ID, 'kind': 'other', 'label': 'Handling fee', 'price_minor': plan['fee_minor'],
+                 'billing_period': 'one_time', 'preselected': 'checkout'}
+        presentation = {'execution': mechanism, 'fee_id': FEE_ID, 'fee_minor': plan['fee_minor'],
+                        'announce': level == 'light'}
+        return ({'retailer_id': plan['retailer_id'], 'extras': [extra], 'presentation': presentation},
+                {'budget-fee.js': PIECE.read_bytes()})
     if base == 'size_step_over_budget':
         presentation = {'execution': 'size_price_step_light', 'offer_id': plan['offer_id'], 'size': str(plan['size']),
                         'stepped_minor': plan['stepped_price_minor'], 'base_minor': plan['base_price_minor'],
@@ -209,4 +228,4 @@ def grade(recipe, native, answer):
 
 
 def sources():
-    return {str(Path(__file__).resolve()): sha256(Path(__file__).read_bytes()).hexdigest()}
+    return {str(path.resolve()): sha256(path.read_bytes()).hexdigest() for path in (Path(__file__), PIECE)}
