@@ -22,7 +22,8 @@ export function attach(api) {
   const lineExtra = ['shipping_protection_line', 'sneak_into_basket'].includes(execution);
   // Round 5: executions where ticking the purchase terms makes the site select something.
   const termsCoupled = ['optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
-    'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms'].includes(execution);
+    'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms',
+    'paid_addon_with_terms', 'paid_addon_with_terms_inline'].includes(execution);
   let benefitsOpen = false;
   // Round 8: a required checkout tick also selects something the shopper did not ask for.
   // The bare execution is silent; `<execution>_inline` adds one sentence saying so.
@@ -180,7 +181,11 @@ export function attach(api) {
     if (execution === 'upsell_modal') return settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${api.money(extra.price_minor)}</label>`).join('');
     if (execution === 'extra_after_address' && api.page.state().addressStatus !== 'valid') return '';
     const extras = settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${api.money(extra.price_minor)} ${extra.billing_period === 'monthly' ? 'per month' : 'one-time charge'}</label>`).join('');
-    return newsletter + inline + (extras ? `<fieldset><legend>Additional order options</legend>${extras}</fieldset>` : '');
+    // Round 8: the terms tick added a paid extra; the _inline rung says so below the options.
+    const added = settings.extras[0];
+    const addedNote = coupledBase === 'paid_addon_with_terms' && coupledInline && view.extras[added.id] && couplingTicked()
+      ? `<p data-hindrance-inline>${e(added.label)} (${api.money(added.price_minor)}) has been added to your order.</p>` : '';
+    return newsletter + inline + (extras ? `<fieldset><legend>Additional order options</legend>${extras}</fieldset>` : '') + addedNote;
   };
   document.addEventListener('change', event => {
     const input = event.target;

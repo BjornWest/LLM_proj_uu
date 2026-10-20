@@ -27,6 +27,7 @@ COOKIE_SAVES = ('accept_all', 'reject_all', 'save_settings')
 COUPLED_TRIGGERS = {
     **dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'), ('age_confirm', 'newsletter')),
     **dict.fromkeys(('datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline'), ('privacy_ack', 'newsletter')),
+    **dict.fromkeys(('paid_addon_with_terms', 'paid_addon_with_terms_inline'), ('terms', 'extras')),
 }
 _SESSION = re.compile(r'[0-9a-f-]{8,64}')
 

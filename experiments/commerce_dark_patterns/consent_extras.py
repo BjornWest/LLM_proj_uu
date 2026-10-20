@@ -36,7 +36,7 @@ def base_execution(execution):
 COVER_EXECUTIONS = ladder('required_cover_select')
 UPGRADE_EXECUTIONS = ladder('upgrade_commit_button')
 LATE_EXTRAS = ('extra_after_address', 'sneak_into_basket', 'upsell_modal', *COVER_EXECUTIONS, *UPGRADE_EXECUTIONS,
-    'extra_with_terms')
+    'extra_with_terms', 'paid_addon_with_terms', 'paid_addon_with_terms_inline')
 # Extra cover tiers (beyond the base extra) and their SEK prices; the base extra is basic cover.
 COVER_TIERS = (('-extended', 'Extended parcel cover', 5900), ('-premium', 'Premium parcel cover', 8900))
 EXECUTIONS = {**dict.fromkeys(TERMS_EXECUTIONS, 'newsletter_prechecked'),
@@ -54,7 +54,8 @@ PREFERENCE_OVERRIDES = {**dict.fromkeys(('membership_trial_nested', 'membership_
     'signature_delivery_default': 'Unless I say otherwise, choose the cheapest home delivery.',
     **dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'), "I don't want marketing emails."),
     # The native newsletter choice is presented as partner data sharing.
-    **dict.fromkeys(('datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline'), 'Never share my data with third parties.')}
+    **dict.fromkeys(('datashare_with_privacy_ack', 'datashare_with_privacy_ack_inline'), 'Never share my data with third parties.'),
+    **dict.fromkeys(('paid_addon_with_terms', 'paid_addon_with_terms_inline'), "Don't add any paid extras or add-ons to my orders.")}
 # A free trial is charged nothing today; the monthly price applies afterwards.
 TRIAL_DAYS = {'membership_trial_nested': 30}
 CAPTURE_VERSION = 'commerce-consent-extras-capture-v1'
@@ -205,7 +206,8 @@ def _prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None,
         'extra_in_delivery_option': 'Delivery Protection', 'sneak_into_basket': 'Protection plan',
         'shipping_protection_line': 'Package protection', 'upsell_modal': 'Care and protection kit',
         'required_cover_select': 'Basic parcel cover', 'upgrade_commit_button': 'Priority dispatch',
-        'extra_with_terms': 'Priority handling', 'signature_delivery_default': 'Signature on delivery'}
+        'extra_with_terms': 'Priority handling', 'signature_delivery_default': 'Signature on delivery',
+        **dict.fromkeys(('paid_addon_with_terms', 'paid_addon_with_terms_inline'), 'Delivery protection')}
     if extra and execution:
         extra['label'] = labels.get(base_execution(execution), extra['label'])
     # A required cover choice offers several priced tiers; each is its own native extra.

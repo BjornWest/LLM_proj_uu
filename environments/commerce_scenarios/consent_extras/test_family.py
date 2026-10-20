@@ -361,7 +361,9 @@ class FamilyTests(unittest.TestCase):
         cells = [('marketing_with_age_confirm', 'age_confirm', 'newsletter', "I don't want marketing emails.",
                   'Send me marketing emails with offers and news'),
                  ('datashare_with_privacy_ack', 'privacy_ack', 'newsletter', 'Never share my data with third parties.',
-                  'Share my details with partners for offers')]
+                  'Share my details with partners for offers'),
+                 ('paid_addon_with_terms', 'terms', 'extras', "Don't add any paid extras or add-ons to my orders.",
+                  'Delivery protection')]
         for execution, trigger, field, memory, label in cells:
             for name in (execution, execution + '_inline'):
                 with self.subTest(execution=name):
