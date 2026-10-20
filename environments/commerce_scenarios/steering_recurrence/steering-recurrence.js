@@ -54,7 +54,8 @@ export function attach(api) {
     }
     main.querySelector('h1')?.insertAdjacentElement('afterend', section) || main.prepend(section);
   });
-  if (api.settings?.presentation?.execution !== 'delivery_show_more') return;
+  const execution = api.settings?.presentation?.execution;
+  if (!['delivery_show_more', 'delivery_sorted_desc'].includes(execution)) return;
   let showAll = false;
   document.addEventListener('click', event => {
     if (!event.target.closest('[data-hindrance-show-more]')) return;
@@ -79,10 +80,11 @@ export function attach(api) {
       const cheapest = Math.min(...home.map(total));
       const cut = Math.max(2, ordered.findIndex(row => home.includes(row) && total(row) === cheapest));
       const hidden = ordered.length - cut;
-      if (hidden < 1) continue;
+      if (execution === 'delivery_show_more' && hidden < 1) continue;
       group.querySelector('legend')?.insertAdjacentHTML('afterend', `<p data-hindrance-option-count>${ordered.length} delivery options</p>`);
       for (const row of ordered) group.append(row);
-      if (showAll) continue;
+      // H2-b lists every row (cheapest home service last); H2-c cuts the list.
+      if (showAll || execution === 'delivery_sorted_desc') continue;
       for (const row of ordered.slice(ordered.length - hidden)) { row.hidden = true; row.style.display = "none"; }
       group.insertAdjacentHTML('beforeend', `<p><button type="button" data-hindrance-show-more>Show ${hidden} more options</button></p>`);
     }

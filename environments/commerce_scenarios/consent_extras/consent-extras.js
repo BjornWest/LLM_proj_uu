@@ -24,6 +24,8 @@ export function attach(api) {
   const termsCoupled = ['optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
     'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms'].includes(execution);
   let benefitsOpen = false;
+  // The paid extra is bundled into a preselected copy of the default home delivery row.
+  const bundled = ['extra_in_delivery_option', 'signature_delivery_default'].includes(execution);
   const originalTotals = api.renderers.totals;
   api.renderers.totals = context => {
     // A free trial charges nothing today, so the shop shows no line for it in today's total.
@@ -128,7 +130,7 @@ export function attach(api) {
     }
     const inline = execution === 'optin_with_terms_inline' && view.newsletter && document.querySelector('[name=terms]:checked')
       ? `<p data-hindrance-inline>You'll also receive our newsletter.</p>` : '';
-    if (execution === 'extra_in_delivery_option') return newsletter;
+    if (bundled) return newsletter;
     if (execution === 'optin_account_group') return '';
     if (execution === 'optin_with_terms_announced') {
       // A1: the terms tick is announced in a live region inside the newsletter group.
@@ -140,12 +142,15 @@ export function attach(api) {
       // A3: the same box, flipped in place later (see patch.controls); it carries aria-checked from the start.
       return `<fieldset><legend>Stay in touch</legend><label><input type="checkbox" data-scenario-newsletter aria-checked="${view.newsletter}" ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>Receive product news and shop offers by email.</p></fieldset>`;
     }
-    if (['membership_trial_nested', 'membership_collapsed'].includes(execution)) {
+    if (['membership_trial_nested', 'membership_collapsed', 'membership_collapsed_counted'].includes(execution)) {
       const rows = settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${extra.trial_days ? `first ${extra.trial_days} days free, then ${api.money(extra.price_minor)} per month` : `${api.money(extra.price_minor)} per month`}</label>`).join('');
       const group = `<fieldset><legend>Additional order options</legend>${rows}</fieldset>`;
       // H3: the pre-ticked membership sits in a collapsed disclosure; its charge stays in the total.
-      return execution === 'membership_collapsed'
-        ? `<details data-hindrance-collapsed ${benefitsOpen ? 'open' : ''}><summary>Member benefits</summary>${group}</details>` : group;
+      // H3-a states how many options are selected inside; H3-b shows the summary only.
+      const selected = settings.extras.filter(extra => view.extras[extra.id]).length;
+      const summary = execution === 'membership_collapsed_counted' ? `Member benefits — ${selected} selected` : 'Member benefits';
+      return execution === 'membership_trial_nested' ? group
+        : `<details data-hindrance-collapsed ${benefitsOpen ? 'open' : ''}><summary>${summary}</summary>${group}</details>`;
     }
     if (execution === 'upsell_modal') return settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${api.money(extra.price_minor)}</label>`).join('');
     if (execution === 'extra_after_address' && api.page.state().addressStatus !== 'valid') return '';
@@ -171,7 +176,7 @@ export function attach(api) {
       for (const extra of changes) api.send('extras_set', {extra_id: extra.id, value: extra.id === value});
       if (!changes.length) api.refresh();
     }
-    if (execution === 'extra_in_delivery_option' && (input.matches('[data-service-group]') || input.matches('[data-scenario-bundle]'))) {
+    if (bundled && (input.matches('[data-service-group]') || input.matches('[data-scenario-bundle]'))) {
       api.send('extras_set', {extra_id: api.settings.extras[0].id, value: input.matches('[data-scenario-bundle]')});
     }
   });
@@ -263,7 +268,7 @@ export function attach(api) {
         address.insertAdjacentElement('afterend', root.querySelector('[data-scenario-part="controls"]'));
       }
     }
-    if (execution !== 'extra_in_delivery_option') return;
+    if (!bundled) return;
     const extra = settings.extras[0];
     // The bundle and plain option use the same native home service. Only the
     // optional protection charge changes; no shipping price is fabricated.
@@ -278,7 +283,11 @@ export function attach(api) {
       bundle.dataset.scenarioBundle = '';
       bundle.name = plain.name;
       const shipping = Math.round(api.page.quote().shipping * 100);
-      clone.querySelector('span').innerHTML = `<strong>Home delivery incl. Delivery Protection — ${api.money(shipping + extra.price_minor)}</strong><br>${api.escape(row.querySelector('strong').textContent)}<br>Includes ${api.money(extra.price_minor)} protection.`;
+      const service = row.querySelector('strong').textContent;
+      // H5-b: the preselected default is the same service with a paid signature on delivery.
+      clone.querySelector('span').innerHTML = execution === 'signature_delivery_default'
+        ? `<strong>${api.escape(service)} + signature on delivery — ${api.money(shipping + extra.price_minor)}</strong><br>Home delivery · the parcel is handed over against your signature<br>Includes ${api.money(extra.price_minor)} for the signature service.`
+        : `<strong>Home delivery incl. Delivery Protection — ${api.money(shipping + extra.price_minor)}</strong><br>${api.escape(service)}<br>Includes ${api.money(extra.price_minor)} protection.`;
       row.before(clone);
       row.dataset.scenarioPlainDelivery = '';
     }

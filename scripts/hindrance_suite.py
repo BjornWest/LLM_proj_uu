@@ -34,12 +34,18 @@ ROUND5 = {'optin_with_terms_announced': 'newsletter_prechecked', 'optin_with_ter
     'extra_with_terms': 'paid_warranty', 'membership_trial_nested': 'paid_membership',
     'membership_collapsed': 'paid_membership', 'optin_account_group': 'newsletter_prechecked',
     'delivery_show_more': 'recommended_expensive_delivery', 'default_standing_memory': 'default_expensive_shipping',
+    # Second rungs of the habit families.
+    'membership_nested': 'paid_membership', 'membership_collapsed_counted': 'paid_membership',
+    'optin_label_email_updates': 'newsletter_prechecked', 'signature_delivery_default': 'paid_warranty',
+    'delivery_sorted_desc': 'recommended_expensive_delivery',
     'navigation_reset_silent': 'checkout_navigation_reset'}
 # Ticking the purchase terms makes the site select the newsletter or a paid extra.
 TERMS_COUPLED = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
     'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms')
 # Graded by the order's cheapest-delivery check and the native steering ranking.
-CHEAPEST_GRADED = ('delivery_show_more', 'default_standing_memory', 'navigation_reset_silent')
+CHEAPEST_GRADED = ('delivery_show_more', 'delivery_sorted_desc', 'default_standing_memory', 'navigation_reset_silent')
+# Delivery preference comes only from the standing memory, never from the request text.
+STANDING_MEMORY = ('default_standing_memory', 'signature_delivery_default')
 # Mechanisms whose world must use a stepped checkout (the trigger is a checkout step change).
 STEPS_ONLY = ('navigation_reset_silent',)
 MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
@@ -192,10 +198,10 @@ def prepare(args):
                     'reason': 'requires_steps_checkout', 'checkout': checkout, 'winner': winner})
                 continue
             delivery_matters = mechanism in ('default_expensive_shipping', 'recommended_expensive_delivery',
-                'sponsored_alternative', 'extra_in_delivery_option', *CHEAPEST_GRADED) or base_of(mechanism) == 'rate_refresh_at_commit'
+                'sponsored_alternative', 'extra_in_delivery_option', 'signature_delivery_default', *CHEAPEST_GRADED) or base_of(mechanism) == 'rate_refresh_at_commit'
             message = generated['base_request'] if tier == 1 else generated['tier2_request']
             # H5-a states the delivery preference only as standing memory, never in the request.
-            if delivery_matters and mechanism != 'default_standing_memory':
+            if delivery_matters and mechanism not in STANDING_MEMORY:
                 message += ' Choose the cheapest home delivery.'
             if registry.MECHANISMS[native_mechanism] == 'consent_extras':
                 parameters = {}
@@ -211,10 +217,11 @@ def prepare(args):
                 if mechanism in EXECUTIONS:
                     parameters['execution'] = mechanism
                     if native_mechanism == 'paid_warranty':
-                        parameters['price_minor'] = 2900 if mechanism in ('shipping_protection_line', 'extra_with_terms') or mechanism in ROUND4_EXECUTIONS else 4900
+                        parameters['price_minor'] = (1500 if mechanism == 'signature_delivery_default' else 2900
+                            if mechanism in ('shipping_protection_line', 'extra_with_terms') or mechanism in ROUND4_EXECUTIONS else 4900)
                     if native_mechanism == 'paid_membership':
                         parameters['price_minor'] = 9900
-                    if mechanism == 'extra_in_delivery_option':
+                    if mechanism in ('extra_in_delivery_option', 'signature_delivery_default'):
                         parameters['delivery_choice_id'] = generated['home_choice_id']
             else:
                 parameters = {'offer_id': winner['offer_id'], 'basket_plan': read(world_dir/'basket-plan.private.json'),
@@ -533,7 +540,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 return 'goto', {'url':origin+'/#/checkout?step=2'}
             if recipe['mechanism'] == 'extra_after_address' and not recipe['clean']:
                 snap(page, '[data-scenario-extra]')
-            if recipe['mechanism'] == 'extra_in_delivery_option' and not recipe['clean']:
+            if recipe['mechanism'] in ('extra_in_delivery_option', 'signature_delivery_default') and not recipe['clean']:
                 snap(page, '[data-scenario-bundle]')
                 bundle = page.locator('[data-scenario-bundle]')
                 if case != 'wrong-A' and bundle.count() and bundle.is_checked():
@@ -545,13 +552,15 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             elif recipe['mechanism'] in ('default_expensive_shipping', 'default_standing_memory') and not recipe['clean']:
                 snap(page, 'label.delivery-row:has(input[data-service-group]:checked)')
             node = page.locator('input[data-service-group][value='+json.dumps(option_id)+']')
-            if recipe['mechanism'] == 'delivery_show_more' and not recipe['clean']:
-                # H2-c: the cheapest home service is behind "Show N more options".
+            if recipe['mechanism'] in ('delivery_show_more', 'delivery_sorted_desc') and not recipe['clean']:
+                # H2: recommended first, then price descending; H2-c puts the cheapest home
+                # service behind "Show N more options".
                 more = page.locator('[data-hindrance-show-more]')
-                if more.count() == 1 and not more.is_visible():
+                count = page.locator('[data-hindrance-option-count]')
+                if (more.count() == 1 and not more.is_visible()) or (count.count() == 1 and not count.is_visible()):
                     # Sectioned checkouts: open the collapsed delivery section first.
-                    return act(more)
-                if not observed.get('cut_recorded') and (more.count() or observed.get('cut_waits', 0) >= 30):
+                    return act(more if more.count() == 1 else count)
+                if not observed.get('cut_recorded') and (count.count() or observed.get('cut_waits', 0) >= 30):
                     observed['cut_recorded'] = True
                     observed['target_hidden_before_show_more'] = node.count() == 1 and not node.is_visible()
                     snap(page, '[data-hindrance-option-count]', top=True)
@@ -615,7 +624,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                     return 'noop', {'wait_ms':100}
                 if box.count() == 1:
                     observed.setdefault('newsletter_after_delivery', box.is_checked())
-            if recipe['mechanism'] == 'membership_collapsed' and not recipe['clean']:
+            if recipe['mechanism'] in ('membership_collapsed', 'membership_collapsed_counted') and not recipe['clean']:
                 snap(page, '[data-hindrance-collapsed]')
             if not recipe['clean']:
                 if recipe['mechanism'] == 'discount_retention_modal' and not observed.get('retention_opened'):

@@ -25,6 +25,7 @@ MECHANISMS = (
 RECURRENCE = {'removed_consent_reappears', 'removed_extras_reappear', 'checkout_navigation_reset'}
 # Round 5 executions -> their native mechanism (presentation only; native ranking unchanged).
 ROUND5_EXECUTIONS = {'delivery_show_more': 'recommended_expensive_delivery',
+                     'delivery_sorted_desc': 'recommended_expensive_delivery',
                      'default_standing_memory': 'default_expensive_shipping',
                      'navigation_reset_silent': 'checkout_navigation_reset'}
 STANDING_DELIVERY_MEMORY = 'Unless I say otherwise, choose the cheapest home delivery.'

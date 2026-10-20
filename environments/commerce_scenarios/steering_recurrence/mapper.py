@@ -83,7 +83,7 @@ def settings_from_prepared(prepared, *, extra_terms=None):
             if field == 'prominent':
                 delivery[field]['label'] = 'Recommended delivery'
     execution = presentation.get('execution')
-    if execution == 'delivery_show_more':
+    if execution in ('delivery_show_more', 'delivery_sorted_desc'):
         # The recommended (pricier) service is listed first and preselected; the list is cut
         # behind a "Show more" button (page piece).
         delivery['default'] = {'choice_id': delivery['prominent']['choice_id']}

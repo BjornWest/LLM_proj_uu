@@ -72,7 +72,8 @@ def settings_for(setup):
             'discount_retention_modal': 'Email newsletter — get 10% off your next order',
             'refresh_reticks_optin': 'Email me news and offers',
             'submit_soft_optin': 'Offers by email',
-            'optin_account_group': 'Personalised offers to your inbox'}.get(base, 'Email newsletter: news and offers')
+            'optin_account_group': 'Personalised offers to your inbox',
+            'optin_label_email_updates': 'E-mail updates'}.get(base, 'Email newsletter: news and offers')
         settings['newsletter'] = {'label': label, 'preselected': False if execution in TERMS_EXECUTIONS else 'start'}
         if base == 'refresh_reticks_optin':
             # The order-review refresh restores the server default after these shopper events.

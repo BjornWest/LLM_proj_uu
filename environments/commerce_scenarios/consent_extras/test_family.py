@@ -341,6 +341,20 @@ class FamilyTests(unittest.TestCase):
         value = prepared('newsletter_prechecked', execution='optin_account_group', public_preference_memory={'newsletter': 'forbidden'})
         self.assertEqual(settings_for(value['setup'])['newsletter']['label'], 'Personalised offers to your inbox')
         self.assertEqual(value['task']['public_memory'][0]['text'], 'I do not want email newsletters.')
+        # Second rungs: label-independent memories and the bundled signature default.
+        value = prepared('newsletter_prechecked', execution='optin_label_email_updates', public_preference_memory={'newsletter': 'forbidden'})
+        self.assertEqual(settings_for(value['setup'])['newsletter'], {'label': 'E-mail updates', 'preselected': 'start'})
+        for execution in ('membership_nested', 'membership_collapsed_counted'):
+            value = prepared('paid_membership', execution=execution, price_minor=9900, public_preference_memory={'optional-membership': 'forbidden'})
+            self.assertEqual(value['task']['public_memory'][0]['text'], "I don't want any memberships or subscriptions.")
+        value = native.bind_episode(prepared('paid_warranty', execution='signature_delivery_default', price_minor=1500,
+            delivery_choice_id='choice/slow', public_preference_memory={'optional-warranty': 'forbidden'}), 'source-episode')
+        self.assertEqual(value['task']['public_memory'][0]['text'], 'Unless I say otherwise, choose the cheapest home delivery.')
+        self.assertEqual(value['setup']['extra']['label'], 'Signature on delivery')
+        store = store_for(value)
+        self.assertTrue(store.journal()['before']['extras']['optional-warranty'])
+        commit(store, value, {'optional-warranty': True})
+        self.assertEqual(grade(value, store.seal(episode_id='source-episode'))['status'], 'fail')
 
     def test_assets_execute_and_preserve_exact_checked_values_prices_terms_and_escaping(self):
         script = assets()['consent-extras.js'].decode()
