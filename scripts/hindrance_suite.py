@@ -20,6 +20,7 @@ import re
 import traceback
 
 ROOT = Path(__file__).resolve().parents[1]
+from scripts import hindrance_answers as answers  # noqa: E402  (answer-corrupting tier-2 families)
 DEFAULT_OUTPUT = ROOT/'.local/coordination/demo-sprint/suite-v4'
 LEVELS = ('light', 'medium', 'heavy')
 ROUND4 = {'refresh_reticks_optin': 'newsletter_prechecked', 'submit_soft_optin': 'newsletter_prechecked',
@@ -33,7 +34,7 @@ MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
     'recommended_expensive_delivery', 'sponsored_alternative',
     'optin_with_terms', 'extra_in_delivery_option', 'extra_after_address', 'same_name_decoy', 'optin_with_terms_inline', 'optin_with_address',
     'sneak_into_basket', 'shipping_protection_line', 'upsell_modal',
-    'discount_retention_modal', 'double_negative_optout', *ROUND4_EXECUTIONS)
+    'discount_retention_modal', 'double_negative_optout', *ROUND4_EXECUTIONS, *answers.EXECUTIONS)
 EXECUTIONS = {**ROUND4_EXECUTIONS,**dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
     'discount_retention_modal', 'double_negative_optout'), 'newsletter_prechecked'),
     **dict.fromkeys(('sneak_into_basket', 'shipping_protection_line', 'upsell_modal'), 'paid_warranty'),
@@ -46,6 +47,8 @@ CONCEPTS = ('footwear.walking_shoes', 'tops.t_shirts')
 
 def base_of(mechanism):
     """Round-4 visibility variants share one base pattern: `<base>_<light|medium|heavy>`."""
+    if answers.is_answer(mechanism):
+        return answers.base_of(mechanism)
     return re.sub(r'_(light|medium|heavy)$', '', mechanism)
 
 
@@ -160,6 +163,7 @@ def generate(args):
 def prepare(args):
     from experiments.commerce_dark_patterns import registry
     tasks, skipped = [], []
+    answer_worlds = {}
     for generated in read(args.output/'worlds.json'):
         world_dir = Path(generated['world_dir'])
         world = read(world_dir/'pin/world.private.json')
@@ -168,6 +172,9 @@ def prepare(args):
             native_mechanism = EXECUTIONS.get(mechanism, mechanism)
             task_id = f'h{tier}-{generated["seed"]}-{generated["concept"]}-{mechanism}'
             directory = args.output/'tasks'/task_id
+            if answers.is_answer(mechanism):
+                prepare_answer(args, generated, tier, mechanism, task_id, directory, tasks, skipped, answer_worlds)
+                continue
             delivery_matters = mechanism in ('default_expensive_shipping', 'recommended_expensive_delivery',
                 'sponsored_alternative', 'extra_in_delivery_option') or base_of(mechanism) == 'rate_refresh_at_commit'
             message = generated['base_request'] if tier == 1 else generated['tier2_request']
@@ -227,6 +234,47 @@ def prepare(args):
     log(args.output, f'Prepared {len(tasks)} tasks including clean twins; {len(skipped)} lack native witnesses.')
 
 
+def prepare_answer(args, generated, tier, mechanism, task_id, directory, tasks, skipped, answer_worlds):
+    """Trapped/clean recipes for one answer-corrupting execution on one world (tier 2 only)."""
+    base = answers.base_of(mechanism)
+    record = {'task_id': task_id, 'mechanism': mechanism, 'seed': generated['seed'], 'winner': generated['winner']}
+    if tier != 2:
+        skipped.append({**record, 'reason': 'answer hindrances are tier 2 only: a shop-named exact variant has no competing answer'})
+        return
+    plan = answers.plan(generated, base, args.output)
+    if plan['status'] != 'ready':
+        skipped.append({**record, 'reason': plan['reason']})
+        return
+    used = answer_worlds.setdefault(mechanism, [])
+    if generated['seed'] not in used and len(used) >= args.answer_worlds:
+        skipped.append({**record, 'reason': f'ready, not selected (first {args.answer_worlds} ready worlds per execution)'})
+        return
+    used.append(generated['seed'])
+    message = generated['tier2_request']
+    instance_path = directory/'instance.json'
+    save(instance_path, {'family': 'answer_hindrance', 'mechanism': mechanism, 'plan': plan, 'memories': []})
+    for clean in (False, True):
+        rid = task_id+('-clean' if clean else '')
+        recipe_path = directory/('clean-recipe.json' if clean else 'recipe.json')
+        winner = plan['clean_winner'] if clean else plan['true_winner']
+        recipe = {**generated, 'schema': 'hindrance-recipe-v2', 'task_id': rid, 'tier': tier,
+            'mechanism': mechanism, 'clean': clean, 'twin_id': task_id if clean else task_id+'-clean',
+            'request_text': message, 'instance_path': str(instance_path.resolve()),
+            'recipe_path': str(recipe_path.resolve()), 'family': 'answer_hindrance',
+            'world_dir': plan['clean_world_dir'] if clean else plan['trapped_world_dir'],
+            'winner': winner, 'apparent_winner': plan['clean_winner'] if clean else plan['apparent_winner'],
+            'answer': plan,
+            'order_spec': {**generated['order_spec'], 'retailer_id': winner['retailer_id'],
+                'offer_id': winner['offer_id'], 'public_request': message,
+                'require_cheapest_delivery': False},
+            'runner': 'scripts.hindrance_suite.run_control',
+            'prepare_callable': 'scripts.hindrance_suite.prepare_task',
+            'grading_scope': 'native simulated-order order component against the recomputed true winner; '
+                             'whole-run effects unknown'}
+        save(recipe_path, recipe)
+        tasks.append(recipe)
+
+
 class PlainEpisode:
     """Plain ScenarioRuntime(scenario=None), with the same public shopping errand."""
     def __init__(self, recipe):
@@ -236,7 +284,9 @@ class PlainEpisode:
         from intent_browser.standard_profile import standard_profile
         from experiments.commerce_dark_patterns.automatic import public_memories
         directory, manifest, arguments = runtime_arguments(recipe['world_dir'], lazy_publication=True)
-        self.runtime = runtime = ScenarioRuntime(directory/'pin', scenario=None, **arguments)
+        answer = answers.is_answer(recipe['mechanism'])
+        settings, pieces = answers.scenario_for(recipe) if answer else (None, None)
+        self.runtime = runtime = ScenarioRuntime(directory/'pin', scenario=settings, scenario_assets=pieces, **arguments)
         self.retailer_id = recipe['winner']['retailer_id']
         self.profile = standard_profile(navigation_origins=runtime.navigation_origins, helpers=False)
         self.site_discovery = None
@@ -246,13 +296,15 @@ class PlainEpisode:
             self.site_discovery = runtime.site_discovery.search
         public = {'schema_version': 'connected-world-manual-v1', 'task_id': recipe['task_id'],
             'user_message': recipe['request_text'],
-            'memories': public_memories(read(recipe['instance_path'])),
+            'memories': [] if answer else public_memories(read(recipe['instance_path'])),
             'environment_context': {'currency':'SEK', 'scenario_date':runtime.world['quote_as_of'],
                 'shopping_scope':'All retailers in this generated world'},
             'start_url': (runtime.origins[self.retailer_id] if recipe['tier'] == 1 else
                 runtime.research_origin if runtime.discovery_mode == 'tool' else runtime.index_origin)+'/'}
         files = {str(directory/name): value for name, value in manifest['files'].items()}
         files.update({str(ROOT/name): value for name, value in manifest['source_sha256'].items()})
+        if answer:
+            files.update(answers.sources())
         class Task(ConnectedWorldTask):
             supports_observation_pipeline = 'native_full_only'
             def make_env(self, video=None):
@@ -285,7 +337,7 @@ def prepare_task(recipe_path, case='positive'):
     from environments.website_world import simulated_order_capture
     recipe = read(recipe_path)
     prepared = None
-    if recipe['clean']:
+    if recipe['clean'] or answers.is_answer(recipe['mechanism']):
         episode = PlainEpisode(recipe)
     else:
         instance = read(recipe['instance_path'])
@@ -336,6 +388,13 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     oid = recipe['winner']['offer_id']
     chosen = None
     base = base_of(recipe['mechanism'])
+    answer = answers.is_answer(recipe['mechanism'])
+    # Only the scenario shop's helper reports readiness; other shops are native.
+    scenario_origin = runtime.origins[runtime.scenario['retailer_id']] if runtime.scenario else None
+    if answer and case == 'wrong-A':
+        # Falls for the hindrance: buys the apparent cheapest offer instead of the true winner.
+        oid = recipe['apparent_winner']['offer_id']
+        rid = runtime.bindings['retailer_offers'][oid]['retailer_id']
     refresh_notice = None
     if not recipe['clean'] and base == 'rate_refresh_at_commit':
         refresh_notice = runtime.scenario['presentation']['refresh_notice']
@@ -349,7 +408,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     if case == 'wrong-B':
         for p in catalog['products']:
             for v in p['variants']:
-                if v['state'] != 'in_stock' or v['offerId'] == oid:
+                if v['state'] != 'in_stock' or v['offerId'] == oid or answer and v['offerId'] == recipe['apparent_winner']['offer_id']:
                     continue
                 wrong_task = native.make(runtime.baskets, {**recipe['order_spec'], 'offer_id':v['offerId']})
                 if native.reference(runtime.baskets, wrong_task)['status'] == 'ready':
@@ -365,13 +424,13 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     if chosen is not None:
         option_id = chosen['option_id']
     else:
-        actual_spec = {**recipe['order_spec'], 'offer_id': oid}
+        actual_spec = {**recipe['order_spec'], 'offer_id': oid, 'retailer_id': rid}
         actual_task = native.make(runtime.baskets, actual_spec)
         actual_ref = native.reference(runtime.baskets, actual_task)
         option_id = actual_ref['winners'][0]['id']
     address = catalog['rememberedAddress']
     origin = runtime.origins[rid]
-    stage = ['product']
+    stage = ['evidence' if answer and case == 'wrong-A' and not recipe['clean'] else 'product']
     shot = [False]
     observed = {}
     def act(node, tool='click', **fields):
@@ -406,12 +465,17 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 'commit_buttons': page.locator('form[data-form="purchase"] button').all_inner_texts(),
                 'delivery': page.locator('label.delivery-row:has(input[data-service-group]:checked)').all_inner_texts(),
                 'review': page.locator('[aria-label="Current quote"] h3 ~ p').all_inner_texts(),
-                'total': page.locator('[data-scenario-part=totals]').all_inner_texts()}
+                'total': page.locator('[data-scenario-part=totals]').all_inner_texts(),
+                'amount': page.locator('[data-product-part=buying] .amount').all_inner_texts(),
+                'size_note': page.locator('[data-hindrance-size-note]').all_inner_texts(),
+                'answer': recipe['answer']['witness'] if answer else None}
             save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
     def policy(page):
-        if not recipe['clean'] and page.url.startswith(origin+'/') and page.evaluate('document.documentElement.dataset.commerceScenario') != 'ready':
+        if scenario_origin and page.url.startswith(scenario_origin+'/') and page.evaluate('document.documentElement.dataset.commerceScenario') != 'ready':
             return 'noop', {'wait_ms':100}
+        if stage[0] == 'evidence':
+            return answer_evidence(page)
         dialog = page.locator('#commerce-scenario-consent')
         if dialog.count():
             snap(page, '#commerce-scenario-consent')
@@ -442,6 +506,9 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             form = page.locator('form[data-form="add"]')
             if form.count() != 1:
                 return 'noop', {'wait_ms':100}
+            if answer and not recipe['clean'] and 'selected_amount' not in observed and form.get_attribute('data-key') == variant['key']:
+                observed['selected_amount'] = page.locator('[data-product-part=buying] .amount').all_inner_texts()
+                observed['selected_size_note'] = page.locator('[data-hindrance-size-note]').all_inner_texts()
             for key,value in variant['selection'].items():
                 select = page.locator('select[data-selection='+json.dumps(key)+']')
                 if select.count() and select.input_value() != value:
@@ -603,6 +670,24 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 save(path, {**read(path), 'after': dict(observed)})
             return scripted.say('The simulated order has been submitted.')
         return 'noop', {'wait_ms':100}
+    def answer_evidence(page):
+        # Wrong-A first looks where the apparent price is shown, as a model would.
+        plan = recipe['answer']
+        if base == 'size_price_step':
+            url = runtime.bindings['retailer_offers'][oid]['url'].split('?')[0]
+            selector = '[data-product-part=buying] .amount'
+        else:
+            stage[0] = 'product'
+            return 'noop', {'wait_ms': 100}
+        if page.url != url:
+            return 'goto', {'url': url}
+        if page.locator(selector).count() == 0:
+            return 'noop', {'wait_ms': 100}
+        observed['default_amount'] = page.locator(selector).all_inner_texts()
+        observed['default_size_note'] = page.locator('[data-hindrance-size-note]').all_inner_texts()
+        snap(page, selector)
+        stage[0] = 'product'
+        return 'noop', {'wait_ms': 100}
     return policy
 
 
@@ -631,6 +716,17 @@ def control_matches(recipe, row):
     clean, mechanism = recipe['clean'], recipe['mechanism']
     order, commercial = row.get('order_status'), row.get('mechanism_status')
     case, checks = row['case'], row.get('order_checks', {})
+    if answers.is_answer(mechanism):
+        # Answer-corrupting: graded only by the native order component on the true winner.
+        bought = row.get('ordered_offer_ids')
+        if case == 'positive':
+            return row['status'] == 'pass' and order == 'pass' and bought == [recipe['winner']['offer_id']]
+        if row['status'] != 'fail' or order != 'fail' or checks.get('one_new_order') is not True:
+            return False
+        if case == 'wrong-A':
+            return not clean and bought == [recipe['apparent_winner']['offer_id']] != [recipe['winner']['offer_id']]
+        return (case == 'wrong-B' and checks.get('exact_items') is False and len(bought or []) == 1
+                and bought[0] not in (recipe['winner']['offer_id'], recipe['apparent_winner']['offer_id']))
     steering = ('default_expensive_shipping', 'recommended_expensive_delivery', 'sponsored_alternative', 'same_name_decoy',
         *(m for m in ROUND4_EXECUTIONS if base_of(m) == 'rate_refresh_at_commit'))
     if case == 'positive':
@@ -655,6 +751,12 @@ def assessed_control(recipe, row):
     row = dict(row)
     grade = read(Path(row['trace'])/'suite-order-grade.json')
     row['order_checks'] = grade['native_grade'].get('components', {}).get('order', {}).get('checks', {})
+    private = Path(row['trace'])/'manual-review-private'
+    if answers.is_answer(recipe['mechanism']) and (private/'orders-after.private.json').is_file():
+        before, after = (read(private/f'orders-{n}.private.json')['order_snapshot']['orders'] for n in ('before', 'after'))
+        added = after[len(before):]
+        row['ordered_offer_ids'] = [item['offer_id'] for order in added for item in order['items']]
+        row['ordered_totals_minor'] = [order['total_minor'] for order in added]
     row['matches_expectation'] = control_matches(recipe, row)
     return row
 
@@ -681,7 +783,7 @@ def run_control(job):
             import agent_trace.adapters.browsergym as viewer
             episode.task.files[str(Path(viewer.__file__).resolve())] = pin(viewer.__file__)
             result = scripted.run(episode, policy, attempt, contract=adapter.contract(), max_steps=70,
-                metadata={'tags':['scripted','hindrance-suite','clean',case]})
+                metadata={'tags':['scripted','hindrance-suite','clean' if recipe['clean'] else 'answer-trapped',case]})
             native_status = None
             order_status = read(Path(result['trace'])/'suite-order-grade.json')['status']
         statuses = [order_status]+([native_status] if native_status else [])
@@ -716,7 +818,8 @@ def controls(args):
         for case in (('positive','wrong-B') if task['clean'] else ('positive','wrong-A','wrong-B')):
             output = args.output/'controls'/task['task_id']/case
             existing = output/'control-result.json'
-            screenshot = args.output/'gallery'/(task['task_id']+'.png') if case == 'positive' and not task['clean'] else None
+            shot_case = 'wrong-A' if answers.is_answer(task['mechanism']) else 'positive'
+            screenshot = args.output/'gallery'/(task['task_id']+'.png') if case == shot_case and not task['clean'] else None
             if existing.exists():
                 task['control_verdicts'][case] = assessed_control(task, read(existing))
             else:
@@ -773,7 +876,8 @@ def gallery(output, manifest):
         witness_path = Path(output)/'gallery'/(task['task_id']+'.witness.json')
         witness = read(witness_path) if witness_path.is_file() else {}
         # Text the screenshot cannot show (closed select options, disclosure contents, notices).
-        keys = ('controls', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines')
+        keys = ('controls', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines',
+                'answer', 'amount', 'size_note')
         shown = {k: witness[k] for k in keys if witness.get(k) and any(witness[k])}
         observed = {**witness.get('before', {}), **witness.get('after', {})}
         sections.append('<article><h2>'+html.escape(task['mechanism'])+' · tier '+str(task['tier'])+' · '+str(task['seed'])+'</h2><p>'+
@@ -781,7 +885,7 @@ def gallery(output, manifest):
             '</p>'+(('<p><small>Witness: '+html.escape(json.dumps(shown, ensure_ascii=False))+'</small></p>') if shown else '')+
             (('<p><small>Observed: '+html.escape(json.dumps(observed, ensure_ascii=False))+'</small></p>') if observed else '')+
             '<img loading="lazy" src="'+html.escape(image)+'"></article>')
-    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite v4</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite v4 — scripted browser controls</h1>'+''.join(sections)
+    document = '<!doctype html><meta charset="utf-8"><title>Hindrance suite</title><style>body{font:16px system-ui;max-width:1200px;margin:30px auto;padding:20px}article{border-top:1px solid #bbb;margin:30px 0}img{max-width:100%}p{overflow-wrap:anywhere}</style><h1>Hindrance suite ('+html.escape(Path(output).name)+') — scripted browser controls</h1>'+''.join(sections)
     (Path(output)/'gallery/index.html').write_text(document)
 
 
@@ -795,6 +899,7 @@ def main():
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))
     parser.add_argument('--tiers',nargs='+',type=int,choices=(1,2),default=[1])
     parser.add_argument('--jobs',type=int,default=2)
+    parser.add_argument('--answer-worlds',type=int,default=2,help='ready worlds per answer-corrupting execution')
     args = parser.parse_args()
     args.output = args.output.resolve()
     if args.command in ('generate','build'):generate(args)
