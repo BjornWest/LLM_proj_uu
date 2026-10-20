@@ -195,3 +195,58 @@ python3 scripts/run_bounded_job.py --memory-mib 6000 --tasks 0 -- "$PY" -m scrip
   --seeds 4101 4102 4104 4108 --concepts tops.t_shirts footwear.walking_shoes \
   --tiers 1 2 --jobs 6 --mechanisms $M
 ```
+
+## Round 6: answer-corrupting tier-2 hindrances
+
+`scripts/hindrance_answers.py` adds hindrances that change *which offer is the
+correct answer* of a tier-2 find-then-buy errand instead of adding a side
+effect. Each base pattern has `light`/`heavy` executions (`<base>_<level>`),
+tier 2 only (a shop-named tier-1 errand has no competing answer). The apparent
+winner is what listings or a comparison site suggest; the true winner is
+recomputed by the native oracles under the hindrance. Grading is only the
+native order component on the true winner (`prepare_task` returns no publication
+adapter; `CleanGrading` grades trapped and clean recipes alike).
+
+- `size_price_step` (footwear: size is chosen on the product page): a derived
+  world raises the native winner's requested size of that model at that shop
+  (all colours/widths) just above the runner-up. Listings, comparison "from"
+  prices and the default size still show the base price; selecting the size
+  shows the true one, as do basket and checkout. Light adds "Price for size 42:
+  SEK 569 …" beside the price; heavy is the plain native page.
+- `remote_area_surcharge`: a derived world adds a surcharge (49–249 SEK, the
+  smallest that flips the answer) to the delivered-cheapest shop's carrier home
+  fees. The request asks for the lowest total including home delivery and the
+  cheapest home delivery (`require_cheapest_delivery`). Checkout home-delivery
+  rows say "Includes a SEK 89 remote-area surcharge for postcode …"; light also
+  states it beside the product price.
+- `stale_comparison`: native world; one comparison row shows an out-of-date
+  price below the true winner (the shop shows its real, higher price). Light
+  appends "(price last checked 9 days ago; it may have changed)"; heavy shows
+  only the site's general snapshot wording.
+
+Derived worlds (`worlds/<seed>-<concept>--<base>/`) copy the generated world,
+change only those world fields and keep the world id, so every sampled layout,
+delivery menu and comparison listing is identical; dependent digests are
+re-bound and the comparison sidecar's private provenance is replayed (public
+listings must not change). The clean twin is the original world, where the
+apparent winner is the true winner. Plans and witnesses are cached as
+`worlds/*/answer-<base>.json`; a world without a realistic witness is skipped
+with its reason. Wrong-A buys the apparent winner (and first visits the
+comparison row or default-size page for the gallery witness); wrong-B buys a
+third item at the true winner's shop. Not implemented: `price_in_basket`,
+`ex_vat_display`.
+
+```bash
+source .local/coordination/demo-sprint/env.sh; export DISPLAY=:99
+PY=/home/bjorn/code/LLM_proj_uu/.venv/bin/python
+M="size_price_step_light size_price_step_heavy remote_area_surcharge_light remote_area_surcharge_heavy stale_comparison_light stale_comparison_heavy"
+python3 scripts/run_bounded_job.py --memory-mib 9000 --tasks 0 -- "$PY" -m scripts.hindrance_suite build \
+  --output .local/coordination/demo-sprint/suite-v6 --seeds 6100 6107 6109 \
+  --concepts footwear.walking_shoes tops.t_shirts footwear.walking_shoes --tiers 2 --jobs 6 --mechanisms $M
+```
+
+Seeds 6100–6110 were generated; 6110 has no unique winner. Feasible witnesses:
+size step 6100/6103/6109, surcharge 6100/6103/6109, stale 6100/6103/6107/6109;
+the suite uses the first two ready worlds of 6100, 6107 and 6109
+(`--answer-worlds`). Model screening must import this checkout's
+`scripts.hindrance_suite` (manifest `source_root`).

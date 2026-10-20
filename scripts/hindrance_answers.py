@@ -14,6 +14,9 @@ listings or a comparison site suggest) is also the true winner.
   home delivery carries a surcharge (added to its carrier contracts' home fee),
   so another shop is cheapest in total. The checkout's home-delivery rows say
   which part is the remote-area surcharge; light also states it on the product page.
+- stale_comparison: native world; one comparison-site row shows an out-of-date
+  price below the true winner, while that shop's own pages show the real,
+  higher price. Light marks the row's age; heavy shows only the site-wide date.
 
 Derived worlds copy the generated world directory, change only the declared
 world fields, keep the world identity (so every sampled layout stays the same)
@@ -30,10 +33,11 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 PIECE = Path(__file__).with_name('hindrance_answers.js')
-BASES = ('size_price_step', 'remote_area_surcharge')
+BASES = ('size_price_step', 'remote_area_surcharge', 'stale_comparison')
 LEVELS = ('light', 'heavy')
 EXECUTIONS = tuple(f'{b}_{l}' for b in BASES for l in LEVELS)
 SURCHARGES = (4900, 6900, 8900, 9900, 12900, 14900, 19900, 24900)
+STALE_DAYS = 9
 
 
 def base_of(mechanism):
@@ -305,13 +309,48 @@ def _plan_remote_area_surcharge(generated, clean, output):
                    f'{sek(winner["delivered_minor"] + surcharge)} delivered vs {sek(truth["delivered_minor"])} at {truth["retailer_id"]}.'}
 
 
+def _plan_stale_comparison(generated, clean, output):
+    rows = clean['rows']
+    winner = unique_min(rows, 'price_minor')
+    if winner is None or winner['offer_id'] != generated['winner']['offer_id']:
+        raise Skip('clean native item-price winner is not unique')
+    sidecar = read(Path(generated['world_dir'])/'surrounding.private.json')
+    matching = {(r['product_id'], r['retailer_id']): r for r in rows}
+    options = []
+    for site in sidecar['sites']:
+        if site['kind'] != 'aggregator':
+            continue
+        listed = [l for l in site['listings'] if (l['product_id'], l['retailer_id']) in matching]
+        for listing in listed:
+            row = matching[(listing['product_id'], listing['retailer_id'])]
+            if row['offer_id'] == winner['offer_id'] or row['retailer_id'] == winner['retailer_id']:
+                continue
+            if row['price_minor'] <= winner['price_minor'] or listing['price_minor'] <= winner['price_minor']:
+                continue
+            floor = min([winner['price_minor'], *(l['price_minor'] for l in listed)])
+            stale = nice_below(floor, max(1000, floor // 20))
+            if stale <= 0 or listing['price_minor'] > stale * 1.5:
+                continue
+            options.append((row['price_minor'], site['site_id'], listing, row, stale))
+    if not options:
+        raise Skip('no comparison-listed matching offer above the winner within a realistic stale drop')
+    _, site_id, listing, row, stale = min(options, key=lambda o: (o[0], o[1], o[3]['offer_id']))
+    site = next(s for s in sidecar['sites'] if s['site_id'] == site_id)
+    return {'trapped_world_dir': str(generated['world_dir']), 'true_winner': winner, 'apparent_winner': row,
+        'trapped_candidates': clean['rows'], 'clean_winner': winner, 'site_id': site_id, 'site_name': site['name'], 'product_id': listing['product_id'],
+        'retailer_id': listing['retailer_id'], 'listed_price_minor': listing['price_minor'],
+        'stale_price_minor': stale, 'stale_days': STALE_DAYS,
+        'witness': f'{site["name"]} lists {listing["retailer_id"]} at {sek(stale)} (stale; the shop charges '
+                   f'{sek(row["price_minor"])}), below the true cheapest {sek(winner["price_minor"])} at {winner["retailer_id"]}.'}
+
+
 # Runtime overlays -----------------------------------------------------------
 
 def scenario_for(recipe):
     """ScenarioRuntime settings and page pieces for a trapped recipe, or (None, None)."""
     answer, mechanism = recipe['answer'], recipe['mechanism']
     base, level = base_of(mechanism), level_of(mechanism)
-    if recipe['clean'] or base == 'size_price_step' and level == 'heavy':
+    if recipe['clean'] or base == 'stale_comparison' or base == 'size_price_step' and level == 'heavy':
         return None, None
     apparent = answer['apparent_winner']
     presentation = {'execution': mechanism, 'offer_id': apparent['offer_id']}
@@ -323,6 +362,32 @@ def scenario_for(recipe):
                             postcode=answer['postcode'])
     settings = {'retailer_id': apparent['retailer_id'], 'presentation': presentation}
     return settings, {'answer-hindrance.js': PIECE.read_bytes()}
+
+
+def apply_comparison(runtime, recipe):
+    """Show the stale price on the comparison site's views (trapped stale_comparison only)."""
+    answer = recipe['answer']
+    views = runtime.surrounding_views[answer['site_id']]
+    stale = answer['stale_price_minor']
+    from environments.website_world.comparison_pages import money
+    shown = 0
+    for design in views.views.values():
+        for item in design.items:
+            if item['id'] != answer['product_id']:
+                continue
+            for row in item['listings']:
+                if row['retailer_id'] == answer['retailer_id']:
+                    row['advertised_price_minor'] = stale
+                    shown += 1
+        if level_of(recipe['mechanism']) == 'light':
+            original = design.render
+            note = f' (price last checked {answer["stale_days"]} days ago; it may have changed)'
+            def render(route, query, raw='', original=original):
+                status, body = original(route, query, raw)
+                return status, body.replace(money(stale), money(stale) + note)
+            design.render = render
+    if not shown:
+        raise ValueError('Stale comparison row is not mounted')
 
 
 def sources():

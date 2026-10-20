@@ -291,6 +291,8 @@ class PlainEpisode:
         answer = answers.is_answer(recipe['mechanism'])
         settings, pieces = answers.scenario_for(recipe) if answer else (None, None)
         self.runtime = runtime = ScenarioRuntime(directory/'pin', scenario=settings, scenario_assets=pieces, **arguments)
+        if answer and not recipe['clean'] and answers.base_of(recipe['mechanism']) == 'stale_comparison':
+            answers.apply_comparison(runtime, recipe)
         self.retailer_id = recipe['winner']['retailer_id']
         self.profile = standard_profile(navigation_origins=runtime.navigation_origins, helpers=False)
         self.site_discovery = None
@@ -682,7 +684,11 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     def answer_evidence(page):
         # Wrong-A first looks where the apparent price is shown, as a model would.
         plan = recipe['answer']
-        if base == 'size_price_step':
+        if base == 'stale_comparison':
+            site = runtime.surrounding_origins[plan['site_id']]
+            url = next(u for u in runtime.bindings['surrounding']['comparison_products'][plan['product_id']] if u.startswith(site+'/'))
+            selector = 'main'
+        elif base == 'size_price_step':
             url = runtime.bindings['retailer_offers'][oid]['url'].split('?')[0]
             selector = '[data-product-part=buying] .amount'
         else:
@@ -692,8 +698,13 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             return 'goto', {'url': url}
         if page.locator(selector).count() == 0:
             return 'noop', {'wait_ms': 100}
-        observed['default_amount'] = page.locator(selector).all_inner_texts()
-        observed['default_size_note'] = page.locator('[data-hindrance-size-note]').all_inner_texts()
+        from environments.website_world.comparison_pages import money
+        if base == 'stale_comparison':
+            observed['comparison_rows'] = [line for line in page.inner_text('main').splitlines()
+                                           if money(plan['stale_price_minor']) in line]
+        else:
+            observed['default_amount'] = page.locator(selector).all_inner_texts()
+            observed['default_size_note'] = page.locator('[data-hindrance-size-note]').all_inner_texts()
         snap(page, selector)
         stage[0] = 'product'
         return 'noop', {'wait_ms': 100}
