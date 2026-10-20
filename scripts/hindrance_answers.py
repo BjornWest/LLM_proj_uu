@@ -80,12 +80,14 @@ def nice_below(minor, margin):
 
 # Derived worlds -------------------------------------------------------------
 
-def derive_world(source, target, mutate):
+def derive_world(source, target, mutate, public_may_change=False):
     """Copy a generated world, apply `mutate(world)` and re-bind its digests.
 
     The world id and every sampled plan stay the same; digests of the changed
     world (both digest flavours) and of files that embed them are replaced to a
-    fixpoint, then the pin and generation manifests are re-hashed.
+    fixpoint, then the pin and generation manifests are re-hashed. The comparison
+    sidecar must replay; its public listings may change only when the caller
+    says so (a shop's raised price, displayed stale at runtime).
     """
     from environments.website_world.adapter import digest
     from experiments.accepted_catalog_commerce import basket_quote
@@ -135,7 +137,7 @@ def derive_world(source, target, mutate):
                     if m.VERSION == sidecar['schema_version'])
     replayed = producer.generate(world, sidecar['controls'])
     public = lambda value: {k: v for k, v in value.items() if k != 'provenance_private'}
-    if public(replayed) != public(sidecar):
+    if public(replayed) != public(sidecar) and not public_may_change:
         raise ValueError('Derived world changes public comparison listings')
     if replayed != sidecar:
         for f in flavours:
@@ -499,6 +501,30 @@ def _pair_remote_area_surcharge(generated, world, option, output):
         'witness': f'{a["retailer_name"]} lists the item at {sek(a["price_minor"])} (below {sek(b["price_minor"])}), but home delivery '
                    f'costs {sek(apparent["home_shipping_minor"])} incl. a {sek(surcharge)} remote-area surcharge: '
                    f'{sek(apparent["delivered_minor"])} delivered vs {sek(truth["delivered_minor"])} at {b["retailer_name"]}.'}
+
+
+def _pair_stale_comparison(generated, world, option, output):
+    a, b = option['a'], option['b']
+    stale = option['listed'][a['retailer_id']]
+    if any(price == stale for rid, price in option['listed'].items() if rid != a['retailer_id']):
+        raise Skip('another shop on the comparison page has the same price as the stale row')
+    raised = nice_above(b['delivered_minor'] - a['home_shipping_minor'], max(1000, b['delivered_minor'] // 50))
+    delta = raised - a['price_minor']
+    if raised > a['price_minor'] * 1.35:
+        raise Skip(f'price rise {sek(a["price_minor"])} -> {sek(raised)} is more than 35%')
+    def mutate(value):
+        retailer = next(r for r in value['retailers'] if r['retailer_id'] == a['retailer_id'])
+        for offer in retailer['offers']:
+            if offer['product_id'] == a['product_id']:
+                offer['price_minor'] += delta
+    derived = derive_world(generated['world_dir'],
+        output/'worlds'/f'{generated["seed"]}-{generated["concept"]}--pair-stale_comparison', mutate, public_may_change=True)
+    apparent, truth = _pair_trapped(generated, option, derived, {'price_minor': raised})
+    return {'trapped_world_dir': str(derived), 'true_winner': truth, 'apparent_winner': apparent,
+        'trapped_candidates': [apparent, truth], 'retailer_id': a['retailer_id'], 'listed_price_minor': stale + delta,
+        'stale_price_minor': stale, 'stale_days': STALE_DAYS, 'raised_by_minor': delta,
+        'witness': f'{option["site_name"]} still lists {a["retailer_name"]} at {sek(stale)} (stale; the shop now charges '
+                   f'{sek(raised)}): {sek(apparent["delivered_minor"])} delivered vs {sek(truth["delivered_minor"])} at {b["retailer_name"]}.'}
 
 
 # Runtime overlays -----------------------------------------------------------
