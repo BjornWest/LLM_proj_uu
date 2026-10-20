@@ -256,6 +256,26 @@ def backend_for(options, directory, records, holder, policy=None):
             with (directory / 'usage.jsonl').open('a') as stream:
                 stream.write(json.dumps(record) + '\n')
         backend.client.event_hooks = {'response': [received_bridge]}
+        # The Codex backend rate-limits bursts ({"detail":"Rate limit exceeded"} -> bridge
+        # HTTP 502) and the transport does not retry; back off and retry the same request
+        # instead of ending the episode (seen 2026-10-20 at ~28 concurrent episodes).
+        from intent_browser.backend import BackendResponseError
+        original_complete = backend.complete
+        def complete_with_retry(messages):
+            import random
+            delay = 10.0
+            for attempt in range(6):
+                try:
+                    return original_complete(messages)
+                except BackendResponseError as error:
+                    if getattr(error, 'http_status', None) not in (429, 500, 502, 503, 504) or attempt == 5:
+                        raise
+                    with (directory / 'bridge-retries.jsonl').open('a') as stream:
+                        stream.write(json.dumps({'attempt': attempt + 1, 'status': error.http_status,
+                                                 'sleep': round(delay, 1)}) + '\n')
+                    time.sleep(delay + random.uniform(0, delay))
+                    delay = min(delay * 2, 120.0)
+        backend.complete = complete_with_retry
         return backend
     from intent_browser.openrouter import provider_options
     request = provider_options(options.get('providers') or 'chutes,akashml')
