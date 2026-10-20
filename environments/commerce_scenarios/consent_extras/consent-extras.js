@@ -19,7 +19,47 @@ export function attach(api) {
     const list = level === 'light' ? [none, ...priced] : [...priced, none];
     return `<fieldset data-hindrance-cover-group><legend>Parcel cover</legend><label>Parcel cover (required) <select required data-hindrance-cover><option value="" disabled ${selected ? '' : 'selected'}>Choose an option</option>${list.map(([value, label]) => `<option value="${e(value)}" ${value === selected ? 'selected' : ''}>${e(label)}</option>`).join('')}</select></label><p>Parcel cover refunds the item if your parcel is lost or damaged in transit.</p>${coverError && !selected ? '<p role="alert" data-hindrance-cover-error>Choose a parcel cover option to complete your purchase.</p>' : ''}</fieldset>`;
   }
+  // Round 10: a product-page purchase option defaulting to a repeat-delivery subscription.
+  const subscribe = base === 'subscribe_default';
   const lineExtra = ['shipping_protection_line', 'sneak_into_basket'].includes(execution);
+  // Repeat deliveries cost 10% less than the item's price (whole kronor).
+  const repeatPrice = price => api.money(Math.round(price * 0.9) * 100);
+  const basketPrice = () => {
+    const line = api.page.state().cart[0];
+    return line ? api.page.byVariant(line.key)?.variant.price : null;
+  };
+  const planText = price => `Subscribe & save 10% — delivered every 3 months${price ? ` (${repeatPrice(price)} per repeat delivery)` : ''}`;
+  // The shop's catalog module (already loaded by the page) names the current product.
+  let catalog = null;
+  if (subscribe) import('./catalog.js').then(module => { catalog = module; api.refresh(); }).catch(() => {});
+  function productOptions(root, view, settings) {
+    const form = root.querySelector('form[data-form="add"]'), route = api.page.route();
+    const product = catalog?.products.find(item => item.id === route.id);
+    if (!form || !product) return;
+    const extra = settings.extras[0], on = !!view.extras[extra.id], e = api.escape;
+    if (subscribe && level === 'light') {
+      let group = root.querySelector('[data-hindrance-purchase-group]');
+      if (!group) {
+        const variant = catalog.resolveProduct(product.id, api.page.state().selection[product.id] || {})?.variant;
+        form.insertAdjacentHTML('beforebegin', `<fieldset data-hindrance-purchase-group><legend>Purchase option</legend><label><input type="radio" name="purchase-option" value="subscribe" data-hindrance-purchase="subscribe"> ${e(planText(variant?.price))}</label><label><input type="radio" name="purchase-option" value="once" data-hindrance-purchase="once"> One-time purchase</label><p>Today's order is your first delivery at the price shown. Later deliveries are charged when they ship.</p></fieldset>`);
+        group = root.querySelector('[data-hindrance-purchase-group]');
+      }
+      group.querySelector('[value="subscribe"]').checked = on;
+      group.querySelector('[value="once"]').checked = !on;
+    }
+  }
+  function basketPlan(root, view, settings) {
+    // The subscription shows on each basket line and in the order summary.
+    const on = !!view.extras[settings.extras[0].id];
+    root.querySelectorAll('[data-hindrance-plan-line]').forEach(node => { if (!on) node.remove(); });
+    if (!on) return;
+    for (const form of root.querySelectorAll('form[data-form="quantity"]')) {
+      if (!form.previousElementSibling?.matches('[data-hindrance-plan-line]')) form.insertAdjacentHTML('beforebegin', '<p data-hindrance-plan-line>Subscribe & save · delivered every 3 months</p>');
+    }
+    for (const item of root.querySelectorAll('fieldset.delivery-options > ul > li, [aria-label="Current quote"] li section > ul > li')) {
+      if (!item.querySelector('[data-hindrance-plan-line]')) item.insertAdjacentHTML('beforeend', '<span data-hindrance-plan-line> · Subscribe & save, delivered every 3 months</span>');
+    }
+  }
   // Round 5: executions where ticking the purchase terms makes the site select something.
   const termsCoupled = ['optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
     'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms',
@@ -63,6 +103,9 @@ export function attach(api) {
     }
     if (lineExtra && context.view.extras[api.settings.extras[0].id]) {
       body += `<p><small><a href="#" data-hindrance-remove>Remove ${api.escape(api.settings.extras[0].label)}</a></small></p>`;
+    }
+    if (subscribe && context.view.extras[api.settings.extras[0].id]) {
+      body += `<p data-hindrance-plan>Purchase option: ${api.escape(planText(basketPrice()))}. Nothing extra is charged today. <a href="#" data-hindrance-remove>Change to one-time purchase</a></p>`;
     }
     return body;
   };
@@ -147,7 +190,7 @@ export function attach(api) {
     }
     const note = level === 'light' && refreshNote ? '<p role="status" aria-live="polite" data-hindrance-refresh-note>Order summary updated.</p>' : '';
     const newsletter = settings.newsletter ? `<fieldset><legend>Stay in touch</legend>${note}<label><input type="checkbox" data-scenario-newsletter ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>Receive product news and shop offers by email.</p></fieldset>` : '';
-    if (lineExtra || base === 'submit_soft_optin') return '';
+    if (lineExtra || subscribe || base === 'submit_soft_optin') return '';
     if (base === 'refresh_reticks_optin') return newsletter;
     if (base === 'required_cover_select') return coverControl(view, settings);
     if (base === 'upgrade_commit_button') {
@@ -206,6 +249,7 @@ export function attach(api) {
   };
   document.addEventListener('change', event => {
     const input = event.target;
+    if (input.matches?.('[data-hindrance-purchase]')) api.send('extras_set', {extra_id: api.settings.extras[0].id, value: input.value === 'subscribe'});
     if (termsCoupled && input.name === 'terms' && input.checked) {
       // The site's own side effect of the terms tick; its visibility differs per execution.
       api.send('checkout_trigger', {trigger: 'terms'});
@@ -234,6 +278,8 @@ export function attach(api) {
   api.decorators.push((root, {view, settings}) => {
     if (!view) return;
     const role = api.page.route?.().role;
+    if (subscribe && role === 'product') productOptions(root, view, settings);
+    if (subscribe && ['cart', 'checkout'].includes(role)) basketPlan(root, view, settings);
     if (requiredTick) {
       // The required tick sits right after the shopping terms, just above the purchase button.
       const form = root.querySelector('form[data-form="purchase"]');
@@ -309,7 +355,7 @@ export function attach(api) {
       upsellShown = true;
       modal('upsell');
     }
-    if (lineExtra && api.page.state().cart.length && !root.querySelector('[data-scenario-part="totals"]') && ['cart', 'checkout'].includes(api.page.route().role)) {
+    if ((lineExtra || subscribe) && api.page.state().cart.length && !root.querySelector('[data-scenario-part="totals"]') && ['cart', 'checkout'].includes(api.page.route().role)) {
       const main = root.querySelector('main');
       if (main) { main.insertAdjacentHTML('beforeend', '<section data-scenario-part="totals" aria-label="Order total"></section>'); api.refresh(); }
     }

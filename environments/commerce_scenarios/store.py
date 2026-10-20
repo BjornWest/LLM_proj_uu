@@ -442,7 +442,7 @@ class SessionStore:
                  'amount_minor': quote['total_minor']}]
         # A free-trial extra is still a committed selection but costs nothing today.
         rows += [{'kind': 'extra', 'id': extra['id'], 'label': extra['label'],
-                  'amount_minor': 0 if extra.get('trial_days') else extra['price_minor']}
+                  'amount_minor': 0 if extra.get('trial_days') or extra.get('deferred') else extra['price_minor']}
                  for extra in self._settings['extras'] if state['extras'][extra['id']]]
         return rows
 
