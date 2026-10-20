@@ -28,6 +28,12 @@ ROUND5_EXECUTIONS = {'delivery_show_more': 'recommended_expensive_delivery',
                      'delivery_sorted_desc': 'recommended_expensive_delivery',
                      'default_standing_memory': 'default_expensive_shipping',
                      'navigation_reset_silent': 'checkout_navigation_reset'}
+# Round 10 wrong-item executions of the sponsorship mechanism. The native task is the exact
+# requested variant (any home delivery); the alternative is a real in-stock offer of the shop:
+# a near-identical variant swapped into the basket at checkout.
+SUBSTITUTION_EXECUTIONS = ('substitution_at_checkout_light', 'substitution_at_checkout_heavy')
+EXACT_VARIANT_EXECUTIONS = ('same_name_decoy', *SUBSTITUTION_EXECUTIONS)
+SIZE_AXES = ('size_eu', 'size_label', 'pack_count')
 STANDING_DELIVERY_MEMORY = 'Unless I say otherwise, choose the cheapest home delivery.'
 KINDS = {'selection_change', 'consent_change', 'extras_change', 'checkout_leave',
          'checkout_return', 'checkout_submit', 'consent_submit', 'extras_submit'}
@@ -134,7 +140,7 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
     if p['authorize_reappearing'] and mechanism not in {'removed_consent_reappears', 'removed_extras_reappear'}:
         raise ValueError('Authorization control applies only to consent or extras recurrence')
     if p.get('execution') is not None and (mechanism, p['execution']) not in {
-            ('sponsored_alternative', 'same_name_decoy'),
+            *(('sponsored_alternative', execution) for execution in EXACT_VARIANT_EXECUTIONS),
             *(('default_expensive_shipping', 'rate_refresh_at_commit_' + level) for level in ('light', 'medium', 'heavy')),
             *((native, execution) for execution, native in ROUND5_EXECUTIONS.items())}:
         raise ValueError('Unsupported steering execution')
@@ -184,15 +190,30 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
                 continue
             offer_ids = [oid]
             if mechanism == 'sponsored_alternative':
-                decoy = p.get('execution') == 'same_name_decoy'
-                alternatives = ([o for o in retailer['offers'] if o['product_id'] == offer['product_id']
-                    and o['sku_id'] != offer['sku_id']] if decoy else [o for o in retailer['offers'] if o['product_id'] != offer['product_id']
-                    and products[o['product_id']]['concept_id'] == products[offer['product_id']]['concept_id']
-                    and all(skus[o['sku_id']].get(axis) == skus[offer['sku_id']].get(axis)
-                            for axis in ('size_eu', 'size_label', 'width'))])
+                execution = p.get('execution')
+                decoy = execution in EXACT_VARIANT_EXECUTIONS
+                target = skus[offer['sku_id']]
+                if execution in SUBSTITUTION_EXECUTIONS:
+                    # Same product and size (and pack), another colour or width.
+                    alternatives = [o for o in retailer['offers'] if o['product_id'] == offer['product_id']
+                        and o['sku_id'] != offer['sku_id']
+                        and all(skus[o['sku_id']].get(axis) == target.get(axis) for axis in SIZE_AXES)
+                        and any(skus[o['sku_id']].get(axis) != target.get(axis) for axis in ('colour', 'width'))]
+                elif decoy:
+                    alternatives = [o for o in retailer['offers'] if o['product_id'] == offer['product_id']
+                        and o['sku_id'] != offer['sku_id']]
+                else:
+                    alternatives = [o for o in retailer['offers'] if o['product_id'] != offer['product_id']
+                        and products[o['product_id']]['concept_id'] == products[offer['product_id']]['concept_id']
+                        and all(skus[o['sku_id']].get(axis) == target.get(axis)
+                                for axis in ('size_eu', 'size_label', 'width'))]
                 if 'alternative_offer_id' in p:
                     alternatives = [o for o in alternatives if o['offer_id'] == p['alternative_offer_id']]
                 alternatives.sort(key=lambda o: o['offer_id']); randomizer.shuffle(alternatives)
+                if execution in SUBSTITUTION_EXECUTIONS:
+                    # Prefer the same price or up to 20 kr more.
+                    alternatives.sort(key=lambda o: (not 0 <= o['price_minor'] - offer['price_minor'] <= 2000,
+                                                     abs(o['price_minor'] - offer['price_minor'])))
                 pair = None
                 for alternative in alternatives:
                     aid = alternative['offer_id']
@@ -248,7 +269,7 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
         return result
     retailer, rows, offer_ids, promoted = chosen
     ranked, winners = _rank([r for r in rows if r['offer_id'] in offer_ids], p['objective'])
-    if p.get('execution') == 'same_name_decoy':
+    if p.get('execution') in EXACT_VARIANT_EXECUTIONS:
         # The request constrains the exact variant, not delivery price.
         winners = ranked
     task = {'mechanism': mechanism, 'objective': p['objective'], 'offer_ids': offer_ids,

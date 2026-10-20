@@ -14,6 +14,10 @@ MECHANISMS = ('recommended_expensive_delivery', 'default_expensive_shipping',
               'sponsored_alternative', 'removed_consent_reappears',
               'removed_extras_reappear', 'checkout_navigation_reset')
 HERE = Path(__file__).resolve().parent
+# Round 10 wrong-item executions (see the native steering module): a near-identical variant is
+# swapped into the basket at checkout.
+SUBSTITUTION = ('substitution_at_checkout_light', 'substitution_at_checkout_heavy')
+EXACT_VARIANT = ('same_name_decoy', *SUBSTITUTION)
 EXTRAS = {
     'warranty': ('Two-year accident cover', 4900, 'one_time'),
     'membership': ('Shopping club membership', 3900, 'monthly'),
@@ -134,10 +138,18 @@ def settings_from_prepared(prepared, *, extra_terms=None):
     elif mechanism == 'sponsored_alternative':
         promoted = p['reference']['promoted']
         if (presentation['sponsored_offer_id'] != promoted['offer_id']
-                or (presentation.get('execution') != 'same_name_decoy' and promoted['offer_id'] not in p['task']['offer_ids'])):
+                or (presentation.get('execution') not in EXACT_VARIANT and promoted['offer_id'] not in p['task']['offer_ids'])):
             raise ValueError('Native sponsored offer disagrees with the prepared purchasable alternative')
-        settings['sponsored'] = [{'offer_id': promoted['offer_id'], 'label': 'Sponsored', 'placement': placement}
-                                 for placement in (('results',) if presentation.get('execution') == 'same_name_decoy' else ('results', 'product', 'cart'))]
+        if presentation.get('execution') in SUBSTITUTION:
+            # The site swaps the basket line to this variant at checkout (host store, page piece).
+            skus = {sku['sku_id']: sku for item in p['world']['products'] for sku in item['public']['skus']}
+            target, substitute = (skus[next(r['sku_id'] for r in p['reference']['all_options'] if r['offer_id'] == offer)]
+                                  for offer in (p['task']['offer_ids'][0], promoted['offer_id']))
+            axes = [axis for axis in ('colour', 'width') if target.get(axis) != substitute.get(axis)]
+            settings['presentation'].update(substitute_offer_id=promoted['offer_id'], substitution_axis=' and '.join(axes))
+        else:
+            settings['sponsored'] = [{'offer_id': promoted['offer_id'], 'label': 'Sponsored', 'placement': placement}
+                                     for placement in (('results',) if presentation.get('execution') in EXACT_VARIANT else ('results', 'product', 'cart'))]
     settings['recurrence'] = recurrence
     return options(settings)
 

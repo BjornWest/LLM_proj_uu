@@ -2,12 +2,15 @@
 import {products} from './catalog.js';
 
 export function attach(api) {
+  const round10 = /^substitution_at_checkout_/.test(api.settings?.presentation?.execution || '');
+  if (round10) roundTen(api);
   api.decorators.push((root, {settings, view}) => {
     const role = api.page.route().role;
     for (const row of root.querySelectorAll('label:has([data-scenario-badge])')) {
       row.dataset.steeringRecommended = '';
     }
-    const placements = settings.sponsored.filter(item => item.placement === role);
+    // Round 10 executions place their own listings (see roundTen).
+    const placements = round10 ? [] : settings.sponsored.filter(item => item.placement === role);
     const main = root.querySelector('main');
     if (!main || !placements.length || main.querySelector('[data-steering-sponsored]')) return;
     const section = document.createElement('section');
@@ -89,4 +92,61 @@ export function attach(api) {
       group.insertAdjacentHTML('beforeend', `<p><button type="button" data-hindrance-show-more>Show ${hidden} more options</button></p>`);
     }
   });
+}
+
+function find(offerId) {
+  for (const product of products) {
+    const variant = product.variants.find(variant => variant.offerId === offerId);
+    if (variant) return {product, variant};
+  }
+  return null;
+}
+
+// Round 10 wrong-item executions; `_light` / `_heavy` rungs.
+function roundTen(api) {
+  const presentation = api.settings.presentation, execution = presentation.execution;
+  const light = execution.endsWith('_light'), e = api.escape;
+  const target = find(presentation.target_offer_id);
+  if (!target) throw Error('The requested native catalog offer is absent.');
+  const describe = ({product, variant}) => product.name + (product.options.length
+    ? ' (' + product.options.map(option => `${option.label}: ${variant.selection[option.key]}`).join(' · ') + ')' : '');
+  if (execution.startsWith('substitution_at_checkout')) {
+    // Bait-and-switch: on reaching checkout the basket line becomes a near-identical variant.
+    // Light: a banner says so and offers to undo it. Heavy: only the line text changes.
+    const substitute = find(presentation.substitute_offer_id);
+    if (!substitute) throw Error('The substitute native catalog offer is absent.');
+    const flag = 'commerce-scenario.substitution.' + api.page.site;
+    const read = () => { try { return localStorage.getItem(flag); } catch { return null; } };
+    const write = value => { try { localStorage.setItem(flag, value); } catch {} };
+    api.decorators.push((root, {view}) => {
+      if (!view || api.page.route().role !== 'checkout') return;
+      const state = api.page.state();
+      const line = state.cart.length === 1 && state.cart[0].quantity === 1 ? state.cart[0] : null;
+      if (!read() && line?.key === target.variant.key && view.checkout.location === 'checkout') {
+        // The host swaps its basket first; the page reports the same basket right after.
+        write('substituted');
+        api.send('checkout_trigger', {trigger: 'substitution'});
+        line.key = substitute.variant.key;
+        state.editing = null;
+        setTimeout(() => api.page.revise(''), 0);
+        return;
+      }
+      if (light && read() === 'substituted' && line?.key === substitute.variant.key && !root.querySelector('[data-hindrance-substitution]')) {
+        const notice = `<p role="status" data-hindrance-substitution>Your selected ${e(presentation.substitution_axis || 'variant')} sold out while you shopped; we've replaced it with ${e(describe(substitute))}. <a href="#" data-hindrance-undo>Undo substitution</a></p>`;
+        const heading = root.querySelector('main h1');
+        if (heading) heading.insertAdjacentHTML('afterend', notice);
+      }
+    });
+    document.addEventListener('click', event => {
+      if (!event.target.closest('[data-hindrance-undo]')) return;
+      event.preventDefault();
+      const state = api.page.state();
+      if (state.cart.length === 1 && state.cart[0].key === substitute.variant.key) {
+        state.cart[0].key = target.variant.key;
+        state.editing = null;
+      }
+      write('undone');
+      api.page.revise('Your original choice is back in your basket.');
+    });
+  }
 }

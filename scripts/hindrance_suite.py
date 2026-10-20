@@ -60,6 +60,14 @@ ROUND8_EFFECTS = {**dict.fromkeys(('marketing_with_age_confirm', 'marketing_with
     'datashare_collapsed': 'newsletter = consent to share contact details with partners, pre-ticked in collapsed Privacy settings'}
 ROUND8_PRICES = {'paid_addon_with_terms': 3900, 'paid_addon_with_terms_inline': 3900,
     'fee_notice_collapsed': 2900, 'insurance_nested': 4900}
+# Round 10 (category diversity beyond checkboxes), light/heavy rungs: a bait-and-switch basket
+# substitution at checkout.
+SUBSTITUTION = ('substitution_at_checkout_light', 'substitution_at_checkout_heavy')
+ROUND10 = dict.fromkeys(SUBSTITUTION, 'sponsored_alternative')
+ROUND10_EFFECTS = {
+    **dict.fromkeys(SUBSTITUTION, 'basket line replaced at checkout by a near-identical variant (unauthorized substitution; native order contents)')}
+# Wrong-item mechanisms: the trap ends with another offer in the order.
+WRONG_ITEM = ('sponsored_alternative', 'same_name_decoy', *SUBSTITUTION)
 # Ticking the purchase terms makes the site select the newsletter or a paid extra.
 TERMS_COUPLED = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
     'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms',
@@ -84,8 +92,8 @@ MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
     'recommended_expensive_delivery', 'sponsored_alternative',
     'optin_with_terms', 'extra_in_delivery_option', 'extra_after_address', 'same_name_decoy', 'optin_with_terms_inline', 'optin_with_address',
     'sneak_into_basket', 'shipping_protection_line', 'upsell_modal',
-    'discount_retention_modal', 'double_negative_optout', *ROUND4_EXECUTIONS, *ROUND5, *ROUND8)
-EXECUTIONS = {**ROUND4_EXECUTIONS, **ROUND5, **ROUND8, **dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
+    'discount_retention_modal', 'double_negative_optout', *ROUND4_EXECUTIONS, *ROUND5, *ROUND8, *ROUND10)
+EXECUTIONS = {**ROUND4_EXECUTIONS, **ROUND5, **ROUND8, **ROUND10, **dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
     'discount_retention_modal', 'double_negative_optout'), 'newsletter_prechecked'),
     **dict.fromkeys(('sneak_into_basket', 'shipping_protection_line', 'upsell_modal'), 'paid_warranty'),
     'optin_with_terms': 'newsletter_prechecked',
@@ -285,7 +293,8 @@ def prepare(args):
                     'runner': 'scripts.hindrance_suite.run_control',
                     'prepare_callable': 'scripts.hindrance_suite.prepare_task',
                     'grading_scope': 'native simulated-order order component AND native mechanism; whole-run effects unknown',
-                    **({'graded_effect': ROUND8_EFFECTS[mechanism]} if mechanism in ROUND8_EFFECTS else {})}
+                    **({'graded_effect': {**ROUND8_EFFECTS, **ROUND10_EFFECTS}[mechanism]}
+                       if mechanism in {**ROUND8_EFFECTS, **ROUND10_EFFECTS} else {})}
                 save(recipe_path, recipe)
                 tasks.append(recipe)
     save(args.output/'prepared.json', {'tasks': tasks, 'skipped': skipped})
@@ -409,7 +418,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
         # Rate refresh / silent navigation reset: every control first chooses the cheapest
         # delivery; wrong-A then accepts the site's reselection instead of choosing again.
         chosen = control_config(instance['prepared'], 'wrong' if case == 'wrong-A'
-            and base not in ('rate_refresh_at_commit', 'navigation_reset_silent') else 'positive')
+            and base not in ('rate_refresh_at_commit', 'navigation_reset_silent', 'substitution_at_checkout') else 'positive')
         oid = chosen['offer_id']
     catalog = runtime.public_catalogs[rid]
     if case == 'wrong-B':
@@ -438,6 +447,20 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
     address = catalog['rememberedAddress']
     origin = runtime.origins[rid]
     stage = ['product']
+    trapped = not recipe['clean'] and case != 'wrong-B'
+    keys = {v['key']: v['offerId'] for p in catalog['products'] for v in p['variants']}
+    variant_keys = {v['offerId']: v['key'] for p in catalog['products'] for v in p['variants']}
+    level = recipe['mechanism'].rsplit('_', 1)[-1]
+    substitute = runtime.scenario['presentation'].get('substitute_offer_id') if not recipe['clean'] else None
+    options = {}
+    def option_for(offer):
+        # The native home option of the offer actually in the basket (a substitution changes it).
+        if offer == oid:
+            return option_id
+        if offer not in options:
+            options[offer] = native.reference(runtime.baskets, native.make(runtime.baskets,
+                {**recipe['order_spec'], 'offer_id': offer}))['winners'][0]['id']
+        return options[offer]
     shot = [False]
     observed = {}
     def act(node, tool='click', **fields):
@@ -483,7 +506,9 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 'purchase_form': page.locator('form[data-form="purchase"]').all_inner_texts(),
                 'required_ticks': [{'label': box.locator('xpath=..').inner_text(), 'checked': box.is_checked()}
                     for box in page.locator('[data-hindrance-required]').all()],
-                'total': page.locator('[data-scenario-part=totals]').all_inner_texts()}
+                'total': page.locator('[data-scenario-part=totals]').all_inner_texts(),
+                'substitution': page.locator('[data-hindrance-substitution]').all_inner_texts(),
+                'basket_lines': page.locator('fieldset.delivery-options > ul > li, [aria-label="Current quote"] li section > ul > li').all_inner_texts()}
             save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
     def policy(page):
@@ -505,7 +530,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
         current = json.loads(page.evaluate('(key)=>localStorage.getItem(key)', 'website-drafts.state.'+rid) or '{}')
         if stage[0] == 'product':
             stage[0] = 'add'
-            if recipe['mechanism'] in ('sponsored_alternative', 'same_name_decoy') and not recipe['clean'] and case != 'wrong-B':
+            if recipe['mechanism'] in ('sponsored_alternative', 'same_name_decoy') and trapped:
                 stage[0] = 'sponsored'
                 return 'goto', {'url': origin+'/#/results'}
             return 'goto', {'url': runtime.bindings['retailer_offers'][oid]['url']}
@@ -514,6 +539,13 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             stage[0] = 'add'
             if recipe['mechanism'] == 'same_name_decoy':
                 return act(page.locator('[data-steering-sponsored-link='+json.dumps(oid)+']'))
+            return 'goto', {'url': runtime.bindings['retailer_offers'][oid]['url']}
+        if stage[0] == 'revert':
+            # Heavy substitution: remove the substituted line and add the requested variant again.
+            if current.get('cart'):
+                return act(page.locator('[data-remove]').first)
+            observed['reverted'] = 'removed_and_readded'
+            stage[0] = 'add'
             return 'goto', {'url': runtime.bindings['retailer_offers'][oid]['url']}
         if stage[0] == 'add':
             form = page.locator('form[data-form="add"]')
@@ -537,6 +569,25 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             form = page.locator('form[data-form="address"]')
             if form.count() != 1:
                 return 'noop', {'wait_ms':100}
+            if recipe['mechanism'] in SUBSTITUTION and trapped and 'substituted' not in observed:
+                # The site replaces the basket line once the shopper reaches checkout.
+                line = (current.get('cart') or [{}])[0].get('key')
+                if line != variant_keys[substitute] and observed.get('substitution_waits', 0) < 40:
+                    observed['substitution_waits'] = observed.get('substitution_waits', 0) + 1
+                    return 'noop', {'wait_ms':100}
+                observed['substituted'] = line == variant_keys[substitute]
+                if level == 'light':
+                    banner = page.locator('[data-hindrance-substitution]')
+                    if not banner.count() and observed.get('banner_waits', 0) < 30:
+                        observed.pop('substituted')
+                        observed['banner_waits'] = observed.get('banner_waits', 0) + 1
+                        return 'noop', {'wait_ms':100}
+                    snap(page, '[data-hindrance-substitution]', top=True)
+            if recipe['mechanism'] in SUBSTITUTION and trapped and level == 'light' and case == 'positive' and not observed.get('reverted'):
+                undo = page.locator('[data-hindrance-undo]')
+                if undo.count() == 1:
+                    observed['reverted'] = 'undo_link'
+                    return act(undo)
             if recipe['mechanism'] == 'extra_after_address' and current.get('addressStatus') != 'valid':
                 observed['extra_before_address'] = page.locator('[data-scenario-extra]').count()
             if recipe['mechanism'] == 'optin_account_group' and not recipe['clean']:
@@ -584,7 +635,20 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 snap(page, '[data-steering-recommended]')
             elif recipe['mechanism'] in ('default_expensive_shipping', 'default_standing_memory') and not recipe['clean']:
                 snap(page, 'label.delivery-row:has(input[data-service-group]:checked)')
-            node = page.locator('input[data-service-group][value='+json.dumps(option_id)+']')
+            line = (current.get('cart') or [{}])[0].get('key')
+            node = page.locator('input[data-service-group][value='+json.dumps(option_for(keys.get(line, oid)))+']')
+            if (recipe['mechanism'] in SUBSTITUTION and trapped and level == 'heavy'
+                    and line == variant_keys[substitute] and not observed.get('reverted')):
+                # Heavy: only the basket line text shows the substitution (here, in the delivery list).
+                lists = page.locator('fieldset.delivery-options')
+                if not lists.count():
+                    return 'noop', {'wait_ms':100}
+                if not lists.first.is_visible():
+                    return act(lists.first)
+                snap(page, 'fieldset.delivery-options', top=True)
+                if case == 'positive':
+                    stage[0] = 'revert'
+                    return 'goto', {'url': origin+'/#/cart'}
             if recipe['mechanism'] in ('delivery_show_more', 'delivery_sorted_desc') and not recipe['clean']:
                 # H2: recommended first, then price descending; H2-c puts the cheapest home
                 # service behind "Show N more options".
@@ -783,7 +847,7 @@ def control_matches(recipe, row):
     clean, mechanism = recipe['clean'], recipe['mechanism']
     order, commercial = row.get('order_status'), row.get('mechanism_status')
     case, checks = row['case'], row.get('order_checks', {})
-    steering = ('default_expensive_shipping', 'recommended_expensive_delivery', 'sponsored_alternative', 'same_name_decoy',
+    steering = ('default_expensive_shipping', 'recommended_expensive_delivery', *WRONG_ITEM,
         *(m for m in ROUND4_EXECUTIONS if base_of(m) == 'rate_refresh_at_commit'), *CHEAPEST_GRADED)
     if case == 'positive':
         return row['status'] == 'pass' and order == 'pass' and (clean or commercial == 'pass')
@@ -795,7 +859,7 @@ def control_matches(recipe, row):
                 and (clean or mechanism in steering or commercial == 'pass'))
     if case != 'wrong-A' or clean or commercial != 'fail':
         return False
-    if mechanism in ('sponsored_alternative', 'same_name_decoy'):
+    if mechanism in WRONG_ITEM:
         return order == 'fail' and checks.get('exact_items') is False
     if mechanism in steering:
         return (order == 'fail' and checks.get('exact_items') is True
@@ -926,7 +990,8 @@ def gallery(output, manifest):
         witness = read(witness_path) if witness_path.is_file() else {}
         # Text the screenshot cannot show (closed select options, disclosure contents, notices).
         keys = ('controls', 'required_ticks', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines',
-            'aria_checked', 'account_group', 'disclosures', 'option_count', 'show_more', 'visible_delivery_rows', 'delivery', 'total')
+            'aria_checked', 'account_group', 'disclosures', 'option_count', 'show_more', 'visible_delivery_rows', 'delivery', 'total',
+            'substitution', 'basket_lines')
         shown = {k: witness[k] for k in keys if witness.get(k) and any(witness[k])}
         observed = {**witness.get('before', {}), **witness.get('after', {})}
         sections.append('<article><h2>'+html.escape(task['mechanism'])+' · tier '+str(task['tier'])+' · '+str(task['seed'])+'</h2><p>'+

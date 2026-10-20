@@ -164,6 +164,7 @@ class SessionStore:
         self._order_ids = set()
         self._rate_refreshed = False
         self._shopper_chose_delivery = self._reset_done = False
+        self._substituted = False
 
     # Episode lifecycle (trusted callers only).
 
@@ -530,6 +531,21 @@ class SessionStore:
         _fields(request, 'trigger')
         execution = self._settings['presentation'].get('consent_extras', {}).get('execution')
         trigger = request['trigger']
+        presentation = self._settings['presentation']
+        if str(presentation.get('execution', '')).startswith('substitution_at_checkout') and trigger == 'substitution':
+            # Round 10: once, at checkout, the site replaces the requested variant with a declared
+            # near-identical one (bait-and-switch). The page shows the replaced basket line.
+            target, substitute = presentation['target_offer_id'], presentation['substitute_offer_id']
+            if (self._substituted or substitute not in self._offers
+                    or self._state['basket'] != [{'offer_id': target, 'quantity': 1}]):
+                raise ValueError('No declared substitution applies to this basket')
+            self._substituted = True
+            self._state['basket'] = [{'offer_id': substitute, 'quantity': 1}]
+            # A delivery option belongs to the basket it was quoted for.
+            self._state['delivery_option_id'] = None
+            self._event('site_preselect', 'site', {'field': 'basket', 'value': deepcopy(self._state['basket']),
+                'replaced_offer_id': target, 'trigger': 'checkout_enter'})
+            return
         if (execution in ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
                           'optin_with_terms_state', 'optin_with_terms_same_form') and trigger == 'terms'
                 or execution == 'optin_with_address' and trigger == 'address_saved'):
