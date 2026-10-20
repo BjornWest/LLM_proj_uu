@@ -14,6 +14,7 @@
 
 """Registry of all instructions."""
 
+# Modified for this repository (2026): imports made package-relative; no logic changes.
 from . import instructions
 
 

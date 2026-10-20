@@ -35,6 +35,7 @@ from collections.abc import Sequence
 
 import langdetect
 
+# Modified for this repository (2026): imports made package-relative; no logic changes.
 from . import instructions_util
 
 

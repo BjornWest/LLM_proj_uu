@@ -327,8 +327,10 @@ def self_hosted_backend(options, directory, records, holder):
     """Same Qwen sampling against an OpenAI-compatible server (e.g. vLLM over an SSH tunnel).
 
     Transient failures (connection refused/reset, timeouts, HTTP 429/5xx) are resent
-    unchanged with backoff for up to options['retry_seconds'] per request (retry attempts
-    and backoffs are bounded by that budget); each retry is logged to endpoint-retries.jsonl.
+    unchanged with backoff for up to options['retry_seconds'] per request (backoffs and the
+    per-operation connect/read/write timeouts of retry attempts are bounded by that budget;
+    it limits waiting on a silent endpoint, not total transfer time, so a response that keeps
+    delivering data can finish after it); each retry is logged to endpoint-retries.jsonl.
     If they persist, holder['infrastructure_error'] is set and the episode is recorded as
     a system_failure, not graded as a model outcome.
     Episode start waits up to options['endpoint_wait_seconds'] for the endpoint.
@@ -392,8 +394,9 @@ def self_hosted_backend(options, directory, records, holder):
     original_complete = backend.complete
     def complete_with_retry(messages):
         # The first attempt has the full request timeout; every backoff (with jitter) and
-        # retry attempt must fit in the retry budget, so a request ends within
-        # max(request_timeout, retry_seconds).
+        # retry attempt's per-operation (connect/read/write) timeout is capped by the remaining
+        # retry budget. This bounds waiting on a silent endpoint; it is not a wall-clock bound on
+        # total transfer time (a response that keeps delivering chunks can finish later).
         first, delay, attempt = time.monotonic(), 5.0, 0
         deadline = first + retry_seconds
         try:
@@ -644,7 +647,9 @@ def main():
     parser.add_argument('--env-file', type=Path)
     parser.add_argument('--concurrency', type=int, default=8)
     parser.add_argument('--concurrency-file', type=Path,
-                        help='live episode cap shared by runners (integer; fallback --concurrency, which stays the ceiling)')
+                        help='live episode cap shared by runners (integer; fallback --concurrency, which stays the ceiling). '
+                        'Counts are per live runner: if a runner is killed while its episode processes survive, those '
+                        'episodes stop being counted, so stop whole runner process groups (e.g. the bounded job)')
     parser.add_argument('--limit', type=int)
     parser.add_argument('--episode', action='append', help='Exact manifest entry ID; repeatable')
     parser.add_argument('--offline', action='store_true')
@@ -671,8 +676,8 @@ def main():
     parser.add_argument('--request-timeout', type=int, default=900, help='--openai-base-url request timeout (s)')
     parser.add_argument('--retry-seconds', type=int, default=600,
                         help='--openai-base-url: retry transient errors (refused/reset/timeout/429/5xx) for at most '
-                        'this long per request (backoffs and retry attempts fit in it; the first attempt keeps '
-                        '--request-timeout)')
+                        'this long per request (backoffs and the per-operation socket timeouts of retry attempts fit '
+                        'in it; the first attempt keeps --request-timeout; not a bound on total transfer time)')
     parser.add_argument('--endpoint-wait-seconds', type=int, default=900,
                         help='--openai-base-url: wait this long for the endpoint at episode start before a system_failure')
     parser.add_argument('--worker-start', choices=('spawn', 'forkserver'), default='spawn',
