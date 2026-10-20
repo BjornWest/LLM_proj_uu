@@ -104,6 +104,29 @@ BENCH = {'gsm8k': (gsm8k_prompt, gsm8k_score), 'ifeval': (ifeval_prompt, ifeval_
          'mmlu_pro': (mmlu_prompt, mmlu_score)}
 
 
+def check_scoring(benches):
+    """Score one trivial response per benchmark before any generation is dispatched.
+
+    IFEval needs the vendored ifeval_lm_eval checker plus nltk (punkt_tab), langdetect and
+    immutabledict; without them every generated response would end as an unscored error.
+    """
+    probes = {'ifeval': ({'key': 0, 'prompt': 'probe', 'instruction_id_list':
+                          ['punctuation:no_comma', 'length_constraints:number_sentences'],
+                          'kwargs': [{}, {'num_sentences': 1, 'relation': 'at least'}]},
+                         'One sentence. Another one.'),
+              'gsm8k': ({'answer': '4'}, '#### 4'), 'mmlu_pro': ({'answer': 'A'}, 'Answer: A')}
+    for b in benches:
+        it, content = probes[b]
+        try:
+            ok = BENCH[b][1](it, content)['correct']
+        except Exception as e:  # noqa: BLE001 - reported as an actionable setup error
+            sys.exit(f'{b} scoring is unavailable ({type(e).__name__}: {e}). Nothing was sent. '
+                     f'See README.md: install nltk>=3.9.1, langdetect and immutabledict into .venv and '
+                     f'download punkt_tab into NLTK_DATA (now {os.environ["NLTK_DATA"]}).')
+        if ok is not True:
+            sys.exit(f'{b} scoring self-check returned {ok!r} for a known-correct response; nothing was sent.')
+
+
 # ---------------------------------------------------------------- endpoint
 def http_json(url, body=None, timeout=1800, api_key=None):
     data = None if body is None else json.dumps(body).encode()
@@ -163,6 +186,10 @@ def main():
         k, v = kv.split('=')
         max_tokens[k] = int(v)
     no_think = set(filter(None, a.no_think.split(',')))
+    unknown = [b for b in benches if b not in BENCH]
+    if unknown:
+        sys.exit(f'Unknown benchmarks: {unknown}')
+    check_scoring(benches)
     os.makedirs(a.out, exist_ok=True)
 
     models = http_json(a.base_url.rstrip('/') + '/models', timeout=30, api_key=a.api_key)
