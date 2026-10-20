@@ -155,6 +155,7 @@ class SessionStore:
         self._scope_reason = None
         self._order_ids = set()
         self._rate_refreshed = False
+        self._shopper_chose_delivery = self._reset_done = False
 
     # Episode lifecycle (trusted callers only).
 
@@ -430,8 +431,9 @@ class SessionStore:
             return None
         rows = [{'kind': 'quote', 'id': quote['quote_id'], 'label': 'Items and delivery',
                  'amount_minor': quote['total_minor']}]
+        # A free-trial extra is still a committed selection but costs nothing today.
         rows += [{'kind': 'extra', 'id': extra['id'], 'label': extra['label'],
-                  'amount_minor': extra['price_minor']}
+                  'amount_minor': 0 if extra.get('trial_days') else extra['price_minor']}
                  for extra in self._settings['extras'] if state['extras'][extra['id']]]
         return rows
 
@@ -501,6 +503,11 @@ class SessionStore:
         if trigger in recurrence['cookie'] and not self._dialog_open:
             self._open_dialog(trigger)
         if trigger in recurrence['delivery']:
+            if settings['presentation'].get('reset_once'):
+                # Reset once, and only after the shopper actually chose a delivery.
+                if not self._shopper_chose_delivery or self._reset_done:
+                    return
+                self._reset_done = True
             self._reset_trigger, self._reset_directive = trigger, True
 
     def _refresh_notice(self):
@@ -515,13 +522,21 @@ class SessionStore:
         _fields(request, 'trigger')
         execution = self._settings['presentation'].get('consent_extras', {}).get('execution')
         trigger = request['trigger']
-        if (execution in ('optin_with_terms', 'optin_with_terms_inline') and trigger == 'terms'
+        if (execution in ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
+                          'optin_with_terms_state', 'optin_with_terms_same_form') and trigger == 'terms'
                 or execution == 'optin_with_address' and trigger == 'address_saved'):
             self._state['newsletter'] = True
             self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
         elif trigger == 'address_saved' and trigger in self._settings['recurrence']['newsletter']:
             # The order-review fragment re-renders with the server default after an address save.
             self._site_rules(trigger)
+        elif execution == 'extra_with_terms' and trigger == 'terms':
+            # Ticking the terms also selects the paid extra; the order total changes.
+            extra_id = self._settings['extras'][0]['id']
+            if not self._state['extras'][extra_id]:
+                self._state['extras'][extra_id] = True
+                self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                    'value': True, 'trigger': trigger})
         elif execution == 'extra_after_address' and trigger == 'address_saved':
             if not getattr(self, '_address_extra_shown', False):
                 self._address_extra_shown = True
@@ -728,6 +743,7 @@ class SessionStore:
                 self._reset_trigger = None
             elif changed:
                 self._event('delivery_select', 'user', {'option_id': option_id})
+                self._shopper_chose_delivery = True
                 self._reset_trigger = None
                 self._site_rules('delivery_select')
 

@@ -544,5 +544,28 @@ class RateRefresh(Controls):
         self.assertTrue(self.send(store, 'order_arm', grand_total_minor=30000)['order']['armed'])
 
 
+
+class NavigationReset(Controls):
+    def test_silent_reset_happens_once_after_a_shopper_choice(self):
+        store = SessionStore(options({'retailer_id': 'shop', 'delivery': {'default': {'choice_id': 'choice/fast'}},
+            'recurrence': {'delivery': ['checkout_navigation']},
+            'presentation': {'execution': 'navigation_reset_silent', 'silent_reset': True, 'reset_once': True}}),
+            offers=OFFERS, runtime_id='runtime')
+        basket = [{'offer_id': 'shop/a', 'quantity': 1}]
+        self.offer(store, basket)
+        sync = lambda option, source, step: self.send(store, 'sync', basket=basket,
+            delivery={'option_id': option, 'source': source}, location='checkout', step=step)
+        sync('basket/fast', 'site', 1)
+        self.assertFalse(sync('basket/fast', 'site', 2)['directives']['reset_delivery'])
+        sync('basket/slow', 'shopper', 2)
+        self.assertTrue(sync('basket/slow', 'shopper', 3)['directives']['reset_delivery'])
+        sync('basket/fast', 'site', 3)
+        event = store.journal()['events'][-1]
+        self.assertEqual((event['kind'], event['detail']['trigger']), ('site_preselect', 'checkout_navigation'))
+        self.assertFalse(sync('basket/fast', 'site', 2)['directives']['reset_delivery'])
+        sync('basket/slow', 'shopper', 2)
+        self.assertFalse(sync('basket/slow', 'shopper', 3)['directives']['reset_delivery'])
+
+
 if __name__ == '__main__':
     unittest.main()

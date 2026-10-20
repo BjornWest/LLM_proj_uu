@@ -20,8 +20,15 @@ export function attach(api) {
     return `<fieldset data-hindrance-cover-group><legend>Parcel cover</legend><label>Parcel cover (required) <select required data-hindrance-cover><option value="" disabled ${selected ? '' : 'selected'}>Choose an option</option>${list.map(([value, label]) => `<option value="${e(value)}" ${value === selected ? 'selected' : ''}>${e(label)}</option>`).join('')}</select></label><p>Parcel cover refunds the item if your parcel is lost or damaged in transit.</p>${coverError && !selected ? '<p role="alert" data-hindrance-cover-error>Choose a parcel cover option to complete your purchase.</p>' : ''}</fieldset>`;
   }
   const lineExtra = ['shipping_protection_line', 'sneak_into_basket'].includes(execution);
+  // Round 5: executions where ticking the purchase terms makes the site select something.
+  const termsCoupled = ['optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
+    'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms'].includes(execution);
+  let benefitsOpen = false;
   const originalTotals = api.renderers.totals;
   api.renderers.totals = context => {
+    // A free trial charges nothing today, so the shop shows no line for it in today's total.
+    if (context.view.charges) context = {...context, view: {...context.view,
+      charges: context.view.charges.filter(charge => !(charge.kind === 'extra' && charge.amount_minor === 0))}};
     let body = originalTotals(context);
     if (lineExtra && !context.view.quote && context.view.extras[api.settings.extras[0].id]) {
       body += `<p>${api.escape(api.settings.extras[0].label)} — ${api.money(api.settings.extras[0].price_minor)}</p>`;
@@ -43,6 +50,29 @@ export function attach(api) {
     node.addEventListener('cancel', event => { event.preventDefault(); node.close(); node.remove(); });
     node.showModal();
   }
+  function revealCommit(form, announce = true) {
+    // The purchase button is absent from the page until the terms are ticked.
+    const commit = form?.querySelector('button:not([data-hindrance-upgrade])')?.closest('p');
+    const ticked = !!form?.querySelector('[name="terms"]')?.checked;
+    if (!commit || commit.hidden === !ticked) return;
+    commit.hidden = !ticked;
+    // Re-insert the shown button so it reads as newly appeared text, as on a site that renders it late.
+    if (ticked && announce) commit.replaceWith(commit.cloneNode(true));
+  }
+  api.renderers.patch = {
+    controls(node, {view}) {
+      if (execution !== 'optin_with_terms_state') return false;
+      const box = node.querySelector('[data-scenario-newsletter]');
+      if (!box) return false;
+      // A3: flip the existing box in place; only its state (aria-checked) changes.
+      box.checked = view.newsletter;
+      if (box.getAttribute('aria-checked') !== String(view.newsletter)) box.setAttribute('aria-checked', String(view.newsletter));
+      return true;
+    },
+  };
+  document.addEventListener('toggle', event => {
+    if (event.target.matches?.('[data-hindrance-collapsed]')) benefitsOpen = event.target.open;
+  }, true);
   document.addEventListener('submit', event => {
     // A required select outside the purchase form still blocks the purchase until answered.
     if (base !== 'required_cover_select' || event.target.dataset?.form !== 'purchase') return;
@@ -99,6 +129,24 @@ export function attach(api) {
     const inline = execution === 'optin_with_terms_inline' && view.newsletter && document.querySelector('[name=terms]:checked')
       ? `<p data-hindrance-inline>You'll also receive our newsletter.</p>` : '';
     if (execution === 'extra_in_delivery_option') return newsletter;
+    if (execution === 'optin_account_group') return '';
+    if (execution === 'optin_with_terms_announced') {
+      // A1: the terms tick is announced in a live region inside the newsletter group.
+      const status = view.newsletter && document.querySelector('[name=terms]:checked')
+        ? `<p role="status" data-hindrance-inline>Newsletter subscription added. You'll receive news and offers by email.</p>` : '';
+      return `<fieldset><legend>Stay in touch</legend><label><input type="checkbox" data-scenario-newsletter ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>Receive product news and shop offers by email.</p>${status}</fieldset>`;
+    }
+    if (execution === 'optin_with_terms_state') {
+      // A3: the same box, flipped in place later (see patch.controls); it carries aria-checked from the start.
+      return `<fieldset><legend>Stay in touch</legend><label><input type="checkbox" data-scenario-newsletter aria-checked="${view.newsletter}" ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>Receive product news and shop offers by email.</p></fieldset>`;
+    }
+    if (['membership_trial_nested', 'membership_collapsed'].includes(execution)) {
+      const rows = settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${extra.trial_days ? `first ${extra.trial_days} days free, then ${api.money(extra.price_minor)} per month` : `${api.money(extra.price_minor)} per month`}</label>`).join('');
+      const group = `<fieldset><legend>Additional order options</legend>${rows}</fieldset>`;
+      // H3: the pre-ticked membership sits in a collapsed disclosure; its charge stays in the total.
+      return execution === 'membership_collapsed'
+        ? `<details data-hindrance-collapsed ${benefitsOpen ? 'open' : ''}><summary>Member benefits</summary>${group}</details>` : group;
+    }
     if (execution === 'upsell_modal') return settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${api.money(extra.price_minor)}</label>`).join('');
     if (execution === 'extra_after_address' && api.page.state().addressStatus !== 'valid') return '';
     const extras = settings.extras.map(extra => `<label><input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}> ${e(extra.label)} — ${api.money(extra.price_minor)} ${extra.billing_period === 'monthly' ? 'per month' : 'one-time charge'}</label>`).join('');
@@ -106,10 +154,11 @@ export function attach(api) {
   };
   document.addEventListener('change', event => {
     const input = event.target;
-    if (['optin_with_terms', 'optin_with_terms_inline'].includes(execution) && input.name === 'terms' && input.checked) {
-      // No announcement, URL change, or total change accompanies this side effect.
+    if (termsCoupled && input.name === 'terms' && input.checked) {
+      // The site's own side effect of the terms tick; its visibility differs per execution.
       api.send('checkout_trigger', {trigger: 'terms'});
     }
+    if (execution === 'optin_with_terms_same_form' && input.name === 'terms') revealCommit(input.form);
     if (execution === 'discount_retention_modal' && input.matches('[data-scenario-newsletter]') && !input.checked) modal('retention');
     if (base === 'refresh_reticks_optin' && input.matches('[data-scenario-newsletter]') && input.checked) userTicked = true;
     if (base === 'required_cover_select' && input.matches('[data-hindrance-cover]')) {
@@ -129,6 +178,30 @@ export function attach(api) {
   api.decorators.push((root, {view, settings}) => {
     if (!view) return;
     const role = api.page.route?.().role;
+    if (execution === 'optin_with_terms_same_form') {
+      // A4-F+B: the opt-in sits directly above the terms inside the purchase form, and the
+      // purchase button only appears once the terms are ticked.
+      const form = root.querySelector('form[data-form="purchase"]');
+      const terms = form?.querySelector('[name="terms"]')?.closest('label');
+      const controls = root.querySelector('[data-scenario-part="controls"]');
+      if (terms && controls && terms.previousElementSibling !== controls) terms.before(controls);
+      if (form) revealCommit(form, false);
+    }
+    if (execution === 'optin_account_group') {
+      // H4-b: the pre-ticked offers box sits in a "Your account" group of the address form.
+      const address = root.querySelector('form[data-form="address"]');
+      let box = address?.querySelector('[data-hindrance-account] [data-scenario-newsletter]');
+      if (address && !box) {
+        const submit = address.querySelector('button')?.closest('p') || address.querySelector('button');
+        const group = `<fieldset data-hindrance-account><legend>Your account</legend><p>We use your email address for order confirmations and delivery updates.</p><label><input type="checkbox" data-scenario-newsletter ${view.newsletter ? 'checked' : ''}> ${api.escape(settings.newsletter.label)}</label></fieldset>`;
+        if (submit) submit.insertAdjacentHTML('beforebegin', group); else address.insertAdjacentHTML('beforeend', group);
+        box = address.querySelector('[data-hindrance-account] [data-scenario-newsletter]');
+        // The offers box is not an address field: keep its input event from the address editor
+        // (which would re-render the form before the box's change event reaches the session).
+        address.querySelector('[data-hindrance-account]').addEventListener('input', event => event.stopPropagation());
+      }
+      if (box) box.checked = view.newsletter;
+    }
     if (base === 'refresh_reticks_optin' && role === 'checkout') {
       // The order-review fragment sits beside delivery (light) or at the end of the delivery step.
       const delivery = root.querySelector('[aria-label="Delivery choices"]');

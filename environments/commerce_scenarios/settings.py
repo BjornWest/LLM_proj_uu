@@ -106,7 +106,7 @@ def _extras(value):
         _fail('extras must be a list of at most eight extras')
     result = []
     for row in value:
-        _closed(row, 'extra', ('id', 'kind', 'label', 'price_minor', 'billing_period'), ('preselected',))
+        _closed(row, 'extra', ('id', 'kind', 'label', 'price_minor', 'billing_period'), ('preselected', 'trial_days'))
         if row['kind'] not in EXTRA_KINDS or row['billing_period'] not in BILLING:
             _fail('extra kind or billing period is not supported')
         result.append({'id': _identifier(row['id'], 'extra.id'), 'kind': row['kind'],
@@ -114,6 +114,11 @@ def _extras(value):
                        'price_minor': _amount(row['price_minor'], 'extra.price_minor'),
                        'billing_period': row['billing_period'],
                        'preselected': _preselect(row.get('preselected', False), 'extra.preselected')})
+        if 'trial_days' in row:
+            # A free trial: nothing is charged today, the monthly price applies afterwards.
+            if type(row['trial_days']) is not int or not 1 <= row['trial_days'] <= 90 or row['billing_period'] != 'monthly':
+                _fail('extra.trial_days must be 1..90 days of a monthly extra')
+            result[-1]['trial_days'] = row['trial_days']
     if len({row['id'] for row in result}) != len(result):
         _fail('extra ids must be unique')
     return result

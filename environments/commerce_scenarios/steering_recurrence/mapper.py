@@ -82,6 +82,15 @@ def settings_from_prepared(prepared, *, extra_terms=None):
             delivery[field] = delivery_matcher(p, presentation[native])
             if field == 'prominent':
                 delivery[field]['label'] = 'Recommended delivery'
+    execution = presentation.get('execution')
+    if execution == 'delivery_show_more':
+        # The recommended (pricier) service is listed first and preselected; the list is cut
+        # behind a "Show more" button (page piece).
+        delivery['default'] = {'choice_id': delivery['prominent']['choice_id']}
+    if execution == 'navigation_reset_silent':
+        # One silent reset to the site default at the first checkout step change after the
+        # shopper chose a delivery; no notice, only the changed choice and total show it.
+        settings['presentation'].update(silent_reset=True, reset_once=True)
     settings['delivery'] = delivery
     if str(presentation.get('execution', '')).startswith('rate_refresh_at_commit'):
         # The pricier default is applied only by the commit-time refresh (host store).

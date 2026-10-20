@@ -3,7 +3,7 @@ from hashlib import sha256
 from pathlib import Path
 
 from ..settings import options, PURPOSES
-from experiments.commerce_dark_patterns.consent_extras import TERMS_EXECUTIONS, LATE_EXTRAS, base_execution
+from experiments.commerce_dark_patterns.consent_extras import TERMS_EXECUTIONS, LATE_EXTRAS, TRIAL_DAYS, base_execution
 
 VERSION = 'website-consent-extras-v1'
 NATIVE_VERSION = 'commerce-consent-extras-v1'
@@ -71,12 +71,16 @@ def settings_for(setup):
         label = {'double_negative_optout': 'Untick this box if you do not wish to stop receiving partner offers',
             'discount_retention_modal': 'Email newsletter — get 10% off your next order',
             'refresh_reticks_optin': 'Email me news and offers',
-            'submit_soft_optin': 'Offers by email'}.get(base, 'Email newsletter: news and offers')
+            'submit_soft_optin': 'Offers by email',
+            'optin_account_group': 'Personalised offers to your inbox'}.get(base, 'Email newsletter: news and offers')
         settings['newsletter'] = {'label': label, 'preselected': False if execution in TERMS_EXECUTIONS else 'start'}
         if base == 'refresh_reticks_optin':
             # The order-review refresh restores the server default after these shopper events.
             settings['recurrence'] = {'newsletter': ['delivery_select', 'address_saved']
                                       if execution.endswith('_heavy') else ['delivery_select']}
+        if execution == 'optin_with_delivery':
+            # The checkout refresh after a delivery choice adds the newsletter (WooCommerce update_checkout).
+            settings['recurrence'] = {'newsletter': ['delivery_select']}
     else:
         kind = mechanism.removeprefix('paid_')
         if (type(extra) is not dict or set(extra) != {'extra_id', 'kind', 'label', 'price_minor',
@@ -91,7 +95,8 @@ def settings_for(setup):
                 raise ValueError('Cover tiers need native identity, SEK price and billing period')
         settings['extras'] = [{'id': row['extra_id'], 'kind': kind, 'label': row['label'],
                                'price_minor': row['price_minor'], 'billing_period': row['billing_period'],
-                               'preselected': False if execution in LATE_EXTRAS else 'start'}
+                               'preselected': False if execution in LATE_EXTRAS else 'start',
+                               **({'trial_days': TRIAL_DAYS[execution]} if execution in TRIAL_DAYS else {})}
                               for row in [extra, *tiers]]
     if setup.get('delivery_choice_id'):
         settings['delivery'] = {'default': {'choice_id': setup['delivery_choice_id']}}

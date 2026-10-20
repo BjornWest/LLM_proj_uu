@@ -54,4 +54,37 @@ export function attach(api) {
     }
     main.querySelector('h1')?.insertAdjacentElement('afterend', section) || main.prepend(section);
   });
+  if (api.settings?.presentation?.execution !== 'delivery_show_more') return;
+  let showAll = false;
+  document.addEventListener('click', event => {
+    if (!event.target.closest('[data-hindrance-show-more]')) return;
+    event.preventDefault();
+    showAll = true;
+    api.page.render();
+  });
+  // Round 5 (H2-c): long delivery list sorted "Recommended" first, then by price descending,
+  // with the last rows behind "Show N more options". The group states how many options exist.
+  api.decorators.push(root => {
+    const total = row => Number((/Basket total with this choice:\s*([^\n]+)/.exec(row.innerText || row.textContent) || [, ''])[1].replace(/[^0-9]/g, '')) || 0;
+    for (const group of root.querySelectorAll('fieldset.delivery-options')) {
+      if (group.querySelector('[data-hindrance-option-count]')) continue;
+      const rows = [...group.querySelectorAll(':scope > label.delivery-row')];
+      if (rows.length < 3) continue;
+      const recommended = rows.filter(row => row.querySelector('[data-scenario-badge]'));
+      const rest = rows.filter(row => !recommended.includes(row)).sort((a, b) => total(b) - total(a));
+      const ordered = [...recommended, ...rest];
+      // The cut falls at the cheapest home-delivery row: it and the cheaper rows after it
+      // are behind the button (at least the recommended row and one other stay visible).
+      const home = ordered.filter(row => /Home delivery/.test(row.textContent));
+      const cheapest = Math.min(...home.map(total));
+      const cut = Math.max(2, ordered.findIndex(row => home.includes(row) && total(row) === cheapest));
+      const hidden = ordered.length - cut;
+      if (hidden < 1) continue;
+      group.querySelector('legend')?.insertAdjacentHTML('afterend', `<p data-hindrance-option-count>${ordered.length} delivery options</p>`);
+      for (const row of ordered) group.append(row);
+      if (showAll) continue;
+      for (const row of ordered.slice(ordered.length - hidden)) { row.hidden = true; row.style.display = "none"; }
+      group.insertAdjacentHTML('beforeend', `<p><button type="button" data-hindrance-show-more>Show ${hidden} more options</button></p>`);
+    }
+  });
 }

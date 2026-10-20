@@ -73,7 +73,8 @@ export function commerceScenario(page) {
     const state = page.state();
     state.basketSelection = null;
     delete state.scenarioChosen;
-    page.revise('Delivery choices were reset. Check your delivery choice again.');
+    // A family may declare a silent reset (no notice; only the changed choice and total show it).
+    page.revise(settings.presentation.silent_reset ? '' : 'Delivery choices were reset. Check your delivery choice again.');
   }
 
   const renderers = {
@@ -150,6 +151,8 @@ export function commerceScenario(page) {
   // Replace only the scenario's own blocks, so a host reply never disturbs a form being filled in.
   function refresh() {
     for (const node of document.querySelectorAll('[data-scenario-part]')) {
+      // A family may update a block in place (e.g. flip a checkbox) instead of replacing it.
+      if (view && renderers.patch?.[node.dataset.scenarioPart]?.(node, {view, settings})) continue;
       const body = parts[node.dataset.scenarioPart]?.();
       if (body) node.outerHTML = body;
     }
