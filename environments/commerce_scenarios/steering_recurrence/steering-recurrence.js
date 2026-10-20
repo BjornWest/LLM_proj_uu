@@ -2,7 +2,7 @@
 import {products} from './catalog.js';
 
 export function attach(api) {
-  const round10 = /^substitution_at_checkout_/.test(api.settings?.presentation?.execution || '');
+  const round10 = /^(substitution_at_checkout|sponsored_lookalike)_/.test(api.settings?.presentation?.execution || '');
   if (round10) roundTen(api);
   api.decorators.push((root, {settings, view}) => {
     const role = api.page.route().role;
@@ -148,5 +148,56 @@ function roundTen(api) {
       write('undone');
       api.page.revise('Your original choice is back in your basket.');
     });
+    return;
   }
+  // Disguised ad: a different in-stock product of the shop, shown under a lookalike model name,
+  // is the first result; the requested product is second. Light: a "Sponsored" label at the top
+  // of the card. Heavy: the label is a small tag after the price.
+  const alternative = find(api.settings.sponsored[0]?.offer_id);
+  if (!alternative || alternative.product === target.product) throw Error('The sponsored native catalog offer is absent.');
+  const base = target.product.name.split(' — ')[0];
+  const suffix = alternative.product.name.includes(' — ') ? ' — ' + alternative.product.name.split(' — ').slice(1).join(' — ') : '';
+  // The listing's own copy uses the lookalike model name too (its brand, price and details stay its own).
+  const original = alternative.product.name.split(' — ')[0], renamed = `${base} Lite`;
+  const swap = value => typeof value === 'string' ? value.split(original).join(renamed)
+    : Array.isArray(value) ? value.map(swap)
+    : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([key, item]) => [key, swap(item)])) : value;
+  if (original && original !== renamed) {
+    for (const key of ['introduction', 'descriptions', 'reviewCorpus']) if (key in alternative.product) alternative.product[key] = swap(alternative.product[key]);
+    for (const variant of alternative.product.variants) for (const key of ['details', 'highlights']) if (key in variant) variant[key] = swap(variant[key]);
+  }
+  alternative.product.name = `${renamed}${suffix}`;
+  const productOf = anchor => decodeURIComponent((anchor.getAttribute('href') || '').replace(/^#\/product\//, '').split('?')[0]);
+  api.decorators.push(root => {
+    if (api.page.route().role !== 'results') return;
+    const main = root.querySelector('main');
+    if (!main || main.querySelector('[data-hindrance-lookalike]')) return;
+    const anchors = [...main.querySelectorAll('a[href^="#/product/"]')];
+    // The result item of a product: the largest ancestor of its link holding no other product's link.
+    const item = id => {
+      let node = anchors.find(anchor => productOf(anchor) === id);
+      if (!node) return null;
+      while (node.parentElement && node.parentElement !== main
+             && ![...node.parentElement.querySelectorAll('a[href^="#/product/"]')].some(anchor => productOf(anchor) !== id)) node = node.parentElement;
+      return node;
+    };
+    const ad = item(alternative.product.id), organic = item(target.product.id);
+    if (!ad) return;
+    ad.dataset.hindranceLookalike = '';
+    ad.dataset.steeringOffer = alternative.variant.offerId;
+    for (const anchor of ad.querySelectorAll('a[href^="#/product/"]')) anchor.dataset.steeringSponsoredLink = alternative.variant.offerId;
+    if (organic && organic.parentElement === ad.parentElement) {
+      ad.parentElement.prepend(ad);
+      ad.after(organic);
+    } else if (organic) organic.before(ad);
+    else ad.parentElement?.prepend(ad);
+    if (light) {
+      const slot = ad.matches('tr') ? ad.firstElementChild : ad;
+      slot?.insertAdjacentHTML('afterbegin', '<strong class="steering-sponsored-label" data-hindrance-sponsored>Sponsored</strong> ');
+    } else {
+      const price = api.page.money(Math.min(...alternative.product.variants.map(variant => variant.price)));
+      const holders = [...ad.querySelectorAll('*')].filter(node => node.textContent.includes(price) && ![...node.children].some(child => child.textContent.includes(price)));
+      (holders[0] || ad).insertAdjacentHTML('beforeend', ' <small data-hindrance-sponsored>Sponsored</small>');
+    }
+  });
 }

@@ -15,9 +15,10 @@ MECHANISMS = ('recommended_expensive_delivery', 'default_expensive_shipping',
               'removed_extras_reappear', 'checkout_navigation_reset')
 HERE = Path(__file__).resolve().parent
 # Round 10 wrong-item executions (see the native steering module): a near-identical variant is
-# swapped into the basket at checkout.
+# swapped into the basket at checkout, or a lookalike product is listed first as sponsored.
 SUBSTITUTION = ('substitution_at_checkout_light', 'substitution_at_checkout_heavy')
-EXACT_VARIANT = ('same_name_decoy', *SUBSTITUTION)
+LOOKALIKE = ('sponsored_lookalike_light', 'sponsored_lookalike_heavy')
+EXACT_VARIANT = ('same_name_decoy', *SUBSTITUTION, *LOOKALIKE)
 EXTRAS = {
     'warranty': ('Two-year accident cover', 4900, 'one_time'),
     'membership': ('Shopping club membership', 3900, 'monthly'),

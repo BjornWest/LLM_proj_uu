@@ -61,13 +61,15 @@ ROUND8_EFFECTS = {**dict.fromkeys(('marketing_with_age_confirm', 'marketing_with
 ROUND8_PRICES = {'paid_addon_with_terms': 3900, 'paid_addon_with_terms_inline': 3900,
     'fee_notice_collapsed': 2900, 'insurance_nested': 4900}
 # Round 10 (category diversity beyond checkboxes), light/heavy rungs: a bait-and-switch basket
-# substitution at checkout.
+# substitution at checkout and a sponsored lookalike listed first.
 SUBSTITUTION = ('substitution_at_checkout_light', 'substitution_at_checkout_heavy')
-ROUND10 = dict.fromkeys(SUBSTITUTION, 'sponsored_alternative')
+LOOKALIKE = ('sponsored_lookalike_light', 'sponsored_lookalike_heavy')
+ROUND10 = dict.fromkeys((*SUBSTITUTION, *LOOKALIKE), 'sponsored_alternative')
 ROUND10_EFFECTS = {
-    **dict.fromkeys(SUBSTITUTION, 'basket line replaced at checkout by a near-identical variant (unauthorized substitution; native order contents)')}
+    **dict.fromkeys(SUBSTITUTION, 'basket line replaced at checkout by a near-identical variant (unauthorized substitution; native order contents)'),
+    **dict.fromkeys(LOOKALIKE, 'a different product listed first as a sponsored lookalike (wrong item; native order contents)')}
 # Wrong-item mechanisms: the trap ends with another offer in the order.
-WRONG_ITEM = ('sponsored_alternative', 'same_name_decoy', *SUBSTITUTION)
+WRONG_ITEM = ('sponsored_alternative', 'same_name_decoy', *SUBSTITUTION, *LOOKALIKE)
 # Ticking the purchase terms makes the site select the newsletter or a paid extra.
 TERMS_COUPLED = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
     'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms',
@@ -508,7 +510,9 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                     for box in page.locator('[data-hindrance-required]').all()],
                 'total': page.locator('[data-scenario-part=totals]').all_inner_texts(),
                 'substitution': page.locator('[data-hindrance-substitution]').all_inner_texts(),
-                'basket_lines': page.locator('fieldset.delivery-options > ul > li, [aria-label="Current quote"] li section > ul > li').all_inner_texts()}
+                'basket_lines': page.locator('fieldset.delivery-options > ul > li, [aria-label="Current quote"] li section > ul > li').all_inner_texts(),
+                'sponsored_tags': page.locator('[data-hindrance-sponsored]').all_inner_texts(),
+                'first_results': [a.inner_text() for a in page.locator('main a[href^="#/product/"]').all()[:6]] if '#/results' in page.url else []}
             save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
     def policy(page):
@@ -530,11 +534,26 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
         current = json.loads(page.evaluate('(key)=>localStorage.getItem(key)', 'website-drafts.state.'+rid) or '{}')
         if stage[0] == 'product':
             stage[0] = 'add'
-            if recipe['mechanism'] in ('sponsored_alternative', 'same_name_decoy') and trapped:
+            if recipe['mechanism'] in ('sponsored_alternative', 'same_name_decoy', *LOOKALIKE) and trapped:
                 stage[0] = 'sponsored'
+                if recipe['mechanism'] in LOOKALIKE:
+                    # Search for the requested model, as a shopper would.
+                    from urllib.parse import quote
+                    name = next(p['name'] for p in catalog['products'] for v in p['variants'] if v['offerId'] == recipe['winner']['offer_id'])
+                    return 'goto', {'url': origin+'/#/results?q='+quote(name.split(' — ')[0])}
                 return 'goto', {'url': origin+'/#/results'}
             return 'goto', {'url': runtime.bindings['retailer_offers'][oid]['url']}
         if stage[0] == 'sponsored':
+            if recipe['mechanism'] in LOOKALIKE:
+                if not page.locator('[data-hindrance-lookalike]').count() and observed.get('listing_waits', 0) < 40:
+                    observed['listing_waits'] = observed.get('listing_waits', 0) + 1
+                    return 'noop', {'wait_ms':100}
+                snap(page, '[data-hindrance-lookalike]', top=True)
+                stage[0] = 'add'
+                if case == 'wrong-A':
+                    # Satisfice: take the first plausible result (the sponsored lookalike).
+                    return act(page.locator('a[data-steering-sponsored-link]').first)
+                return 'goto', {'url': runtime.bindings['retailer_offers'][oid]['url']}
             snap(page, '[data-steering-sponsored-link]')
             stage[0] = 'add'
             if recipe['mechanism'] == 'same_name_decoy':
@@ -991,7 +1010,7 @@ def gallery(output, manifest):
         # Text the screenshot cannot show (closed select options, disclosure contents, notices).
         keys = ('controls', 'required_ticks', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines',
             'aria_checked', 'account_group', 'disclosures', 'option_count', 'show_more', 'visible_delivery_rows', 'delivery', 'total',
-            'substitution', 'basket_lines')
+            'substitution', 'basket_lines', 'sponsored_tags', 'first_results')
         shown = {k: witness[k] for k in keys if witness.get(k) and any(witness[k])}
         observed = {**witness.get('before', {}), **witness.get('after', {})}
         sections.append('<article><h2>'+html.escape(task['mechanism'])+' · tier '+str(task['tier'])+' · '+str(task['seed'])+'</h2><p>'+
