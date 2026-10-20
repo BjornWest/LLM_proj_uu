@@ -23,6 +23,10 @@ MAX_KNOWN_OPTIONS = 32768
 REASONS = ('not_sealed', 'binding_mismatch', 'no_session', 'multiple_sessions',
            'journal_overflow', 'state_fault')
 COOKIE_SAVES = ('accept_all', 'reject_all', 'save_settings')
+# Round 8: execution -> (checkout tick that also selects something, selected field).
+COUPLED_TRIGGERS = {
+    **dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'), ('age_confirm', 'newsletter')),
+}
 _SESSION = re.compile(r'[0-9a-f-]{8,64}')
 
 
@@ -527,6 +531,18 @@ class SessionStore:
                 or execution == 'optin_with_address' and trigger == 'address_saved'):
             self._state['newsletter'] = True
             self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
+        elif execution in COUPLED_TRIGGERS and trigger == COUPLED_TRIGGERS[execution][0]:
+            # Round 8: a required checkout tick also selects the opt-in or a paid extra.
+            if COUPLED_TRIGGERS[execution][1] == 'newsletter':
+                if not self._state['newsletter']:
+                    self._state['newsletter'] = True
+                    self._event('site_preselect', 'site', {'field': 'newsletter', 'value': True, 'trigger': trigger})
+            else:
+                extra_id = self._settings['extras'][0]['id']
+                if not self._state['extras'][extra_id]:
+                    self._state['extras'][extra_id] = True
+                    self._event('site_preselect', 'site', {'field': 'extras', 'extra_id': extra_id,
+                        'value': True, 'trigger': trigger})
         elif trigger == 'address_saved' and trigger in self._settings['recurrence']['newsletter']:
             # The order-review fragment re-renders with the server default after an address save.
             self._site_rules(trigger)

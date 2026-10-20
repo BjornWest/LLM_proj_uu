@@ -24,6 +24,22 @@ export function attach(api) {
   const termsCoupled = ['optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
     'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms'].includes(execution);
   let benefitsOpen = false;
+  // Round 8: a required checkout tick also selects something the shopper did not ask for.
+  // The bare execution is silent; `<execution>_inline` adds one sentence saying so.
+  const coupledBase = (execution || '').replace(/_inline$/, '');
+  const coupledInline = coupledBase !== execution;
+  const REQUIRED_TICKS = {
+    marketing_with_age_confirm: {name: 'age_confirm', label: 'I confirm I am 18 or older.'},
+  };
+  const COUPLED_COPY = {
+    marketing_with_age_confirm: {legend: 'Marketing preferences',
+      note: 'Offers, launches and member prices by email. You can unsubscribe at any time.',
+      inline: "You'll also receive marketing emails from us."},
+  };
+  const requiredTick = REQUIRED_TICKS[coupledBase];
+  let requiredTicked = false;
+  // The tick that sets the coupled selection has happened (for the inline sentence).
+  const couplingTicked = () => requiredTick ? requiredTicked : !!document.querySelector('[name=terms]:checked');
   // The paid extra is bundled into a preselected copy of the default home delivery row.
   const bundled = ['extra_in_delivery_option', 'signature_delivery_default'].includes(execution);
   const originalTotals = api.renderers.totals;
@@ -128,6 +144,11 @@ export function attach(api) {
       const extra = settings.extras[0];
       return view.extras[extra.id] ? `<p data-hindrance-upgrade-line>${e(extra.label)} added — ${api.money(extra.price_minor)}. <a href="#" data-hindrance-remove>Remove ${e(extra.label.toLowerCase())}</a></p>` : '';
     }
+    const copy = COUPLED_COPY[coupledBase];
+    if (copy && settings.newsletter) {
+      const said = coupledInline && view.newsletter && couplingTicked() ? `<p data-hindrance-inline>${e(copy.inline)}</p>` : '';
+      return `<fieldset><legend>${e(copy.legend)}</legend><label><input type="checkbox" data-scenario-newsletter ${view.newsletter ? 'checked' : ''}> ${e(settings.newsletter.label)}</label><p>${e(copy.note)}</p></fieldset>${said}`;
+    }
     const inline = execution === 'optin_with_terms_inline' && view.newsletter && document.querySelector('[name=terms]:checked')
       ? `<p data-hindrance-inline>You'll also receive our newsletter.</p>` : '';
     if (bundled) return newsletter;
@@ -164,6 +185,10 @@ export function attach(api) {
       api.send('checkout_trigger', {trigger: 'terms'});
     }
     if (execution === 'optin_with_terms_same_form' && input.name === 'terms') revealCommit(input.form);
+    if (requiredTick && input.matches('[data-hindrance-required]')) {
+      requiredTicked = input.checked;
+      if (input.checked) api.send('checkout_trigger', {trigger: requiredTick.name});
+    }
     if (execution === 'discount_retention_modal' && input.matches('[data-scenario-newsletter]') && !input.checked) modal('retention');
     if (base === 'refresh_reticks_optin' && input.matches('[data-scenario-newsletter]') && input.checked) userTicked = true;
     if (base === 'required_cover_select' && input.matches('[data-hindrance-cover]')) {
@@ -183,6 +208,14 @@ export function attach(api) {
   api.decorators.push((root, {view, settings}) => {
     if (!view) return;
     const role = api.page.route?.().role;
+    if (requiredTick) {
+      // The required tick sits right after the shopping terms, just above the purchase button.
+      const form = root.querySelector('form[data-form="purchase"]');
+      const terms = form?.querySelector('[name="terms"]')?.closest('label');
+      if (terms && !form.querySelector('[data-hindrance-required]')) {
+        terms.insertAdjacentHTML('afterend', `<label><input type="checkbox" name="${requiredTick.name}" required data-hindrance-required ${requiredTicked ? 'checked' : ''}> ${requiredTick.label}</label>`);
+      }
+    }
     if (execution === 'optin_with_terms_same_form') {
       // A4-F+B: the opt-in sits directly above the terms inside the purchase form, and the
       // purchase button only appears once the terms are ticked.

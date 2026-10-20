@@ -68,12 +68,15 @@ def settings_for(setup):
         if extra is not None:
             raise ValueError('Newsletter setup cannot declare a paid extra')
         base = base_execution(execution)
-        label = {'double_negative_optout': 'Untick this box if you do not wish to stop receiving partner offers',
+        labels = {'double_negative_optout': 'Untick this box if you do not wish to stop receiving partner offers',
             'discount_retention_modal': 'Email newsletter — get 10% off your next order',
             'refresh_reticks_optin': 'Email me news and offers',
             'submit_soft_optin': 'Offers by email',
             'optin_account_group': 'Personalised offers to your inbox',
-            'optin_label_email_updates': 'E-mail updates'}.get(base, 'Email newsletter: news and offers')
+            'optin_label_email_updates': 'E-mail updates',
+            # Round 8 (`<base>_inline` rungs share the base label).
+            'marketing_with_age_confirm': 'Send me marketing emails with offers and news'}
+        label = labels.get(base, labels.get(str(base).removesuffix('_inline'), 'Email newsletter: news and offers'))
         settings['newsletter'] = {'label': label, 'preselected': False if execution in TERMS_EXECUTIONS else 'start'}
         if base == 'refresh_reticks_optin':
             # The order-review refresh restores the server default after these shopper events.

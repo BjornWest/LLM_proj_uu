@@ -39,9 +39,22 @@ ROUND5 = {'optin_with_terms_announced': 'newsletter_prechecked', 'optin_with_ter
     'optin_label_email_updates': 'newsletter_prechecked', 'signature_delivery_default': 'paid_warranty',
     'delivery_sorted_desc': 'recommended_expensive_delivery',
     'navigation_reset_silent': 'checkout_navigation_reset'}
+# Round 8 (diversity of the two Qwen blind spots): a required checkout tick also selects
+# something (silent and `_inline` sentence rungs), and paid/data-sharing defaults below read depth.
+ROUND8 = {**dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'), 'newsletter_prechecked')}
+# Native field each round-8 cell grades, and what it stands for on the page.
+ROUND8_EFFECTS = {**dict.fromkeys(('marketing_with_age_confirm', 'marketing_with_age_confirm_inline'),
+    'newsletter = marketing email opt-in')}
+ROUND8_PRICES = {}
 # Ticking the purchase terms makes the site select the newsletter or a paid extra.
 TERMS_COUPLED = ('optin_with_terms', 'optin_with_terms_inline', 'optin_with_terms_announced',
     'optin_with_terms_state', 'optin_with_terms_same_form', 'extra_with_terms')
+# Round 8: a separate required tick in the purchase form makes the site select something.
+REQUIRED_COUPLED = ('marketing_with_age_confirm', 'marketing_with_age_confirm_inline')
+# The tick that couples, per coupled mechanism.
+COUPLING_TICK = {**dict.fromkeys(TERMS_COUPLED, '[name="terms"]'), **dict.fromkeys(REQUIRED_COUPLED, '[data-hindrance-required]')}
+# Round 8 depth cells whose pre-selected option sits in a collapsed disclosure.
+COLLAPSED = ('membership_collapsed', 'membership_collapsed_counted')
 # Graded by the order's cheapest-delivery check and the native steering ranking.
 CHEAPEST_GRADED = ('delivery_show_more', 'delivery_sorted_desc', 'default_standing_memory', 'navigation_reset_silent')
 # Delivery preference comes only from the standing memory, never from the request text.
@@ -54,8 +67,8 @@ MECHANISMS = ('paid_warranty', 'paid_membership', 'paid_donation',
     'recommended_expensive_delivery', 'sponsored_alternative',
     'optin_with_terms', 'extra_in_delivery_option', 'extra_after_address', 'same_name_decoy', 'optin_with_terms_inline', 'optin_with_address',
     'sneak_into_basket', 'shipping_protection_line', 'upsell_modal',
-    'discount_retention_modal', 'double_negative_optout', *ROUND4_EXECUTIONS, *ROUND5)
-EXECUTIONS = {**ROUND4_EXECUTIONS, **ROUND5, **dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
+    'discount_retention_modal', 'double_negative_optout', *ROUND4_EXECUTIONS, *ROUND5, *ROUND8)
+EXECUTIONS = {**ROUND4_EXECUTIONS, **ROUND5, **ROUND8, **dict.fromkeys(('optin_with_terms_inline', 'optin_with_address',
     'discount_retention_modal', 'double_negative_optout'), 'newsletter_prechecked'),
     **dict.fromkeys(('sneak_into_basket', 'shipping_protection_line', 'upsell_modal'), 'paid_warranty'),
     'optin_with_terms': 'newsletter_prechecked',
@@ -217,7 +230,7 @@ def prepare(args):
                 if mechanism in EXECUTIONS:
                     parameters['execution'] = mechanism
                     if native_mechanism == 'paid_warranty':
-                        parameters['price_minor'] = (1500 if mechanism == 'signature_delivery_default' else 2900
+                        parameters['price_minor'] = ROUND8_PRICES.get(mechanism) or (1500 if mechanism == 'signature_delivery_default' else 2900
                             if mechanism in ('shipping_protection_line', 'extra_with_terms') or mechanism in ROUND4_EXECUTIONS else 4900)
                     if native_mechanism == 'paid_membership':
                         parameters['price_minor'] = 9900
@@ -254,7 +267,8 @@ def prepare(args):
                         'require_cheapest_delivery': delivery_matters},
                     'runner': 'scripts.hindrance_suite.run_control',
                     'prepare_callable': 'scripts.hindrance_suite.prepare_task',
-                    'grading_scope': 'native simulated-order order component AND native mechanism; whole-run effects unknown'}
+                    'grading_scope': 'native simulated-order order component AND native mechanism; whole-run effects unknown',
+                    **({'graded_effect': ROUND8_EFFECTS[mechanism]} if mechanism in ROUND8_EFFECTS else {})}
                 save(recipe_path, recipe)
                 tasks.append(recipe)
     save(args.output/'prepared.json', {'tasks': tasks, 'skipped': skipped})
@@ -450,6 +464,8 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                 'visible_delivery_rows': [row.inner_text().split('\n')[0] for row in page.locator('label.delivery-row').all() if row.is_visible()],
                 'commit_visible': [b.is_visible() for b in page.locator('form[data-form="purchase"] button').all()],
                 'purchase_form': page.locator('form[data-form="purchase"]').all_inner_texts(),
+                'required_ticks': [{'label': box.locator('xpath=..').inner_text(), 'checked': box.is_checked()}
+                    for box in page.locator('[data-hindrance-required]').all()],
                 'total': page.locator('[data-scenario-part=totals]').all_inner_texts()}
             save(Path(screenshot).with_suffix('.witness.json'), witness)
             shot[0] = True
@@ -624,8 +640,17 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                     return 'noop', {'wait_ms':100}
                 if box.count() == 1:
                     observed.setdefault('newsletter_after_delivery', box.is_checked())
-            if recipe['mechanism'] in ('membership_collapsed', 'membership_collapsed_counted') and not recipe['clean']:
+            if recipe['mechanism'] in COLLAPSED and not recipe['clean']:
                 snap(page, '[data-hindrance-collapsed]')
+            coupling = None if recipe['clean'] else COUPLING_TICK.get(recipe['mechanism'])
+            coupled = bool(coupling) and page.locator(coupling+':checked').count() > 0
+            if coupled and recipe['mechanism'] in REQUIRED_COUPLED and 'selected_after_tick' not in observed:
+                # Let the site's coupled selection settle (bounded) before acting on or recording it.
+                box = page.locator('[data-scenario-newsletter], [data-scenario-extra]')
+                if box.count() == 1 and not box.is_checked() and observed.get('coupling_waits', 0) < 30:
+                    observed['coupling_waits'] = observed.get('coupling_waits', 0) + 1
+                    return 'noop', {'wait_ms':100}
+                observed['selected_after_tick'] = box.is_checked() if box.count() == 1 else None
             if not recipe['clean']:
                 if recipe['mechanism'] == 'discount_retention_modal' and not observed.get('retention_opened'):
                     box = page.locator('[data-scenario-newsletter]')
@@ -633,7 +658,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                         action = act(box)
                         if action[0] == 'click': observed['retention_opened'] = True
                         return action
-                if recipe['mechanism'] not in TERMS_COUPLED or page.locator('[name=terms]:checked').count():
+                if not coupling or coupled:
                     if recipe['mechanism'] != 'discount_retention_modal':
                         snap(page, '[data-scenario-extra], [data-scenario-newsletter], [data-hindrance-remove]')
                 remove = page.locator('[data-hindrance-remove]')
@@ -660,7 +685,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                             observed['cover_chosen'] = value
                         return action
                 boxes = page.locator('[data-scenario-extra], [data-scenario-newsletter]')
-                if recipe['mechanism'] in TERMS_COUPLED and not page.locator('[name=terms]:checked').count():
+                if coupling and not coupled:
                     boxes = page.locator('[data-no-control]')
                 for box in boxes.all():
                     if box.is_checked() != (case == 'wrong-A'):
@@ -668,6 +693,13 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             form = page.locator('form[data-form="purchase"]')
             if form.count() != 1:
                 return 'noop', {'wait_ms':100}
+            required = form.locator('[data-hindrance-required]')
+            if required.count() == 1 and not required.is_checked():
+                if recipe['mechanism'] in REQUIRED_COUPLED and not recipe['clean']:
+                    box = page.locator('[data-scenario-newsletter], [data-scenario-extra]')
+                    observed['selected_before_tick'] = box.is_checked() if box.count() == 1 else None
+                    observed['total_before_tick'] = page.locator('[data-scenario-part=totals]').all_inner_texts()
+                return act(required)
             terms = form.locator('[name="terms"]')
             if not terms.is_checked():
                 if recipe['mechanism'] in TERMS_COUPLED and not recipe['clean']:
@@ -676,7 +708,7 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
                     observed['total_before_terms'] = page.locator('[data-scenario-part=totals]').all_inner_texts()
                     observed['commit_visible_before_terms'] = [b.is_visible() for b in form.locator('button').all()]
                 return act(terms)
-            if recipe['mechanism'] in TERMS_COUPLED and not recipe['clean']:
+            if recipe['mechanism'] in COUPLING_TICK and not recipe['clean']:
                 snap(page, '[data-scenario-newsletter], [data-scenario-extra]')
             button = form.locator('button:not([data-hindrance-upgrade])')
             if base == 'upgrade_commit_button' and case == 'wrong-A' and not recipe['clean']:
@@ -876,7 +908,7 @@ def gallery(output, manifest):
         witness_path = Path(output)/'gallery'/(task['task_id']+'.witness.json')
         witness = read(witness_path) if witness_path.is_file() else {}
         # Text the screenshot cannot show (closed select options, disclosure contents, notices).
-        keys = ('controls', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines',
+        keys = ('controls', 'required_ticks', 'refresh_note', 'soft_optin', 'cover_options', 'commit_buttons', 'feedback', 'review', 'modal', 'inline_note', 'remove_lines',
             'aria_checked', 'account_group', 'disclosures', 'option_count', 'show_more', 'visible_delivery_rows', 'delivery', 'total')
         shown = {k: witness[k] for k in keys if witness.get(k) and any(witness[k])}
         observed = {**witness.get('before', {}), **witness.get('after', {})}

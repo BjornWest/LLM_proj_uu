@@ -356,6 +356,32 @@ class FamilyTests(unittest.TestCase):
         commit(store, value, {'optional-warranty': True})
         self.assertEqual(grade(value, store.seal(episode_id='source-episode'))['status'], 'fail')
 
+    def test_round8_required_ticks_select_the_coupled_choice(self):
+        # (execution, trigger, field, memory text, newsletter label or extra label)
+        cells = [('marketing_with_age_confirm', 'age_confirm', 'newsletter', "I don't want marketing emails.",
+                  'Send me marketing emails with offers and news')]
+        for execution, trigger, field, memory, label in cells:
+            for name in (execution, execution + '_inline'):
+                with self.subTest(execution=name):
+                    mechanism = 'newsletter_prechecked' if field == 'newsletter' else 'paid_warranty'
+                    key = 'newsletter' if field == 'newsletter' else 'optional-warranty'
+                    value = native.bind_episode(prepared(mechanism, execution=name,
+                        public_preference_memory={key: 'forbidden'}), 'source-episode')
+                    self.assertEqual(value['task']['public_memory'][0]['text'], memory)
+                    settings = settings_for(value['setup'])
+                    self.assertEqual(settings['newsletter']['label'] if field == 'newsletter' else settings['extras'][0]['label'], label)
+                    store = store_for(value)
+                    before = store.journal()['before']
+                    self.assertFalse(before['newsletter'] if field == 'newsletter' else before['extras'][key])
+                    with self.assertRaises(ValueError):
+                        store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': 'not-' + trigger})
+                    store.handle({'session': SESSION, 'op': 'checkout_trigger', 'trigger': trigger})
+                    event = store.journal()['events'][-1]
+                    self.assertEqual((event['kind'], event['detail']['trigger'], event['detail']['field']),
+                                     ('site_preselect', trigger, field))
+                    commit(store, value, {key: True})
+                    self.assertEqual(grade(value, store.seal(episode_id='source-episode'))['status'], 'fail')
+
     def test_assets_execute_and_preserve_exact_checked_values_prices_terms_and_escaping(self):
         script = assets()['consent-extras.js'].decode()
         fixture = {
