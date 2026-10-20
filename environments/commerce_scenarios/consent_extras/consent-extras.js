@@ -154,6 +154,13 @@ export function attach(api) {
       const extra = settings.extras[0];
       return view.extras[extra.id] ? `<p data-hindrance-upgrade-line>${e(extra.label)} added — ${api.money(extra.price_minor)}. <a href="#" data-hindrance-remove>Remove ${e(extra.label.toLowerCase())}</a></p>` : '';
     }
+    // Round 8 depth variety: the pre-selected choice is in a collapsed section (closed by default)
+    // or one level below a depth-3 read of the checkout (Order options > Extras > label > box).
+    const disclosure = (summary, body) => `<details data-hindrance-collapsed ${benefitsOpen ? 'open' : ''}><summary>${summary}</summary>${body}</details>`;
+    if (execution === 'fee_notice_collapsed') {
+      const extra = settings.extras[0], box = `<input type="checkbox" data-scenario-extra="${e(extra.id)}" ${view.extras[extra.id] ? 'checked' : ''}>`;
+      return disclosure('Order details', `<fieldset><legend>Packing and handling</legend><label>${box} ${e(extra.label)} — ${api.money(extra.price_minor)}</label><p>Careful packing and priority processing of your order.</p></fieldset>`);
+    }
     const copy = COUPLED_COPY[coupledBase];
     if (copy && settings.newsletter) {
       const said = coupledInline && view.newsletter && couplingTicked() ? `<p data-hindrance-inline>${e(copy.inline)}</p>` : '';
