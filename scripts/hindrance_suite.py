@@ -548,6 +548,9 @@ def browser_policy(episode, recipe, case, reference, screenshot=None):
             if recipe['mechanism'] == 'delivery_show_more' and not recipe['clean']:
                 # H2-c: the cheapest home service is behind "Show N more options".
                 more = page.locator('[data-hindrance-show-more]')
+                if more.count() == 1 and not more.is_visible():
+                    # Sectioned checkouts: open the collapsed delivery section first.
+                    return act(more)
                 if not observed.get('cut_recorded') and (more.count() or observed.get('cut_waits', 0) >= 30):
                     observed['cut_recorded'] = True
                     observed['target_hidden_before_show_more'] = node.count() == 1 and not node.is_visible()
