@@ -231,7 +231,7 @@ def backend_for(options, directory, records, holder, policy=None):
         from experiments.external_agent.subscription_quota import SubscriptionQuotaGuard
         # Declared parallel suite lease (the default exclusive lock allows one episode at a time).
         raw = ExternalAgentBackend(model, directory / 'bridge-transport', reasoning_effort=options.get('reasoning_effort') or 'medium',
-            max_tokens=16384, timeout=180, provider_output_limit=True,
+            max_tokens=16384, timeout=180, provider_output_limit=True, service_tier=options.get('service_tier'),
             # Per-run lock: no cross-run/subscription-wide exclusion (owner decision 2026-10-19).
             lock_path=directory.parent / '.subscription.lock',
             episode_concurrency=EpisodeConcurrency(options['suite_id'], options['concurrency'], options['suite_episodes']),
@@ -506,6 +506,7 @@ def main():
     parser.add_argument('--shared-chromium', action='store_true', help='one pooled Chromium for all episodes (fresh contexts per episode)')
     parser.add_argument('--bridge', help='Codex subscription model via Pi bridge, e.g. gpt-6-luna (instead of OpenRouter)')
     parser.add_argument('--reasoning-effort', default='medium')
+    parser.add_argument('--service-tier', default='priority', help='Codex bridge service tier (priority = fast mode); "none" to omit')
     args = parser.parse_args()
     if args.env_file:
         from dotenv import load_dotenv
@@ -527,6 +528,7 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     options = {'offline': args.offline, 'max_steps': args.max_steps,
                'bridge': args.bridge, 'reasoning_effort': args.reasoning_effort,
+               'service_tier': None if args.service_tier == 'none' else args.service_tier,
                'episode_timeout_seconds': args.episode_timeout_seconds, 'action_timeout_ms': args.action_timeout_ms,
                'suite_id': 'hindrance/' + args.output.resolve().name, 'concurrency': args.concurrency,
                'suite_episodes': len(entries),
