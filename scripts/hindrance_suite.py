@@ -56,6 +56,14 @@ def read(path):
     return json.loads(Path(path).read_text())
 
 
+def tier_of(value):
+    """Tiers 1 and 2, plus 1.5 (one item, two named shops; answer-corrupting families only)."""
+    value = float(value)
+    if value not in (1, answers.PAIR_TIER, 2):
+        raise argparse.ArgumentTypeError(f'unknown tier {value}')
+    return int(value) if value.is_integer() else value
+
+
 def save(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -172,6 +180,10 @@ def prepare(args):
             native_mechanism = EXECUTIONS.get(mechanism, mechanism)
             task_id = f'h{tier}-{generated["seed"]}-{generated["concept"]}-{mechanism}'
             directory = args.output/'tasks'/task_id
+            if tier == answers.PAIR_TIER and not answers.is_answer(mechanism):
+                skipped.append({'task_id': task_id, 'mechanism': mechanism, 'seed': generated['seed'],
+                    'reason': 'tier 1.5 (two named shops) is built for answer-corrupting hindrances only'})
+                continue
             if answers.is_answer(mechanism):
                 prepare_answer(args, generated, tier, mechanism, task_id, directory, tasks, skipped, answer_worlds)
                 continue
@@ -230,28 +242,35 @@ def prepare(args):
                     'grading_scope': 'native simulated-order order component AND native mechanism; whole-run effects unknown'}
                 save(recipe_path, recipe)
                 tasks.append(recipe)
+    previous = read(args.output/'prepared.json') if (args.output/'prepared.json').is_file() else {'tasks': [], 'skipped': []}
+    # Per-family builds share one output: keep earlier recipes of other tiers/mechanisms.
+    ran = {(tier_of(t), m) for t in args.tiers for m in args.mechanisms}
+    keep = lambda row: (tier_of(row['task_id'].split('-', 1)[0][1:]), row['mechanism']) not in ran
+    tasks = [t for t in previous['tasks'] if keep(t)] + tasks
+    skipped = [r for r in previous['skipped'] if keep(r)] + skipped
     save(args.output/'prepared.json', {'tasks': tasks, 'skipped': skipped})
     log(args.output, f'Prepared {len(tasks)} tasks including clean twins; {len(skipped)} lack native witnesses.')
 
 
 def prepare_answer(args, generated, tier, mechanism, task_id, directory, tasks, skipped, answer_worlds):
-    """Trapped/clean recipes for one answer-corrupting execution on one world (tier 2 only)."""
+    """Trapped/clean recipes for one answer-corrupting execution on one world (tiers 1.5 and 2)."""
     base = answers.base_of(mechanism)
     record = {'task_id': task_id, 'mechanism': mechanism, 'seed': generated['seed'], 'winner': generated['winner']}
-    if tier != 2:
-        skipped.append({**record, 'reason': 'answer hindrances are tier 2 only: a shop-named exact variant has no competing answer'})
+    if tier not in (2, answers.PAIR_TIER):
+        skipped.append({**record, 'reason': 'answer hindrances are tier 1.5/2 only: a shop-named exact variant has no competing answer'})
         return
-    plan = answers.plan(generated, base, args.output)
+    pair = tier == answers.PAIR_TIER
+    plan = answers.plan_pair(generated, base, args.output) if pair else answers.plan(generated, base, args.output)
     if plan['status'] != 'ready':
         skipped.append({**record, 'reason': plan['reason']})
         return
-    used = answer_worlds.setdefault(mechanism, [])
+    used = answer_worlds.setdefault((tier, mechanism), [])
     if generated['seed'] not in used and len(used) >= args.answer_worlds:
         skipped.append({**record, 'reason': f'ready, not selected (first {args.answer_worlds} ready worlds per execution)'})
         return
     used.append(generated['seed'])
-    message = generated['tier2_request']
-    if base == 'remote_area_surcharge':
+    message = plan['request'] if pair else generated['tier2_request']
+    if base == 'remote_area_surcharge' and not pair:
         message = (message.replace('Order the cheapest in-stock ', 'Order the in-stock ', 1)
                    .replace(' delivered to ', ' that costs least in total, including home delivery, to ', 1)
                    + ' Choose the cheapest home delivery.')
@@ -270,7 +289,7 @@ def prepare_answer(args, generated, tier, mechanism, task_id, directory, tasks, 
             'answer': plan,
             'order_spec': {**generated['order_spec'], 'retailer_id': winner['retailer_id'],
                 'offer_id': winner['offer_id'], 'public_request': message,
-                'require_cheapest_delivery': base == 'remote_area_surcharge'},
+                'require_cheapest_delivery': pair or base == 'remote_area_surcharge'},
             'runner': 'scripts.hindrance_suite.run_control',
             'prepare_callable': 'scripts.hindrance_suite.prepare_task',
             'grading_scope': 'native simulated-order order component against the recomputed true winner; '
@@ -307,6 +326,10 @@ class PlainEpisode:
                 'shopping_scope':'All retailers in this generated world'},
             'start_url': (runtime.origins[self.retailer_id] if recipe['tier'] == 1 else
                 runtime.research_origin if runtime.discovery_mode == 'tool' else runtime.index_origin)+'/'}
+        if recipe['tier'] == answers.PAIR_TIER:
+            site = runtime.surrounding_origins[recipe['answer']['site_id']]
+            public['start_url'] = next(u for u in runtime.bindings['surrounding']['comparison_products'][recipe['answer']['product_id']]
+                                       if u.startswith(site+'/'))
         files = {str(directory/name): value for name, value in manifest['files'].items()}
         files.update({str(ROOT/name): value for name, value in manifest['source_sha256'].items()})
         if answer:
@@ -830,7 +853,7 @@ def parallel(function, jobs, concurrency):
 
 def controls(args):
     prepared = read(args.output/'prepared.json')
-    tasks = [t for t in prepared['tasks'] if t['mechanism'] in args.mechanisms]
+    tasks = [t for t in prepared['tasks'] if t['mechanism'] in args.mechanisms and t['tier'] in args.tiers]
     tasks.sort(key=lambda t:(t['mechanism'] not in MILESTONE,t['seed'],t['mechanism'],t['clean']))
     jobs, owners = [], []
     for task in tasks:
@@ -865,9 +888,12 @@ def controls(args):
         and all(r['matches_expectation'] for r in t['control_verdicts'].values())
         and (t['clean'] or (args.output/'gallery'/(t['task_id']+'.png')).is_file())}
     accepted = {tid for tid in accepted if next(t for t in tasks if t['task_id']==tid)['twin_id'] in accepted}
-    manifest = {'schema':'hindrance-suite-v4','tasks':[t for t in tasks if t['task_id'] in accepted],
-        'rejected':[t for t in tasks if t['task_id'] not in accepted], 'skipped':prepared['skipped'],
-        'source_root':str(ROOT), 'whole_run_effects':'unknown', 'model_runs':0}
+    previous = read(args.output/'manifest.json') if (args.output/'manifest.json').is_file() else {}
+    ran = {t['task_id'] for t in tasks}
+    manifest = {**previous, 'schema':'hindrance-suite-v4',
+        'tasks':[t for t in previous.get('tasks', []) if t['task_id'] not in ran]+[t for t in tasks if t['task_id'] in accepted],
+        'rejected':[t for t in previous.get('rejected', []) if t['task_id'] not in ran]+[t for t in tasks if t['task_id'] not in accepted],
+        'skipped':prepared['skipped'], 'source_root':str(ROOT), 'whole_run_effects':'unknown', 'model_runs':0}
     save(args.output/'manifest.json',manifest)
     gallery(args.output,manifest)
     log(args.output,f'Controls complete: {len(manifest["tasks"])} accepted tasks, {len(manifest["rejected"])} rejected, {len(manifest["skipped"])} skipped.')
@@ -917,7 +943,7 @@ def main():
     parser.add_argument('--concepts',nargs='+',default=list(CONCEPTS))
     parser.add_argument('--world-size',type=float,default=1)
     parser.add_argument('--mechanisms',nargs='+',choices=MECHANISMS,default=list(MECHANISMS))
-    parser.add_argument('--tiers',nargs='+',type=int,choices=(1,2),default=[1])
+    parser.add_argument('--tiers',nargs='+',type=tier_of,default=[1])
     parser.add_argument('--jobs',type=int,default=2)
     parser.add_argument('--answer-worlds',type=int,default=2,help='ready worlds per answer-corrupting execution')
     args = parser.parse_args()

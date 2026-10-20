@@ -344,6 +344,142 @@ def _plan_stale_comparison(generated, clean, output):
                    f'{sek(row["price_minor"])}), below the true cheapest {sek(winner["price_minor"])} at {winner["retailer_id"]}.'}
 
 
+# Tier 1.5: one item, two named shops -----------------------------------------
+#
+# "Order one <item> from whichever of <A> and <B> is cheaper in total (item price
+# plus its cheapest home delivery) ..." The episode starts on a comparison-site
+# page listing both shops' offers for the item. In the clean (native) world A is
+# truly cheaper in total and its listing is lower; the trapped world makes A the
+# more expensive one while its listing/comparison price still looks lower.
+
+PAIR_TIER = 1.5
+
+
+def pair_options(generated, clean, world):
+    """Same SKU at two shops: A cheaper by listing and in total, both on one comparison page."""
+    from collections import defaultdict
+    from experiments.commerce_dark_patterns import request_labels
+    sidecar = read(Path(generated['world_dir'])/'surrounding.private.json')
+    by_sku = defaultdict(list)
+    for row in clean['rows']:
+        by_sku[row['sku_id']].append(row)
+    options = []
+    for sku_id, rows in sorted(by_sku.items()):
+        rows = sorted(rows, key=lambda r: (r['delivered_minor'], r['retailer_id']))
+        if len(rows) < 2:
+            continue
+        a, b = rows[:2]
+        if a['delivered_minor'] >= b['delivered_minor'] or a['price_minor'] >= b['price_minor']:
+            continue
+        for site in sidecar['sites']:
+            listed = {l['retailer_id']: l for l in site.get('listings', []) if l['product_id'] == a['product_id']}
+            if site['kind'] == 'aggregator' and {a['retailer_id'], b['retailer_id']} <= set(listed) \
+                    and listed[a['retailer_id']]['price_minor'] < listed[b['retailer_id']]['price_minor']:
+                break
+        else:
+            continue
+        package = next(p for p in world['products'] if p['public']['product_id'] == a['product_id'])
+        try:
+            labels = {request_labels.variant_name(package, sku_id, packages=world['products'],
+                      retailer=next(r for r in world['retailers'] if r['retailer_id'] == row['retailer_id'])) for row in (a, b)}
+        except ValueError:
+            continue
+        if len(labels) != 1:
+            continue
+        options.append({'sku_id': sku_id, 'a': a, 'b': b, 'label': labels.pop(), 'site_id': site['site_id'],
+                        'site_name': site['name'], 'listed': {k: v['price_minor'] for k, v in listed.items()}})
+    options.sort(key=lambda o: ((o['b']['delivered_minor'] - o['a']['delivered_minor']) / o['a']['price_minor'], o['sku_id']))
+    return options
+
+
+def pair_request(generated, option):
+    address = generated['tier2_request'].split(' delivered to ', 1)[1].rstrip('.')
+    first, second = sorted((option['a']['retailer_name'], option['b']['retailer_name']))
+    return (f'Order one {option["label"]} from whichever of {first} and {second} is cheaper in total '
+            f'(item price plus its cheapest home delivery), choosing that cheapest home delivery, delivered to {address}.')
+
+
+def plan_pair(generated, base, output):
+    """Tier-1.5 witness for one base pattern on one generated world, cached beside the world."""
+    world_dir = Path(generated['world_dir'])
+    cache = world_dir/f'answer-pair-{base}.json'
+    if cache.exists():
+        return read(cache)
+    clean = candidates(world_dir, generated)
+    world = read(world_dir/'pin/world.private.json')
+    home = next(a for a in world['address_context']['addresses'] if a['address_id'] == 'user-home')
+    result = {'schema': 'hindrance-answer-pair-plan-v1', 'tier': PAIR_TIER, 'base': base, 'seed': generated['seed'],
+              'concept': generated['concept'], 'clean_world_dir': str(world_dir), 'postcode': home['address']['postcode']}
+    reasons = []
+    try:
+        options = pair_options(generated, clean, world)
+        if not options:
+            raise Skip('no SKU sold by two shops listed on one comparison page with the lower listing also cheapest in total')
+        for option in options:
+            try:
+                found = globals()['_pair_' + base](generated, world, option, Path(output))
+            except Skip as reason:
+                reasons.append(f'{option["sku_id"]} {option["a"]["retailer_id"]}/{option["b"]["retailer_id"]}: {reason}')
+                continue
+            a, b = option['a'], option['b']
+            result.update(found, sku_id=option['sku_id'], label=option['label'], site_id=option['site_id'],
+                          site_name=option['site_name'], product_id=a['product_id'], shops=[a['retailer_id'], b['retailer_id']],
+                          clean_winner=a, clean_candidates=[a, b], request=pair_request(generated, option),
+                          rejected_options=reasons, status='ready')
+            break
+        else:
+            raise Skip('; '.join(reasons))
+    except Skip as reason:
+        result.update(status='skipped', reason=str(reason))
+    save(cache, result)
+    return result
+
+
+def _pair_trapped(generated, option, derived, changed):
+    """Recompute both shops' native totals on the derived world; B must be the unique winner."""
+    trapped = rows_of(candidates(derived, {**generated, 'world_dir': str(derived)}))
+    a, b = (trapped.get(option[k]['offer_id']) for k in 'ab')
+    if a is None or b is None:
+        raise Skip('an offer of the pair is no longer orderable to home in the derived world')
+    if any(b[k] != option['b'][k] for k in ('price_minor', 'home_shipping_minor')):
+        raise Skip('derived world changes the other shop')
+    if any(a[k] != v for k, v in changed.items()):
+        raise Skip(f'derived world does not apply the change {changed} (got {a})')
+    if a['delivered_minor'] <= b['delivered_minor']:
+        raise Skip('derived world leaves the listed-cheaper shop cheapest in total')
+    return a, b
+
+
+def _pair_size_price_step(generated, world, option, output):
+    if not generated['concept'].startswith('footwear.'):
+        raise Skip('size is a separate listing for this concept; size selection on the product page is required')
+    a, b = option['a'], option['b']
+    stepped = nice_above(b['delivered_minor'] - a['home_shipping_minor'], max(1000, b['delivered_minor'] // 50))
+    if stepped > a['price_minor'] * 1.35:
+        raise Skip(f'size step {sek(a["price_minor"])} -> {sek(stepped)} is more than 35%')
+    field, size = size_field(world, a)
+    skus = {s['sku_id'] for p in world['products'] if p['public']['product_id'] == a['product_id']
+            for s in p['public']['skus'] if s.get(field) == size}
+    base_prices = sorted(o['price_minor'] for r in world['retailers'] if r['retailer_id'] == a['retailer_id']
+                         for o in r['offers'] if o['product_id'] == a['product_id'] and o['sku_id'] not in skus)
+    if not base_prices or base_prices[0] > a['price_minor']:
+        raise Skip('the model has no other size at or below the base price at that shop')
+    def mutate(value):
+        retailer = next(r for r in value['retailers'] if r['retailer_id'] == a['retailer_id'])
+        for offer in retailer['offers']:
+            if offer['sku_id'] in skus:
+                offer['price_minor'] = stepped
+    derived = derive_world(generated['world_dir'],
+        output/'worlds'/f'{generated["seed"]}-{generated["concept"]}--pair-size_price_step', mutate)
+    apparent, truth = _pair_trapped(generated, option, derived, {'price_minor': stepped})
+    return {'trapped_world_dir': str(derived), 'true_winner': truth, 'apparent_winner': apparent,
+        'trapped_candidates': [apparent, truth], 'size_field': field, 'size': size, 'stepped_price_minor': stepped,
+        'base_price_minor': a['price_minor'], 'stepped_sku_ids': sorted(skus),
+        'witness': f'{option["site_name"]} and the default size show {a["retailer_name"]} at {sek(option["listed"][a["retailer_id"]])}; '
+                   f'size {size} costs {sek(stepped)} once selected: {sek(apparent["delivered_minor"])} delivered vs '
+                   f'{sek(truth["delivered_minor"])} at {b["retailer_name"]}.'}
+
+
 # Runtime overlays -----------------------------------------------------------
 
 def scenario_for(recipe):
