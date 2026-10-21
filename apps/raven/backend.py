@@ -311,7 +311,8 @@ def episode_options(preset):
                 reasoning_effort=preset.get('reasoning_effort'), service_tier=preset.get('service_tier') or 'priority',
                 max_context=preset.get('max_context'),
                 max_total_input_tokens=preset.get('max_total_input_tokens'),
-                max_total_output_tokens=preset.get('max_total_output_tokens'))
+                max_total_output_tokens=preset.get('max_total_output_tokens'),
+                providers=preset.get('providers'))
 
 
 @dataclass

@@ -152,7 +152,12 @@ def openrouter_request_options(model, options):
     from intent_browser.openrouter import provider_options, DEFAULT_PROVIDERS
     if model == OPENROUTER_MODEL:
         return provider_options(os.getenv('OPENROUTER_PROVIDERS') or DEFAULT_PROVIDERS)
-    return {'reasoning': {'effort': options.get('reasoning_effort') or 'low'}}
+    request = {'reasoning': {'effort': options.get('reasoning_effort') or 'low'}}
+    if options.get('providers'):
+        # Preferred OpenRouter providers in order (e.g. Google AI Studio before Vertex,
+        # whose prompt cache rarely hit); fall back to others if they are down.
+        request['provider'] = {'order': list(options['providers']), 'allow_fallbacks': True}
+    return request
 
 
 def subscription_backend(output, emit, options):
