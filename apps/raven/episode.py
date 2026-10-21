@@ -132,7 +132,8 @@ POINT_AT_JS = """([bid, show]) => {
   return text.length > 60 ? text.slice(0, 57) + '…' : text;
 }"""
 ROOT = Path(__file__).resolve().parents[2]
-WRAP_UP_SECONDS = 120  # Live demo: first "answer with what you have" nudge.
+# Optional time-based "answer with what you have" nudge (seconds); off unless RAVEN_WRAP_UP_SECONDS is set.
+WRAP_UP_SECONDS = float(os.environ['RAVEN_WRAP_UP_SECONDS']) if os.environ.get('RAVEN_WRAP_UP_SECONDS') else None
 MEMORY_POLICY = (
     "Raven memory: the STORED USER MEMORY snapshot is the user's saved preferences. Use it without asking "
     "(for example their shoe or clothing size, colours, stores to avoid) and mention briefly when you did. "
@@ -476,8 +477,9 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         elapsed = _time.monotonic() - pacing['started']
         total_share = pacing['input_total'] / budgets['total_input'] if budgets['total_input'] else 0.0
         request_share = pacing['last_input'] / budgets['request_input']
-        due = (elapsed > WRAP_UP_SECONDS or total_share > 0.5 or request_share > 0.6) if pacing['nudges'] == 0 else (
-            elapsed > WRAP_UP_SECONDS + 45 or total_share > 0.7 or request_share > 0.85)
+        late = WRAP_UP_SECONDS is not None and elapsed > WRAP_UP_SECONDS + (45 if pacing['nudges'] else 0)
+        due = (late or total_share > 0.5 or request_share > 0.6) if pacing['nudges'] == 0 else (
+            late or total_share > 0.7 or request_share > 0.85)
         if not due:
             return
         pacing['nudges'] += 1

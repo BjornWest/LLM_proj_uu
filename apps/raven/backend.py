@@ -76,6 +76,10 @@ class UserWindow:
             browserContextId=context_id, newWindow=True, background=True))['targetId']
         page.wait_for_timeout(300)
         window_id = session.send('Browser.getWindowForTarget', {'targetId':self.background_target})['windowId']
+        # Keep the agent's window out of sight: park it off-screen, then minimize. WSL/Windows
+        # can still map and focus a newly created window; off-screen it never covers the user's.
+        session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'normal',
+            'left':-32000, 'top':-32000, 'width':1440, 'height':1000}})
         session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'minimized'}})
         session.detach()
         for old in self.background_contexts:
@@ -191,6 +195,7 @@ class UserWindow:
                                     session = p.context.new_cdp_session(p)
                                     wid = session.send('Browser.getWindowForTarget')['windowId']
                                     session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'windowState':'normal'}})
+                                    session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'left':80,'top':60}})  # back on-screen when the user asks to see it
                                     session.detach()
                                     p.bring_to_front()
                                     response.put(True)
