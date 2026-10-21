@@ -11,6 +11,9 @@ in the WSL Linux filesystem, e.g. `~/code/LLM_proj_uu`, rather than `/mnt/c/...`
 Create laptop-local resources; do not copy this PC's virtualenv, browser profiles,
 Docker volumes, home paths or live-process configuration.
 
+For the Raven side-panel demo only, go to
+[Raven demo on the laptop](#raven-demo-on-the-laptop).
+
 ## 1. Install the Python/browser dependencies
 
 Read `AGENTS.md`, inspect `git status`, and record `git rev-parse HEAD`. Pull with
@@ -313,6 +316,154 @@ HTTP 503. Use the explicit `--runs` command above until matching viewer changes
 are published. Do not claim full desktop UI parity. After that compatibility fix,
 the no-`--runs` path uses `.local/trace-viewer/sources.json`; configure laptop-local
 roots there rather than desktop absolute paths. Record both repository commits.
+
+## Raven demo on the laptop
+
+The Raven demo (an LLM browser agent in a Chrome side panel) runs its backend in
+WSL and drives a **native Windows Chrome for Testing** window that carries the
+Raven extension (`--windows-browser`). This section is independent of sections
+1-7; the setup script below performs the relevant parts of them.
+
+### Prerequisites
+
+- Windows 11 (or 10 21H2+) with WSL2 Ubuntu 24.04 (22.04 works with Python 3.11).
+  Keep the checkout in the Linux filesystem, e.g. `~/code/LLM_proj_uu`.
+- WSL **interop** on (default): `powershell.exe` must run from WSL. The backend
+  starts Chrome and relays its debugging port through PowerShell stdin/stdout,
+  using `-Command`/`-EncodedCommand` only, so the PowerShell **execution policy
+  does not matter** and no `.ps1` file is run.
+- WSL **localhost forwarding** on (default NAT mode, or `networkingMode=mirrored`):
+  the side panel loads `http://127.0.0.1:8770/panel.html` from Windows. Do not set
+  `localhostForwarding=false` in `%UserProfile%\.wslconfig`.
+- About 1 GB of downloads (Python packages, Playwright Chromium, Chrome for Testing,
+  13 MB tokenizer). No model weights, no GPU.
+
+### 1. Get the code
+
+```bash
+cd ~/code
+git clone git@github.com:BjornWest/LLM_proj_uu.git   # skip if it exists
+cd LLM_proj_uu
+git status                                           # must be clean before switching
+git fetch origin claude/raven-demo-20261019
+git switch claude/raven-demo-20261019 && git pull --ff-only
+```
+
+### 2. Run the setup script (idempotent; rerun after pulls)
+
+```bash
+bash scripts/raven_laptop_setup.sh
+```
+
+It asks for `sudo` once (apt: Python 3.12, venv, git, curl, xvfb; Playwright's
+Chromium system libraries via `playwright install-deps chromium`), then:
+creates `.venv` from `requirements.lock.txt`; installs Playwright Chromium; clones
+`common_agent_util` (provides `agent_trace`) to `../common_agent_util` at pinned
+commit `73cf7e9` and installs it into the venv; fetches the pinned Qwen3.8-27B
+tokenizer files (revision `1d4bf0f2`, SHA-256 checked against
+`intent_browser/model_tokenizers.json`) into `.local/model-tokenizers/` and
+`training/.cache/qwen38-tokenizer/`; downloads Chrome for Testing into
+`%LOCALAPPDATA%\raven-demo`; writes non-secret `.local/raven-demo.env`
+(`RAVEN_CAU_PATH`, `RAVEN_BOUNDED=0`); and runs the **no-model smoke check**
+against a temporary backend on port 8790. It ends with `PASS` lines for backend
+health, panel and full-page load and a scripted mock run in each layout.
+
+Switches: `RAVEN_SKIP_SUDO=1`, `RAVEN_SKIP_WINDOWS=1`, `RAVEN_SKIP_SMOKE=1`,
+`RAVEN_SMOKE_PORT=...`, `RAVEN_CAU_PATH=...`, `RAVEN_CAU_SOURCE=<url|path|bundle>`.
+
+### 3. Create `.env` yourself
+
+The script never writes or copies secrets. Create the file privately:
+
+```bash
+[ -e .env ] || install -m 600 /dev/null .env
+nano .env                         # add: OPENROUTER_API_KEY=<your key>
+```
+
+Other locations: export `RAVEN_ENV_FILE=/path/to/.env`.
+
+### 4. Model access
+
+- **OpenRouter** (default for the laptop): needs only `OPENROUTER_API_KEY`.
+  Start with `--model-backend openrouter` (Qwen 3.8 27B). Once the model picker
+  (`apps/raven/models.json`) is on the branch, omit `--model-backend` to start
+  with that file's default preset; presets such as Gemini Flash are selectable in
+  the UI and also go through OpenRouter.
+- **Self-hosted Qwen on Vast** (the "Qwen 27B (self-hosted Vast)" preset expects
+  vLLM at `http://127.0.0.1:18000/v1`):
+  1. Give the instance the laptop's SSH key. In WSL: `ls ~/.ssh/id_ed25519.pub ||
+     ssh-keygen -t ed25519`, then `cat ~/.ssh/id_ed25519.pub`. Either add it under
+     *Account -> SSH Keys* in the Vast console (applies to new instances; for a
+     running one, use the instance's key icon / `vastai attach ssh INSTANCE_ID
+     "$(cat ~/.ssh/id_ed25519.pub)"`), or from a machine that already has access:
+     `ssh -p PORT root@HOST 'cat >> ~/.ssh/authorized_keys' < laptop_key.pub`.
+  2. Take `HOST` and `PORT` from the instance's *Connect -> SSH* command
+     (`ssh -p PORT root@HOST`) and start the self-healing tunnel:
+     ```bash
+     VAST_SSH_HOST=HOST VAST_SSH_PORT=PORT nohup apps/raven/vast_tunnel.sh >/dev/null 2>&1 &
+     curl -s http://127.0.0.1:18000/v1/models     # lists Qwen/Qwen3.8-27B-FP8
+     ```
+     Logs/known_hosts: `.local/raven-vast/`. Stop: `kill "$(cat .local/raven-vast/tunnel.pid)"`.
+     vLLM must already be serving on the instance's port 8000.
+- **GPT-6.1 Sol** (`--model-backend sol`) needs the workstation's Codex
+  subscription bridge (Node, `pi`, Codex login) and is not set up on the laptop.
+
+### 5. Start and verify
+
+```bash
+apps/raven/start_demo.sh 8770 --model-backend openrouter
+```
+
+Chrome for Testing opens on the Windows desktop with the Raven side panel. The
+script stops an earlier service on that port and only Raven's own Chrome for
+Testing processes (never your normal Chrome), starts `Xvfb :99` for Linux-side
+background browsers when needed, and logs to `.local/raven-logs/raven-8770.log`.
+Verify:
+
+```bash
+curl -s http://127.0.0.1:8770/api/health
+.venv/bin/python -m apps.raven.smoke --url http://127.0.0.1:8770 --windows-browser \
+  --output .local/raven-logs/smoke-8770
+```
+
+Then open http://localhost:8770/ in Windows and ask one short question in the side
+panel (one real model call).
+
+### Troubleshooting
+
+- `powershell.exe: command not found`: enable interop (`[interop] enabled=true`,
+  `appendWindowsPath=true` in `/etc/wsl.conf`), then `wsl --shutdown` in Windows.
+- Side panel blank / "refused to connect": Windows cannot reach WSL's
+  `127.0.0.1:8770`. Check `curl` inside WSL first, then open
+  http://127.0.0.1:8770/api/health in Windows; re-enable localhost forwarding or
+  use `networkingMode=mirrored`, then `wsl --shutdown`.
+- `Install Windows Chrome for Testing first`: rerun the setup script, or
+  `PYTHONPATH=$PWD .venv/bin/python -m apps.raven.windows_browser --setup`.
+- `Diagnostic port already occupied` or a stale Raven window: rerun
+  `start_demo.sh` (it stops Raven's Chrome for Testing) or close it in Task Manager.
+- `ModuleNotFoundError: agent_trace`: rerun the setup script; or set
+  `RAVEN_CAU_PATH` in `.local/raven-demo.env` to the `common_agent_util` checkout.
+- `Commit 73cf7e9... is not available`: that commit must be on GitHub (or pass a
+  bundle via `RAVEN_CAU_SOURCE=/path/cau.bundle`).
+- Chromium fails with missing `lib*.so`: `sudo .venv/bin/python -m playwright
+  install-deps chromium`.
+- `Current harness requires the local Qwen tokenizer`: rerun the setup script
+  (step 5 restores `training/.cache/qwen38-tokenizer/`).
+- `KeyError: 'OPENROUTER_API_KEY'` in the log: `.env` is missing the key or is
+  elsewhere (set `RAVEN_ENV_FILE`).
+- Vast preset errors: `curl http://127.0.0.1:18000/v1/models`; see
+  `.local/raven-vast/tunnel-ssh.err` (`Permission denied (publickey)` means the
+  laptop key is not on the instance).
+- `Raven did not start`: read the log path printed by `start_demo.sh`.
+- On the workstation, `RAVEN_BOUNDED=1` (default without `.local/raven-demo.env`)
+  runs the service under `scripts/run_bounded_job.py`.
+
+Validated on the workstation (2026-10-21) as a fresh clone with a new venv and
+common_agent_util clone, `RAVEN_SKIP_SUDO=1 RAVEN_SKIP_WINDOWS=1` and the
+workstation's sudo-less Chromium libraries: setup, tokenizer download/hash check,
+all five smoke checks and one scripted (no-model) background episode passed. Not
+covered there: apt/`install-deps`, the Windows Chrome download, the
+`--windows-browser` path on another PC, the Vast tunnel, and real model calls.
 
 ## Laptop agent's completion report
 

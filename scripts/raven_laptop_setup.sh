@@ -94,7 +94,7 @@ fi
 step "Done"
 if [ ! -f .env ] || ! grep -q '^OPENROUTER_API_KEY=.' .env; then
   echo "Next: create .env with your OpenRouter key (this script never writes secrets):"
-  echo "  install -m 600 /dev/null .env   # only if .env does not exist yet"
+  echo "  [ -e .env ] || install -m 600 /dev/null .env"
   echo "  nano .env                       # add the line OPENROUTER_API_KEY=<your key>"
 fi
 echo "Start the demo: apps/raven/start_demo.sh 8770 --model-backend openrouter"
