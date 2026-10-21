@@ -199,3 +199,19 @@ def test_raven_memory_store_matches_harness_contract(tmp_path, monkeypatch):
     import pytest as _pytest
     with _pytest.raises(Exception):
         store.update('newsletter_opt_in', 'maybe')
+
+
+def test_concurrent_memory_edit_is_a_recoverable_rejection(tmp_path):
+    from types import SimpleNamespace
+    from intent_browser.memory import MemorySession
+    from apps.raven.memory_store import MemoryStore
+    store = MemoryStore(tmp_path / 'memory.json')
+    session = MemorySession(store, SimpleNamespace(directory=tmp_path, episode_id='e'))
+    original = store.update
+    def interleaved(key, value, expected_revision=None):
+        MemoryStore(tmp_path / 'memory.json').update('name', 'UI edit')  # Another writer wins the race.
+        return original(key, value, expected_revision)
+    store.update = interleaved
+    result, _ = session.execute('memory_update', {'key': 'shoe_size_eu', 'value': 43,
+                                                  'expected_revision': session.initial['revision']}, 1)
+    assert result['applied'] is False and 'Stale' in result['error'] and not session.uncertain

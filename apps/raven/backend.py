@@ -462,8 +462,13 @@ class Service:
             journal = Path(run.trace) / 'service-events.jsonl' if run.trace else None
             while True:
                 if run.retry_requested.is_set():
-                    failure = 'SSE connection dropped'
-                    break
+                    if answered:
+                        # The answer is already published; the client reconnects by event replay.
+                        # Keep owning the episode until its process finishes.
+                        run.retry_requested.clear()
+                    else:
+                        failure = 'SSE connection dropped'
+                        break
                 try:
                     event = events.get(timeout=0.2)
                 except queue.Empty:

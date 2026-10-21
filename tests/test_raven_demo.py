@@ -197,3 +197,25 @@ def test_broken_old_stream_cannot_charge_unsent_retry_marker():
     assert not run.retry_requested.is_set()
     svc.retry.assert_not_called()
     svc.cancel.assert_not_called()
+
+
+def test_stream_recovery_after_early_answer_keeps_owning_live_episode():
+    svc = service()
+    svc.start_attempt = Mock()
+    alive = {'value': True}
+    process = SimpleNamespace(is_alive=lambda: alive['value'], join=lambda **kw: None, exitcode=None)
+    run = Run('test', {'mode': 'user_window'}, process=process)
+    events = queue.Queue()
+    events.put({'type': 'final', 'markdown': 'Answer', 'sources': []})
+    worker = threading.Thread(target=svc.collect, args=(run, events))
+    worker.start()
+    deadline = __import__('time').time() + 5
+    while not any(e['type'] == 'final' for e in run.events) and __import__('time').time() < deadline:
+        __import__('time').sleep(0.02)
+    svc.retry(run, after_event_id=1)  # Panel stream dropped after the early answer.
+    __import__('time').sleep(0.6)
+    assert not run.done and not any(e['type'] == 'error' for e in run.events)
+    events.put({'type': 'done', 'stop_reason': 'agent_finished'})
+    worker.join(5)
+    assert [e['type'] for e in run.events] == ['final', 'done']
+    svc.stop_process.assert_not_called()

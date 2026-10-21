@@ -460,7 +460,11 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         """Live-demo pacing: ask for an answer with what is known before time/budget runs out."""
         if not env_holder or pacing['started'] is None or pacing['nudges'] >= 2:
             return
-        if controller and any(t['state'] in ('awaiting_human', 'human_active') for t in controller.snapshot()['tabs']):
+        custody = getattr(getattr(env_holder[0], '_active_page_check', None), '__self__', None)
+        requested = getattr(custody, 'raven_requested_handovers', set())
+        # Only Raven-requested handovers pause pacing; pre-existing user tabs are also 'awaiting_human'.
+        if controller and any(t['tab_id'] in requested and t['state'] in ('awaiting_human', 'human_active')
+                              for t in controller.snapshot()['tabs']):
             pacing['started'] = max(pacing['started'], _time.monotonic() - 30)  # Human time is not agent time.
             return
         elapsed = _time.monotonic() - pacing['started']

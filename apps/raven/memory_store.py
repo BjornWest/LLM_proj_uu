@@ -74,7 +74,8 @@ class MemoryStore:
         with self._locked():
             data = self._load()
             if expected_revision is not None and str(expected_revision) != str(data['revision']):
-                raise ValueError('Stale memory revision')
+                from intent_browser.memory import MemoryRejected
+                raise MemoryRejected('Stale memory revision; read current memory before deciding again')
             if delete:
                 data['values'].pop(key, None)
             else:
