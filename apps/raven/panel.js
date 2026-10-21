@@ -36,7 +36,8 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   // Thinking indicator inside the conversation (replaces the separate Ready/status line).
   let thinking = null, answered = false;
-  window.ravenAnswered = () => { answered = true; thinking?.remove(); thinking = null; };
+  window.ravenAnswered = () => { answered = true; thinking?.remove(); thinking = null;
+    c.messages.querySelectorAll('.message.note').forEach(n => n.remove()); };  // progress notes give way to the answer
   let reasoning = '';
   const thinkingText = () => {
     if (reasoning) return reasoning;

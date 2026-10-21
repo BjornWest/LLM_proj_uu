@@ -75,18 +75,18 @@ DEMO_POLICY = (
     "When you start a task or change approach, first write one short sentence to the user (in their language) "
     "saying what you will do, then make your tool calls in the same response; do not narrate every step. "
     "Take the time you need and be persistent: work efficiently (go straight to a search or a well-known "
-    "store/price-comparison site, prefer a listing sorted by price such as Prisjakt or the store's own search with "
+    "store/price-comparison site, prefer a price-comparison listing or the store's own search sorted by price with "
     "price sorting over setting many filters one by one), but if a page does not show what you need, try other "
     "routes before giving up: scroll or search the page again, dismiss cookie banners, open product pages, or use "
-    "another store or Prisjakt. Only say something could not be verified after several genuine attempts. "
-    "Once a listing shows matching products with prices, answer with 1-3 concrete candidates. Unless the user says otherwise, assume they are in Uppsala, Sweden, want "
-    "prices in SEK from Swedish stores and new items; state such assumptions in the answer instead of "
+    "another store or price-comparison site. Only say something could not be verified after several genuine attempts. "
+    "Once a listing shows matching products with prices, answer with 1-3 concrete candidates. Take the user's location, currency, sizes and other preferences from their stored memory; "
+    "if a detail is missing, make a reasonable assumption and state it in the answer instead of "
     "asking. Ask a clarifying question only when no reasonable assumption exists. "
     "Give a concise answer in the language of the user's latest message (not the website's language) "
     "with links to inspected sources; "
     "say clearly when a price or fact could not be verified. Reuse the current tab for navigation. "
     "Do not browse eBay.com (its automated-access restriction explicitly includes buy-for-me "
-    "and LLM agents), Amazon.se (its robots rules exclude named shopping/AI agents), or "
+    "and LLM agents), Amazon (its robots rules exclude named shopping/AI agents), or "
     "Trustpilot (its policy explicitly restricts AI-agent collection). Explain the site-specific "
     "restriction briefly and offer another source. These demo exclusions come from "
     "docs/browser-site-automation-policies.md; do not claim all other sites permit automation. "
@@ -113,7 +113,7 @@ def verification_policy(mode):
                 'verification and hand the tab back. Korp will bring this tab to the front. '
                 'Wait for handback without model polling or alternative research.')
     return ('On a bot check, immediately call handover_tab on that tab with a short message, '
-            'for example: "Prisjakt wants to check you’re human; can you complete it and hand the tab back?" '
+            'for example: "This site wants to check you’re human; can you complete it and hand the tab back?" '
             'Wait for handback without model polling or alternative research.')
 
 # Marks the tab Korp is working in: a raven prefix on the tab title, kept while steps keep
@@ -158,7 +158,7 @@ MEMORY_POLICY = (
     "Korp memory: the STORED USER MEMORY snapshot is the user's saved preferences. Use it without asking "
     "(for example their shoe or clothing size, colours, stores to avoid) and mention briefly when you did. "
     "Save durable facts the user states about themselves (\"I'm a size 43\", \"never sign me up for newsletters\", "
-    "\"I live in Uppsala\") with memory_update before continuing; never save one-off task details, prices, "
+    "\"I live in <city>\") with memory_update before continuing; never save one-off task details, prices, "
     "products or anything read on websites. newsletter_opt_in stays 'never' unless the user explicitly says otherwise.")
 WRAP_UP_MESSAGE = ('Korp live-demo timer: time is up for browsing. Do not open or read more pages. '
                    'Call send_msg_to_user now with the best answer from what you have already seen: name concrete '
@@ -523,14 +523,13 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         memory = MemoryStore()
         profile = with_memory(profile)
         profile = replace(profile, instructions=profile.instructions + '\n' + MEMORY_POLICY)
-    from zoneinfo import ZoneInfo
-    now = datetime.now(ZoneInfo('Europe/Stockholm'))
+    now = datetime.now()  # machine-local time; deliberately no place or time-zone name (location comes from memory)
     # Last line of the system message, so relative dates ("tomorrow", "this weekend") resolve.
     profile = replace(profile, instructions=profile.instructions +
-        f"\nCurrent date and time: {now:%A %-d %B %Y, %H:%M} ({now:%Z}, Europe/Stockholm).")
+        f"\nCurrent date and time: {now:%A %-d %B %Y, %H:%M}.")
     history = '\n'.join(f"{m['who']}: {m['text']}" for m in payload.get('history', []))
     goal = (('Previous conversation (context):\n' + history + '\n\n') if history else '') + payload['text']
-    goal += ('\n\nWrite the final answer in the same language as my message above, even if the websites are in Swedish.'
+    goal += ('\n\nWrite the final answer in the same language as my message above, even if the websites use another language.'
              'For research answers, link to pages you actually inspected. '
              'Only refuse what the demo policy forbids (purchases, payments, logins, accounts, messages, personal data); help with everything else. '
              'Do not purchase or create accounts.')
