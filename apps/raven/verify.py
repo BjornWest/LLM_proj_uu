@@ -193,7 +193,7 @@ def main():
             end=time.monotonic()+60
             while not any(e['type']=='handover' for e in ui_run.events) and time.monotonic()<end:
                 time.sleep(.1)
-            matching=frame.locator('#tabs button[title="https://example.com/"]')
+            matching=frame.locator('#tabs button[title="Show this tab: https://example.com/"]')
             assert matching.count()>=2
             for i in range(2):
                 matching.nth(i).click()
@@ -233,7 +233,8 @@ def main():
             assert any(e['type']=='handover' for e in reload_run.events),reload_run.events
             frame.locator('#handover').wait_for(state='visible',timeout=30000)
             extra=urlopen(f'http://127.0.0.1:{PORT}/api/tasks/{reload_run.run_id}/events')
-            assert extra.readline().startswith(b'data: ')
+            first=extra.readline()
+            assert first.startswith(b'data: ') or (first.startswith(b'id: ') and extra.readline().startswith(b'data: '))
             extra.close()
             time.sleep(5)
             assert not reload_run.done, 'Other SSE reader must not cancel the live panel'

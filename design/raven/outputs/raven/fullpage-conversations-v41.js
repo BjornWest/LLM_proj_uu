@@ -195,6 +195,7 @@
       header.insertBefore(slot, header.querySelector('.raven-settings'));
       window.ravenModels.mount(slot, { hasConversation: () => (active()?.messages.length || 0) > 0, currentConversation: () => activeId,
         newConversation: () => document.getElementById('new-conversation')?.click() });
+      window.ravenMemory?.button(slot);
     }
     list.addEventListener('click', event => {
       const button = event.target.closest('button[data-conversation-id]');

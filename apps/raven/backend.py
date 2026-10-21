@@ -616,6 +616,10 @@ class Handler(preview.Handler):
         if path == '/api/health':
             return self.json(dict(service.options, ok=True, demo_mode=service.demo_mode,
                 modes=['background', 'user_window', 'background_window'] if service.window else ['background']))
+        if path == '/api/memory':
+            from apps.raven.memory_store import MemoryStore
+            store = MemoryStore()
+            return self.json(dict(store.snapshot(), fields=store.describe()['fields']))
         if path == '/api/models':
             default, fallback = service.models.default(), service.models.fallback()
             return self.json(dict(default=default and default['id'], fallback=fallback and fallback['id'],
@@ -675,6 +679,34 @@ class Handler(preview.Handler):
             self.close_connection = True
             return
         return super().do_GET()
+
+    def memory_change(self, delete):
+        if not self.allowed_client():
+            self.send_error(403, 'Local origin required')
+            return
+        from urllib.parse import unquote
+        from apps.raven.memory_store import MemoryStore, FIELDS
+        parts = [unquote(p) for p in urlsplit(self.path).path.strip('/').split('/')]
+        if len(parts) != 3 or parts[:2] != ['api', 'memory'] or parts[2] not in FIELDS:
+            return self.json({'error': 'Unknown memory field'}, 404)
+        try:
+            store = MemoryStore()
+            if delete:
+                return self.json(store.delete(parts[2]))
+            value = json.loads(self.rfile.read(int(self.headers.get('Content-Length', '0'))) or '{}').get('value')
+            if FIELDS[parts[2]]['type'] == 'number' and isinstance(value, str):
+                value = float(value.replace(',', '.'))
+                value = int(value) if value.is_integer() else value
+            return self.json(store.update(parts[2], value))
+        except Exception as exc:
+            LOG.info('Memory edit rejected: %s', exc)
+            return self.json({'problem': 'That value does not fit this field.'}, 400)
+
+    def do_PUT(self):
+        return self.memory_change(False)
+
+    def do_DELETE(self):
+        return self.memory_change(True)
 
     def do_POST(self):
         if not self.allowed_client():

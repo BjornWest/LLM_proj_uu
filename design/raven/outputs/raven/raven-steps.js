@@ -11,13 +11,18 @@
       this.line.setAttribute('aria-live', 'polite');
       scene.querySelector('.sky').after(this.line);
       this.line.hidden = true;
-      this.steps = [];
+      this.steps = []; this.memory = []; this.model = null;
     }
-    reset() { this.steps = []; this.model = null; this.line.hidden = false; this.line.textContent = 'Working: starting research…'; }
+    reset() { this.steps = []; this.model = null; this.memory = []; this.line.hidden = false; this.line.textContent = 'Working: starting research…'; }
     event(event) {
       let text;
       if (event.type === 'model') { this.model = event.notice || event.label; if (window.ravenModels && event.conversation_id) window.ravenModels.record(event.conversation_id, event.id); }
       if (event.type === 'activity') { this.line.hidden = false; this.line.textContent = 'Working: ' + event.summary; return; }
+      if (event.type === 'memory') {
+        const name = (window.RavenMemoryLabel || (k => k))(event.key);
+        text = event.action === 'deleted' ? 'Memory updated: forgot ' + name : 'Memory updated: ' + name + ' → ' + event.value;
+        this.memory.push(text); document.dispatchEvent(new CustomEvent('raven-memory-changed'));
+      }
       if (event.type === 'step') text = event.summary;
       if (event.type === 'site') {
         try { text = 'Reading ' + new URL(event.url).hostname.replace(/^www\./, ''); } catch {}
@@ -29,6 +34,7 @@
     }
     finish(message) {
       this.line.hidden = true;
+      for (const text of (message ? this.memory || [] : [])) { const line = document.createElement('small'); line.className = 'raven-memory-updated'; line.textContent = text; message.append(line); }
       if (message && this.model) { const label = document.createElement('small'); label.className = 'raven-model-label'; label.textContent = this.model.includes('—') ? this.model : 'Answered by ' + this.model; message.append(label); }
       if (!this.steps.length || !message) return;
       const details = document.createElement('details'), summary = document.createElement('summary');

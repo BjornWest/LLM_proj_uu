@@ -22,6 +22,7 @@ window.addEventListener('DOMContentLoaded', () => {
         history = []; conversation = crypto.randomUUID(); c.messages.replaceChildren(); steps.reset(); steps.stop();
         status.textContent = 'New conversation with ' + window.ravenModels.label(window.ravenModels.preferred());
       }});
+    window.ravenMemory?.button(slot);
   }
   let run = null, stream = null, pendingTab = null, generation = 0;
   const post = async (url, body = {}) => {

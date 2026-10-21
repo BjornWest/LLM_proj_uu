@@ -179,3 +179,23 @@ def test_cli_selfhosted_preset_and_episode_options(tmp_path):
     options = episode_options(svc.models.default())
     assert options['model_backend'] == 'selfhosted' and options['base_url'] == 'http://127.0.0.1:18000/v1'
     assert options['model'] == 'Qwen/Qwen3.8-27B-FP8'
+
+
+def test_raven_memory_store_matches_harness_contract(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from intent_browser.memory import MemorySession
+    from apps.raven.memory_store import MemoryStore, SEED
+    monkeypatch.setenv('RAVEN_MEMORY_FILE', str(tmp_path / 'memory.json'))
+    store = MemoryStore()
+    session = MemorySession(store, SimpleNamespace(directory=tmp_path, episode_id='e'))
+    assert session.initial['values'] == SEED
+    result, _ = session.execute('memory_update', {'key': 'shoe_size_eu', 'value': 43,
+                                                  'expected_revision': session.initial['revision']}, 1)
+    assert result['applied'] and result['snapshot']['values']['shoe_size_eu'] == 43
+    stale, _ = session.execute('memory_update', {'key': 'name', 'value': 'B', 'expected_revision': '1'}, 2)
+    assert stale['applied'] is False
+    store.update('newsletter_opt_in', 'ask')  # UI edit between episodes (no revision).
+    assert MemoryStore().snapshot()['values']['newsletter_opt_in'] == 'ask'
+    import pytest as _pytest
+    with _pytest.raises(Exception):
+        store.update('newsletter_opt_in', 'maybe')
