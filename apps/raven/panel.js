@@ -45,10 +45,16 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   window.ravenReasoning = text => { reasoning = text || ''; syncThinking(); };
   window.ravenNote = text => {
-    const note = document.createElement('article'); note.className = 'message note';
-    note.innerHTML = '<span class="message-label">Raven</span><div class="message-copy"></div>';
-    note.querySelector('.message-copy').textContent = text;
-    if (thinking) c.messages.insertBefore(note, thinking); else c.messages.append(note);
+    // Consecutive notes share one bubble (one line each) to keep the conversation compact.
+    const before = thinking ? thinking.previousElementSibling : c.messages.lastElementChild;
+    let note = before?.classList.contains('note') ? before : null;
+    if (!note) {
+      note = document.createElement('article'); note.className = 'message note';
+      note.innerHTML = '<span class="message-label">Raven</span><div class="message-copy"></div>';
+      if (thinking) c.messages.insertBefore(note, thinking); else c.messages.append(note);
+    }
+    const line = document.createElement('div'); line.textContent = text;
+    note.querySelector('.message-copy').append(line);
     c.messages.scrollTop = c.messages.scrollHeight;
   };
   const syncThinking = () => {

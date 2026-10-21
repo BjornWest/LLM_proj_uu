@@ -606,9 +606,17 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
             text = (message.get('content') or '').strip() if isinstance(message.get('content'), str) else ''
             if text and message.get('tool_calls'):
                 emit('note', text=text[:600])
+            def detail_text(d):
+                if not isinstance(d, dict):
+                    return ''
+                if d.get('type') in ('reasoning.text', 'reasoning.summary') and (d.get('text') or d.get('summary')):
+                    return d.get('text') or d.get('summary')
+                # Codex bridge: the summary stays in the original Responses item even when the
+                # reasoning itself is encrypted.
+                item = d.get('responses_item') or {}
+                return ' '.join(p.get('text', '') for p in item.get('summary') or [] if isinstance(p, dict))
             reasoning = message.get('reasoning') or message.get('reasoning_content') or ' '.join(
-                d.get('text') or d.get('summary') or '' for d in message.get('reasoning_details') or []
-                if isinstance(d, dict) and d.get('type') in ('reasoning.text', 'reasoning.summary'))
+                t for t in map(detail_text, message.get('reasoning_details') or []) if t)
             if isinstance(reasoning, str) and reasoning.strip():
                 line = re.sub(r'\*\*([^*]+)\*\*\s*', '', reasoning).strip() or reasoning.strip()
                 emit('reasoning', text=' '.join(line.split())[:240])
