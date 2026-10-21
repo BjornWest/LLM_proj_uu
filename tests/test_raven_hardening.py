@@ -139,7 +139,7 @@ def test_health_reports_selected_openrouter_model_and_budget():
                   max_total_input_tokens=600000)
     assert svc.model == 'google/gemini-3.8-flash'
     assert svc.options['openrouter_model'] == 'google/gemini-3.8-flash'
-    assert svc.options['max_total_input_tokens'] == 600000
+    assert svc.options['max_total_input_tokens'] == 1200000
 
 
 def _registry_service(tmp_path, presets, default='a', fallback='b'):

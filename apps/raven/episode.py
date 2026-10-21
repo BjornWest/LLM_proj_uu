@@ -477,7 +477,7 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         total_share = pacing['input_total'] / budgets['total_input']
         request_share = pacing['last_input'] / budgets['request_input']
         due = (elapsed > WRAP_UP_SECONDS or total_share > 0.5 or request_share > 0.6) if pacing['nudges'] == 0 else (
-            elapsed > WRAP_UP_SECONDS + 45 or total_share > 0.8 or request_share > 0.85)
+            elapsed > WRAP_UP_SECONDS + 45 or total_share > 0.7 or request_share > 0.85)
         if not due:
             return
         pacing['nudges'] += 1
@@ -597,7 +597,15 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
                 messages = [*messages, {'role': 'user', 'content': WRAP_UP_MESSAGE}]
                 if pacing['nudges'] >= 2 and isinstance(getattr(backend, 'request_options', None), dict) \
                         and backend_kind in ('openrouter', 'selfhosted'):
-                    backend.request_options['tool_choice'] = {'type': 'function', 'function': {'name': 'send_msg_to_user'}}
+                    options_ = backend.request_options
+                    options_['tool_choice'] = {'type': 'function', 'function': {'name': 'send_msg_to_user'}}
+                    # Some models (e.g. Gemini via OpenRouter) ignore tool_choice and keep browsing
+                    # until the token budget ends the episode with no answer: offer only the answer tool.
+                    if isinstance(options_.get('tools'), list):
+                        answer_only = [t for t in options_['tools']
+                                       if (t.get('function') or {}).get('name') == 'send_msg_to_user']
+                        if answer_only:
+                            options_['tools'] = answer_only
             return unpaced_complete(messages)
         backend.complete = paced_complete
     metadata = dict(task='openended', goal=goal, model=model if scripted is None else 'scripted',
