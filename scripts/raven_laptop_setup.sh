@@ -83,7 +83,7 @@ else
   eval "$(python3 -m apps.raven.paths --shell)"
   mkdir -p .local/raven-logs
   export DISPLAY=${DISPLAY:-:99} TASK_SOURCE_BINDING=current OPENBLAS_NUM_THREADS=1
-  "$RAVEN_PYTHON" apps/raven/backend.py --port "$PORT" --demo-mode --model-backend openrouter \
+  "$RAVEN_PYTHON" apps/raven/backend.py --port "$PORT" --demo-mode \
     > .local/raven-logs/setup-smoke-backend.log 2>&1 &
   BACKEND=$!
   trap 'kill $BACKEND 2>/dev/null || true' EXIT
@@ -97,4 +97,4 @@ if [ ! -f .env ] || ! grep -q '^OPENROUTER_API_KEY=.' .env; then
   echo "  [ -e .env ] || install -m 600 /dev/null .env"
   echo "  nano .env                       # add the line OPENROUTER_API_KEY=<your key>"
 fi
-echo "Start the demo: apps/raven/start_demo.sh 8770 --model-backend openrouter"
+echo "Start the demo: apps/raven/start_demo.sh 8770"

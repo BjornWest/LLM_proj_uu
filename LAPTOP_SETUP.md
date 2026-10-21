@@ -384,11 +384,11 @@ Other locations: export `RAVEN_ENV_FILE=/path/to/.env`.
 
 ### 4. Model access
 
-- **OpenRouter** (default for the laptop): needs only `OPENROUTER_API_KEY`.
-  Start with `--model-backend openrouter` (Qwen 3.8 27B). Once the model picker
-  (`apps/raven/models.json`) is on the branch, omit `--model-backend` to start
-  with that file's default preset; presets such as Gemini Flash are selectable in
-  the UI and also go through OpenRouter.
+- **OpenRouter** (default): needs only `OPENROUTER_API_KEY`. The service starts
+  with the `default` preset of `apps/raven/models.json` (Gemini Flash); the panel's
+  model picker switches between presets (Gemini Flash, Muse Spark, Qwen 27B via
+  OpenRouter, Qwen 27B on Vast, Sol). The file is reloaded when it changes.
+  `--preset ID` or `--model-backend openrouter` picks the startup model instead.
 - **Self-hosted Qwen on Vast** (the "Qwen 27B (self-hosted Vast)" preset expects
   vLLM at `http://127.0.0.1:18000/v1`):
   1. Give the instance the laptop's SSH key. In WSL: `ls ~/.ssh/id_ed25519.pub ||
@@ -405,13 +405,13 @@ Other locations: export `RAVEN_ENV_FILE=/path/to/.env`.
      ```
      Logs/known_hosts: `.local/raven-vast/`. Stop: `kill "$(cat .local/raven-vast/tunnel.pid)"`.
      vLLM must already be serving on the instance's port 8000.
-- **GPT-6.1 Sol** (`--model-backend sol`) needs the workstation's Codex
-  subscription bridge (Node, `pi`, Codex login) and is not set up on the laptop.
+- **GPT-6.1 Sol** (the `sol` preset) needs the workstation's Codex subscription
+  bridge (Node, `pi`, Codex login) and is not set up on the laptop.
 
 ### 5. Start and verify
 
 ```bash
-apps/raven/start_demo.sh 8770 --model-backend openrouter
+apps/raven/start_demo.sh 8770
 ```
 
 Chrome for Testing opens on the Windows desktop with the Raven side panel. The

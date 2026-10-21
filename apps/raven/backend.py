@@ -335,7 +335,7 @@ class Service:
                  openrouter_model=OPENROUTER_MODEL, max_total_input_tokens=None, max_total_output_tokens=None,
                  base_url=None, model=None, preset=None, models_file=None):
         from dotenv import load_dotenv
-        load_dotenv('/home/bjorn/code/LLM_proj_uu/.env', override=False)
+        load_dotenv(paths.ENV_FILE, override=False)
         self.port = port
         self.demo_mode = demo_mode
         self.runs = {}
