@@ -103,16 +103,30 @@ window.addEventListener('DOMContentLoaded', () => {
   // Flock mode: one helper raven per helper agent; it flies off when the main agent closes it.
   if (window.RavenFlock) c.flock = new window.RavenFlock({controller: c});
   const helperBirds = new Map();
+  // A button per active helper (next to the page buttons) shows that helper's current tab.
+  const helperTabs = document.createElement('span'); helperTabs.id = 'helper-tabs';
+  document.querySelector('#tabs').after(helperTabs);
   const flockEvent = e => {
     if (e.action === 'spawned') {
       const bird = c.flock?.spawn();
       if (bird) helperBirds.set(e.id, bird);
       window.ravenNote?.('Sent out a helper: ' + e.name);
+      const button = document.createElement('button'); button.type = 'button'; button.dataset.helper = e.id;
+      button.textContent = '\u{1F426}\u200D\u2B1B ' + e.name; button.title = 'Show what this helper is doing';
+      button.onclick = () => fetch('/api/tabs/' + encodeURIComponent(e.id + ':active') + '/focus', {method: 'POST',
+        headers: {'Content-Type': 'application/json'}, body: '{}'}).catch(() => {});
+      helperTabs.append(button);
     }
     if (e.action === 'reported') window.ravenNote?.(e.name + ' reported back');
-    if (e.action === 'closed') { c.flock?.dismiss(helperBirds.get(e.id)); helperBirds.delete(e.id); }
+    if (e.action === 'closed') {
+      c.flock?.dismiss(helperBirds.get(e.id)); helperBirds.delete(e.id);
+      helperTabs.querySelector(`[data-helper="${e.id}"]`)?.remove();
+    }
   };
-  const dismissHelpers = () => { for (const bird of helperBirds.values()) c.flock?.dismiss(bird); helperBirds.clear(); };
+  const dismissHelpers = () => {
+    for (const bird of helperBirds.values()) c.flock?.dismiss(bird);
+    helperBirds.clear(); helperTabs.replaceChildren();
+  };
   const post = async (url, body = {}) => {
     await window.ravenTransport.ready;
     const r = await fetch(url, {method: 'POST', headers: {'Content-Type':'application/json'}, body:JSON.stringify(body)});

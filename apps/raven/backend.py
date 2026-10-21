@@ -786,6 +786,11 @@ class Service:
         if ':' in tab_id:
             run_id, tab_id = tab_id.split(':', 1)
             run = self.runs[run_id]
+            if tab_id == 'active':  # e.g. a flock helper's current tab
+                tab_id = next((t['tab_id'] for t in run.tabs if t.get('active') and t['tab_id'] in run.targets),
+                              next(iter(run.targets), None))
+                if tab_id is None:
+                    raise ValueError('That helper has no tab yet')
             self.window.call('focus', run.targets[tab_id])
             return
         for run in reversed(list(self.runs.values())):
