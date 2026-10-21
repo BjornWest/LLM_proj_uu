@@ -197,6 +197,14 @@ class UserWindow:
                             if helper is not None:
                                 helper.close()
                             response.put(True)
+                        elif action == 'close_helper_target':
+                            helper = self.helper_contexts.pop(data, None)
+                            if helper is not None:
+                                helper.close()
+                            for tab in list(self.context.pages):
+                                if not tab.is_closed() and target_id(self.context, tab) == data:
+                                    tab.close()
+                            response.put(True)
                         elif action == 'tabs':
                             from apps.raven.shared_browser import active_target
                             active = active_target(self.context)
@@ -440,12 +448,34 @@ class Service:
         return preset, notice
 
     def submit(self, payload, scripted=None):
+        if not payload.get('_helper_of'):
+            return self._submit(payload, scripted)
+        # Flock helpers get their own tab/window; the one-task-per-mode rule is for user tasks.
+        # A failed start must not leak that target or leave an unfinished run behind.
+        with self.lock:
+            target = self.window.call('helper_tab' if payload['mode'] == 'user_window' else 'helper_window')
+            try:
+                return self._submit({**payload, '_background_target': target}, scripted)
+            except BaseException:
+                for run in [r for r in self.runs.values() if r.payload.get('_background_target') == target]:
+                    self.runs.pop(run.run_id, None)
+                    if run.process is not None:
+                        try:
+                            self.stop_process(run)
+                        except Exception:
+                            pass
+                    run.emit({'type': 'done', 'stop_reason': 'error'})
+                try:
+                    self.window.call('close_helper_target', target)
+                except Exception:
+                    LOG.exception('Could not close the target of a failed helper')
+                raise
+
+    def _submit(self, payload, scripted=None):
         with self.lock:
             payload = dict(payload)
             if payload.get('_helper_of'):
-                # Flock helpers get their own tab/window; the one-task-per-mode rule is for user tasks.
-                payload['_background_target'] = self.window.call(
-                    'helper_tab' if payload['mode'] == 'user_window' else 'helper_window')
+                pass
             elif payload['mode'] == 'background_window':
                 if not self.window:
                     raise ValueError('Start the backend with --user-window')
@@ -617,18 +647,25 @@ class Service:
             raise ValueError('window must be new_window or this_window')
         if sum(1 for h in helpers.values() if h['parent'] == parent_id and not h['closed']) >= MAX_HELPERS:
             return {'error': f'At most {MAX_HELPERS} helpers at a time; close one first.'}
+        with cond:
+            if not getattr(parent, '_flock_watch', False):
+                parent._flock_watch = True
+                threading.Thread(target=self.flock_watch, args=(parent,), daemon=True).start()
         run = self.submit({'text': task, 'mode': 'user_window' if window == 'this_window' else 'background_window',
                            'conversation_id': parent.payload.get('conversation_id'), 'history': [],
                            '_helper_of': parent_id, '_helper_name': name})
         with cond:
+            # Registration and the watcher's retirement snapshot are both under cond, and the
+            # watcher runs only after parent.done: a helper registered after the snapshot sees done.
             helpers[run.run_id] = dict(parent=parent_id, name=name, window=window, state='working',
                                        closed=False, replies=[], target=run.payload.get('_background_target'))
             inbox.setdefault(parent_id, [])
+            orphan = parent.done
+        if orphan:
+            self.flock_close(parent_id, run.run_id)
+            return {'error': 'The main agent has finished; the helper was stopped.'}
         parent.emit({'type': 'helper', 'action': 'spawned', 'id': run.run_id, 'name': name, 'window': window})
         LOG.info('Flock: %s spawned helper %s (%s, %s)', parent_id, run.run_id, name, window)
-        if not getattr(parent, '_flock_watch', False):
-            parent._flock_watch = True
-            threading.Thread(target=self.flock_watch, args=(parent,), daemon=True).start()
         return {'helper_id': run.run_id, 'name': name, 'state': 'working'}
 
     def flock_helper_event(self, run, event):
@@ -753,10 +790,11 @@ class Service:
         with parent.condition:
             while not parent.done:
                 parent.condition.wait(1)
-        helpers, _, _ = self.flock_state()
-        for hid, h in list(helpers.items()):
-            if h['parent'] == parent.run_id and not h['closed']:
-                self.flock_close(parent.run_id, hid)
+        helpers, _, cond = self.flock_state()
+        with cond:
+            open_helpers = [hid for hid, h in helpers.items() if h['parent'] == parent.run_id and not h['closed']]
+        for hid in open_helpers:
+            self.flock_close(parent.run_id, hid)
 
     def cancel(self, run):
         with run.condition:

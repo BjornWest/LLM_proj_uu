@@ -258,7 +258,7 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         }
       }, onError:error => {
-        steps.stop();mode.disabled=false;
+        steps.stop();mode.disabled=false;dismissHelpers();
         const id=run;generation++;stream?.close();stream=null;run=null;stop.disabled=true;
         handovers.clear();showHandover();c.cancelTask({announce:false});
         status.textContent=window.ravenTransport.errorMessage(error);
