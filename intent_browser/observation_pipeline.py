@@ -352,6 +352,7 @@ class ObservationPipeline:
             event['observation_pipeline']['background_error']=f'{type(exc).__name__}: {exc}'
             if dynamic_pending and isinstance(exc,(ObservationChanged,DocumentScanInvalidated)):
                 event['observation_pipeline']['invalidated']=True
+                self.invalidation_streak=getattr(self,'invalidation_streak',0)+1
         def dispatch():
             start=time.monotonic()
             event['observation_pipeline']['backend_start_seconds']=start-barrier_started
@@ -402,6 +403,14 @@ class ObservationPipeline:
         capable=(type(backend).__dict__.get('supports_background_completion') is True and
                  not getattr(backend,'requires_browser_thread',False))
         if not self.config.dynamic_preview or not capable:
+            return self.capture()
+        if getattr(self,'invalidation_streak',0)>=2:
+            # Live-content pages (carousels, tickers) change between preview and full capture,
+            # so every preview-based decision would be discarded as stale. After two such
+            # invalidations, use native full captures for the rest of the episode.
+            if not getattr(self,'preview_disabled_logged',False):
+                self.preview_disabled_logged=True
+                self.trace.event('dynamic_preview_disabled',reason='repeated_background_preview_invalidation')
             return self.capture()
         if self.dynamic is None and self.config.decision_capture=='budgeted_overview':
             from .budgeted_decision import BudgetedDecision

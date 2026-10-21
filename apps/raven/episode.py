@@ -622,10 +622,10 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
     try:
         emit('status', state='working')
         pacing['started'] = _time.monotonic()
-        # observation_pipeline='native': full captures. The 'auto' background preview kept
-        # invalidating every decision on pages with live content (carousels), so nothing executed.
+        # 'auto' uses background previews; on live-content pages the pipeline falls back to
+        # full captures after two stale-preview invalidations (intent_browser/observation_pipeline.py).
         directory, summary = runner.run_episode(factory, backend, metadata, output, max_steps=None, episode_task=task,
-            harness_profile=profile, human_handover=controller, before_observation=before_observation, observation_pipeline='native', trace_screenshots=False,
+            harness_profile=profile, human_handover=controller, before_observation=before_observation, observation_pipeline='auto', trace_screenshots=False,
             max_input_tokens=budgets['request_input'], input_counter=input_counter,
             max_total_input_tokens=budgets['total_input'], max_total_output_tokens=budgets['total_output'],
             allow_ungraded=True, ungraded_reason='Raven supervised live-web demo', memory_adapter=memory,
