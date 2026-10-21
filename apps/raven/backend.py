@@ -625,6 +625,12 @@ class Handler(preview.Handler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ASSETS), **kwargs)
 
+    def end_headers(self):
+        # Revalidate the app's own files on every load so a restart never leaves a stale script behind.
+        if self.command == 'GET' and not self.path.startswith('/api/'):
+            self.send_header('Cache-Control', 'no-cache')
+        super().end_headers()
+
     def translate_path(self, path):
         name = urlsplit(path).path
         if name in ('/panel.html', '/panel.js', '/panel-controller.js'):

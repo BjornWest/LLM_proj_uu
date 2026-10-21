@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const append = c.appendMessage.bind(c);
   c.appendMessage = function(text, who, options) {
     append(text, who, options);
-    if (who === 'Korp') { steps.finish(c.messages.lastElementChild); window.ravenAnswered?.(); }
+    if (who !== 'You') { steps.finish(c.messages.lastElementChild); window.ravenAnswered?.(); }
   };
   let conversation = crypto.randomUUID();
   if (window.ravenModels) {
@@ -25,6 +25,23 @@ window.addEventListener('DOMContentLoaded', () => {
     window.ravenMemory?.button(slot);
     slot.append(document.querySelector('#tabs'));  // visited/agent pages sit next to the model selector
   }
+  // Centre the perched raven's body (not its feet) on the send button; measured once from an idle frame.
+  let perchShift = null;
+  const originalResize = c.resize.bind(c);
+  c.resize = function() {
+    originalResize();
+    if (perchShift && c.geometry?.button) { c.geometry.button.x += perchShift; c.draw?.(performance.now(), true); }
+  };
+  const measurePerch = () => {
+    const q = c.drawBounds, b = c.geometry?.button;
+    if (perchShift === null && c.state === 'idle' && q && b && q.width > 20) {
+      perchShift = Math.round(b.x - (q.x + q.width / 2));
+      c.resize();
+      return;
+    }
+    if (perchShift === null) setTimeout(measurePerch, 250);
+  };
+  setTimeout(measurePerch, 500);
   // The send button doubles as Stop (a square) while Korp is working.
   const sendButton = document.querySelector('#send-button');
   const syncStop = () => {

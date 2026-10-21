@@ -37,6 +37,7 @@
     .send-row{display:flex;align-items:center;justify-content:flex-end}
     .mode-select{flex:none;height:42px;max-width:150px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 8px;font:inherit;font-size:12px;color:#33404d}
     /* While Korp works the send button becomes Stop: same size and shape, dark, with a square icon. */
+    #send-button{width:132px;min-width:132px;flex:none}
     .send[data-stop="1"]::before{background:#1f2933}
     .send[data-stop="1"]:hover::before{background:#111a22}
     .send[data-stop="1"] span{display:none}
@@ -142,7 +143,7 @@
     <form id="chat-form">
       <label class="input-label" for="message-input">New message</label>
       <div class="input-wrap"><textarea id="message-input" name="message" rows="3" aria-describedby="demo-hint" placeholder="Write something for the raven…"></textarea></div>
-      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><select id="browser-mode" class="mode-select" aria-label="Where Korp works"><option value="user_window">Use this window</option><option value="background_window">Work in background</option></select><button class="send" id="send-button" type="submit" disabled><span>Send message ↗</span></button></div>
+      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><select id="browser-mode" class="mode-select" aria-label="Where Korp works"><option value="user_window">Use this window</option><option value="background_window">Work in background</option></select><button class="send" id="send-button" type="submit" disabled><span>Fetch ↗</span></button></div>
     </form>
     <div id="tracking-zone" class="tracking-zone" aria-hidden="true" hidden></div>
     <canvas class="bird-overlay" id="raven-sounds" aria-hidden="true"></canvas>
