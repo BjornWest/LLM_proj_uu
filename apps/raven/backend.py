@@ -65,6 +65,26 @@ class UserWindow:
         if not self.cdp_url:
             raise RuntimeError('Shared Chromium did not start')
 
+    def new_background_window(self, page):
+        """(Re)create the minimized agent window used by "Work in background window"."""
+        session = self.browser.new_browser_cdp_session()
+        before = set(session.send('Target.getBrowserContexts')['browserContextIds'])
+        background = self.browser.new_context(accept_downloads=False, service_workers='block', no_viewport=True)
+        after = set(session.send('Target.getBrowserContexts')['browserContextIds'])
+        context_id = (after - before).pop()
+        self.background_target = session.send('Target.createTarget', dict(url='about:blank',
+            browserContextId=context_id, newWindow=True, background=True))['targetId']
+        page.wait_for_timeout(300)
+        window_id = session.send('Browser.getWindowForTarget', {'targetId':self.background_target})['windowId']
+        session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'minimized'}})
+        session.detach()
+        for old in self.background_contexts:
+            try:
+                old.close()
+            except Exception:
+                pass
+        self.background_contexts = [background]
+
     def loop(self):
         from playwright.sync_api import sync_playwright
         try:
@@ -112,18 +132,10 @@ class UserWindow:
                 # Create the separate agent window during startup, before the
                 # user's window is presented. WSL can focus newly mapped windows
                 # even when Target.createTarget requests background:true.
-                session = self.browser.new_browser_cdp_session()
-                before = set(session.send('Target.getBrowserContexts')['browserContextIds'])
-                background = self.browser.new_context(accept_downloads=False, service_workers='block', no_viewport=True)
-                after = set(session.send('Target.getBrowserContexts')['browserContextIds'])
-                context_id = (after - before).pop()
-                self.background_target = session.send('Target.createTarget', dict(url='about:blank',
-                    browserContextId=context_id, newWindow=True, background=True))['targetId']
-                page.wait_for_timeout(300)
-                window_id = session.send('Browser.getWindowForTarget', {'targetId':self.background_target})['windowId']
-                session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'minimized'}})
-                session.detach()
-                self.background_contexts = [background]
+                self.background_contexts = []
+                self.new_background_window(page)
+                for extra in [p for p in self.context.pages if p is not page and p.url == 'about:blank']:
+                    extra.close()
                 page.bring_to_front()
                 self.cdp_url = self.windows_chrome.endpoint if self.windows_browser else f'http://127.0.0.1:{debug_port}'
                 self.ready.set()
@@ -152,9 +164,11 @@ class UserWindow:
                             response.put(True)
                             break
                         if action == 'background':
-                            pages = self.background_contexts[0].pages
+                            pages = self.background_contexts[0].pages if self.background_contexts else []
                             if not pages:
-                                raise ValueError('Agent window was closed; restart the demo service')
+                                # The user closed the agent window: make a new minimized one.
+                                self.new_background_window(self.context.pages[0])
+                                pages = self.background_contexts[0].pages
                             response.put(target_id(pages[0].context, pages[0]))
                         elif action == 'tabs':
                             from apps.raven.shared_browser import active_target
