@@ -406,12 +406,18 @@ class ObservationPipeline:
             return self.capture()
         if getattr(self,'invalidation_streak',0)>=2:
             # Live-content pages (carousels, tickers) change between preview and full capture,
-            # so every preview-based decision would be discarded as stale. After two such
-            # invalidations, use native full captures for the rest of the episode.
-            if not getattr(self,'preview_disabled_logged',False):
-                self.preview_disabled_logged=True
-                self.trace.event('dynamic_preview_disabled',reason='repeated_background_preview_invalidation')
-            return self.capture()
+            # so every preview-based decision would be discarded as stale. Use native full
+            # captures while the agent stays on that page; previews resume after navigation.
+            try:url=human.env.page.url
+            except Exception:url=None
+            if getattr(self,'preview_disabled_url',None) is None:
+                self.preview_disabled_url=url
+                self.trace.event('dynamic_preview_paused',reason='repeated_background_preview_invalidation',url=url)
+            if url is not None and url!=self.preview_disabled_url:
+                self.invalidation_streak=0;self.preview_disabled_url=None
+                self.trace.event('dynamic_preview_resumed',url=url)
+            else:
+                return self.capture()
         if self.dynamic is None and self.config.decision_capture=='budgeted_overview':
             from .budgeted_decision import BudgetedDecision
             self.dynamic=BudgetedDecision(human,self.trace,budget_tokens=lambda:self.overview_budget())
