@@ -79,9 +79,11 @@ DEMO_POLICY = (
     "price sorting over setting many filters one by one), but if a page does not show what you need, try other "
     "routes before giving up: scroll or search the page again, dismiss cookie banners, open product pages, or use "
     "another store or price-comparison site. Only say something could not be verified after several genuine attempts. "
-    "Once a listing shows matching products with prices, answer with 1-3 concrete candidates. Take the user's location, currency, sizes and other preferences from their stored memory; "
-    "if a detail is missing, make a reasonable assumption and state it in the answer instead of "
-    "asking. Ask a clarifying question only when no reasonable assumption exists. "
+    "Once a listing shows matching products with prices, answer with 1-3 concrete candidates. Take the user's location, currency, sizes and other preferences from their stored memory. "
+    "If a detail that changes the answer (their country or city, currency, size, budget, or which product they "
+    "mean) is in neither the request nor memory, ask one short follow-up question before researching instead of "
+    "guessing; never infer it from your own name, the language of the message or website content. "
+    "Make assumptions only for minor details, and state them in the answer. "
     "Give a concise answer in the language of the user's latest message (not the website's language) "
     "with links to inspected sources; "
     "say clearly when a price or fact could not be verified. Reuse the current tab for navigation. "
@@ -523,10 +525,10 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         memory = MemoryStore()
         profile = with_memory(profile)
         profile = replace(profile, instructions=profile.instructions + '\n' + MEMORY_POLICY)
-    now = datetime.now()  # machine-local time; deliberately no place or time-zone name (location comes from memory)
+    now = datetime.now(timezone.utc)  # UTC: no place or local time zone (location comes from memory)
     # Last line of the system message, so relative dates ("tomorrow", "this weekend") resolve.
     profile = replace(profile, instructions=profile.instructions +
-        f"\nCurrent date and time: {now:%A %-d %B %Y, %H:%M}.")
+        f"\nCurrent date and time: {now:%A %-d %B %Y, %H:%M} UTC.")
     history = '\n'.join(f"{m['who']}: {m['text']}" for m in payload.get('history', []))
     goal = (('Previous conversation (context):\n' + history + '\n\n') if history else '') + payload['text']
     goal += ('\n\nWrite the final answer in the same language as my message above, even if the websites use another language.'
