@@ -32,7 +32,15 @@
     main{width:100%;height:100svh;min-height:560px;margin:0;padding:8px 0 10px;display:flex;flex-direction:column}
     header{flex:none;padding:4px 12px 10px;gap:12px}
     .scene{flex:1;min-height:auto;display:flex;flex-direction:column}
-    .sky{flex:none;height:100px}
+    .sky{flex:none;height:40px}
+    .status-row{margin:4px 12px 0}
+    .send-row{display:flex;align-items:center;justify-content:flex-end}
+    .mode-select{flex:none;height:42px;max-width:150px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 8px;font:inherit;font-size:12px;color:#33404d}
+    .send[data-stop="1"]{min-width:42px;width:42px;padding:0;background:#1f2933}
+    .send[data-stop="1"] span{display:none}
+    .send[data-stop="1"]::before{background:#1f2933}
+    .send-row .hint{display:none}
+    .send[data-stop="1"]::after{content:"";position:relative;z-index:3;display:block;width:14px;height:14px;margin:auto;background:#fff;border-radius:2px}
     .sky-caption{top:6px;left:12px;right:12px;z-index:1}
     .chat-window{flex:1 1 0;min-height:160px;height:0;width:100%;border-radius:12px}
     .chat-window::before{border-radius:12px}
@@ -85,10 +93,17 @@
     .new-reply[hidden]{display:none}.new-reply:focus-visible{outline:2px solid #3377ed;outline-offset:3px}
     @media(pointer:coarse){.new-reply{min-height:44px}}
   </style>
-<script src="raven-transport.js" defer></script><script src="raven-steps.js" defer></script><script src="raven-models.js" defer></script><script src="raven-memory.js" defer></script><script src="/panel.js" defer></script><style>header nav,.settings,#raven-status{display:none}.hint{visibility:hidden}.chat-heading span{font-size:10px}#tabs{display:flex;gap:4px;overflow:auto;padding:4px 12px;flex:none}#tabs button{font:11px system-ui;border:1px solid #ddd;background:white;border-radius:10px;padding:4px 7px;white-space:nowrap}.controls{display:flex;gap:8px;padding:4px 12px;font:12px system-ui}.controls button{font:inherit}#handover{padding:8px;background:#fff4d5}#handover[hidden]{display:none}</style><style>#run-status{overflow-wrap:anywhere;line-height:1.4}.controls{align-items:center;min-height:38px}#tabs button{max-width:220px;overflow:hidden;text-overflow:ellipsis}</style><style>#tabs button{display:flex;align-items:center;gap:5px}#browser-mode{font:inherit;border:1px solid #d9e1e9;border-radius:6px;padding:5px;background:white}</style><style>.message:not(.user) .raven-steps{color:#d8e4f0}</style><style>/* Projector readability */.message-copy{font-size:15.5px;line-height:1.5}.message.pending .message-copy{font-size:14px}.message-label{font-size:11px}#run-status{font-size:14.5px;font-weight:500;color:#1f3f6b}.controls{font-size:13px}#tabs button{font-size:12.5px}.raven-working{font-size:13.5px}.raven-steps{font-size:13px}.raven-model-label{font-size:12px}#handover{font-size:14.5px;border-left:4px solid #e0a800}#handover button{font-size:14px;padding:7px 12px;font-weight:600}</style></head>
+<script src="raven-transport.js" defer></script><script src="raven-steps.js" defer></script><script src="raven-models.js" defer></script><script src="raven-memory.js" defer></script><script src="/panel.js" defer></script><style>header nav,.settings,#raven-status{display:none}.hint{visibility:hidden}.chat-heading span{font-size:10px}#tabs{display:flex;gap:4px;overflow:auto;padding:4px 12px;flex:none}#tabs button{font:11px system-ui;border:1px solid #ddd;background:white;border-radius:10px;padding:4px 7px;white-space:nowrap}.controls{display:flex;gap:8px;padding:4px 12px;font:12px system-ui}.controls button{font:inherit}#handover{padding:8px;background:#fff4d5}#handover[hidden]{display:none}</style><style>#run-status{overflow-wrap:anywhere;line-height:1.4}.controls{align-items:center;min-height:38px}#tabs button{max-width:220px;overflow:hidden;text-overflow:ellipsis}</style><style>#tabs button{display:flex;align-items:center;gap:5px}#browser-mode{font:inherit;border:1px solid #d9e1e9;border-radius:6px;padding:5px;background:white}</style><style>.message:not(.user) .raven-steps{color:#d8e4f0}</style><style>/* Projector readability */.message-copy{font-size:15.5px;line-height:1.5}.message.pending .message-copy{font-size:14px}.message-label{font-size:11px}#run-status{font-size:14.5px;font-weight:500;color:#1f3f6b}.controls{font-size:13px}#tabs button{font-size:12.5px}.raven-working{font-size:13.5px}.raven-steps{font-size:13px}.raven-model-label{font-size:12px}#handover{font-size:14.5px;border-left:4px solid #e0a800}#handover button{font-size:14px;padding:7px 12px;font-weight:600}</style><style>
+/* Compact controls: model + memory + visited pages share one wrapping row. */
+.controls{flex-wrap:wrap;row-gap:6px}
+.controls #tabs{display:flex;flex:1 1 120px;min-width:0;padding:0;overflow-x:auto}
+.controls select:not(.mode-select){max-width:180px}
+.status-row{min-height:0;padding-top:0;padding-bottom:0}
+</style>
+</head>
 <body>
 <main>
-  <header><b>Raven <span>/ your browser assistant</span></b><nav aria-label="Other previews"><a href="chat-fullpage-v42.html">Full-page chat ↗</a><a href="index.html">Asset index ↗</a></nav></header><label class="controls">Browser <select id="browser-mode" aria-label="Browser mode"><option value="user_window">Use my window</option><option value="background_window">Work in background</option></select></label><div id="tabs" aria-label="Agent tabs"></div><div class="controls"><button type="button" id="stop" disabled>Stop</button><span id="run-status" role="status">Ready</span></div><div id="handover" hidden><p id="handover-message"></p><button type="button" id="handback">Finished — return tab to Raven</button></div>
+  <header><b>Raven <span>/ your browser assistant</span></b><nav aria-label="Other previews"><a href="chat-fullpage-v42.html">Full-page chat ↗</a><a href="index.html">Asset index ↗</a></nav></header><div id="tabs" aria-label="Agent tabs"></div><div class="controls status-row"><button type="button" id="stop" disabled hidden>Stop</button><span id="run-status" role="status">Ready</span></div><div id="handover" hidden><p id="handover-message"></p><button type="button" id="handback">Finished — return tab to Raven</button></div>
   <section class="scene" id="chat-scene" data-state="loading" aria-label="Raven chat demo">
     <div class="sky" id="sky"><canvas class="flight-guides" id="flight-guides" aria-hidden="true" hidden></canvas><div class="sky-caption"><span class="status" id="raven-status" role="status">Loading raven…</span><span id="countdown">A ten-second demo</span></div><div class="web-activity" id="web-activity" role="status" aria-live="polite" aria-atomic="true" hidden>
       <span class="activity-dot" data-activity-dot aria-hidden="true"></span>
@@ -101,7 +116,7 @@
     <form id="chat-form">
       <label class="input-label" for="message-input">New message</label>
       <div class="input-wrap"><textarea id="message-input" name="message" rows="3" aria-describedby="demo-hint" placeholder="Write something for the raven…"></textarea></div>
-      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><button class="send" id="send-button" type="submit" disabled><span>Send message ↗</span></button></div>
+      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><select id="browser-mode" class="mode-select" aria-label="Where Raven works"><option value="user_window">Use my window</option><option value="background_window">Work in background</option></select><button class="send" id="send-button" type="submit" disabled><span>Send message ↗</span></button></div>
     </form>
     <div id="tracking-zone" class="tracking-zone" aria-hidden="true" hidden></div>
     <canvas class="bird-overlay" id="raven-sounds" aria-hidden="true"></canvas>

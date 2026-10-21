@@ -23,7 +23,22 @@ window.addEventListener('DOMContentLoaded', () => {
         status.textContent = 'New conversation with ' + window.ravenModels.label(window.ravenModels.preferred());
       }});
     window.ravenMemory?.button(slot);
+    slot.append(document.querySelector('#tabs'));  // visited/agent pages sit next to the model selector
   }
+  // The send button doubles as Stop (a square) while Raven is working.
+  const sendButton = document.querySelector('#send-button');
+  const syncStop = () => {
+    const running = !stop.disabled;
+    sendButton.dataset.stop = running ? '1' : '';
+    sendButton.title = running ? 'Stop' : '';
+    sendButton.setAttribute('aria-label', running ? 'Stop' : 'Send message');
+    if (running) sendButton.disabled = false;
+  };
+  new MutationObserver(syncStop).observe(stop, {attributes: true, attributeFilter: ['disabled']});
+  sendButton.addEventListener('click', event => {
+    if (sendButton.dataset.stop !== '1') return;
+    event.preventDefault(); event.stopImmediatePropagation(); stop.click();
+  }, true);
   let run = null, stream = null, pendingTab = null, generation = 0;
   const post = async (url, body = {}) => {
     await window.ravenTransport.ready;

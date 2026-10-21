@@ -72,8 +72,13 @@ class UserWindow:
         background = self.browser.new_context(accept_downloads=False, service_workers='block', no_viewport=True)
         after = set(session.send('Target.getBrowserContexts')['browserContextIds'])
         context_id = (after - before).pop()
-        self.background_target = session.send('Target.createTarget', dict(url='about:blank',
-            browserContextId=context_id, newWindow=True, background=True))['targetId']
+        create = dict(url='about:blank', browserContextId=context_id, newWindow=True, background=True)
+        try:
+            # Born minimized and off-screen (newer Chrome), so Windows shows no opening animation.
+            self.background_target = session.send('Target.createTarget', dict(create, windowState='minimized',
+                left=-32000, top=-32000, width=1440, height=1000))['targetId']
+        except Exception:
+            self.background_target = session.send('Target.createTarget', create)['targetId']
         page.wait_for_timeout(300)
         window_id = session.send('Browser.getWindowForTarget', {'targetId':self.background_target})['windowId']
         # Keep the agent's window out of sight: park it off-screen, then minimize. WSL/Windows
