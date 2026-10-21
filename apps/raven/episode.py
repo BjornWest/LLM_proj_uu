@@ -501,10 +501,14 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         memory = MemoryStore()
         profile = with_memory(profile)
         profile = replace(profile, instructions=profile.instructions + '\n' + MEMORY_POLICY)
+    from zoneinfo import ZoneInfo
+    now = datetime.now(ZoneInfo('Europe/Stockholm'))
+    # Last line of the system message, so relative dates ("tomorrow", "this weekend") resolve.
+    profile = replace(profile, instructions=profile.instructions +
+        f"\nCurrent date and time: {now:%A %-d %B %Y, %H:%M} ({now:%Z}, Europe/Stockholm).")
     history = '\n'.join(f"{m['who']}: {m['text']}" for m in payload.get('history', []))
     goal = (('Previous conversation (context):\n' + history + '\n\n') if history else '') + payload['text']
     goal += ('\n\nWrite the final answer in the same language as my message above, even if the websites are in Swedish.'
-             f"\nToday is {datetime.now():%A %-d %B %Y} (Sweden). "
              'For research answers, link to pages you actually inspected. '
              'Only refuse what the demo policy forbids (purchases, payments, logins, accounts, messages, personal data); help with everything else. '
              'Do not purchase or create accounts.')
