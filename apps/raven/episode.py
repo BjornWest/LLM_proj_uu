@@ -430,10 +430,8 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         try:
             page = env_holder[0].page
             for frame in [page.main_frame, *[f for f in page.frames if f is not page.main_frame]]:
-                label = frame.evaluate(POINT_AT_JS, [bid, bool(cdp_url)])
+                label = frame.evaluate(POINT_AT_JS, [bid, False])  # name only: no outline, no pause
                 if label is not None:
-                    if cdp_url:
-                        page.wait_for_timeout(450)  # Let the audience see the outline before the action.
                     return label
         except Exception:
             pass  # Presentation only; never affects the action itself.
@@ -538,6 +536,9 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
                 task_kwargs=dict(start_url=task.start_url, goal=goal, record=task.trace.event),
                 headless=False, action_mapping=actions.to_python_code, wait_for_user_message=False,
                 pw_context_kwargs={'accept_downloads':False, 'service_workers':'block'})
+        # BrowserGym sleeps pre_observation_delay (0.5 s) after every action; our own capture and
+        # change detection follow, so a short delay is enough (RAVEN_PRE_OBSERVATION_DELAY overrides).
+        env.pre_observation_delay = float(os.environ.get('RAVEN_PRE_OBSERVATION_DELAY', '0.1'))
         env.raven_drain_notes = before_observation
         env_holder.append(env)
         return env

@@ -98,7 +98,14 @@
 .controls{flex-wrap:wrap;row-gap:6px}
 .controls #tabs{display:flex;flex:1 1 120px;min-width:0;padding:0;overflow-x:auto}
 .controls select:not(.mode-select){max-width:180px}
-.status-row{min-height:0;padding-top:0;padding-bottom:0}
+.status-row{display:none}
+.tracking-zone{display:none!important}
+.sky{height:80px!important}
+.message.thinking .message-copy{display:flex;align-items:center;gap:8px;color:#c2c9d2}
+.thinking-dots{display:inline-flex;gap:3px}
+.thinking-dots i{width:5px;height:5px;border-radius:50%;background:#c2c9d2;animation:raven-think 1.2s infinite ease-in-out}
+.thinking-dots i:nth-child(2){animation-delay:.15s}.thinking-dots i:nth-child(3){animation-delay:.3s}
+@keyframes raven-think{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-2px)}}
 </style>
 </head>
 <body>

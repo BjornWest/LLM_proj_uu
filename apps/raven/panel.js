@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const append = c.appendMessage.bind(c);
   c.appendMessage = function(text, who, options) {
     append(text, who, options);
-    if (who === 'Raven') steps.finish(c.messages.lastElementChild);
+    if (who === 'Raven') { steps.finish(c.messages.lastElementChild); window.ravenAnswered?.(); }
   };
   let conversation = crypto.randomUUID();
   if (window.ravenModels) {
@@ -34,7 +34,30 @@ window.addEventListener('DOMContentLoaded', () => {
     sendButton.setAttribute('aria-label', running ? 'Stop' : 'Send message');
     if (running) sendButton.disabled = false;
   };
-  new MutationObserver(syncStop).observe(stop, {attributes: true, attributeFilter: ['disabled']});
+  // Thinking indicator inside the conversation (replaces the separate Ready/status line).
+  let thinking = null, answered = false;
+  window.ravenAnswered = () => { answered = true; thinking?.remove(); thinking = null; };
+  const thinkingText = () => {
+    const t = status.textContent.trim();
+    return !t || /^(Ready|Starting…|Researching…)$/.test(t) ? 'Thinking…' : t;
+  };
+  const syncThinking = () => {
+    const running = !stop.disabled;
+    if (!running) answered = false;
+    if (running && !thinking && !answered) {
+      thinking = document.createElement('article'); thinking.className = 'message thinking';
+      thinking.innerHTML = '<span class="message-label">Raven</span><div class="message-copy"><span class="thinking-dots"><i></i><i></i><i></i></span><span class="thinking-text"></span></div>';
+      c.messages.append(thinking);
+    }
+    if (!running && thinking) { thinking.remove(); thinking = null; }
+    if (thinking) {
+      thinking.querySelector('.thinking-text').textContent = thinkingText();
+      c.messages.append(thinking);  // keep it last
+      c.messages.scrollTop = c.messages.scrollHeight;
+    }
+  };
+  new MutationObserver(() => { syncStop(); syncThinking(); }).observe(stop, {attributes: true, attributeFilter: ['disabled']});
+  new MutationObserver(syncThinking).observe(status, {childList: true, characterData: true, subtree: true});
   sendButton.addEventListener('click', event => {
     if (sendButton.dataset.stop !== '1') return;
     event.preventDefault(); event.stopImmediatePropagation(); stop.click();
