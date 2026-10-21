@@ -253,3 +253,35 @@ tracks whether an error answer was already rendered and appends one only when
 needed; budget stops now have browser coverage in both layouts. Cancellation
 still produces no failure answer. See the final review disposition for the exact
 four-commit candidate.
+
+## WEB-H: challenger rehearsal changes (2026-10-21)
+
+Rehearsal report (prompts, timings, safe prompts, risks):
+`/home/bjorn/code/LLM_proj_uu/.local/coordination/demo-sprint/REHEARSAL.md`.
+
+- **Model presets** live in `apps/raven/models.json` (hot-reloaded): `gemini-flash`
+  (default and fallback), `muse-spark`, `qwen-openrouter`, `qwen-vast` (self-hosted
+  OpenAI-compatible endpoint), `sol`. `GET /api/models` reports availability,
+  `POST /api/model {id}` changes the default for new conversations, and a task's
+  `model` field is honoured for that conversation's first message only. The model
+  is fixed per conversation. An unavailable preset falls back with the notice
+  "Self-hosted model unavailable — using Gemini 3.8 Flash". CLI flags
+  (`--model-backend sol|openrouter|selfhosted`, `--openrouter-model`,
+  `--openai-base-url`, `--model`, `--preset`) only pick the default.
+- **Pacing**: after 120 s (or half the input budget) the model receives a
+  trailing "answer now with what you have" message. A second nudge forces
+  `send_msg_to_user` on OpenRouter/self-hosted models. Time spent waiting for a
+  human does not count. The answer is shown when `send_msg_to_user` is called,
+  not after teardown. OpenRouter 429/5xx responses are retried once per request.
+- **Visible actions**: steps name their target ("Clicking “Add to basket”").
+  In window modes, the element is scrolled into view and outlined for about
+  1.2 s. `activity` events ("Thinking…", "Looking at the page…") update only the
+  status line.
+- **Memory**: `apps/raven/memory_store.py` provides harness `user-memory-v1` memory
+  backed by `.local/raven-memory.json` (or `RAVEN_MEMORY_FILE`). The file starts
+  with clothing size M, preferred colours and `newsletter_opt_in=never`.
+  `GET /api/memory` reads it; `PUT` and `DELETE /api/memory/{field}` change it.
+  Both UIs have a Memory dialog, and answers show "Memory updated: …".
+  Delete the file to reset it to the seed.
+- `start_demo.sh` now uses a 6 GiB job limit. With the old 4 GiB limit, four
+  concurrent full-page episodes OOM-killed the whole service.
