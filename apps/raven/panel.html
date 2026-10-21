@@ -36,11 +36,12 @@
     .status-row{margin:4px 12px 0}
     .send-row{display:flex;align-items:center;justify-content:flex-end}
     .mode-select{flex:none;height:42px;max-width:150px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 8px;font:inherit;font-size:12px;color:#33404d}
-    .send[data-stop="1"]{min-width:42px;width:42px;padding:0;background:#1f2933}
-    .send[data-stop="1"] span{display:none}
+    /* While Korp works the send button becomes Stop: same size and shape, dark, with a square icon. */
     .send[data-stop="1"]::before{background:#1f2933}
+    .send[data-stop="1"]:hover::before{background:#111a22}
+    .send[data-stop="1"] span{display:none}
+    .send[data-stop="1"]::after{content:"\25A0\00A0\00A0Stop";position:relative;z-index:3}
     .send-row .hint{display:none}
-    .send[data-stop="1"]::after{content:"";position:relative;z-index:3;display:block;width:14px;height:14px;margin:auto;background:#fff;border-radius:2px}
     .sky-caption{top:6px;left:12px;right:12px;z-index:1}
     .chat-window{flex:1 1 0;min-height:160px;height:0;width:100%;border-radius:12px}
     .chat-window::before{border-radius:12px}
