@@ -101,7 +101,10 @@
 .status-row{display:none}
 .tracking-zone{display:none!important}
 .sky{height:80px!important}
-.message.thinking .message-copy{display:flex;align-items:center;gap:8px;color:#c2c9d2}
+.message.thinking{max-width:96%}
+.message.thinking .message-copy{display:flex;align-items:center;gap:8px;color:#c2c9d2;min-width:0}
+.thinking-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.message.note .message-copy{font-size:13px;color:#d9dee4;font-style:italic}
 .thinking-dots{display:inline-flex;gap:3px}
 .thinking-dots i{width:5px;height:5px;border-radius:50%;background:#c2c9d2;animation:raven-think 1.2s infinite ease-in-out}
 .thinking-dots i:nth-child(2){animation-delay:.15s}.thinking-dots i:nth-child(3){animation-delay:.3s}

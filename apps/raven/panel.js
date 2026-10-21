@@ -37,13 +37,23 @@ window.addEventListener('DOMContentLoaded', () => {
   // Thinking indicator inside the conversation (replaces the separate Ready/status line).
   let thinking = null, answered = false;
   window.ravenAnswered = () => { answered = true; thinking?.remove(); thinking = null; };
+  let reasoning = '';
   const thinkingText = () => {
+    if (reasoning) return reasoning;
     const t = status.textContent.trim();
     return !t || /^(Ready|Starting…|Researching…)$/.test(t) ? 'Thinking…' : t;
   };
+  window.ravenReasoning = text => { reasoning = text || ''; syncThinking(); };
+  window.ravenNote = text => {
+    const note = document.createElement('article'); note.className = 'message note';
+    note.innerHTML = '<span class="message-label">Raven</span><div class="message-copy"></div>';
+    note.querySelector('.message-copy').textContent = text;
+    if (thinking) c.messages.insertBefore(note, thinking); else c.messages.append(note);
+    c.messages.scrollTop = c.messages.scrollHeight;
+  };
   const syncThinking = () => {
     const running = !stop.disabled;
-    if (!running) answered = false;
+    if (!running) { answered = false; reasoning = ''; }
     if (running && !thinking && !answered) {
       thinking = document.createElement('article'); thinking.className = 'message thinking';
       thinking.innerHTML = '<span class="message-label">Raven</span><div class="message-copy"><span class="thinking-dots"><i></i><i></i><i></i></span><span class="thinking-text"></span></div>';
@@ -126,6 +136,8 @@ window.addEventListener('DOMContentLoaded', () => {
         steps.event(e);
         if (e.type === 'status') status.textContent = {starting:'Starting research…',working:'Researching…',finishing:'Preparing your answer…'}[e.state] || 'Researching…';
         if (e.type === 'step' || e.type === 'activity') status.textContent = e.summary;
+        if (e.type === 'reasoning') window.ravenReasoning?.(e.text);
+        if (e.type === 'note') window.ravenNote?.(e.text);
         if (e.type === 'site') {
           const tab=tabs.get(e.tab_id);if(tab){Object.assign(tab,{url:e.url,title:e.title,favicon:e.favicon});drawTabs();}
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{url:e.url,label:e.title}}));

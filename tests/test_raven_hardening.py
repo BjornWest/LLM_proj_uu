@@ -130,7 +130,7 @@ def test_openrouter_model_option_routes_any_model_and_keeps_qwen_pin():
     qwen = openrouter_request_options(OPENROUTER_MODEL, {'reasoning_effort': 'low'})
     assert qwen['provider']['only']
     other = openrouter_request_options('google/gemini-3.8-flash', {'reasoning_effort': 'low'})
-    assert other == {'reasoning': {'effort': 'low'}}
+    assert other == {'reasoning': {'effort': 'low', 'summary': 'auto'}}
 
 
 def test_health_reports_selected_openrouter_model_and_budget():
