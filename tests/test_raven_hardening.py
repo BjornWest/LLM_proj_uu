@@ -123,3 +123,59 @@ def test_raven_worker_waits_for_matching_extension_on_startup():
     args, kwargs = context.wait_for_event.call_args
     assert args == ('serviceworker',)
     assert not kwargs['predicate'](component) and kwargs['predicate'](raven)
+
+
+def test_openrouter_model_option_routes_any_model_and_keeps_qwen_pin():
+    from apps.raven.episode import openrouter_request_options, OPENROUTER_MODEL
+    qwen = openrouter_request_options(OPENROUTER_MODEL, {'reasoning_effort': 'low'})
+    assert qwen['provider']['only']
+    other = openrouter_request_options('google/gemini-3.8-flash', {'reasoning_effort': 'low'})
+    assert other == {'reasoning': {'effort': 'low'}}
+
+
+def test_health_reports_selected_openrouter_model_and_budget():
+    from apps.raven.backend import Service
+    svc = Service(0, model_backend='openrouter', openrouter_model='google/gemini-3.8-flash',
+                  max_total_input_tokens=600000)
+    assert svc.model == 'google/gemini-3.8-flash'
+    assert svc.options['openrouter_model'] == 'google/gemini-3.8-flash'
+    assert svc.options['max_total_input_tokens'] == 600000
+
+
+def _registry_service(tmp_path, presets, default='a', fallback='b'):
+    import json as _json
+    from apps.raven.backend import Service
+    path = tmp_path / 'models.json'
+    path.write_text(_json.dumps({'default': default, 'fallback': fallback, 'presets': presets}))
+    return Service(0, models_file=path), path
+
+
+def test_model_presets_hot_reload_fallback_and_conversation_pinning(tmp_path, monkeypatch):
+    import json as _json, os, time as _time
+    monkeypatch.setenv('OPENROUTER_API_KEY', 'test')
+    presets = [dict(id='a', label='Self', backend='selfhosted', model='Q', base_url='http://127.0.0.1:9/v1'),
+               dict(id='b', label='Flash', backend='openrouter', model='google/flash')]
+    svc, path = _registry_service(tmp_path, presets)
+    assert svc.models.default()['id'] == 'a' and svc.model == 'Q'
+    preset, notice = svc.choose_model({'conversation_id': 'c1', 'model': 'a'})
+    assert preset['id'] == 'b' and notice == 'Self-hosted model unavailable — using Flash'
+    # The conversation keeps its model even if the client later asks for another.
+    presets.append(dict(id='c', label='Other', backend='openrouter', model='x/other'))
+    path.write_text(_json.dumps({'default': 'c', 'fallback': 'b', 'presets': presets}))
+    os.utime(path, (_time.time() + 5, _time.time() + 5))
+    assert svc.models.default()['id'] == 'c'
+    assert svc.choose_model({'conversation_id': 'c1', 'model': 'c'})[0]['id'] == 'b'
+    assert svc.choose_model({'conversation_id': 'c2', 'model': 'c'}) == (svc.models.get('c'), None)
+    # A broken edit keeps the previous presets.
+    path.write_text('{broken')
+    os.utime(path, (_time.time() + 9, _time.time() + 9))
+    assert svc.models.get('c') is not None
+
+
+def test_cli_selfhosted_preset_and_episode_options(tmp_path):
+    from apps.raven.backend import Service, episode_options
+    svc = Service(0, model_backend='selfhosted', base_url='http://127.0.0.1:18000/v1', model='Qwen/Qwen3.8-27B-FP8',
+                  models_file=tmp_path / 'missing.json')
+    options = episode_options(svc.models.default())
+    assert options['model_backend'] == 'selfhosted' and options['base_url'] == 'http://127.0.0.1:18000/v1'
+    assert options['model'] == 'Qwen/Qwen3.8-27B-FP8'

@@ -13,9 +13,11 @@
       this.line.hidden = true;
       this.steps = [];
     }
-    reset() { this.steps = []; this.line.hidden = false; this.line.textContent = 'Working: starting research…'; }
+    reset() { this.steps = []; this.model = null; this.line.hidden = false; this.line.textContent = 'Working: starting research…'; }
     event(event) {
       let text;
+      if (event.type === 'model') { this.model = event.notice || event.label; if (window.ravenModels && event.conversation_id) window.ravenModels.record(event.conversation_id, event.id); }
+      if (event.type === 'activity') { this.line.hidden = false; this.line.textContent = 'Working: ' + event.summary; return; }
       if (event.type === 'step') text = event.summary;
       if (event.type === 'site') {
         try { text = 'Reading ' + new URL(event.url).hostname.replace(/^www\./, ''); } catch {}
@@ -27,6 +29,7 @@
     }
     finish(message) {
       this.line.hidden = true;
+      if (message && this.model) { const label = document.createElement('small'); label.className = 'raven-model-label'; label.textContent = this.model.includes('—') ? this.model : 'Answered by ' + this.model; message.append(label); }
       if (!this.steps.length || !message) return;
       const details = document.createElement('details'), summary = document.createElement('summary');
       details.className = 'raven-steps';

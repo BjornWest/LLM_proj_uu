@@ -205,7 +205,7 @@
       this.send.disabled=true;this.setState(this.motion.matches?'working':'takeoff');
       this.task=task;
       this.scene.dispatchEvent(new CustomEvent('raven-chat-submit',{detail:{text:task.text,conversationId:task.conversationId},bubbles:true}));
-      task.transport=window.ravenTransport.start({text:task.text,conversation_id:task.conversationId,mode:'background',history:task.history},{
+      task.transport=window.ravenTransport.start({text:task.text,conversation_id:task.conversationId,mode:'background',history:task.history,model:window.ravenModels?.modelFor(task.conversationId)},{
         onEvent:event=>{if(this.task!==task)return;this.handleTaskEvent(event);},
         onError:error=>{if(this.task===task)this.completeTask({markdown:window.ravenTransport.errorMessage(error),sources:[]});}
       });
@@ -215,7 +215,7 @@
     handleTaskEvent(event){
       this.liveSteps?.event(event);
       if(event.type==='site')document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{...event,label:event.title}}));
-      else if(event.type==='step')this.countdown.textContent=event.summary;
+      else if(event.type==='step'||event.type==='activity')this.countdown.textContent=event.summary;
       else if(event.type==='status')this.countdown.textContent=event.state==='starting'?'Starting research…':event.state==='finishing'?'Preparing your answer…':'Researching…';
       else if(event.type==='final')this.completeTask(event);
       else if(event.type==='error')this.completeTask({markdown:window.ravenTransport.errorMessage(event),sources:[]});

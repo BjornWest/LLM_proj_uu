@@ -4,7 +4,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const status = document.querySelector('#run-status');
   const stop = document.querySelector('#stop');
   const handover = document.querySelector('#handover');
-  const history = [];
+  let history = [];
   const mode = document.querySelector('#browser-mode');
   const steps = new RavenSteps(document.querySelector('#chat-scene'));
   const append = c.appendMessage.bind(c);
@@ -12,7 +12,17 @@ window.addEventListener('DOMContentLoaded', () => {
     append(text, who, options);
     if (who === 'Raven') steps.finish(c.messages.lastElementChild);
   };
-  const conversation = crypto.randomUUID();
+  let conversation = crypto.randomUUID();
+  if (window.ravenModels) {
+    const slot = document.createElement('div'); slot.className = 'controls';
+    document.querySelector('#tabs').before(slot);
+    window.ravenModels.mount(slot, {hasConversation: () => history.length > 0, currentConversation: () => conversation,
+      newConversation: () => {
+        if (run) return;
+        history = []; conversation = crypto.randomUUID(); c.messages.replaceChildren(); steps.reset(); steps.stop();
+        status.textContent = 'New conversation with ' + window.ravenModels.label(window.ravenModels.preferred());
+      }});
+  }
   let run = null, stream = null, pendingTab = null, generation = 0;
   const post = async (url, body = {}) => {
     await window.ravenTransport.ready;
@@ -40,8 +50,10 @@ window.addEventListener('DOMContentLoaded', () => {
       if (site && ['http:','https:'].includes(site.protocol)) {
         const icon=document.createElement('img');icon.src=tab.favicon || site.origin+'/favicon.ico';icon.alt='';icon.width=14;icon.height=14;icon.onerror=()=>icon.remove();button.prepend(icon);
       }
-      button.title = tab.url;
-      button.onclick = () => post('/api/tabs/'+encodeURIComponent(tab.focus_id || tab.tab_id)+'/focus').catch(e => status.textContent=window.ravenTransport.errorMessage(e));
+      button.title = 'Show this tab: ' + tab.url;
+      button.onclick = () => post('/api/tabs/'+encodeURIComponent(tab.focus_id || tab.tab_id)+'/focus')
+        .then(() => { if (!run) status.textContent = 'Showing ' + button.textContent; })
+        .catch(() => status.textContent = 'Couldn’t show that tab — it may have been closed.');
       root.append(button);
     }
   }
@@ -66,7 +78,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let errorShown = false;
     stop.disabled = false;
     status.textContent = 'Starting…';
-    post('/api/tasks', {text, conversation_id:conversation, mode:mode.value, history:prior}).then(data => {
+    post('/api/tasks', {text, conversation_id:conversation, mode:mode.value, history:prior, model:window.ravenModels?.modelFor(conversation)}).then(data => {
       if (token !== generation) {post('/api/tasks/'+data.run_id+'/cancel');return;}
       run = data.run_id;
       tabs.clear();drawTabs();handovers.clear();showHandover();
@@ -74,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (token !== generation) return;
         steps.event(e);
         if (e.type === 'status') status.textContent = {starting:'Starting research…',working:'Researching…',finishing:'Preparing your answer…'}[e.state] || 'Researching…';
-        if (e.type === 'step') status.textContent = e.summary;
+        if (e.type === 'step' || e.type === 'activity') status.textContent = e.summary;
         if (e.type === 'site') {
           const tab=tabs.get(e.tab_id);if(tab){Object.assign(tab,{url:e.url,title:e.title,favicon:e.favicon});drawTabs();}
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{url:e.url,label:e.title}}));
@@ -151,6 +163,14 @@ window.addEventListener('DOMContentLoaded', () => {
 document.getElementById('message-input')?.addEventListener('keydown', event => {
   if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
   event.preventDefault();
-  const send = document.getElementById('send-button');
-  if (send && !send.disabled && event.target.value.trim()) event.target.form.requestSubmit();
+  const send = document.getElementById('send-button'), form = event.target.form;
+  if (!send || !event.target.value.trim()) return;
+  if (!send.disabled) { form.requestSubmit(); return; }
+  // The raven is still landing after a reply: send as soon as the composer is ready (not during a run).
+  if (!document.getElementById('stop')?.disabled) return;
+  const started = Date.now();
+  const timer = setInterval(() => {
+    if (!send.disabled) { clearInterval(timer); if (event.target.value.trim()) form.requestSubmit(); }
+    else if (Date.now() - started > 8000) clearInterval(timer);
+  }, 150);
 });

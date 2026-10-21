@@ -201,6 +201,105 @@ class UserWindow:
         return result
 
 
+BACKENDS = ('sol', 'openrouter', 'selfhosted')
+
+
+class ModelRegistry:
+    """Presets from models.json, reloaded when the file changes; CLI picks the default."""
+    def __init__(self, path, cli_preset=None, defaults=None):
+        self.path, self.cli_preset, self.defaults = Path(path), cli_preset, defaults or {}
+        self.mtime, self.data, self.override = object(), {}, None
+        self.lock = threading.Lock()
+        self.probes = {}
+        if cli_preset:
+            match = next((p for p in self.presets() if p['id'] != 'cli' and p['backend'] == cli_preset['backend']
+                          and p['model'] == cli_preset['model']
+                          and p.get('base_url') == cli_preset.get('base_url')), None)
+            self.override = match['id'] if match else cli_preset['id']
+            if match:
+                self.cli_preset = None
+
+    def presets(self):
+        with self.lock:
+            try:
+                mtime = self.path.stat().st_mtime
+            except FileNotFoundError:
+                mtime = None
+            if mtime != self.mtime:
+                self.mtime = mtime
+                try:
+                    data = json.loads(self.path.read_text()) if mtime else {}
+                    for preset in data.get('presets', []):
+                        if not preset.get('id') or preset.get('backend') not in BACKENDS or not preset.get('model'):
+                            raise ValueError(f'Invalid preset {preset!r}')
+                        if preset['backend'] == 'selfhosted' and not preset.get('base_url'):
+                            raise ValueError(f"Self-hosted preset {preset['id']} needs base_url")
+                    self.data = data
+                    LOG.info('Loaded %d model presets from %s', len(data.get('presets', [])), self.path)
+                except Exception:
+                    LOG.exception('Ignoring invalid %s; keeping previous presets', self.path)
+            presets = [dict(p) for p in self.data.get('presets', [])]
+        if self.cli_preset and all(p['id'] != self.cli_preset['id'] for p in presets):
+            presets.append(dict(self.cli_preset))
+        for preset in presets:
+            preset.setdefault('label', preset['model'])
+            for key, value in self.defaults.items():
+                if value is not None:
+                    preset.setdefault(key, value)
+        return presets
+
+    def get(self, preset_id):
+        return next((p for p in self.presets() if p['id'] == preset_id), None)
+
+    def default(self):
+        presets = self.presets()
+        for preset_id in (self.override, self.data.get('default')):
+            preset = next((p for p in presets if p['id'] == preset_id), None)
+            if preset:
+                return preset
+        return presets[0] if presets else None
+
+    def fallback(self):
+        return self.get(self.data.get('fallback') or 'gemini-flash')
+
+    def available(self, preset):
+        key = (preset['backend'], preset['model'], preset.get('base_url'))
+        cached = self.probes.get(key)
+        if cached and time.monotonic() - cached[0] < 10:
+            return cached[1]
+        if preset['backend'] == 'openrouter':
+            ok = bool(os.environ.get('OPENROUTER_API_KEY'))
+        elif preset['backend'] == 'sol':
+            import shutil
+            ok = shutil.which('pi') is not None
+        else:
+            import httpx
+            key_value = os.environ.get('SELF_HOSTED_API_KEY')
+            try:
+                ok = httpx.get(preset['base_url'].rstrip('/') + '/models', timeout=2, trust_env=False,
+                               headers={'Authorization': 'Bearer ' + key_value} if key_value else {}).is_success
+            except Exception:
+                ok = False
+        self.probes[key] = (time.monotonic(), ok)
+        return ok
+
+    def public(self, preset, availability=True):
+        row = {k: preset.get(k) for k in ('id', 'label', 'backend', 'model')}
+        if availability:
+            row['available'] = self.available(preset)
+        return row
+
+
+def episode_options(preset):
+    return dict(preset_id=preset['id'], label=preset['label'], model_backend=preset['backend'],
+                model=preset['model'], base_url=preset.get('base_url'),
+                openrouter_model=preset['model'] if preset['backend'] == 'openrouter' else None,
+                reasoning_effort=preset.get('reasoning_effort'), service_tier=preset.get('service_tier') or 'priority',
+                max_context=preset.get('max_context'),
+                max_total_input_tokens=preset.get('max_total_input_tokens'),
+                max_total_output_tokens=preset.get('max_total_output_tokens'))
+
+
 @dataclass
 class Run:
     run_id: str
@@ -219,6 +318,7 @@ class Run:
     attempt: int = 0
     retry_cursor: int = 0
     retry_requested: threading.Event = field(default_factory=threading.Event)
+    options: dict = field(default_factory=dict)
 
     def emit(self, event):
         with self.condition:
@@ -231,15 +331,61 @@ class Run:
 
 
 class Service:
-    def __init__(self, port, user_window=False, profile_dir=None, model_backend='sol', reasoning_effort='medium', service_tier='priority', windows_browser=False, demo_mode=False):
+    def __init__(self, port, user_window=False, profile_dir=None, model_backend=None, reasoning_effort=None, service_tier='priority', windows_browser=False, demo_mode=False,
+                 openrouter_model=OPENROUTER_MODEL, max_total_input_tokens=None, max_total_output_tokens=None,
+                 base_url=None, model=None, preset=None, models_file=None):
+        from dotenv import load_dotenv
+        load_dotenv('/home/bjorn/code/LLM_proj_uu/.env', override=False)
         self.port = port
         self.demo_mode = demo_mode
         self.runs = {}
+        self.conversations = {}
         self.lock = threading.RLock()
         self.window = UserWindow(port, profile_dir, windows_browser) if user_window or windows_browser else None
         self.context = mp.get_context('spawn')
-        self.options = dict(model_backend=model_backend, reasoning_effort=reasoning_effort, service_tier=service_tier)
-        self.model = OPENROUTER_MODEL if model_backend == 'openrouter' else MODEL
+        cli = None
+        if model_backend:
+            name = {'sol': MODEL, 'openrouter': openrouter_model}.get(model_backend) or model
+            if not name:
+                raise ValueError('--model is required with --model-backend selfhosted')
+            cli = dict(id='cli', label=name, backend=model_backend, model=name, base_url=base_url,
+                       reasoning_effort=reasoning_effort)
+        self.models = ModelRegistry(models_file or APP / 'models.json', cli, dict(
+            reasoning_effort=reasoning_effort, service_tier=service_tier,
+            max_total_input_tokens=max_total_input_tokens, max_total_output_tokens=max_total_output_tokens))
+        if preset:
+            if not self.models.get(preset):
+                raise ValueError('Unknown model preset ' + preset)
+            self.models.override = preset
+
+    @property
+    def options(self):
+        preset = self.models.default()
+        return episode_options(preset) if preset else {}
+
+    @property
+    def model(self):
+        return self.options.get('model')
+
+    def choose_model(self, payload):
+        """Fixed per conversation; an unavailable choice falls back with a visible notice."""
+        conversation = payload.get('conversation_id')
+        requested = self.conversations.get(conversation) or payload.get('model')
+        preset = self.models.get(requested) if requested else None
+        preset = preset or self.models.default()
+        if preset is None:
+            raise ValueError('No model presets are configured')
+        notice = None
+        if not self.models.available(preset):
+            fallback = self.models.fallback()
+            if fallback and fallback['id'] != preset['id'] and self.models.available(fallback):
+                name = 'Self-hosted model' if preset['backend'] == 'selfhosted' else preset['label']
+                notice = f"{name} unavailable — using {fallback['label']}"
+                LOG.warning('Model %s unavailable; falling back to %s', preset['id'], fallback['id'])
+                preset = fallback
+        if conversation:
+            self.conversations[conversation] = preset['id']
+        return preset, notice
 
     def submit(self, payload, scripted=None):
         with self.lock:
@@ -255,9 +401,19 @@ class Service:
                     raise ValueError('Start the backend with --user-window')
                 if any(not r.done and r.payload['mode'] == 'user_window' for r in self.runs.values()):
                     raise ValueError('The shared window already has an active task')
-            run = Run(uuid4().hex, payload)
+            if getattr(self, 'models', None) is not None:
+                preset, notice = self.choose_model(payload)
+                options = episode_options(preset)
+            else:  # Unit-test services built without a registry.
+                preset, notice, options = None, None, dict(getattr(self, 'test_options', {}))
+            run = Run(uuid4().hex, payload, options=options)
             self.runs[run.run_id] = run
             run.emit({'type': 'status', 'state': 'starting'})
+            if preset:
+                run.emit({'type': 'model', 'id': preset['id'], 'label': preset['label'], 'notice': notice,
+                          'conversation_id': payload.get('conversation_id')})
+            if notice:
+                run.emit({'type': 'step', 'summary': notice, 'index': 0})
             self.start_attempt(run, scripted)
             threading.Thread(target=self.collect, args=(run, run._events, scripted), daemon=True).start()
             return run
@@ -270,7 +426,7 @@ class Service:
         run.process = self.context.Process(target=episode_main, args=(dict(run.payload),
             str(output), run._events, run.controls,
             self.window.cdp_url if run.payload['mode'] in ('user_window', 'background_window') else None,
-            list(scripted) if scripted is not None else None, self.options))
+            list(scripted) if scripted is not None else None, run.options))
         run.process.start()
 
     @staticmethod
@@ -455,8 +611,12 @@ class Handler(preview.Handler):
         path = urlsplit(self.path).path
         service = self.server.service
         if path == '/api/health':
-            return self.json(dict(ok=True, model=service.model, demo_mode=service.demo_mode, **service.options,
+            return self.json(dict(service.options, ok=True, demo_mode=service.demo_mode,
                 modes=['background', 'user_window', 'background_window'] if service.window else ['background']))
+        if path == '/api/models':
+            default, fallback = service.models.default(), service.models.fallback()
+            return self.json(dict(default=default and default['id'], fallback=fallback and fallback['id'],
+                presets=[service.models.public(p) for p in service.models.presets()]))
         if path == '/api/worker-health':
             try:
                 return self.json(service.window.call('worker-health') if service.window else {'ok': False},
@@ -542,6 +702,12 @@ class Handler(preview.Handler):
                         raise ValueError('No pending handover for that tab')
                     run.controls.put({'action': 'handback', 'tab_id': data['tab_id'], 'note': data.get('note')})
                     return self.json({'ok': True})
+            if parts == ['api', 'model']:
+                if not service.models.get(data.get('id')):
+                    raise ValueError('Unknown model preset')
+                service.models.override = data['id']
+                LOG.info('Default model for new conversations: %s', data['id'])
+                return self.json({'ok': True, 'default': data['id']})
             if len(parts) == 4 and parts[:2] == ['api', 'tabs'] and parts[3] == 'focus':
                 service.focus(parts[2])
                 return self.json({'ok': True})
@@ -560,14 +726,28 @@ def main():
     parser.add_argument('--user-window', action='store_true')
     parser.add_argument('--windows-browser', action='store_true', help='Use native Windows Chrome for Testing for panel modes (implies --user-window)')
     parser.add_argument('--profile-dir', type=Path, help='Dedicated profile; Windows path when using --windows-browser')
-    parser.add_argument('--model-backend', choices=['sol', 'openrouter'], default='sol')
-    parser.add_argument('--reasoning-effort', choices=['low', 'medium', 'high', 'xhigh'], default='medium')
+    parser.add_argument('--model-backend', choices=list(BACKENDS),
+                        help='Default model backend (default: the "default" preset in apps/raven/models.json)')
+    parser.add_argument('--openrouter-model', default=OPENROUTER_MODEL,
+                        help='Any OpenRouter tool-calling model slug, used with --model-backend openrouter')
+    parser.add_argument('--openai-base-url', help='OpenAI-compatible endpoint for --model-backend selfhosted')
+    parser.add_argument('--model', help='Model name for --model-backend selfhosted')
+    parser.add_argument('--preset', help='Default preset id from apps/raven/models.json')
+    parser.add_argument('--models-file', type=Path, help='Preset registry (default apps/raven/models.json)')
+    parser.add_argument('--max-total-input-tokens', type=int,
+                        help='Per-episode cumulative input-token budget (default 4,000,000)')
+    parser.add_argument('--max-total-output-tokens', type=int,
+                        help='Per-episode cumulative output-token budget (default 60,000)')
+    parser.add_argument('--reasoning-effort', choices=['low', 'medium', 'high', 'xhigh'],
+                        help='Applies to presets without their own reasoning_effort')
     parser.add_argument('--service-tier', choices=['priority', 'default'], default='priority')
     args = parser.parse_args()
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     server.daemon_threads = True
     server.service = Service(args.port, args.user_window, args.profile_dir,
-        args.model_backend, args.reasoning_effort, args.service_tier, args.windows_browser, args.demo_mode)
+        args.model_backend, args.reasoning_effort, args.service_tier, args.windows_browser, args.demo_mode,
+        args.openrouter_model, args.max_total_input_tokens, args.max_total_output_tokens,
+        args.openai_base_url, args.model, args.preset, args.models_file)
     print(f'Raven: http://localhost:{args.port}/panel.html', flush=True)
     try:
         server.serve_forever()
