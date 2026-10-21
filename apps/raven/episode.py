@@ -472,6 +472,11 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
     def control_loop():
         while True:
             command = controls.get()
+            if command.get('action') == 'steer':
+                # Reaches the model as a user message right after its next tool call (HumanChat).
+                human_notes.put('Message from the user while you are working (it may change or add to the task; '
+                                'take it into account and continue): ' + command['text'])
+                continue
             if command.get('action') == 'handback' and controller:
                 try:
                     tab = next(t for t in controller.snapshot()['tabs'] if t['tab_id'] == command['tab_id'])

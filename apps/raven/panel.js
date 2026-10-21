@@ -44,13 +44,18 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(measurePerch, 500);
   // The send button doubles as Stop (a square) while Korp is working.
   const sendButton = document.querySelector('#send-button');
+  // While Korp works: Stop when the composer is empty, "Steer" (message without interrupting) when it has text.
+  const sendLabel = sendButton.querySelector('span'), fetchLabel = sendLabel.textContent;
   const syncStop = () => {
-    const running = !stop.disabled;
-    sendButton.dataset.stop = running ? '1' : '';
-    sendButton.title = running ? 'Stop' : '';
-    sendButton.setAttribute('aria-label', running ? 'Stop' : 'Send message');
+    const running = !stop.disabled, steering = running && !!c.input.value.trim();
+    sendButton.dataset.stop = running && !steering ? '1' : '';
+    sendButton.dataset.steer = steering ? '1' : '';
+    sendLabel.textContent = steering ? 'Steer \u2197' : fetchLabel;
+    sendButton.title = steering ? 'Send this to Korp without stopping it' : running ? 'Stop' : '';
+    sendButton.setAttribute('aria-label', steering ? 'Steer Korp' : running ? 'Stop' : 'Send message');
     if (running) sendButton.disabled = false;
   };
+  c.input.addEventListener('input', syncStop);
   // Thinking indicator inside the conversation (replaces the separate Ready/status line).
   let thinking = null, answered = false;
   window.ravenAnswered = () => { answered = true; thinking?.remove(); thinking = null;
@@ -96,10 +101,21 @@ window.addEventListener('DOMContentLoaded', () => {
     .observe(sendButton, {attributes: true, attributeFilter: ['disabled']});
   new MutationObserver(syncThinking).observe(status, {childList: true, characterData: true, subtree: true});
   sendButton.addEventListener('click', event => {
+    if (sendButton.dataset.steer === '1') { event.preventDefault(); event.stopImmediatePropagation(); steer(); return; }
     if (sendButton.dataset.stop !== '1') return;
     event.preventDefault(); event.stopImmediatePropagation(); stop.click();
   }, true);
   let run = null, stream = null, pendingTab = null, generation = 0;
+  // Steering: the message reaches the agent after its next tool call; the run continues.
+  const steer = () => {
+    const text = c.input.value.trim();
+    if (!text || !run) return;
+    fetch('/api/tasks/' + run + '/message', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text})}).catch(() => {});
+    c.appendMessage(text, 'You'); history.push({who: 'You', text});
+    c.input.value = ''; syncStop(); syncThinking();
+  };
+  window.ravenSteer = steer;
   // Flock mode: one helper raven per helper agent; it flies off when the main agent closes it.
   if (window.RavenFlock) c.flock = new window.RavenFlock({controller: c});
   const helperBirds = new Map();
@@ -311,6 +327,7 @@ document.getElementById('message-input')?.addEventListener('keydown', event => {
   event.preventDefault();
   const send = document.getElementById('send-button'), form = event.target.form;
   if (!send || !event.target.value.trim()) return;
+  if (send.dataset.steer === '1') { window.ravenSteer?.(); return; }  // a run is active: Enter steers it
   if (send.dataset.stop === '1') return;  // a run is active: the button is Stop, Enter must not stop or resend
   if (!send.disabled) { form.requestSubmit(); return; }
   // The raven is still landing after a reply: send as soon as the composer is ready (not during a run).

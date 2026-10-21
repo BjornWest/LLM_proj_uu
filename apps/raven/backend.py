@@ -122,6 +122,13 @@ class UserWindow:
                         ignore_default_args=['--disable-extensions'],
                         accept_downloads=False, service_workers='allow'))
                 page = self.context.pages[0] if self.context.pages else self.context.new_page()
+                try:
+                    # The persistent demo profile may hold app files cached by an older build.
+                    cache = self.context.new_cdp_session(page)
+                    cache.send('Network.clearBrowserCache')
+                    cache.detach()
+                except Exception:
+                    LOG.warning('Could not clear the demo browser cache', exc_info=True)
                 page.goto('https://example.com/')
                 from apps.raven.shared_browser import raven_worker
                 worker = raven_worker(self.context)
@@ -1002,6 +1009,15 @@ class Handler(preview.Handler):
                     return self.json(service.retry(run, int(data.get('after_event_id', 0))))
                 if parts[3] == 'cancel':
                     return self.json(service.cancel(run))
+                if parts[3] == 'message':
+                    # Steering: a message for the running agent, delivered after its next tool call.
+                    text = data.get('text')
+                    if not isinstance(text, str) or not text.strip():
+                        raise ValueError('Expected message text')
+                    if run.done:
+                        raise ValueError('That task has already finished')
+                    run.controls.put({'action': 'steer', 'text': text.strip()[:4000]})
+                    return self.json({'ok': True})
                 if parts[3] == 'handback':
                     tabs = run.controller.get('tabs', [])
                     tab = next((t for t in tabs if t['tab_id'] == data.get('tab_id')), None)
