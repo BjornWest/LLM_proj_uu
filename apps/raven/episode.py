@@ -122,6 +122,7 @@ def verification_policy(mode):
 # refreshing it and removed by the page itself ~15 s after the last step (no cleanup call needed).
 MARK_TAB_JS = r"""() => {
   const P = '\u{1F426}\u200D\u2B1B ';
+  if (location.protocol === 'about:') return;  // placeholder pages are not shown to the user
   window.__korpUntil = Date.now() + 15000;
   if (window.__korpObs) return;
   const fix = () => {
@@ -341,7 +342,10 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
                                'press': 'Pressing ' + str(args.get('key_comb') or 'a key') + (' in' + quoted if quoted else ''),
                                'select_option': 'Choosing ' + str(args.get('options', ''))[:60] + (' in' + quoted if quoted else ''),
                                }.get(name, summary)
-                emit('step', index=data.get('step', current_step), summary=summary[:240])
+                # Reads, memory and messages are not page interaction; the panel's raven takes off on the first that is.
+                page = not (name.startswith(('ax_', 'memory_')) or name in (
+                    'send_msg_to_user', 'handover_tab', 'noop', 'screenshot', 'report_infeasible'))
+                emit('step', index=data.get('step', current_step), summary=summary[:240], page=page)
             if kind == 'human_tab_transition':
                 t = data['transition']
                 if t.get('event') == 'resumed' and pacing['started'] is not None:

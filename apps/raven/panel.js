@@ -105,7 +105,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const button = document.createElement('button');
       if(mode.value === 'background_window' ? tab.owner !== 'agent' : (tab.owner === 'agent' && !tab.focus_id)) continue;
       let site;try {site=new URL(tab.url);} catch {}
-      button.textContent = site?.hostname.replace(/^www\./,'') || tab.title || 'New tab';
+      button.textContent = site?.hostname.replace(/^www\./,'') || (tab.title || '').replace(/^\u{1F426}\u200D\u2B1B\s*/u, '') || 'New tab';
       if (site && ['http:','https:'].includes(site.protocol)) {
         const icon=document.createElement('img');icon.src=tab.favicon || site.origin+'/favicon.ico';icon.alt='';icon.width=14;icon.height=14;icon.onerror=()=>icon.remove();button.prepend(icon);
       }
@@ -119,17 +119,51 @@ window.addEventListener('DOMContentLoaded', () => {
   c.input.placeholder = 'Ask Korp to explore the web…';
   c.updateHint = () => {};
   c.countdown.textContent = 'Your shared browser';
+  // The raven stays perched, thinking, until Korp first acts on a page; a reply that comes first
+  // (e.g. a follow-up question) is given from the perch without a flight.
   const originalLaunch = c.launch.bind(c);
-  c.launch = function(replyMs) {
-    originalLaunch(replyMs);
-    if(c.agentReply)c.reply();
+  let held = null, flying = false;
+  const thought = document.createElement('div');
+  thought.className = 'thought'; thought.hidden = true; thought.setAttribute('aria-hidden', 'true');
+  thought.innerHTML = '<i></i><i></i><b></b>';
+  document.querySelector('#chat-scene').append(thought);
+  const birdCanvas = document.querySelector('#raven-canvas');
+  const placeThought = () => {
+    if (held === null) { thought.hidden = true; return; }
+    if (c.head) {
+      thought.hidden = false;
+      thought.style.left = (birdCanvas.offsetLeft + c.head.x) + 'px';
+      thought.style.top = (birdCanvas.offsetTop + c.head.y) + 'px';
+    }
+    requestAnimationFrame(placeThought);
   };
+  const answerFromPerch = () => {
+    held = null;
+    const message = c.agentReply.markdown;
+    c.appendMessage(message, 'Korp', {sources: c.agentReply.sources || []});
+    c.scene.dispatchEvent(new CustomEvent('raven-chat-reply', {detail: {message}, bubbles: true}));
+    c.land(performance.now());
+  };
+  const takeOff = () => {
+    flying = true;
+    if (held === null) return;
+    const replyMs = held; held = null;
+    originalLaunch(replyMs);
+    if (c.agentReply) c.reply();
+  };
+  c.launch = function(replyMs) {
+    if (flying) { originalLaunch(replyMs); if (c.agentReply) c.reply(); return; }
+    held = replyMs; requestAnimationFrame(placeThought);
+    if (c.agentReply) answerFromPerch();
+  };
+  const originalCancel = c.cancelTask.bind(c);
+  c.cancelTask = function(options) { held = null; flying = false; return originalCancel(options); };
   const originalStart = c.start.bind(c);
   c.start = function(options) {
     if (run) return false;
     const text = c.input.value.trim();
     const prior = history.slice();
-    c.agentReply = null;
+    c.agentReply = null; held = null; flying = false;
     if (!originalStart(options)) return false;
     history.push({who:'You', text});
     steps.reset();mode.disabled=true;
@@ -146,6 +180,7 @@ window.addEventListener('DOMContentLoaded', () => {
         steps.event(e);
         if (e.type === 'status') status.textContent = {starting:'Starting research…',working:'Researching…',finishing:'Preparing your answer…'}[e.state] || 'Researching…';
         if (e.type === 'step' || e.type === 'activity') status.textContent = e.summary;
+        if (e.type === 'step' && e.page) takeOff();
         if (e.type === 'reasoning') window.ravenReasoning?.(e.text);
         if (e.type === 'note') window.ravenNote?.(e.text);
         if (e.type === 'site') {
@@ -160,7 +195,7 @@ window.addEventListener('DOMContentLoaded', () => {
           handovers.set(e.tab_id,e.message);showHandover();
         }
         if (e.type === 'final') {
-          c.agentReply=e;c.reply();history.push({who:'Korp',text:e.markdown});
+          c.agentReply=e;if(held!==null)answerFromPerch();else c.reply();history.push({who:'Korp',text:e.markdown});
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{status:'complete'}}));
         }
         if (e.type === 'error') {
