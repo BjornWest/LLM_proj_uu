@@ -67,7 +67,7 @@
         this.course=this.clip('patrol').poses.map((p,i)=>p.path||{x:path.screen[i][0]/256,y:path.screen[i][1]/256});
         this.courseBounds={left:Math.min(...this.course.map(p=>p.x)),right:Math.max(...this.course.map(p=>p.x)),top:Math.min(...this.course.map(p=>p.y)),bottom:Math.max(...this.course.map(p=>p.y))};
         if(!this.live){
-          const library=await import('./raven-live-v38.js?'+CACHE_QUERY);
+          const library=await import('./raven-live-v42.js?'+CACHE_QUERY);  // v42 = v38 + renderBatch (helper ravens)
           const factory=library.RavenLive||window.RavenLive||library.default;
           this.live=await factory.load({canvas:this.canvas,url:'live-raven-v34.json?'+CACHE_QUERY});
         }
@@ -109,6 +109,7 @@
       const area=this.geometry.sky;this.geometry.director={left:area.left,top:area.top,width:area.width,height:area.height,scale:flightScale,pad:2,topPad:0,preferredSideWidth:70};
       if(this.director){this.director.configure(this.geometry.director);if(!this.director.blocked){this.geometry.flightScale=this.director.geometry.scale;this.configureEntrance(true);}}
       if(this.director&&this.diveStartClock!==null&&this.diveStartWorld){this.diveStartPoint=this.director.project(this.diveStartWorld);this.diveStartDepthScale=this.director.depthScale(this.diveStartWorld.z);}
+      this.flock?.resize();
       this.live?.resize?.(this.geometry.width,this.geometry.height,this.geometry.ratio);this.soundCanvas.width=Math.max(1,Math.round(this.geometry.width*this.geometry.ratio));this.soundCanvas.height=Math.max(1,Math.round(this.geometry.height*this.geometry.ratio));this.dirtyRect=null;this.lastDrawKey='';if(this.ready)this.draw(performance.now(),true);
       if(this.guideCanvas){this.guideCanvas.width=Math.max(1,Math.round(area.width*this.geometry.ratio));this.guideCanvas.height=Math.max(1,Math.round(area.height*this.geometry.ratio));this.guideLast=null;this.drawGuides(performance.now(),true);}
     }
@@ -384,7 +385,8 @@
       const attention=sample.clip==='idle'&&!this.motion.matches?this.attentionFrame(this.motionClock,sample):null;
       const old=sample.blendFrom,blendFrom=old?{...old,frame:this.nativeFrame(old.clip,old.frame),size:this.cellSize(this.pose(old.clip,old.frame),this.scaleFor(old.clip,old.frame,old)),anchor:old.anchor||'root'}:null;
       try{
-        const result=this.live.render({clip:sample.clip,frame:this.nativeFrame(sample.clip,sample.frame),attentionPose:attention===null?null:this.headPose.slice(),flightRotation:sample.flightRotation,petHeadPose:sample.petHeadPose,petStartBlink:sample.petStartBlink,petIdleFrame:sample.petIdleFrame,blink:this.motionClock<this.blinkUntil,size,anchor:sample.anchor,point:sample.point,darker:this.darker.checked,blendFrom,blendWeight:sample.blendWeight??1});
+        const options={clip:sample.clip,frame:this.nativeFrame(sample.clip,sample.frame),attentionPose:attention===null?null:this.headPose.slice(),flightRotation:sample.flightRotation,petHeadPose:sample.petHeadPose,petStartBlink:sample.petStartBlink,petIdleFrame:sample.petIdleFrame,blink:this.motionClock<this.blinkUntil,size,anchor:sample.anchor,point:sample.point,darker:this.darker.checked,blendFrom,blendWeight:sample.blendWeight??1};const helpers=this.flock?.samples(this.motionClock)||[];
+        const result=helpers.length&&this.live.renderBatch?this.live.renderBatch([options,...helpers])[0]:this.live.render(options);this.canvas.dataset.helperCount=String(helpers.length);
         const anchor=this.anchor(pose,sample.anchor),x=sample.point.x-anchor.x*size,y=sample.point.y-anchor.y*size,box=result?.bounds||pose.bounds;
         this.drawBounds=result?.bounds?{x:box.left,y:box.top,width:box.right-box.left,height:box.bottom-box.top,size}:{x:x+box.left*size,y:y+box.top*size,width:(box.right-box.left)*size,height:(box.bottom-box.top)*size,size};
         if(sample.clip==='pet'&&result?.pose.headTilt)this.headPose=result.pose.headTilt.slice();this.head=result?.markers?.head||{x:x+pose.head.x*size,y:y+pose.head.y*size,size};

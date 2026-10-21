@@ -65,8 +65,9 @@ class UserWindow:
         if not self.cdp_url:
             raise RuntimeError('Shared Chromium did not start')
 
-    def new_background_window(self, page):
-        """(Re)create the minimized agent window used by "Work in background window"."""
+    def new_background_window(self, page, keep_others=False):
+        """(Re)create the minimized agent window used by "Work in background window"
+        (keep_others: an additional window for a flock helper; returns its context)."""
         session = self.browser.new_browser_cdp_session()
         before = set(session.send('Target.getBrowserContexts')['browserContextIds'])
         background = self.browser.new_context(accept_downloads=False, service_workers='block', no_viewport=True)
@@ -87,6 +88,9 @@ class UserWindow:
             'left':-32000, 'top':-32000, 'width':1440, 'height':1000}})
         session.send('Browser.setWindowBounds', {'windowId':window_id, 'bounds':{'windowState':'minimized'}})
         session.detach()
+        if keep_others:
+            self.helper_contexts[self.background_target] = background
+            return background
         for old in self.background_contexts:
             try:
                 old.close()
@@ -142,6 +146,7 @@ class UserWindow:
                 # user's window is presented. WSL can focus newly mapped windows
                 # even when Target.createTarget requests background:true.
                 self.background_contexts = []
+                self.helper_contexts = {}
                 self.new_background_window(page)
                 blank = ('about:blank', 'chrome://newtab/', 'chrome://new-tab-page/')
                 page.wait_for_timeout(1500)  # the side panel/welcome flow can still open a default tab
@@ -181,11 +186,22 @@ class UserWindow:
                                 self.new_background_window(self.context.pages[0])
                                 pages = self.background_contexts[0].pages
                             response.put(target_id(pages[0].context, pages[0]))
+                        elif action == 'helper_window':
+                            self.new_background_window(self.context.pages[0], keep_others=True)
+                            response.put(self.background_target)
+                        elif action == 'helper_tab':
+                            tab = self.context.new_page()
+                            response.put(target_id(self.context, tab))
+                        elif action == 'close_helper_window':
+                            helper = self.helper_contexts.pop(data, None)
+                            if helper is not None:
+                                helper.close()
+                            response.put(True)
                         elif action == 'tabs':
                             from apps.raven.shared_browser import active_target
                             active = active_target(self.context)
                             rows = []
-                            for c in [self.context, *self.background_contexts]:
+                            for c in [self.context, *self.background_contexts, *self.helper_contexts.values()]:
                               for p in c.pages:
                                 # The agent window's idle placeholder is not a page anyone visited.
                                 if p.is_closed() or p.url.startswith('chrome-extension:') or (
@@ -200,7 +216,7 @@ class UserWindow:
                                         raise
                             response.put(rows)
                         elif action == 'focus':
-                            for p in [p for c in [self.context, *self.background_contexts] for p in c.pages]:
+                            for p in [p for c in [self.context, *self.background_contexts, *self.helper_contexts.values()] for p in c.pages]:
                                 if target_id(p.context, p) == data:
                                     session = p.context.new_cdp_session(p)
                                     wid = session.send('Browser.getWindowForTarget')['windowId']
@@ -426,13 +442,17 @@ class Service:
     def submit(self, payload, scripted=None):
         with self.lock:
             payload = dict(payload)
-            if payload['mode'] == 'background_window':
+            if payload.get('_helper_of'):
+                # Flock helpers get their own tab/window; the one-task-per-mode rule is for user tasks.
+                payload['_background_target'] = self.window.call(
+                    'helper_tab' if payload['mode'] == 'user_window' else 'helper_window')
+            elif payload['mode'] == 'background_window':
                 if not self.window:
                     raise ValueError('Start the backend with --user-window')
                 if any(not r.done and r.payload['mode'] == 'background_window' for r in self.runs.values()):
                     raise ValueError('The background window already has an active task')
                 payload['_background_target'] = self.window.call('background')
-            if payload['mode'] == 'user_window':
+            if payload['mode'] == 'user_window' and not payload.get('_helper_of'):
                 if not self.window:
                     raise ValueError('Start the backend with --user-window')
                 if any(not r.done and r.payload['mode'] == 'user_window' for r in self.runs.values()):
@@ -443,6 +463,7 @@ class Service:
             else:  # Unit-test services built without a registry.
                 preset, notice, options = None, None, dict(getattr(self, 'test_options', {}))
             run = Run(uuid4().hex, payload, options=options)
+            payload.update(_run_id=run.run_id, _port=self.port)  # flock host tools call back into this service
             self.runs[run.run_id] = run
             run.emit({'type': 'status', 'state': 'starting'})
             if preset:
@@ -530,6 +551,8 @@ class Service:
                         break
                     if event['type'] == 'final':
                         answered = True
+                    if run.payload.get('_helper_of'):
+                        self.flock_helper_event(run, event)
                     if event['type'] == 'handover' and run.payload['mode'] == 'background_window':
                         try:
                             self.focus(run.run_id + ':' + event['tab_id'])
@@ -577,6 +600,163 @@ class Service:
                 run.emit({'type': 'error', 'message': FRIENDLY_ERROR if demo else failure})
                 run.emit({'type': 'done', 'stop_reason': 'error'})
             return
+
+    # --- Flock: helper agents of a main Korp episode (see apps/raven/flock.py) ---
+    def flock_state(self):
+        if not hasattr(self, '_flock'):
+            self._flock, self._flock_inbox, self._flock_cond = {}, {}, threading.Condition()
+        return self._flock, self._flock_inbox, self._flock_cond
+
+    def flock_spawn(self, parent_id, task, name, window):
+        from apps.raven.flock import MAX_HELPERS
+        helpers, inbox, cond = self.flock_state()
+        parent = self.runs.get(parent_id)
+        if not parent or parent.done or not parent.payload.get('flock'):
+            raise ValueError('Unknown or finished main agent')
+        if window not in ('new_window', 'this_window'):
+            raise ValueError('window must be new_window or this_window')
+        if sum(1 for h in helpers.values() if h['parent'] == parent_id and not h['closed']) >= MAX_HELPERS:
+            return {'error': f'At most {MAX_HELPERS} helpers at a time; close one first.'}
+        run = self.submit({'text': task, 'mode': 'user_window' if window == 'this_window' else 'background_window',
+                           'conversation_id': parent.payload.get('conversation_id'), 'history': [],
+                           '_helper_of': parent_id, '_helper_name': name})
+        with cond:
+            helpers[run.run_id] = dict(parent=parent_id, name=name, window=window, state='working',
+                                       closed=False, replies=[], target=run.payload.get('_background_target'))
+            inbox.setdefault(parent_id, [])
+        parent.emit({'type': 'helper', 'action': 'spawned', 'id': run.run_id, 'name': name, 'window': window})
+        LOG.info('Flock: %s spawned helper %s (%s, %s)', parent_id, run.run_id, name, window)
+        if not getattr(parent, '_flock_watch', False):
+            parent._flock_watch = True
+            threading.Thread(target=self.flock_watch, args=(parent,), daemon=True).start()
+        return {'helper_id': run.run_id, 'name': name, 'state': 'working'}
+
+    def flock_helper_event(self, run, event):
+        helpers, inbox, cond = self.flock_state()
+        helper = helpers.get(run.run_id)
+        parent = self.runs.get(run.payload['_helper_of'])
+        if not helper or not parent:
+            return
+        if event['type'] == 'step' and event.get('summary'):
+            parent.emit({'type': 'helper', 'action': 'step', 'id': run.run_id, 'summary': event['summary']})
+        if event['type'] == 'final' and not helper['closed']:
+            # A helper that answered with send_msg_to_user has finished: its answer is its report.
+            self.flock_to_main(run.run_id, event.get('markdown', ''), final=True)
+
+    def flock_to_main(self, helper_id, text, final=False):
+        helpers, inbox, cond = self.flock_state()
+        with cond:
+            helper = helpers.get(helper_id)
+            if not helper or helper['closed']:
+                return {'error': 'This conversation has ended'}
+            helper['state'] = 'finished' if final else 'waiting'
+            inbox.setdefault(helper['parent'], []).append(
+                {'helper_id': helper_id, 'name': helper['name'], 'text': text, 'finished': final})
+            cond.notify_all()
+        parent = self.runs.get(helper['parent'])
+        if parent:
+            parent.emit({'type': 'helper', 'action': 'reported', 'id': helper_id, 'name': helper['name']})
+        return {'ok': True}
+
+    def flock_wait_reply(self, helper_id, timeout):
+        helpers, inbox, cond = self.flock_state()
+        deadline = time.monotonic() + min(float(timeout), 120)
+        with cond:
+            while True:
+                helper = helpers.get(helper_id)
+                if not helper:
+                    return {'error': 'Unknown helper'}
+                if helper['closed']:
+                    return {'closed': True, 'instruction': 'The main agent ended this conversation. Stop.'}
+                if helper['replies']:
+                    helper['state'] = 'working'
+                    return {'reply': helper['replies'].pop(0)}
+                left = deadline - time.monotonic()
+                if left <= 0:
+                    return {'pending': True}
+                cond.wait(left)
+
+    def flock_status(self, parent_id):
+        helpers, _, _ = self.flock_state()
+        rows = []
+        for hid, h in helpers.items():
+            if h['parent'] == parent_id:
+                run = self.runs.get(hid)
+                state = 'closed' if h['closed'] else ('stopped' if run and run.done and h['state'] == 'working'
+                                                      else h['state'])
+                rows.append({'helper_id': hid, 'name': h['name'], 'state': state})
+        return rows
+
+    def flock_wait_main(self, parent_id, timeout):
+        helpers, inbox, cond = self.flock_state()
+        deadline = time.monotonic() + min(float(timeout), 120)
+        with cond:
+            while True:
+                messages = inbox.get(parent_id) or []
+                active = [r for r in self.flock_status(parent_id) if r['state'] == 'working']
+                if messages or not active or time.monotonic() >= deadline:
+                    inbox[parent_id] = []
+                    result = {'messages': messages, 'helpers': self.flock_status(parent_id)}
+                    if not messages and not active:
+                        result['note'] = 'No helper is working; message or close the paused ones.'
+                    return result
+                cond.wait(min(1.0, max(0.05, deadline - time.monotonic())))
+
+    def flock_message(self, parent_id, helper_id, text):
+        helpers, inbox, cond = self.flock_state()
+        with cond:
+            helper = helpers.get(helper_id)
+            if not helper or helper['parent'] != parent_id:
+                return {'error': 'Unknown helper of this agent'}
+            run = self.runs.get(helper_id)
+            if helper['closed'] or helper['state'] == 'finished' or (run and run.done):
+                return {'error': 'That helper has finished; spawn a new helper for more work.'}
+            helper['replies'].append(text)
+            cond.notify_all()
+        parent = self.runs.get(parent_id)
+        if parent:
+            parent.emit({'type': 'helper', 'action': 'resumed', 'id': helper_id})
+        return {'ok': True, 'state': 'working'}
+
+    def flock_close(self, parent_id, helper_id):
+        helpers, inbox, cond = self.flock_state()
+        with cond:
+            helper = helpers.get(helper_id)
+            if not helper or helper['parent'] != parent_id:
+                return {'error': 'Unknown helper of this agent'}
+            if helper['closed']:
+                return {'ok': True, 'state': 'closed'}
+            helper['closed'] = True
+            cond.notify_all()
+        parent = self.runs.get(parent_id)
+        if parent:
+            parent.emit({'type': 'helper', 'action': 'closed', 'id': helper_id})
+        threading.Thread(target=self.flock_retire, args=(helper_id,), daemon=True).start()
+        return {'ok': True, 'state': 'closed'}
+
+    def flock_retire(self, helper_id):
+        """Stop the helper's episode and close its own window (tabs in the user's window stay)."""
+        helpers, _, _ = self.flock_state()
+        time.sleep(1.5)  # let a paused message_main_agent call observe the close
+        run = self.runs.get(helper_id)
+        if run:
+            self.cancel(run)
+        helper = helpers.get(helper_id)
+        if helper and helper['window'] == 'new_window' and helper.get('target') and self.window:
+            try:
+                self.window.call('close_helper_window', helper['target'])
+            except Exception:
+                LOG.exception('Could not close helper window')
+
+    def flock_watch(self, parent):
+        """Retire every helper when its main agent finishes or is cancelled."""
+        with parent.condition:
+            while not parent.done:
+                parent.condition.wait(1)
+        helpers, _, _ = self.flock_state()
+        for hid, h in list(helpers.items()):
+            if h['parent'] == parent.run_id and not h['closed']:
+                self.flock_close(parent.run_id, hid)
 
     def cancel(self, run):
         with run.condition:
@@ -762,8 +942,13 @@ class Handler(preview.Handler):
         try:
             data = json.loads(self.rfile.read(int(self.headers.get('Content-Length', '0'))) or '{}')
             if parts == ['api', 'tasks']:
-                if not isinstance(data.get('text'), str) or not data['text'].strip() or data.get('mode') not in ('background', 'user_window', 'background_window'):
-                    raise ValueError('Expected text and mode background, user_window or background_window')
+                if not isinstance(data.get('text'), str) or not data['text'].strip() or data.get('mode') not in ('background', 'user_window', 'background_window', 'flock'):
+                    raise ValueError('Expected text and mode background, user_window, background_window or flock')
+                data = {k: v for k, v in data.items() if not k.startswith('_')}  # internal keys are server-set
+                if data['mode'] == 'flock':  # the main agent works in the user's window and may spawn helpers
+                    data.update(mode='user_window', flock=True)
+                else:
+                    data.pop('flock', None)
                 run = service.submit(data)
                 return self.json({'run_id': run.run_id})
             if len(parts) == 4 and parts[:2] == ['api', 'tasks']:
@@ -781,6 +966,20 @@ class Handler(preview.Handler):
                         raise ValueError('No pending handover for that tab')
                     run.controls.put({'action': 'handback', 'tab_id': data['tab_id'], 'note': data.get('note')})
                     return self.json({'ok': True})
+            if len(parts) == 3 and parts[:2] == ['api', 'flock']:
+                action = parts[2]
+                if action == 'spawn':
+                    return self.json(service.flock_spawn(data['parent'], str(data['task']), str(data['name'])[:40], data['window']))
+                if action == 'to_main':
+                    return self.json(service.flock_to_main(data['helper'], str(data['text'])))
+                if action == 'wait_reply':
+                    return self.json(service.flock_wait_reply(data['helper'], data.get('timeout_seconds', 60)))
+                if action == 'wait_main':
+                    return self.json(service.flock_wait_main(data['parent'], data.get('timeout_seconds', 60)))
+                if action == 'message':
+                    return self.json(service.flock_message(data['parent'], data['helper'], str(data['text'])))
+                if action == 'close':
+                    return self.json(service.flock_close(data['parent'], data['helper']))
             if parts == ['api', 'model']:
                 if not service.models.get(data.get('id')):
                     raise ValueError('Unknown model preset')

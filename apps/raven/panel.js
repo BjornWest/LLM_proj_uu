@@ -100,6 +100,19 @@ window.addEventListener('DOMContentLoaded', () => {
     event.preventDefault(); event.stopImmediatePropagation(); stop.click();
   }, true);
   let run = null, stream = null, pendingTab = null, generation = 0;
+  // Flock mode: one helper raven per helper agent; it flies off when the main agent closes it.
+  if (window.RavenFlock) c.flock = new window.RavenFlock({controller: c});
+  const helperBirds = new Map();
+  const flockEvent = e => {
+    if (e.action === 'spawned') {
+      const bird = c.flock?.spawn();
+      if (bird) helperBirds.set(e.id, bird);
+      window.ravenNote?.('Sent out a helper: ' + e.name);
+    }
+    if (e.action === 'reported') window.ravenNote?.(e.name + ' reported back');
+    if (e.action === 'closed') { c.flock?.dismiss(helperBirds.get(e.id)); helperBirds.delete(e.id); }
+  };
+  const dismissHelpers = () => { for (const bird of helperBirds.values()) c.flock?.dismiss(bird); helperBirds.clear(); };
   const post = async (url, body = {}) => {
     await window.ravenTransport.ready;
     const r = await fetch(url, {method: 'POST', headers: {'Content-Type':'application/json'}, body:JSON.stringify(body)});
@@ -200,6 +213,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (e.type === 'step' && e.page) takeOff();
         if (e.type === 'reasoning') window.ravenReasoning?.(e.text);
         if (e.type === 'note') window.ravenNote?.(e.text);
+        if (e.type === 'helper') flockEvent(e);
         if (e.type === 'site') {
           const tab=tabs.get(e.tab_id);if(tab){Object.assign(tab,{url:e.url,title:e.title,favicon:e.favicon});drawTabs();}
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{url:e.url,label:e.title}}));
@@ -220,7 +234,7 @@ window.addEventListener('DOMContentLoaded', () => {
           status.textContent=window.ravenTransport.errorMessage(e);c.cancelTask({announce:false});c.appendMessage(status.textContent,'Korp');if(window.ravenTransport.demoMode)status.textContent='Ready';
         }
         if (e.type === 'done') {
-          steps.stop();mode.disabled=false;
+          steps.stop();mode.disabled=false;dismissHelpers();
           stream.close();stream=null;run=null;stop.disabled=true;handovers.clear();showHandover();
           status.textContent=window.ravenTransport.demoMode ? (e.stop_reason === 'cancelled' ? 'Stopped' : 'Ready') : e.stop_reason === 'cancelled' ? 'Stopped' : e.stop_reason === 'agent_finished' ? 'Ready' : "I couldn't finish that: "+({max_total_input_tokens:'the research budget was reached',max_total_output_tokens:'the answer budget was reached',max_input_tokens:'the conversation became too long',error:'please try again'}[e.stop_reason] || 'the task ended before an answer was ready');
           if(!c.agentReply){
@@ -241,7 +255,7 @@ window.addEventListener('DOMContentLoaded', () => {
     return true;
   };
   stop.onclick = async () => {
-    steps.stop();mode.disabled=false;
+    steps.stop();mode.disabled=false;dismissHelpers();
     generation++;
     const id=run;run=null;stream?.close();stream=null;stop.disabled=true;handovers.clear();showHandover();
     const cancelled = id ? post('/api/tasks/'+id+'/cancel') : Promise.resolve();

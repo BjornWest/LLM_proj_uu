@@ -325,7 +325,11 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
                     'tab_close':'Closing a tab', 'tab_focus':'Switching tabs',
                     'handover_tab':'Asking for your help', 'noop':'Waiting for the page',
                     'memory_read':'Checking your saved preferences', 'memory_update':'Remembering a preference',
-                    'memory_delete':'Forgetting a preference'}.get(name, 'Reviewing the page')
+                    'memory_delete':'Forgetting a preference', 'spawn_helper':'Sending out a helper',
+                    'wait_for_helpers':'Waiting for the helpers', 'message_helper':'Replying to a helper',
+                    'close_helper':'Calling a helper back', 'message_main_agent':'Reporting back'}.get(name, 'Reviewing the page')
+                if name == 'spawn_helper':
+                    summary = 'Sending out a helper: ' + str(args.get('name', ''))[:60]
                 if name in ('memory_update', 'memory_delete'):
                     memory_calls[data.get('call_id')] = (name, dict(args))
                 if args.get('url'):
@@ -344,7 +348,8 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
                                }.get(name, summary)
                 # Reads, memory and messages are not page interaction; the panel's raven takes off on the first that is.
                 page = not (name.startswith(('ax_', 'memory_')) or name in (
-                    'send_msg_to_user', 'handover_tab', 'noop', 'screenshot', 'report_infeasible'))
+                    'send_msg_to_user', 'handover_tab', 'noop', 'screenshot', 'report_infeasible',
+                    'spawn_helper', 'wait_for_helpers', 'message_helper', 'close_helper', 'message_main_agent'))
                 emit('step', index=data.get('step', current_step), summary=summary[:240], page=page)
             if kind == 'human_tab_transition':
                 t = data['transition']
@@ -530,6 +535,19 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         memory = MemoryStore()
         profile = with_memory(profile)
         profile = replace(profile, instructions=profile.instructions + '\n' + MEMORY_POLICY)
+    flock_client = None
+    if payload.get('flock') or payload.get('_helper_of'):
+        from apps.raven import flock
+        main = bool(payload.get('flock'))
+        profile = replace(profile, tools=replace(profile.tools, host_tools=flock.MAIN_TOOLS if main else flock.HELPER_TOOLS),
+            instructions=profile.instructions + '\n' + (flock.MAIN_POLICY if main else
+                flock.HELPER_POLICY % payload.get('_helper_name', 'helper')))
+        def pump():
+            try:
+                env_holder[0].page.wait_for_timeout(200)  # dispatches this agent's route handlers
+            except Exception:
+                _time.sleep(0.2)
+        flock_client = flock.FlockClient(payload['_port'], payload['_run_id'], emit, pump)
     now = datetime.now(timezone.utc)  # UTC: no place or local time zone (location comes from memory)
     # Last line of the system message, so relative dates ("tomorrow", "this weekend") resolve.
     profile = replace(profile, instructions=profile.instructions +
@@ -692,6 +710,7 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
             max_input_tokens=budgets['request_input'], input_counter=input_counter,
             max_total_input_tokens=budgets['total_input'], max_total_output_tokens=budgets['total_output'],
             allow_ungraded=True, ungraded_reason='Raven supervised live-web demo', memory_adapter=memory,
+            host_tool_handler=flock_client,
             terminal_response_instruction='Answer the user with findings, Markdown source links and uncertainties using send_msg_to_user.')
         emit('status', state='finishing')
         # The authoritative BrowserGym chat also handles batched terminal actions.

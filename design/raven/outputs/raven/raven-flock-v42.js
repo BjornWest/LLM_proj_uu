@@ -170,9 +170,20 @@
         point: {x, y: clamp(top + row * size * .4, top, Math.max(top, bottom))}}, scale);
     }
 
+    /* Fly one helper off the edge it is heading for, then remove it. */
+    dismiss(bird) {
+      if (!bird || bird.leaving || !this.birds.includes(bird)) return;
+      bird.leaving = {clock: this.controller.motionClock};
+      if (this.controller.motion?.matches) bird.leaving.done = true;
+    }
+
     samples(clock = this.controller.motionClock) {
       if (this.disposed || !this.controller.ready) return [];
       const reduced = !!this.controller.motion?.matches;
+      if (this.birds.some(bird => bird.leaving?.done)) {
+        this.birds = this.birds.filter(bird => !bird.leaving?.done);
+        this.updateControls();
+      }
       return this.birds.map((bird, index) => {
         const now = Math.max(bird.lastClock, Number.isFinite(clock) ? clock : bird.lastClock);
         // Resume the same flight phase if reduced motion is toggled off.
@@ -186,6 +197,20 @@
           depthScale: e.depthScale, flightRotation: e.flightRotation,
           point: cubic(e.from, e.first, e.second, e.target, clamp(elapsed / e.durationMs))
         } : bird.director.sample(elapsed - e.durationMs);
+        const leaving = bird.leaving;
+        if (leaving) {
+          if (!leaving.from) {
+            const before = elapsed - 60 < e.durationMs ? null : bird.director.sample(elapsed - 60 - e.durationMs);
+            const dx = before ? sample.point.x - before.point.x : e.velocity.x;
+            leaving.from = {...sample.point};
+            leaving.side = dx < 0 ? -1 : 1;
+          }
+          const t = clamp((now - leaving.clock) / 1400), width = this.controller.geometry.width;
+          const to = {x: leaving.side > 0 ? width + 140 : -140, y: leaving.from.y - 50};
+          const ease = t * t;
+          sample.point = {x: leaving.from.x + (to.x - leaving.from.x) * ease, y: leaving.from.y + (to.y - leaving.from.y) * ease};
+          if (t >= 1) leaving.done = true;
+        }
         return this.renderOptions(sample, bird.director.geometry.scale);
       });
     }

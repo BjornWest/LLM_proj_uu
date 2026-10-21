@@ -70,7 +70,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 delegated_instructions=None, delegated_goal=None, decision_wait=None,
                 max_input_tokens=None, input_counter=None,
                 max_total_input_tokens=None, max_total_output_tokens=None,
-                clarification_callback=None, clarification_audit_id=None, memory_adapter=None,
+                clarification_callback=None, clarification_audit_id=None, memory_adapter=None, host_tool_handler=None,
                 site_discovery=None, site_discovery_audit_id=None,
                 observation_pipeline="auto", human_handover=None, human_handover_ui=None,
                 trace_screenshots=None, async_recording=True, debug_timings=None,
@@ -215,6 +215,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     elif site_discovery is not None or site_discovery_audit_id is not None:
         raise ValueError('Site discovery callback requires an opt-in tool profile')
     discovery_session = None
+    host_tools = tuple(getattr(getattr(harness_profile, 'tools', None), 'host_tools', ()) or ())
+    if bool(host_tools) != (host_tool_handler is not None):
+        raise ValueError('Host tools and host_tool_handler are both required')
     memory_enabled = bool(harness_profile and getattr(harness_profile.tools,'memory_tools',False))
     if memory_enabled != (memory_adapter is not None):
         raise ValueError('Memory adapter and opt-in memory profile are both required')
@@ -705,7 +708,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
 
         def present_feedback(value,event,kind):
             with trace.timings.span('feedback.presentation',step=event['step'],kind=kind):
-                if kind in ("vision_result", "data_result", "clarification_result", "human_tab_result", "memory_result", "site_discovery_result"): return value
+                if kind in ("vision_result", "data_result", "clarification_result", "human_tab_result", "memory_result", "site_discovery_result", "host_tool_result"): return value
                 if harness_profile and harness_profile.feedback_presentation:
                     artifact=f"{kind}-raw-{event.get('execution_index',event['step']):03d}.json"
                     write_json(trace.directory/artifact,value)
@@ -785,6 +788,20 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 record_feedback(completion.text,result,event,'memory_result')
                 trace.event('tool_completed',call_id=f'tool-{index:03d}',tool=decision.name,
                             artifact=artifact,error=result.get('error'),browser_stepped=False)
+            elif host_tools and decision.name in host_tools:
+                phase='host_tool'
+                event.update(kind='host_tool',reward=None,browser_stepped=False,next_observation=final_ref)
+                trace.event('tool_started',call_id=f'tool-{index:03d}',tool=decision.name,arguments=decision.arguments)
+                started=time.monotonic()
+                try:
+                    result=host_tool_handler(decision.name,dict(decision.arguments))
+                except Exception as exc:
+                    result={'error':f'{type(exc).__name__}: {exc}'}
+                result=result if isinstance(result,dict) else {'result':result}
+                event.update(tool_output=result,tool_error=result.get('error'),host_tool_seconds=time.monotonic()-started)
+                record_feedback(completion.text,result,event,'host_tool_result')
+                trace.event('tool_completed',call_id=f'tool-{index:03d}',tool=decision.name,
+                            error=result.get('error'),browser_stepped=False)
             elif clarification_enabled and decision.name == 'ask_user':
                 from .clarification import execute_clarification
                 phase = 'clarification_callback'

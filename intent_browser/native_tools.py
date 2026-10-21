@@ -176,6 +176,14 @@ SPECS.update({
 })
 
 
+def register_host_tool(name, description, properties, required=()):
+    """Register an application-provided (host) tool. The app enables it per profile through
+    NativeBrowserTools.host_tools and executes it with run_episode(host_tool_handler=...)."""
+    if name in SPECS and SPECS[name] != (description, properties, list(required)):
+        raise ValueError('Tool name already registered differently: ' + name)
+    SPECS[name] = (description, properties, list(required))
+
+
 class NativeArgumentError(ValueError):
     """Bounded argument encoding/JSON diagnostics, distinct from envelope errors."""
 
@@ -250,6 +258,7 @@ class NativeBrowserTools(BrowserTools):
     data_tools: bool = False
     script_tools: bool = False
     helper_tools: bool = False
+    host_tools: tuple = ()  # names registered with register_host_tool; executed by the runner's host_tool_handler
     allow_spawn: bool = True
     vision_tools: bool = False
     ax_tools: bool = False
@@ -285,7 +294,7 @@ class NativeBrowserTools(BrowserTools):
     def definitions(self, *, allow_search=False):
         definitions=[]
         ax_names=CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS
-        for name in self.names + (('handover_tab','proceed_action') if self.human_handover_tools else ()) + (('ask_user',) if self.clarification_tools else ()) + (('discover_sites',) if self.site_discovery_tools else ()) + (MEMORY_TOOLS if self.memory_tools else ()) + (DATA_TOOLS if self.data_tools else ()) + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()) + (tuple(n for n in AGENT_TOOLS if self.allow_spawn or n!='spawn_agent') if self.helper_tools else ()):
+        for name in self.names + (('handover_tab','proceed_action') if self.human_handover_tools else ()) + (('ask_user',) if self.clarification_tools else ()) + (('discover_sites',) if self.site_discovery_tools else ()) + (MEMORY_TOOLS if self.memory_tools else ()) + (DATA_TOOLS if self.data_tools else ()) + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()) + (tuple(n for n in AGENT_TOOLS if self.allow_spawn or n!='spawn_agent') if self.helper_tools else ()) + tuple(self.host_tools):
             if name == 'script_file' and not self.script_tools: continue
             description,properties,required=SPECS[name]
             properties=deepcopy(properties)
@@ -429,7 +438,7 @@ class NativeBrowserTools(BrowserTools):
         # No model Python evaluation: serialize validated JSON literals and pass
         # through the same allowlist/signature checks as historical actions.
         code=name+'('+', '.join(k+'='+repr(v) for k,v in values.items())+')'
-        decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.site_discovery_tools and name == 'discover_sites') or (self.memory_tools and name in MEMORY_TOOLS) or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
+        decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.site_discovery_tools and name == 'discover_sites') or (self.memory_tools and name in MEMORY_TOOLS) or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or name in self.host_tools or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
                   self._parse_browser_action(code, allow_search=allow_search))
         try:
             self.validate_navigation(decision)

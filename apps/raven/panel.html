@@ -8,14 +8,15 @@
   <script src="vendor-v33/marked-17.0.5.umd.js" defer></script>
   <script src="vendor-v33/dompurify-3.4.16.min.js" defer></script>
   <script src="chat-messages-v33.js?v=33-b60006235205" defer></script>
-  <script type="module" src="raven-live-v38.js?v=38-live-1"></script>
+  <script type="module" src="raven-live-v42.js?v=42-flock-1"></script>
   <script src="raven-idle-gaze-v38.js?v=38-live-1" defer></script>
   <script src="raven-web-activity-v39.js?v=39-live-2" defer></script>
   
   <link rel="stylesheet" href="raven-citations-v40.css?v=40-live-1">
   <script src="raven-citations-v40.js?v=40-live-1" defer></script>
   
-  <script src="panel-controller.js" defer></script>
+  <script src="raven-flock-v42.js?v=42-flock-2" defer></script>
+<script src="panel-controller.js" defer></script>
   <style>
     :root{color-scheme:light;--ink:#202b35;--muted:#74808b;--line:#e2e7ec;--blue:#3377ed;--paper:#fff}
     *{box-sizing:border-box}body{margin:0;background:#f7f9fb;color:var(--ink);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:clip}
@@ -143,7 +144,7 @@
     <form id="chat-form">
       <label class="input-label" for="message-input">New message</label>
       <div class="input-wrap"><textarea id="message-input" name="message" rows="3" aria-describedby="demo-hint" placeholder="Write something for the raven…"></textarea></div>
-      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><select id="browser-mode" class="mode-select" aria-label="Where Korp works"><option value="user_window">Use this window</option><option value="background_window">Work in background</option></select><button class="send" id="send-button" type="submit" disabled><span>Fetch ↗</span></button></div>
+      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><select id="browser-mode" class="mode-select" aria-label="Where Korp works"><option value="user_window">Use this window</option><option value="background_window">Work in background</option><option value="flock">Flock (helpers)</option></select><button class="send" id="send-button" type="submit" disabled><span>Fetch ↗</span></button></div>
     </form>
     <div id="tracking-zone" class="tracking-zone" aria-hidden="true" hidden></div>
     <canvas class="bird-overlay" id="raven-sounds" aria-hidden="true"></canvas>
