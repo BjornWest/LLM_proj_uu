@@ -10,6 +10,7 @@ import time
 
 from .cdp_json import send_json
 from .frame_capture import frame_documents, main_signature
+import os
 from .observation_pipeline import ObservationChanged
 
 PROPERTIES = frozenset(('disabled', 'checked', 'selected', 'expanded', 'pressed',
@@ -66,7 +67,7 @@ class DynamicPreview:
             return budget.timed('shallow_main_document',lambda:self._preview(previous))
 
     def _preview(self, previous):
-        start = time.monotonic(); self.full = None; self.pending = None
+        start = time.monotonic(); self.full = None; self.pending = None; self.changed_bids = set()
         self.previous_metadata={k:deepcopy(previous[k]) for k in ('goal','goal_object') if k in previous}
         h = self.human
         # Returned tabs require the existing full recapture/resume lifecycle.
@@ -163,15 +164,32 @@ class DynamicPreview:
         if self.full['human_tab_capture']['document'] != self.pending['identity']['document']:
             raise ObservationChanged('Background capture changed document')
         indexed = main_nodes(self.full['axtree_object'], self.pending['identity']['document']['frame_id'])
+        # Only elements the decision acts on must still match. Other preview nodes may change
+        # on live-content pages (carousels, tickers); recording them instead of rejecting the
+        # whole decision lets the runner check just the targeted BIDs (HARNESS_STRICT_PREVIEW=1
+        # restores the old all-or-nothing rejection).
+        strict = os.environ.get('HARNESS_STRICT_PREVIEW') == '1'
+        bid_of = {(b, r): bid for b, r, bid in self.pending.get('bids', [])}
+        self.changed_bids = set(); changed_nodes = 0
         for node in self.pending['semantics']:
             candidates = indexed.get((node['backend_node_id'], node['role']), [])
             if not any(node == semantics(n) for n in candidates):
-                raise ObservationChanged('Delivered preview disagrees with full capture')
+                if strict: raise ObservationChanged('Delivered preview disagrees with full capture')
+                changed_nodes += 1
+                bid = bid_of.get((node['backend_node_id'], node['role']))
+                if bid is not None: self.changed_bids.add(bid)
 
         for backend,role,bid in self.pending.get('bids',[]):
             candidates=indexed.get((backend,role),[])
             if not candidates or any(n.get('browsergym_id')!=bid for n in candidates):
-                raise ObservationChanged('Preview BID no longer names the same full-capture element')
+                if strict: raise ObservationChanged('Preview BID no longer names the same full-capture element')
+                self.changed_bids.add(bid); continue
             # A duplicate in the merged tree must never authorize ambiguous lookup.
             owners={n.get('backendDOMNodeId') for n in self.full['axtree_object']['nodes'] if n.get('browsergym_id')==bid}
-            if owners!={backend}:raise ObservationChanged('Preview BID became ambiguous')
+            if owners!={backend}:
+                if strict: raise ObservationChanged('Preview BID became ambiguous')
+                self.changed_bids.add(bid)
+        if (changed_nodes or self.changed_bids) and getattr(self, 'trace', None) is not None:
+            self.trace.event('dynamic_preview_partially_stale', changed_nodes=changed_nodes,
+                             changed_bids=sorted(self.changed_bids),
+                             scope='Decisions targeting these BIDs are not executed; other actions proceed')

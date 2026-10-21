@@ -1305,6 +1305,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     records, results = [], []
                     batch_stop = ('background_preview_invalidated' if
                         event.get('observation_pipeline',{}).get('invalidated') else None)
+                    if batch_stop is None and pipeline is not None:
+                        # Live pages: only a change to an element this batch acts on blocks it.
+                        stale = getattr(getattr(pipeline,'dynamic',None),'changed_bids',None) or set()
+                        if stale & {d.arguments['bid'] for d in decisions if 'bid' in d.arguments}:
+                            batch_stop = 'preview_target_changed'
+                            pipeline.invalidation_streak = getattr(pipeline,'invalidation_streak',0) + 1
                     fatal = None
                     root_event = event
                     root_event['batch_calls'] = records

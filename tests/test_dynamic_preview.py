@@ -1,3 +1,5 @@
+import os
+from unittest.mock import patch
 import unittest
 from copy import deepcopy
 from types import SimpleNamespace
@@ -26,6 +28,7 @@ class DynamicTests(unittest.TestCase):
         p.identity=lambda:p.pending['identity'];p.full=value
         return p
 
+    @patch.dict(os.environ, {'HARNESS_STRICT_PREVIEW': '1'})
     def test_semantics_and_shared_dom_text_ids(self):
         p=self.validator();n=deepcopy(p.full['axtree_object']['nodes'][1]);n.update(nodeId='inline',role={'value':'InlineTextBox'})
         p.full['axtree_object']['nodes'][0]['childIds'].append('inline')
@@ -33,6 +36,7 @@ class DynamicTests(unittest.TestCase):
         p.full['axtree_object']['nodes'][1]['name']={'value':'Changed'}
         with self.assertRaises(ObservationChanged):p.validate()
 
+    @patch.dict(os.environ, {'HARNESS_STRICT_PREVIEW': '1'})
     def test_child_same_dom_id_cannot_substitute_main(self):
         p=self.validator();n=p.full['axtree_object']['nodes'][1];n['frameId']='child'
         self.assertNotIn((2,'button'),main_nodes(p.full['axtree_object'],'main'))
@@ -55,6 +59,7 @@ class DynamicTests(unittest.TestCase):
 if __name__=='__main__':unittest.main()
 
 
+@patch.dict(os.environ, {'HARNESS_STRICT_PREVIEW': '1'})
 def test_preview_bid_must_survive_full_capture():
     p=DynamicTests().validator()
     node=p.full['axtree_object']['nodes'][1]
@@ -66,6 +71,21 @@ def test_preview_bid_must_survive_full_capture():
         p.validate()
 
 
+@patch.dict(os.environ, {'HARNESS_STRICT_PREVIEW': '1'})
+@patch.dict(os.environ, {'HARNESS_STRICT_PREVIEW': ''})
+def test_preview_bid_change_is_recorded_not_raised():
+    p=DynamicTests().validator()
+    node=p.full['axtree_object']['nodes'][1]
+    node['browsergym_id']='7'
+    p.pending['bids']=[(node['backendDOMNodeId'],node['role']['value'],'7')]
+    p.validate()
+    node['browsergym_id']='8'
+    p.validate()  # lenient default: recorded, not raised
+    assert p.changed_bids
+
+
+
+@patch.dict(os.environ, {'HARNESS_STRICT_PREVIEW': '1'})
 def test_preview_bid_duplicate_fails_closed():
     p=DynamicTests().validator()
     node=p.full['axtree_object']['nodes'][1];node['browsergym_id']='7'
