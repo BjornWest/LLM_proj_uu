@@ -125,9 +125,10 @@ MARK_TAB_JS = r"""() => {
   window.__korpUntil = Date.now() + 15000;
   if (window.__korpObs) return;
   const fix = () => {
-    const on = Date.now() < window.__korpUntil, has = document.title.startsWith(P);
-    if (on && !has) document.title = P + document.title;
-    if (!on && has) document.title = document.title.slice(P.length);
+    // document.title trims whitespace, so test and strip the bare emoji (an empty title is just the emoji).
+    const bare = P.trim(), t = document.title, on = Date.now() < window.__korpUntil, has = t.startsWith(bare);
+    if (on && !has) document.title = P + t;
+    if (!on && has) document.title = t.slice(bare.length).trimStart();
     if (!on) { window.__korpObs.disconnect(); clearInterval(window.__korpTimer); window.__korpObs = null; }
   };
   window.__korpObs = new MutationObserver(fix);

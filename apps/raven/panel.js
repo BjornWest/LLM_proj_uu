@@ -74,6 +74,9 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
   new MutationObserver(() => { syncStop(); syncThinking(); }).observe(stop, {attributes: true, attributeFilter: ['disabled']});
+  // The chat controller disables the send button while a task runs; as Stop it must stay clickable.
+  new MutationObserver(() => { if (!stop.disabled && sendButton.disabled) sendButton.disabled = false; })
+    .observe(sendButton, {attributes: true, attributeFilter: ['disabled']});
   new MutationObserver(syncThinking).observe(status, {childList: true, characterData: true, subtree: true});
   sendButton.addEventListener('click', event => {
     if (sendButton.dataset.stop !== '1') return;
@@ -228,6 +231,7 @@ document.getElementById('message-input')?.addEventListener('keydown', event => {
   event.preventDefault();
   const send = document.getElementById('send-button'), form = event.target.form;
   if (!send || !event.target.value.trim()) return;
+  if (send.dataset.stop === '1') return;  // a run is active: the button is Stop, Enter must not stop or resend
   if (!send.disabled) { form.requestSubmit(); return; }
   // The raven is still landing after a reply: send as soon as the composer is ready (not during a run).
   if (!document.getElementById('stop')?.disabled) return;
