@@ -19,16 +19,13 @@ from uuid import uuid4
 from http.server import ThreadingHTTPServer
 
 ROOT = Path(__file__).resolve().parents[2]
-SHARED = Path('/home/bjorn/code/LLM_proj_uu')
-# Keep the documented python3 entry usable with this workstation's shared venv.
-if __name__ == '__main__' and sys.prefix == sys.base_prefix and (SHARED / '.venv/bin/python').exists():
-    env = dict(os.environ)
-    env['OPENBLAS_NUM_THREADS'] = '1'
-    env['PYTHONPATH'] = os.pathsep.join([str(ROOT), '/home/bjorn/code/cau-merge-20261016', env.get('PYTHONPATH', '')])
-    libs = str(SHARED / '.local/system-libs/usr/lib/x86_64-linux-gnu')
-    env['LD_LIBRARY_PATH'] = libs + os.pathsep + env.get('LD_LIBRARY_PATH', '')
-    os.execve(str(SHARED / '.venv/bin/python'), [str(SHARED / '.venv/bin/python'), *sys.argv], env)
 sys.path.insert(0, str(ROOT))
+from apps.raven import paths
+# Keep the documented python3 entry usable with the checkout's venv (see apps/raven/paths.py).
+if __name__ == '__main__' and sys.prefix == sys.base_prefix and paths.PYTHON.exists():
+    env = paths.child_environment(os.environ)
+    env['OPENBLAS_NUM_THREADS'] = '1'
+    os.execve(str(paths.PYTHON), [str(paths.PYTHON), *sys.argv], env)
 from apps.raven.episode import episode_main, MODEL, OPENROUTER_MODEL
 from apps.raven.browser_launch import demo_launch_options
 
@@ -338,7 +335,7 @@ class Service:
                  openrouter_model=OPENROUTER_MODEL, max_total_input_tokens=None, max_total_output_tokens=None,
                  base_url=None, model=None, preset=None, models_file=None):
         from dotenv import load_dotenv
-        load_dotenv('/home/bjorn/code/LLM_proj_uu/.env', override=False)
+        load_dotenv(paths.ENV_FILE, override=False)
         self.port = port
         self.demo_mode = demo_mode
         self.runs = {}
