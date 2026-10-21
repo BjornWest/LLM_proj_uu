@@ -474,7 +474,7 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
             pacing['started'] = max(pacing['started'], _time.monotonic() - 30)  # Human time is not agent time.
             return
         elapsed = _time.monotonic() - pacing['started']
-        total_share = pacing['input_total'] / budgets['total_input']
+        total_share = pacing['input_total'] / budgets['total_input'] if budgets['total_input'] else 0.0
         request_share = pacing['last_input'] / budgets['request_input']
         due = (elapsed > WRAP_UP_SECONDS or total_share > 0.5 or request_share > 0.6) if pacing['nudges'] == 0 else (
             elapsed > WRAP_UP_SECONDS + 45 or total_share > 0.7 or request_share > 0.85)
@@ -539,8 +539,9 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
     model = (MODEL if backend_kind == 'sol' else options.get('model') or options.get('openrouter_model')
              or OPENROUTER_MODEL)
     max_tokens = 8192 if backend_kind == 'selfhosted' else 16384
-    budgets = dict(total_input=options.get('max_total_input_tokens') or 4000000,
-                   total_output=options.get('max_total_output_tokens') or 60000,
+    # No cumulative episode caps in the demo unless a preset sets them explicitly (None = unlimited).
+    budgets = dict(total_input=options.get('max_total_input_tokens'),
+                   total_output=options.get('max_total_output_tokens'),
                    request_input=min(250000, (options.get('max_context') or 10**9) - max_tokens))
     if scripted is not None:
         class ScriptedBackend:
@@ -621,8 +622,10 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
     try:
         emit('status', state='working')
         pacing['started'] = _time.monotonic()
+        # observation_pipeline='native': full captures. The 'auto' background preview kept
+        # invalidating every decision on pages with live content (carousels), so nothing executed.
         directory, summary = runner.run_episode(factory, backend, metadata, output, max_steps=None, episode_task=task,
-            harness_profile=profile, human_handover=controller, before_observation=before_observation, observation_pipeline='auto', trace_screenshots=False,
+            harness_profile=profile, human_handover=controller, before_observation=before_observation, observation_pipeline='native', trace_screenshots=False,
             max_input_tokens=budgets['request_input'], input_counter=input_counter,
             max_total_input_tokens=budgets['total_input'], max_total_output_tokens=budgets['total_output'],
             allow_ungraded=True, ungraded_reason='Raven supervised live-web demo', memory_adapter=memory,
