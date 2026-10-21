@@ -180,7 +180,8 @@ def episode_main(payload, output, events, controls, cdp_url=None, scripted=None,
 
 def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=None, options=None):
     from dotenv import load_dotenv
-    load_dotenv('/home/bjorn/code/LLM_proj_uu/.env', override=False)
+    from apps.raven.paths import ENV_FILE
+    load_dotenv(ENV_FILE, override=False)
     from intent_browser import runner
     from intent_browser.trace import Trace
     from intent_browser.open_internet import (OpenInternetTask, open_profile, with_human_handover,
