@@ -116,6 +116,23 @@ def verification_policy(mode):
             'for example: "Prisjakt wants to check you’re human; can you complete it and hand the tab back?" '
             'Wait for handback without model polling or alternative research.')
 
+# Marks the tab Korp is working in: a raven prefix on the tab title, kept while steps keep
+# refreshing it and removed by the page itself ~15 s after the last step (no cleanup call needed).
+MARK_TAB_JS = r"""() => {
+  const P = '\u{1F426}\u200D\u2B1B ';
+  window.__korpUntil = Date.now() + 15000;
+  if (window.__korpObs) return;
+  const fix = () => {
+    const on = Date.now() < window.__korpUntil, has = document.title.startsWith(P);
+    if (on && !has) document.title = P + document.title;
+    if (!on && has) document.title = document.title.slice(P.length);
+    if (!on) { window.__korpObs.disconnect(); clearInterval(window.__korpTimer); window.__korpObs = null; }
+  };
+  window.__korpObs = new MutationObserver(fix);
+  window.__korpObs.observe(document.head || document.documentElement, {subtree: true, childList: true, characterData: true});
+  window.__korpTimer = setInterval(fix, 1000);
+  fix();
+}"""
 POINT_AT_JS = """([bid, show]) => {
   const el = document.querySelector('[bid="' + CSS.escape(bid) + '"]');
   if (!el) return null;
@@ -458,6 +475,11 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
     threading.Thread(target=control_loop, daemon=True).start()
     def before_observation():
         wrap_up()
+        if env_holder and cdp_url:
+            try:
+                env_holder[0].page.evaluate(MARK_TAB_JS)  # visible windows only; presentation only
+            except Exception:
+                pass
         while True:
             try:
                 note = human_notes.get_nowait()
