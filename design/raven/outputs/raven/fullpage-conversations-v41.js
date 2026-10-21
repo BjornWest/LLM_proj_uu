@@ -189,6 +189,13 @@
       if (threads.length > MAX_THREADS) threads = threads.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, MAX_THREADS);
       selectConversation(id, { focusInput: true });
     });
+    const header = document.querySelector('.app-header');
+    if (window.ravenModels && header) {
+      const slot = document.createElement('div'); slot.className = 'header-model';
+      header.insertBefore(slot, header.querySelector('.raven-settings'));
+      window.ravenModels.mount(slot, { hasConversation: () => (active()?.messages.length || 0) > 0, currentConversation: () => activeId,
+        newConversation: () => document.getElementById('new-conversation')?.click() });
+    }
     list.addEventListener('click', event => {
       const button = event.target.closest('button[data-conversation-id]');
       if (button && list.contains(button)) selectConversation(button.dataset.conversationId);
