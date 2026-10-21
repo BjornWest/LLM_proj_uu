@@ -60,7 +60,7 @@ window.addEventListener('DOMContentLoaded', () => {
     root.replaceChildren();
     for (const tab of tabs.values()) {
       const button = document.createElement('button');
-      if(mode.value === 'background_window' && tab.owner !== 'agent') continue;
+      if(mode.value === 'background_window' ? tab.owner !== 'agent' : (tab.owner === 'agent' && !tab.focus_id)) continue;
       let site;try {site=new URL(tab.url);} catch {}
       button.textContent = site?.hostname.replace(/^www\./,'') || tab.title || 'New tab';
       if (site && ['http:','https:'].includes(site.protocol)) {
@@ -69,7 +69,7 @@ window.addEventListener('DOMContentLoaded', () => {
       button.title = 'Show this tab: ' + tab.url;
       button.onclick = () => post('/api/tabs/'+encodeURIComponent(tab.focus_id || tab.tab_id)+'/focus')
         .then(() => { if (!run) status.textContent = 'Showing ' + button.textContent; })
-        .catch(() => status.textContent = 'Couldn’t show that tab — it may have been closed.');
+        .catch(() => { tabs.delete(tab.tab_id); drawTabs(); status.textContent = 'That tab was closed.'; });
       root.append(button);
     }
   }
@@ -172,7 +172,12 @@ window.addEventListener('DOMContentLoaded', () => {
       if(!navigator.sendBeacon?.(url,'{}'))fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',keepalive:true}).catch(()=>{});
     }
   });
-  fetch('/api/tabs').then(r=>r.json()).then(data=>{for(const t of data.tabs || [])tabs.set(t.tab_id,t);drawTabs();});
+  // Keep the page buttons in sync with the browser while idle (the user opens/closes tabs too).
+  const refreshTabs = () => fetch('/api/tabs').then(r=>r.json()).then(data=>{
+    if (run) return;
+    tabs.clear(); for(const t of data.tabs || [])tabs.set(t.tab_id,t); drawTabs();
+  }).catch(()=>{});
+  refreshTabs(); setInterval(refreshTabs, 3000);
 });
 
 // Enter sends; Shift+Enter (or IME composition) keeps a newline.

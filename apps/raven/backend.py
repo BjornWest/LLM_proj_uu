@@ -143,7 +143,9 @@ class UserWindow:
                 # even when Target.createTarget requests background:true.
                 self.background_contexts = []
                 self.new_background_window(page)
-                for extra in [p for p in self.context.pages if p is not page and p.url == 'about:blank']:
+                blank = ('about:blank', 'chrome://newtab/', 'chrome://new-tab-page/')
+                page.wait_for_timeout(1500)  # the side panel/welcome flow can still open a default tab
+                for extra in [p for p in self.context.pages if p is not page and p.url in blank]:
                     extra.close()
                 page.bring_to_front()
                 self.cdp_url = self.windows_chrome.endpoint if self.windows_browser else f'http://127.0.0.1:{debug_port}'
@@ -183,13 +185,16 @@ class UserWindow:
                             from apps.raven.shared_browser import active_target
                             active = active_target(self.context)
                             rows = []
-                            for p in [p for c in [self.context, *self.background_contexts] for p in c.pages]:
-                                if p.is_closed() or p.url.startswith('chrome-extension:'):
+                            for c in [self.context, *self.background_contexts]:
+                              for p in c.pages:
+                                # The agent window's idle placeholder is not a page anyone visited.
+                                if p.is_closed() or p.url.startswith('chrome-extension:') or (
+                                        c is not self.context and p.url == 'about:blank'):
                                     continue
                                 try:
                                     tid = target_id(p.context, p)
-                                    rows.append(dict(tab_id=tid, url=p.url,
-                                        title=p.title(), owner='human', active=tid == active))
+                                    rows.append(dict(tab_id=tid, url=p.url, title=p.title(),
+                                        owner='human' if c is self.context else 'agent', active=tid == active))
                                 except Exception:
                                     if not p.is_closed():
                                         raise
@@ -199,8 +204,14 @@ class UserWindow:
                                 if target_id(p.context, p) == data:
                                     session = p.context.new_cdp_session(p)
                                     wid = session.send('Browser.getWindowForTarget')['windowId']
-                                    session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'windowState':'normal'}})
-                                    session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'left':80,'top':60}})  # back on-screen when the user asks to see it
+                                    bounds = session.send('Browser.getWindowBounds', {'windowId':wid})['bounds']
+                                    # Only un-minimize / bring the parked agent window on-screen; never
+                                    # touch a normal, maximized or fullscreen window of the user.
+                                    if bounds.get('windowState') == 'minimized':
+                                        session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'windowState':'normal'}})
+                                        bounds = session.send('Browser.getWindowBounds', {'windowId':wid})['bounds']
+                                    if bounds.get('windowState') == 'normal' and (bounds.get('left', 0) < -5000 or bounds.get('top', 0) < -5000):
+                                        session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'left':80,'top':60}})
                                     session.detach()
                                     p.bring_to_front()
                                     response.put(True)
