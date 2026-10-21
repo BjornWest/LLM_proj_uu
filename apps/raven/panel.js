@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const append = c.appendMessage.bind(c);
   c.appendMessage = function(text, who, options) {
     append(text, who, options);
-    if (who === 'Raven') { steps.finish(c.messages.lastElementChild); window.ravenAnswered?.(); }
+    if (who === 'Korp') { steps.finish(c.messages.lastElementChild); window.ravenAnswered?.(); }
   };
   let conversation = crypto.randomUUID();
   if (window.ravenModels) {
@@ -25,7 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.ravenMemory?.button(slot);
     slot.append(document.querySelector('#tabs'));  // visited/agent pages sit next to the model selector
   }
-  // The send button doubles as Stop (a square) while Raven is working.
+  // The send button doubles as Stop (a square) while Korp is working.
   const sendButton = document.querySelector('#send-button');
   const syncStop = () => {
     const running = !stop.disabled;
@@ -50,7 +50,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let note = before?.classList.contains('note') ? before : null;
     if (!note) {
       note = document.createElement('article'); note.className = 'message note';
-      note.innerHTML = '<span class="message-label">Raven</span><div class="message-copy"></div>';
+      note.innerHTML = '<span class="message-label">Korp</span><div class="message-copy"></div>';
       if (thinking) c.messages.insertBefore(note, thinking); else c.messages.append(note);
     }
     const line = document.createElement('div'); line.textContent = text;
@@ -62,7 +62,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!running) { answered = false; reasoning = ''; }
     if (running && !thinking && !answered) {
       thinking = document.createElement('article'); thinking.className = 'message thinking';
-      thinking.innerHTML = '<span class="message-label">Raven</span><div class="message-copy"><span class="thinking-dots"><i></i><i></i><i></i></span><span class="thinking-text"></span></div>';
+      thinking.innerHTML = '<span class="message-label">Korp</span><div class="message-copy"><span class="thinking-dots"><i></i><i></i><i></i></span><span class="thinking-text"></span></div>';
       c.messages.append(thinking);
     }
     if (!running && thinking) { thinking.remove(); thinking = null; }
@@ -112,7 +112,7 @@ window.addEventListener('DOMContentLoaded', () => {
       root.append(button);
     }
   }
-  c.input.placeholder = 'Ask Raven to explore the web…';
+  c.input.placeholder = 'Ask Korp to explore the web…';
   c.updateHint = () => {};
   c.countdown.textContent = 'Your shared browser';
   const originalLaunch = c.launch.bind(c);
@@ -156,12 +156,12 @@ window.addEventListener('DOMContentLoaded', () => {
           handovers.set(e.tab_id,e.message);showHandover();
         }
         if (e.type === 'final') {
-          c.agentReply=e;c.reply();history.push({who:'Raven',text:e.markdown});
+          c.agentReply=e;c.reply();history.push({who:'Korp',text:e.markdown});
           document.dispatchEvent(new CustomEvent('raven-web-activity',{detail:{status:'complete'}}));
         }
         if (e.type === 'error') {
           errorShown = true;
-          status.textContent=window.ravenTransport.errorMessage(e);c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');if(window.ravenTransport.demoMode)status.textContent='Ready';
+          status.textContent=window.ravenTransport.errorMessage(e);c.cancelTask({announce:false});c.appendMessage(status.textContent,'Korp');if(window.ravenTransport.demoMode)status.textContent='Ready';
         }
         if (e.type === 'done') {
           steps.stop();mode.disabled=false;
@@ -170,7 +170,7 @@ window.addEventListener('DOMContentLoaded', () => {
           if(!c.agentReply){
             c.cancelTask({announce:false});
             if(window.ravenTransport.demoMode && !errorShown && e.stop_reason !== 'cancelled')
-              c.appendMessage(window.ravenTransport.errorMessage(e),'Raven');
+              c.appendMessage(window.ravenTransport.errorMessage(e),'Korp');
           }
         }
       }, onError:error => {
@@ -178,10 +178,10 @@ window.addEventListener('DOMContentLoaded', () => {
         const id=run;generation++;stream?.close();stream=null;run=null;stop.disabled=true;
         handovers.clear();showHandover();c.cancelTask({announce:false});
         status.textContent=window.ravenTransport.errorMessage(error);
-        c.appendMessage(status.textContent,'Raven');if(window.ravenTransport.demoMode)status.textContent='Ready';
+        c.appendMessage(status.textContent,'Korp');if(window.ravenTransport.demoMode)status.textContent='Ready';
         if(id)post('/api/tasks/'+id+'/cancel').catch(()=>{});
       }});
-    }).catch(e => {mode.disabled=false;status.textContent=window.ravenTransport.errorMessage(e);stop.disabled=true;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Raven');if(window.ravenTransport.demoMode)status.textContent='Ready';});
+    }).catch(e => {mode.disabled=false;status.textContent=window.ravenTransport.errorMessage(e);stop.disabled=true;c.cancelTask({announce:false});c.appendMessage(status.textContent,'Korp');if(window.ravenTransport.demoMode)status.textContent='Ready';});
     return true;
   };
   stop.onclick = async () => {
@@ -198,10 +198,10 @@ window.addEventListener('DOMContentLoaded', () => {
     button.disabled=true;
     try {
       await post('/api/tasks/'+run+'/handback',{tab_id:tab,note:null});
-      handovers.delete(tab);showHandover();status.textContent='Returned to Raven';
+      handovers.delete(tab);showHandover();status.textContent='Returned to Korp';
     } catch(e) {
       if(e.status===400 || e.status===404) {
-        handovers.delete(tab);showHandover();status.textContent='That tab is no longer waiting for help. Raven can continue.';
+        handovers.delete(tab);showHandover();status.textContent='That tab is no longer waiting for help. Korp can continue.';
       } else status.textContent='I couldn’t return the tab yet. Please try again.';
     }
     finally {button.disabled=false;}

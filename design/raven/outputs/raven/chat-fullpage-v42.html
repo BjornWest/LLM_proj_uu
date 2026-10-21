@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head><link rel="icon" type="image/png" href="korp-icon.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffffff">
-  <title>Raven · shopping conversations</title>
+  <title>Korp</title>
   <script src="chat-flight-director-live-v36.js?v=36-live-1" defer></script>
   <script src="vendor-v33/marked-17.0.5.umd.js" defer></script>
   <script src="vendor-v33/dompurify-3.4.16.min.js" defer></script>
@@ -29,7 +29,7 @@
   <a class="skip-link" href="#message-input">Skip to message</a>
   <div id="app-shell" class="app-shell">
     <aside id="conversation-sidebar" class="conversation-sidebar" aria-label="Conversation history">
-      <div class="sidebar-brand"><a class="brand-name" href="chat-fullpage-v42.html">Raven<span class="brand-dot" aria-hidden="true"></span></a><span class="brand-subtitle">Your shopping companion</span></div>
+      <div class="sidebar-brand"><a class="brand-name" href="chat-fullpage-v42.html">Korp<span class="brand-dot" aria-hidden="true"></span></a><span class="brand-subtitle">Your shopping companion</span></div>
       <button id="new-conversation" class="new-conversation" type="button"><span aria-hidden="true">＋</span>New chat</button>
       <div class="history-search"><label class="sr-only" for="conversation-search">Search conversations</label><input id="conversation-search" type="search" placeholder="Search chats" autocomplete="off"></div>
       <div class="history-heading">Conversations</div>
@@ -41,9 +41,9 @@
     <main class="workspace">
       <header class="app-header">
         <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Open conversation history" aria-controls="conversation-sidebar" aria-expanded="false">Chats</button>
-        <div class="thread-heading"><h1 id="conversation-title">New chat</h1><span class="header-subtitle">Raven</span></div>
+        <div class="thread-heading"><h1 id="conversation-title">New chat</h1><span class="header-subtitle">Korp</span></div>
         <details class="raven-settings">
-          <summary>Raven settings</summary>
+          <summary>Korp settings</summary>
           <div class="settings-panel">
             <label><input id="mouse-tracking" type="checkbox" checked>Follow nearby cursor</label>
             <label><input id="dark-palette" type="checkbox" checked>Darker feathers</label>
@@ -54,13 +54,13 @@
           </div>
         </details>
       </header>
-      <div class="flight-toolbar" aria-label="Raven demo controls">
+      <div class="flight-toolbar" aria-label="Korp demo controls">
         <button id="spawn-raven" type="button" disabled>Spawn raven</button>
         <button id="clear-ravens" type="button" disabled>Clear helpers</button>
         
         <span id="flock-status" role="status">No helper ravens</span>
       </div>
-      <section id="chat-scene" class="scene" data-state="loading" aria-label="Shopping chat with Raven">
+      <section id="chat-scene" class="scene" data-state="loading" aria-label="Shopping chat with Korp">
         <div id="sky" class="sky">
           <canvas id="flight-guides" class="flight-guides" aria-hidden="true" hidden></canvas>
           <div class="sky-caption"><span id="raven-status" class="status" role="status">Loading raven…</span><span id="countdown"></span></div>
@@ -84,16 +84,16 @@
         </section>
         <div class="composer-area">
           <form id="chat-form" class="chat-form">
-            <label class="sr-only" for="message-input">Message Raven</label>
+            <label class="sr-only" for="message-input">Message Korp</label>
             <div class="composer-surface" aria-hidden="true"></div>
-            <div class="input-wrap"><textarea id="message-input" name="message" rows="2" placeholder="Ask Raven anything about shopping…" aria-describedby="demo-hint"></textarea></div>
+            <div class="input-wrap"><textarea id="message-input" name="message" rows="2" placeholder="Ask Korp anything about shopping…" aria-describedby="demo-hint"></textarea></div>
             <div class="send-row"><span class="composer-hint">Enter to send · Shift + Enter for a new line</span><button id="send-button" class="send" type="submit" aria-label="Send message" disabled><span aria-hidden="true">↑</span></button><button id="stop-task" class="stop-task" type="button" aria-label="Stop research" hidden><span aria-hidden="true">■</span></button></div>
           </form>
-          <p id="demo-hint" class="demo-hint">Raven researches in the background. Sources appear with your answer.</p>
+          <p id="demo-hint" class="demo-hint">Korp researches in the background. Sources appear with your answer.</p>
         </div>
         <div id="tracking-zone" class="tracking-zone" aria-hidden="true" hidden></div>
         <canvas id="raven-sounds" class="bird-overlay" aria-hidden="true"></canvas>
-        <canvas id="raven-canvas" class="bird-overlay" role="img" aria-label="Raven perched on the send button"></canvas>
+        <canvas id="raven-canvas" class="bird-overlay" role="img" aria-label="Korp perched on the send button"></canvas>
       </section>
     </main>
   </div>

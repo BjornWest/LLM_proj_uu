@@ -536,7 +536,7 @@ class Service:
                         except Exception:
                             LOG.exception('Could not focus handover tab')
                             event = {**event, 'message': event['message'] +
-                                ' Please open the tab yourself; Raven could not bring it to the front.'}
+                                ' Please open the tab yourself; Korp could not bring it to the front.'}
                     run.emit(event)
             if demo and terminal and terminal['stop_reason'] == 'error':
                 failure = failure or 'Episode failed without an error message'
@@ -821,7 +821,7 @@ def main():
         args.model_backend, args.reasoning_effort, args.service_tier, args.windows_browser, args.demo_mode,
         args.openrouter_model, args.max_total_input_tokens, args.max_total_output_tokens,
         args.openai_base_url, args.model, args.preset, args.models_file)
-    print(f'Raven: http://localhost:{args.port}/panel.html', flush=True)
+    print(f'Korp: http://localhost:{args.port}/panel.html', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

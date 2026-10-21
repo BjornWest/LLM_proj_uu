@@ -1,4 +1,4 @@
-/* Raven backend contract v1. No model credentials belong in this client. */
+/* Korp backend contract v1. No model credentials belong in this client. */
 (() => {
   'use strict';
   class RavenTransport {
@@ -20,7 +20,7 @@
       stream.onopen=()=>{recovering=false;};
       stream.onerror=()=>{
         if(closed||recovering)return;
-        if(!this.demoMode){fail(new Error('Connection to Raven was interrupted. Please try again.'));return;}
+        if(!this.demoMode){fail(new Error('Connection to Korp was interrupted. Please try again.'));return;}
         recovering=true;
         // EventSource reconnects using Last-Event-ID; the backend owns the one retry allowance.
         timer=setTimeout(()=>fail(new Error('Stream recovery timed out')),15000);

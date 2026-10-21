@@ -1,4 +1,4 @@
-/* Raven user memory: a small dialog shared by the full-page chat and the side panel. */
+/* Korp user memory: a small dialog shared by the full-page chat and the side panel. */
 (() => {
   'use strict';
   const LABELS = {name: 'Name', shoe_size_eu: 'Shoe size (EU)', clothing_size: 'Clothing size', preferred_colours: 'Preferred colours',
@@ -27,7 +27,7 @@
   class RavenMemory {
     constructor() {
       this.dialog = document.createElement('dialog'); this.dialog.className = 'raven-memory';
-      this.dialog.innerHTML = '<header><h2>What Raven remembers about you</h2><button type="button" data-close>Close</button></header><div class="rows"></div><p class="note" role="status">Raven reads this before each task and saves lasting preferences you mention.</p>';
+      this.dialog.innerHTML = '<header><h2>What Korp remembers about you</h2><button type="button" data-close>Close</button></header><div class="rows"></div><p class="note" role="status">Korp reads this before each task and saves lasting preferences you mention.</p>';
       document.body.append(this.dialog);
       this.dialog.querySelector('[data-close]').onclick = () => this.dialog.close();
       this.rows = this.dialog.querySelector('.rows'); this.note = this.dialog.querySelector('.note');
@@ -36,7 +36,7 @@
     }
     button(container) {
       const button = document.createElement('button'); button.type = 'button'; button.className = 'raven-memory-button';
-      button.textContent = 'Memory'; button.title = 'What Raven remembers about you';
+      button.textContent = 'Memory'; button.title = 'What Korp remembers about you';
       button.onclick = () => { this.dialog.showModal(); this.refresh(); };
       container.append(button); return button;
     }

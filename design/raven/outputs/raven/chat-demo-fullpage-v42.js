@@ -163,7 +163,7 @@
     }
     setConversation(messages,{title='New conversation'}={}){
       this.cancelTask({announce:false});this.messages.replaceChildren();this.input.value='';
-      for(const item of messages||[]){if(typeof item?.text!=='string')continue;this.appendMessage(item.text,item.who==='You'?'You':'Raven',{sources:Array.isArray(item.sources)?item.sources:[],follow:true});}
+      for(const item of messages||[]){if(typeof item?.text!=='string')continue;this.appendMessage(item.text,item.who==='You'?'You':'Korp',{sources:Array.isArray(item.sources)?item.sources:[],follow:true});}
       if(this.newReply)this.newReply.hidden=true;
       this.scene.dispatchEvent(new CustomEvent('raven-conversation-change',{detail:{title,messageCount:this.messages.children.length},bubbles:true}));
       this.resize();
@@ -224,7 +224,7 @@
     completeTask({markdown,sources=[]}){if(this.started===null||this.replyAdded)return;this.stepMotion(performance.now());this.replyAdded=true;
       this.task?.transport?.close();this.task=null;
       const message=markdown;
-      this.appendMessage(message,'Raven',{sources});this.liveSteps?.finish(this.messages.lastElementChild);this.countdown.textContent='Response ready · coming down';
+      this.appendMessage(message,'Korp',{sources});this.liveSteps?.finish(this.messages.lastElementChild);this.countdown.textContent='Response ready · coming down';
       if(this.motion.matches){this.setState('cawing');this.land(performance.now());}else {const patrolElapsed=this.motionClock-this.taskStartClock-this.timing.patrolStartMs;this.pendingReturn=patrolElapsed<0;const refs=this.pendingReturn?[]:this.director?.requestReturn(Math.max(0,patrolElapsed))||[];this.forecastKey=null;const preload=refs.flatMap(r=>this.clipRefs(r.clip,r.frame,1));preload.push(...this.clipRefs('diving',0,this.clip('diving').frames));this.warmRefs(preload).catch(()=>{});}
       this.scene.dispatchEvent(new CustomEvent('raven-chat-reply',{detail:{message},bubbles:true}));}
     land(now){this.started=null;this.director=null;this.send.disabled=false;this.resetIdle();this.cawStarted=this.motionClock;this.setState(this.wasTypingAfterReply||this.input.value.length?'idle':'cawing');this.countdown.textContent='Ready for another message';this.scene.dispatchEvent(new CustomEvent('raven-chat-land',{bubbles:true}));}
@@ -249,7 +249,7 @@
       return (this.idleFrame+(this.activeFps===60?this.idleAccumulator/step:0))%this.clip('idle').frames;
     }
     updateControls(){const busy=this.loading||this.preparing||this.started!==null;this.send.disabled=!this.ready||busy;this.darker.disabled=!!this.loading||!!this.preparing;if(this.frameRate){const inMotion=busy||!!this.gesture||!!this.settling||!!this.flock?.birds.length;this.frameRate.disabled=!!this.loading||!!this.preparing||(this.activeFps<60&&inMotion);for(const option of this.frameRate.options)option.disabled=inMotion&&Number(option.value)<60;}if(this.petButton)this.petButton.disabled=!this.ready||busy||this.motion.matches||!['idle','cawing','petting'].includes(this.state);this.flock?.updateControls();}
-    setState(state){if(this.state!==state){this.state=state;this.scene.dataset.state=state;const labels={loading:'Loading raven…',preparing:'Preparing to take off',idle:'Ready when you are',petting:'A little affection',settling:'Settling back into idle',takeoff:'Taking off',entering:'Coming in over the conversation',working:'Patrolling above the conversation',diving:'Returning to the send button',cawing:'Caw caw — your response is ready'};this.status.textContent=labels[state]||state;this.canvas.setAttribute('aria-label',state==='idle'?'Raven perched on the send button':labels[state]||'Raven');}this.updateControls();if(state!=='idle'&&this.trackingZone)this.trackingZone.hidden=true;}
+    setState(state){if(this.state!==state){this.state=state;this.scene.dataset.state=state;const labels={loading:'Loading raven…',preparing:'Preparing to take off',idle:'Ready when you are',petting:'A little affection',settling:'Settling back into idle',takeoff:'Taking off',entering:'Coming in over the conversation',working:'Patrolling above the conversation',diving:'Returning to the send button',cawing:'Caw caw — your response is ready'};this.status.textContent=labels[state]||state;this.canvas.setAttribute('aria-label',state==='idle'?'Korp perched on the send button':labels[state]||'Korp');}this.updateControls();if(state!=='idle'&&this.trackingZone)this.trackingZone.hidden=true;}
     onTyping(){
       if(this.replyAdded)this.wasTypingAfterReply=true;
       if(this.gesture){this.gesture.returnState='idle';return;}

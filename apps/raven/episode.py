@@ -62,7 +62,7 @@ class DemoBackend(ChatCompletionsBackend):
 
 
 DEMO_POLICY = (
-    "Raven live demo policy: You may research public information, compare products, and use websites "
+    "Korp live demo policy: You may research public information, compare products, and use websites "
     "interactively on the user's behalf or together with them: play browser games, try code in online "
     "editors, use calculators and other web tools, fill search boxes and filters. Be helpful and playful. "
     "Never buy, order, pay, bid, log in, create accounts, send messages, submit personal data, "
@@ -110,7 +110,7 @@ def verification_policy(mode):
     if mode == 'background_window':
         return ('On a bot check, stop research and call handover_tab on the challenged tab. '
                 'Say research is paused and offer to continue in their window after they complete '
-                'verification and hand the tab back. Raven will bring this tab to the front. '
+                'verification and hand the tab back. Korp will bring this tab to the front. '
                 'Wait for handback without model polling or alternative research.')
     return ('On a bot check, immediately call handover_tab on that tab with a short message, '
             'for example: "Prisjakt wants to check you’re human; can you complete it and hand the tab back?" '
@@ -138,12 +138,12 @@ ROOT = Path(__file__).resolve().parents[2]
 # Optional time-based "answer with what you have" nudge (seconds); off unless RAVEN_WRAP_UP_SECONDS is set.
 WRAP_UP_SECONDS = float(os.environ['RAVEN_WRAP_UP_SECONDS']) if os.environ.get('RAVEN_WRAP_UP_SECONDS') else None
 MEMORY_POLICY = (
-    "Raven memory: the STORED USER MEMORY snapshot is the user's saved preferences. Use it without asking "
+    "Korp memory: the STORED USER MEMORY snapshot is the user's saved preferences. Use it without asking "
     "(for example their shoe or clothing size, colours, stores to avoid) and mention briefly when you did. "
     "Save durable facts the user states about themselves (\"I'm a size 43\", \"never sign me up for newsletters\", "
     "\"I live in Uppsala\") with memory_update before continuing; never save one-off task details, prices, "
     "products or anything read on websites. newsletter_opt_in stays 'never' unless the user explicitly says otherwise.")
-WRAP_UP_MESSAGE = ('Raven live-demo timer: time is up for browsing. Do not open or read more pages. '
+WRAP_UP_MESSAGE = ('Korp live-demo timer: time is up for browsing. Do not open or read more pages. '
                    'Call send_msg_to_user now with the best answer from what you have already seen: name concrete '
                    'products/facts with prices and links where you saw them (mark anything unverified), then say '
                    'briefly what you could not check.')

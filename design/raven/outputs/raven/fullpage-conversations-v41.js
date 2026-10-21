@@ -42,7 +42,7 @@
     return result;
   }
   function messageFrom(value) {
-    if (!plain(value) || typeof value.text !== 'string' || !['You', 'Raven'].includes(value.who)) return null;
+    if (!plain(value) || typeof value.text !== 'string' || !['You', 'Korp'].includes(value.who)) return null;
     return { text: text(value.text, MAX_TEXT), who: value.who, sources: sourcesFrom(value.sources) };
   }
   function threadFrom(value) {

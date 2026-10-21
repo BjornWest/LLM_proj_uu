@@ -158,7 +158,7 @@ const vm=require('node:vm');
   transport.demoMode=false;
   assert.equal(transport.errorMessage(new Error('Worker.evaluate raw stack')),'Worker.evaluate raw stack');
   transport.events('debug',{onEvent:()=>{},onError:e=>errors.push(e)});
-  source.onerror();assert(errors.at(-1).message.includes('Connection to Raven was interrupted'));
+  source.onerror();assert(errors.at(-1).message.includes('Connection to Korp was interrupted'));
 })().catch(error=>{console.error(error);process.exitCode=1;});
 '''
     subprocess.run(['node', '-e', script], cwd=root, check=True)

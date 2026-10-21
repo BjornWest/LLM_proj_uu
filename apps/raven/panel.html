@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head><link rel="icon" type="image/png" href="korp-icon.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Raven · shopping citations</title>
+  <title>Korp</title>
   <script src="chat-flight-director-live-v36.js?v=36-live-1" defer></script>
   <script src="vendor-v33/marked-17.0.5.umd.js" defer></script>
   <script src="vendor-v33/dompurify-3.4.16.min.js" defer></script>
@@ -113,8 +113,8 @@
 </head>
 <body>
 <main>
-  <header><b>Raven <span>/ your browser assistant</span></b><nav aria-label="Other previews"><a href="chat-fullpage-v42.html">Full-page chat ↗</a><a href="index.html">Asset index ↗</a></nav></header><div id="tabs" aria-label="Agent tabs"></div><div class="controls status-row"><button type="button" id="stop" disabled hidden>Stop</button><span id="run-status" role="status">Ready</span></div><div id="handover" hidden><p id="handover-message"></p><button type="button" id="handback">Finished — return tab to Raven</button></div>
-  <section class="scene" id="chat-scene" data-state="loading" aria-label="Raven chat demo">
+  <header><b>Korp <span>/ your browser assistant</span></b><nav aria-label="Other previews"><a href="chat-fullpage-v42.html">Full-page chat ↗</a><a href="index.html">Asset index ↗</a></nav></header><div id="tabs" aria-label="Agent tabs"></div><div class="controls status-row"><button type="button" id="stop" disabled hidden>Stop</button><span id="run-status" role="status">Ready</span></div><div id="handover" hidden><p id="handover-message"></p><button type="button" id="handback">Finished — return tab to Korp</button></div>
+  <section class="scene" id="chat-scene" data-state="loading" aria-label="Korp chat demo">
     <div class="sky" id="sky"><canvas class="flight-guides" id="flight-guides" aria-hidden="true" hidden></canvas><div class="sky-caption"><span class="status" id="raven-status" role="status">Loading raven…</span><span id="countdown">A ten-second demo</span></div><div class="web-activity" id="web-activity" role="status" aria-live="polite" aria-atomic="true" hidden>
       <span class="activity-dot" data-activity-dot aria-hidden="true"></span>
       <span class="activity-label" data-activity-label>Exploring</span>
@@ -122,15 +122,15 @@
       <span class="activity-globe" data-activity-globe aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="8" cy="8" r="6"/><ellipse cx="8" cy="8" rx="2.7" ry="6"/><path d="M2 8h12M3 4.8h10M3 11.2h10"/></svg></span>
       <a class="activity-site" data-activity-site target="_blank" rel="noopener noreferrer"></a>
     </div></div>
-    <section class="chat-window" aria-label="Conversation"><div class="chat-heading"><strong>Your browser assistant</strong><span>Live browser</span></div><div class="chat-divider"></div><div class="messages" id="messages" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions"><article class="message"><span class="message-label">Raven</span><div class="message-copy" data-shopping-welcome>Ask me to explore the web. Choose your window or let me work in the background.</div></article></div><button class="new-reply" id="new-reply" type="button" aria-label="Jump to the new reply" hidden>New reply ↓</button></section>
+    <section class="chat-window" aria-label="Conversation"><div class="chat-heading"><strong>Your browser assistant</strong><span>Live browser</span></div><div class="chat-divider"></div><div class="messages" id="messages" role="log" aria-label="Messages" aria-live="polite" aria-relevant="additions"><article class="message"><span class="message-label">Korp</span><div class="message-copy" data-shopping-welcome>Ask me to explore the web. Choose your window or let me work in the background.</div></article></div><button class="new-reply" id="new-reply" type="button" aria-label="Jump to the new reply" hidden>New reply ↓</button></section>
     <form id="chat-form">
       <label class="input-label" for="message-input">New message</label>
       <div class="input-wrap"><textarea id="message-input" name="message" rows="3" aria-describedby="demo-hint" placeholder="Write something for the raven…"></textarea></div>
-      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><select id="browser-mode" class="mode-select" aria-label="Where Raven works"><option value="user_window">Use my window</option><option value="background_window">Work in background</option></select><button class="send" id="send-button" type="submit" disabled><span>Send message ↗</span></button></div>
+      <div class="send-row"><p class="hint" id="demo-hint"><span id="live-render-info" hidden></span><span id="demo-reply-time" hidden></span>Enter to send · Shift+Enter for a new line</p><select id="browser-mode" class="mode-select" aria-label="Where Korp works"><option value="user_window">Use my window</option><option value="background_window">Work in background</option></select><button class="send" id="send-button" type="submit" disabled><span>Send message ↗</span></button></div>
     </form>
     <div id="tracking-zone" class="tracking-zone" aria-hidden="true" hidden></div>
     <canvas class="bird-overlay" id="raven-sounds" aria-hidden="true"></canvas>
-    <canvas class="bird-overlay" id="raven-canvas" role="img" aria-label="Raven perched on the send button"></canvas>
+    <canvas class="bird-overlay" id="raven-canvas" role="img" aria-label="Korp perched on the send button"></canvas>
   </section>
   <footer class="settings"><label for="frame-rate">Frame rate<select id="frame-rate" class="frame-rate" disabled><option value="144">144 fps</option><option value="120" selected>120 fps</option><option value="60">60 fps</option><option value="24">24 fps</option><option value="8">8 fps · stepped</option></select></label><label><input type="checkbox" id="mouse-tracking" checked title="Move inside the dotted circle to guide its gaze. Circle its head for a playful tilt.">Mouse tracking · dotted circle</label><label><input type="checkbox" id="dark-palette" checked>Darker feathers</label><label><input type="checkbox" id="long-patrol">Long patrol (60 seconds)</label><label><input type="checkbox" id="show-flight-path">Show flight paths</label><button type="button" id="pet-raven" class="pet-action" disabled>Pet the raven</button><div class="links"><a href="chat-fullpage-v42.html">Full-page chat</a><a href="index.html">Asset index</a><a href="index.html#integration">Integration notes</a></div></footer>
 </main>
