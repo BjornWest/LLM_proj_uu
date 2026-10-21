@@ -18,8 +18,8 @@ import uuid
 
 SLICE = "llmjobs.slice"
 GIB = 1024 ** 3
-SHARED_MAX = 16 * GIB
-SHARED_HIGH = 14 * GIB
+SHARED_MAX = 23 * GIB
+SHARED_HIGH = 23 * GIB
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -38,9 +38,18 @@ def cpu_pool():
         online.extend(range(bounds[0], bounds[-1] + 1))
     if len(online) < 2:
         raise RuntimeError("Need at least two online CPUs to reserve interactive capacity")
-    count = max(1, len(online) // 3)
-    start = min(4, len(online) - count)
-    pool = set(online[start:start + count]) & os.sched_getaffinity(0)
+    # BOUNDED_JOB_CPUS: "all", or "a-b". Default: every CPU except the first two,
+    # which stay free for the desktop/interactive sessions (owner decision 2026-10-20;
+    # the old 4-11 pool left 16 of 24 cores idle during overnight runs).
+    spec = os.environ.get("BOUNDED_JOB_CPUS", "")
+    if spec == "all":
+        chosen = online
+    elif "-" in spec:
+        lo, hi = (int(x) for x in spec.split("-", 1))
+        chosen = [c for c in online if lo <= c <= hi]
+    else:
+        chosen = online[2:] if len(online) > 4 else online
+    pool = set(chosen) & os.sched_getaffinity(0)
     if not pool:
         raise RuntimeError("Launcher affinity does not intersect the shared job CPU pool")
     return sorted(pool)
@@ -73,7 +82,7 @@ def enter(args):
     if group.parent.name != SLICE:
         raise RuntimeError("Job is outside the shared resource slice")
     expected = {"memory.max": args.memory_mib * 1024 ** 2,
-                "memory.swap.max": 0, "pids.max": args.tasks}
+                "memory.swap.max": 0, "pids.max": args.tasks or "max"}
     for name, value in expected.items():
         if (group / name).read_text().strip() != str(value):
             raise RuntimeError(f"Effective {name} differs from requested limit")
@@ -111,8 +120,10 @@ def cleanup(unit):
 def run(args):
     if not 32 <= args.memory_mib <= SHARED_MAX // (1024 ** 2):
         raise ValueError(f"Per-job memory must be 32-{SHARED_MAX // (1024 ** 2)} MiB")
-    if not 16 <= args.tasks <= 512:
-        raise ValueError("Per-job tasks must be 16-512")
+    # --tasks 0 removes the per-job task cap (deployments, many-browser cohorts);
+    # memory stays the only bound then.
+    if args.tasks != 0 and not 16 <= args.tasks <= 512:
+        raise ValueError("Per-job tasks must be 16-512, or 0 for no task cap")
     pool = cpu_pool()
     subprocess.run(["systemctl", "--user", "set-property", "--runtime", SLICE,
                     "MemoryAccounting=yes", f"MemoryHigh={SHARED_HIGH}",
@@ -136,7 +147,7 @@ def run(args):
                   # Do not stall a single oversize allocation in reclaim well
                   # below its hard cap. Shared MemoryHigh still limits pressure.
                   "-p", f"MemoryHigh={args.memory_mib}M",
-                  "-p", "MemorySwapMax=0", "-p", f"TasksMax={args.tasks}",
+                  "-p", "MemorySwapMax=0", "-p", f"TasksMax={args.tasks or 'infinity'}",
                   sys.executable, str(Path(__file__).resolve()), "--enter",
                   "--unit", args.unit, "--receipt", str(args.receipt),
                   "--memory-mib", str(args.memory_mib), "--tasks", str(args.tasks),
