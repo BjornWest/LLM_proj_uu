@@ -267,7 +267,7 @@ class UserWindow:
         return result
 
 
-BACKENDS = ('sol', 'openrouter', 'selfhosted')
+BACKENDS = ('sol', 'openrouter', 'selfhosted', 'anthropic')
 
 
 class ModelRegistry:
@@ -335,6 +335,8 @@ class ModelRegistry:
             return cached[1]
         if preset['backend'] == 'openrouter':
             ok = bool(os.environ.get('OPENROUTER_API_KEY'))
+        elif preset['backend'] == 'anthropic':
+            ok = bool(os.environ.get('ANTHROPIC_API_KEY'))
         elif preset['backend'] == 'sol':
             import shutil
             ok = shutil.which('pi') is not None
