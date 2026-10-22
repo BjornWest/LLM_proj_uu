@@ -301,6 +301,13 @@ class UserWindow:
                         self.browser.close()
                     except Exception:
                         pass
+                    if not self.windows_browser:
+                        try:
+                            # A failed Linux attempt may have opened a new persistent context (holding
+                            # the profile) before self.browser was replaced: close it too.
+                            self.context.close()
+                        except Exception:
+                            pass
                     if self.windows_chrome is not None:
                         try:
                             self.windows_chrome.close()

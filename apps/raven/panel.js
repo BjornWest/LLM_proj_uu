@@ -115,7 +115,7 @@ window.addEventListener('DOMContentLoaded', () => {
     post('/api/tasks/' + run + '/message', {text}).then(() => {
       c.appendMessage(text, 'You'); history.push({who: 'You', text}); syncThinking();
     }).catch(() => {
-      if (!c.input.value) c.input.value = text;
+      c.input.value = c.input.value.trim() ? text + '\n' + c.input.value : text;  // keep any newer draft too
       syncStop();
       status.textContent = run ? 'Could not send that to Korp; try again.' : 'Korp had already finished; press Fetch to send it as a new message.';
     });

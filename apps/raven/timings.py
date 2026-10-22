@@ -88,12 +88,13 @@ def report(directory):
         print(f"{len(failed)} model call(s) failed without a response ({sum(m['seconds'] for m in failed):.1f}s); "
               "the fit and per-token figures use completed calls only")
     model_ok = [m for m in model if not m.get('failed')]
+    model_ok_s = sum(m['seconds'] for m in model_ok)
     cost = [m['cost'] for m in model if m['cost'] is not None]
     print(f"wall {wall:.1f}s = model {model_s:.1f}s ({100 * model_s / wall:.0f}%) + tools {tool_s:.1f}s "
           f"({100 * tool_s / wall:.0f}%) + other {wall - model_s - tool_s:.1f}s (observation, guards, pacing)")
     print(f"{len(model)} model calls, mean {model_s / len(model):.2f}s; input {sum(m['input'] for m in model)} tok "
           f"(cached {sum(m['cached'] for m in model)}), output {out} tok; "
-          f"whole-call ms per output token {1000 * model_s / out:.0f}" if out else '')
+          f"whole-call ms per output token {1000 * model_ok_s / out:.0f}" if out else '')
     if cost:
         print(f"provider-reported cost ${sum(cost):.4f}")
     by_tool = {}
