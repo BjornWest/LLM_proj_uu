@@ -655,6 +655,17 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
             on_retry=lambda: emit('step', index=current_step, summary='Provider slow, retrying…'), supports_images=True,
             request_timeout=90, max_tokens=max_tokens)
         backend.sampling = {}
+        configure_tools = backend.configure_tools
+        def anthropic_tools(tool_options):
+            # Anthropic rejects top-level oneOf/anyOf/allOf (scroll's "delta_x or delta_y");
+            # the harness still validates arguments against the full schema.
+            tool_options = json.loads(json.dumps(tool_options))
+            for tool in tool_options.get('tools') or []:
+                parameters = (tool.get('function') or {}).get('parameters') or {}
+                for key in ('oneOf', 'anyOf', 'allOf'):
+                    parameters.pop(key, None)
+            return configure_tools(tool_options)
+        backend.configure_tools = anthropic_tools
         from intent_browser.input_budget import OpaqueReasoningInputCounter, QwenInputCounter
         input_counter = OpaqueReasoningInputCounter(QwenInputCounter(str(
             ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')))
