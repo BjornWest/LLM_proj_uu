@@ -687,7 +687,14 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
                 converted.append(message)
             if images:
                 converted.append({'role': 'user', 'content': images})
-            return complete_text_tools(converted)
+            if converted == messages:
+                return complete_text_tools(messages)
+            completion = complete_text_tools(converted)
+            # Policy-delivery checks bind content spans to the harness's message layout; record
+            # that layout and mark the deterministic wire conversion.
+            completion.request = {**(completion.request or {}), 'messages': messages,
+                                  'wire_conversion': 'anthropic-tool-images-v1'}
+            return completion
         backend.complete = anthropic_messages
         from intent_browser.input_budget import OpaqueReasoningInputCounter, QwenInputCounter
         input_counter = OpaqueReasoningInputCounter(QwenInputCounter(str(
