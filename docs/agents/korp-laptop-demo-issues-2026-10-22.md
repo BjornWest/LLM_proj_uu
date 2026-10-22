@@ -18,8 +18,8 @@ GPT-6.1 Sol (`sol`), Qwen 27B + SFT on Modal (`qwen-sft-modal`).
 | 3 | Closing the Korp Chrome window "crashes the app" | Backend survives but never relaunches the browser | Confirmed, reproduced |
 | 4 | Restart right after closing the window sometimes fails once | Startup races the previous Chrome shutdown (likely) | Observed once |
 | 5 | Flock: helpers restart from scratch, findings lost on cancel | Demo retry applies to helpers; helper reports live only in the main run | Confirmed from traces |
-| 6 | Episodes die with `ObservationChanged: Document/custody changed during preview` | Exception from the dynamic preview is not handled | Confirmed location; trigger unknown |
-| 7 | Page reads take 5-70 s on frame-heavy pages; flock is slow | Every CDP round trip crosses the PowerShell stdin/stdout relay | Measured |
+| 6 | Episodes die with `ObservationChanged: Document/custody changed during preview` | Exception from the dynamic preview is not handled | Location confirmed; trigger likely a post-navigation reload in one case, unknown in the other |
+| 7 | Page reads take 5-70 s on frame-heavy pages; flock is slow | Every CDP round trip crosses the PowerShell stdin/stdout relay (inferred) | Latency measured; relay cause inferred |
 | 8 | Smaller laptop/setup issues | See section 8 | Confirmed |
 
 ## 1. A second window's task is refused, and demo mode hides why
@@ -57,44 +57,57 @@ in the same language as my message above, even if the websites use another langu
 The system prompt already says to answer "in the language of the user's latest message
 (not the website's language)".
 
-Replay of the recorded first request of `b291b876` (50 calls via Anthropic's
-OpenAI-compatible endpoint unless noted; ~710k input tokens, about $1.50):
+Replay of the recorded first request of `b291b876` (55 calls; provider-reported
+`prompt_tokens`/`completion_tokens` of complete requests: 710,565 in, 8,042 out, about
+$1.50 at $2/$10 per MTok). All calls used Anthropic's OpenAI-compatible endpoint (the path
+Korp uses; the recorded request is the wire request) except the native-API row.
+"No-observation base" is the recorded request with the example.com `BROWSER UPDATE` /
+`CURRENT BROWSER OBSERVATION` part of the user message removed.
 
 | Variant | Non-English replies |
 |---|---|
-| Exact recorded request (5 compat + 5 native API with summarized thinking + 10 compat, without the example.com observation) | 11 of 25 total: German, Spanish, Arabic, Vietnamese |
-| Without the example.com observation, without the system sentence "never infer it from your own name, the language of the message or website content" | 7 of 10 (German) |
-| **Without only the appended language sentence** | **0 of 10** |
-| Without every language instruction | 0 of 10 |
+| Exact recorded request | 1 of 5 (Spanish) |
+| Exact recorded request, native Messages API with summarized adaptive thinking | 2 of 5 (Spanish) |
+| No-observation base | 8 of 15 (German, Spanish, Arabic, Vietnamese); 6 of 10 within the batch used for the rows below |
+| No-observation base minus the system sentence "never infer it from your own name, the language of the message or website content" | 7 of 10 (German) |
+| **No-observation base minus only the appended language sentence** | **0 of 10** |
+| No-observation base minus every language instruction | 0 of 10 |
 
 The thinking summaries (native API) never mention language or the user's nationality.
-They only say the origin city and dates are missing. The wrong language appears mostly
-when the model asks a follow-up question instead of answering.
+They only say the origin city and dates are missing. Every replay reply was a follow-up
+question, but the problem is not limited to those: live runs also gave full answers in
+the wrong language (`9eb5229b` attempt 2 in Spanish, `de69e569` final in Spanish,
+`81ff5e34` in German after the German first turn).
 
-Suggested fix: delete only that sentence from the appended goal suffix and keep the rest.
-This is the tested "without only the appended language sentence" variant. Tested only on
-this request and only with Claude Sonnet 5.5; re-check other presets after the change.
+Suggested fix: delete only that sentence from the appended goal suffix and keep the rest,
+including the `\n\n` separator before "For research answers…" (the sentence has no
+trailing space, so the current text reads "…another language.For research answers").
+That is the tested "minus only the appended language sentence" variant. Tested on this one
+request (without the page observation) and only with Claude Sonnet 5.5; re-check other
+presets after the change.
 
 ## 3. Closing the Korp Chrome window leaves the service without a browser
 
 Reproduced: closing the Chrome for Testing window (`CloseMainWindow`) ended every
 Korp Chrome process. `backend.py` kept serving `/api/health` (HTTP 200), but the next
 `user_window` task (`ba4955eb`) failed with
-`TimeoutError: BrowserType.connect_over_cdp: Timeout 30000ms exceeded`. Demo mode retried
-once, then showed the friendly error. Nothing relaunches Chrome; only rerunning
+`TimeoutError: BrowserType.connect_over_cdp: Timeout 30000ms exceeded`. Demo mode started
+attempt 2; I cancelled it after 24 s, so the final friendly error was not observed, but
+`backend.py:618-630` would show it after a second timeout. Nothing relaunches Chrome; only rerunning
 `start_demo.sh` recovers. The side panel lives in that window, so the user also loses the UI.
 
 Suggested fixes: detect browser disconnect in `UserWindow` and relaunch Chrome (with the
 extension), or make `/api/health` report the missing browser and exit so a supervisor
 can restart. Either way, tasks should fail fast with "the Korp window was closed" instead
-of a 30 s CDP timeout twice.
+of up to two 30 s CDP timeouts.
 
 ## 4. Restart right after a close sometimes fails once
 
 Once (13:25), `start_demo.sh` failed with
 `RuntimeError: Page.goto: Target page, context or browser has been closed` in
 `UserWindow.__init__` (`backend.py:64`). Before that it logged `Could not clear the demo
-browser cache` (`backend.py:128`, `TargetClosedError`). A second run a few seconds later
+browser cache` (`backend.py:131`, `TargetClosedError`). Quoted from the launcher's terminal
+output; the log itself was overwritten by the next start (section 8). A second run a few seconds later
 worked. Likely cause, not verified: `start_demo.sh` stops the old Chrome with
 `Stop-Process` and waits 2 s; a new Chrome with the same profile can start while the old
 one is still exiting and then close. A wait until no `raven-demo` Chrome remains
@@ -130,37 +143,52 @@ The request was flagship phones from four brands. The main agent spawned helpers
 
 ## 6. `ObservationChanged: Document/custody changed during preview` ends the episode
 
-Seen in `3ac2f263` (Qwen + SFT on Modal, example.com, single agent) and `52c11f83` attempt
-1 (iPhone helper on apple.com). Raised by `intent_browser/dynamic_preview.py:89-90` when
-`identity()` (tab, handover id, main document backend node id, loader id and URL)
-differs before and after the shallow AX read. The call site
-`intent_browser/observation_pipeline.py:428` does not handle it, so it propagates and the
-episode fails instead of falling back to a full capture. Line 353 handles the same
-exception for the pending path. Neither page was navigating; the preview took 1.9 s and
-3.5 s because of item 7. In `3ac2f263` the user's panel request was refused (section 1)
-about 30 s before the failing preview. I did not determine which identity field changed.
+Seen twice. Raised by `intent_browser/dynamic_preview.py:89-90` when `identity()` (tab,
+handover id, main document backend node id, loader id and URL) differs before and after
+the shallow AX read. The call site `intent_browser/observation_pipeline.py:428` does not
+handle it, so it propagates and the episode fails instead of recapturing.
+`ObservationChanged` is handled only on the overlapped/pending path
+(`observation_pipeline.py:353`, 372-393); the other path re-raises (397-398).
 
-Suggested fix: on `ObservationChanged` from `preview()`, trace it and return
-`self.capture()` (full capture), like the paused-preview path. Log the identity diff.
+- `52c11f83` attempt 1 (iPhone helper): the failing preview (12:07:25-28 UTC) was the
+  first one after step 22 `goto('https://www.gsmarena.com/results.php3?…iphone+18+pro')`,
+  whose load wait took only 0.03 s. GSMArena was serving a Cloudflare Turnstile check to
+  the helpers, which reloads/redirects the page. A post-navigation reload changing the
+  loader id is the likely trigger. (The apple.com URL in the final `human_tab_transition`
+  record is stale metadata.)
+- `3ac2f263` attempt 1 (Qwen + SFT on Modal, example.com, single agent): trigger unknown;
+  I did not determine which identity field changed. The preview took 1.9 s (item 7); the
+  user's panel request was refused (section 1) about 30 s earlier.
+
+Suggested fix: do not blanket-catch. `preview()` also raises
+`ObservationChanged('Preview custody unavailable')` from `identity()`
+(`dynamic_preview.py:56-57`) when the user holds the tab, and a full capture there would
+read a user-controlled tab. Limit the fallback to the "changed during preview" case:
+re-check custody, count it in `invalidation_streak`, then return a full capture. Log
+the identity diff.
 
 ## 7. Slow page reads with `--windows-browser`
 
 CDP traffic goes through `powershell.exe` copying stdin/stdout to a TCP client
-(`intent_browser/windows_browser.py:83-85`), about 0.1-0.2 s per round trip
-(`frame_owner_lookup` median 0.11-0.16 s). Capture cost scales with frame count:
+(`intent_browser/windows_browser.py:83-85`). The per-frame phase `frame_owner_lookup`
+has a median of 0.11-0.22 s across today's traces (0.20-0.22 s in the flock runs); that
+is a phase time, which may include more than one CDP round trip. Capture time grows with
+frame count:
 
 | Pages | Frames per capture | Capture time |
 |---|---|---|
-| example.com, apple.com/se, prisjakt | 1-3 | 0.5-2.5 s |
+| example.com, apple.com/se, prisjakt | 1-3 | 0.4-2.9 s |
 | time.is (ads/trackers) | 20-49 | 5-14 s |
-| time.is, one capture | 278 | 70 s |
+| time.is, one capture | about 280 | 70 s |
 | Flock run, 5 agents sharing one Chrome | — | median 6-12 s per agent |
 
-The live clock on time.is is not the cause; almost no time goes to stability waits. The
-2000 ms screenshot timeout (`intent_browser/visual_readiness.py:108,113`) is also easier
-to hit under this load (Pixel helper). I did not measure the PC, so the PC/laptop gap is
-inferred. A direct CDP connection (for example WSL mirrored networking to the Windows
-debugging port) would remove the per-call relay cost.
+Frame count does not explain everything: Kayak (8 frames) took 5-8 s with one agent, and
+samsung.com (7-11 frames) took 35-44 s in the flock run. The live clock on time.is is not
+the cause; almost no time goes to stability waits. The 2000 ms screenshot timeout
+(`intent_browser/visual_readiness.py:108,113`) is also easier to hit under this load
+(Pixel helper). There is no direct-CDP baseline and I did not measure the PC, so blaming
+the relay is an inference. A direct CDP connection (for example WSL mirrored networking to
+the Windows debugging port) would test it and remove the per-call relay cost.
 
 ## 8. Laptop setup and smaller issues
 
@@ -172,16 +200,20 @@ debugging port) would remove the per-call relay cost.
   app-server daemon**. Without the daemon, `SubscriptionQuotaGuard` cannot read quota
   (`held_unverifiable`, `FileNotFoundError` on the stale socket), the bridge returns HTTP 502
   and the user sees only the friendly error. `codex app-server daemon start` fixed it.
-  `LAPTOP_SETUP.md` does not mention the daemon.
+  `LAPTOP_SETUP.md` does not mention the daemon, and `LAPTOP_SETUP.md:408-409` still says
+  Sol "is not set up on the laptop".
 - `start_demo.sh:27` truncates `.local/raven-logs/raven-$PORT.log` on every start, so
   each restart deletes the evidence of the previous failure. Appending or rotating would
   have preserved the 13:42-13:49 window lost today.
 - `ModelRegistry.available()` (`backend.py:331`) marks OpenRouter presets available when
   `OPENROUTER_API_KEY` merely exists (the laptop has a 15-character placeholder). For
-  self-hosted presets it GETs `/v1/models` with a 2 s timeout on every uncached
-  `/api/models` call: 14 panel calls in 3 minutes probe both Modal presets. That can start
-  a scaled-to-zero GPU, and a cold start never passes in 2 s, so Korp falls back instead.
-  Modal showed 229 queued requests and one starting runner at 13:3x.
+  self-hosted presets it GETs `/v1/models` with a 2 s timeout whenever the 10 s probe
+  cache has expired (`backend.py:333-334,351`); the panel called `/api/models` 14 times in
+  3 minutes, so each Modal preset is probed up to every 10 s. Inferred, not verified: such
+  probes can wake a scaled-to-zero GPU, and a cold start never answers in 2 s, so Korp
+  falls back instead. Modal's function stats (read via the `modal` client, not checkable
+  from local files) showed a backlog of 229 and one starting runner shortly before the
+  talk.
 - The `apps.raven.smoke` mock service has no `models` attribute, so the panel's
   `/api/models` call logs `AttributeError: 'MockService' object has no attribute 'models'`
   tracebacks during an otherwise passing smoke.
@@ -197,5 +229,8 @@ debugging port) would remove the per-call relay cost.
 - Sol: subscription only, no per-token charge.
 - Claude Sonnet 5.5: the user's demo runs plus about $1.50 of language replays (section 2)
   and a 16-token key check.
-- Qwen + SFT on Modal: one test question, about 88k input tokens, billed as GPU time.
+- Qwen + SFT on Modal, provider-reported `prompt_tokens` of complete requests (Qwen
+  tokenizer, from `steps.jsonl`): `3ac2f263` 88,297 (attempt 1) + 9,201 (attempt 2),
+  `713fa0b2` 9,564, `40fbe096` (Kayak search, 24 steps) 584,017; about 691k in total.
+  Billed as Modal GPU time, not per token.
 - OpenRouter: no successful calls (the key is a placeholder).
