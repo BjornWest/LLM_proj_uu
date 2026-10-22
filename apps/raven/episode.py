@@ -667,6 +667,28 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
                     parameters.pop(key, None)
             return configure_tools(tool_options)
         backend.configure_tools = anthropic_tools
+        complete_text_tools = backend.complete
+        def anthropic_messages(messages):
+            # The endpoint accepts only text in tool results: keep the text there and send a
+            # screenshot as a user message right after that run of tool results.
+            converted, images = [], []
+            for message in messages:
+                if message.get('role') != 'tool' and images:
+                    converted.append({'role': 'user', 'content': images})
+                    images = []
+                content = message.get('content')
+                if message.get('role') == 'tool' and isinstance(content, list):
+                    text = '\n'.join(p.get('text', '') for p in content if p.get('type') == 'text')
+                    shots = [p for p in content if p.get('type') == 'image_url']
+                    if shots:
+                        text += '\n(Screenshot attached in the next message.)'
+                        images += [{'type': 'text', 'text': 'Screenshot for the tool result above:'}, *shots]
+                    message = {**message, 'content': text}
+                converted.append(message)
+            if images:
+                converted.append({'role': 'user', 'content': images})
+            return complete_text_tools(converted)
+        backend.complete = anthropic_messages
         from intent_browser.input_budget import OpaqueReasoningInputCounter, QwenInputCounter
         input_counter = OpaqueReasoningInputCounter(QwenInputCounter(str(
             ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')))
