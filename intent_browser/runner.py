@@ -1463,7 +1463,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                                         batch_stop = 'episode_finished'
                                     elif not no_browser and guard_document(env) != initial_document:
                                         batch_stop = 'document_or_navigation_changed'
-                                    if human_browser is not None and batch_stop is None and not (
+                                    # A host tool skipped the guard, so its observation is content the model has not
+                                    # seen: keep the earlier ticket so later page actions are still checked against it.
+                                    if human_browser is not None and batch_stop is None and decision.name not in host_tools and not (
                                             pipeline is not None and pipeline.config.targeted_actions and ordinal==len(decisions)-1):
                                         tab_ticket=human_browser.ticket(obs)
                             except DocumentScanInvalidated as exc:

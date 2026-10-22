@@ -110,10 +110,15 @@ window.addEventListener('DOMContentLoaded', () => {
   const steer = () => {
     const text = c.input.value.trim();
     if (!text || !run) return;
-    fetch('/api/tasks/' + run + '/message', {method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({text})}).catch(() => {});
-    c.appendMessage(text, 'You'); history.push({who: 'You', text});
-    c.input.value = ''; syncStop(); syncThinking();
+    c.input.value = ''; syncStop();
+    // Show the message only once the backend has accepted it; otherwise give the text back.
+    post('/api/tasks/' + run + '/message', {text}).then(() => {
+      c.appendMessage(text, 'You'); history.push({who: 'You', text}); syncThinking();
+    }).catch(() => {
+      if (!c.input.value) c.input.value = text;
+      syncStop();
+      status.textContent = run ? 'Could not send that to Korp; try again.' : 'Korp had already finished; press Fetch to send it as a new message.';
+    });
   };
   window.ravenSteer = steer;
   // Flock mode: one helper raven per helper agent; it flies off when the main agent closes it.
@@ -147,7 +152,7 @@ window.addEventListener('DOMContentLoaded', () => {
     await window.ravenTransport.ready;
     const r = await fetch(url, {method: 'POST', headers: {'Content-Type':'application/json'}, body:JSON.stringify(body)});
     const data = await r.json();
-    if (!r.ok) {const error=new Error(data.error || 'Request failed');error.status=r.status;throw error;}
+    if (!r.ok) {const error=new Error(data.error || 'Request failed');error.status=r.status;error.userFacing=data.user_facing===true;throw error;}
     return data;
   };
   const tabs = new Map();

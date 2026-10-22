@@ -23,7 +23,7 @@ class FailureService(Service):
     def stop_process(self, run):
         run.process.stopped.set()
 
-    def start_attempt(self, run, scripted=None):
+    def start_attempt(self, run, scripted=None, cdp_url=None):
         run._events = queue.Queue()
         run.controls = queue.Queue()
         directory = self.output / run.run_id / f'attempt-{run.attempt + 1}'
