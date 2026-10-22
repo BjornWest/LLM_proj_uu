@@ -649,11 +649,12 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
             input_counter = OpaqueReasoningInputCounter(QwenInputCounter(str(
                 ROOT / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json')))
     elif backend_kind == 'anthropic':
-        # Anthropic's OpenAI-compatible endpoint (API key billing). No extended thinking: this
-        # endpoint cannot hand thinking blocks back between tool calls.
+        # Anthropic's OpenAI-compatible endpoint (API key billing). reasoning_effort enables extended
+        # thinking; the endpoint returns no thinking text and handles earlier turns' thinking itself.
         backend = DemoBackend('https://api.anthropic.com/v1', model, os.environ['ANTHROPIC_API_KEY'],
             on_retry=lambda: emit('step', index=current_step, summary='Provider slow, retrying…'), supports_images=True,
-            request_timeout=90, max_tokens=max_tokens)
+            request_timeout=120, max_tokens=max_tokens, request_options=(
+                {'reasoning_effort': options['reasoning_effort']} if options.get('reasoning_effort') else {}))
         backend.sampling = {}
         configure_tools = backend.configure_tools
         def anthropic_tools(tool_options):
@@ -721,7 +722,7 @@ def _episode_attempt(payload, output, events, controls, cdp_url=None, scripted=N
         source='open-internet-v1', training_eligible=False, headless=False,
         generation=({'temperature': 0.6} if model == OPENROUTER_MODEL or backend_kind == 'selfhosted' else
             {'reasoning': openrouter_request_options(model, options)['reasoning']}
-            if backend_kind == 'openrouter' else {} if backend_kind == 'anthropic' else {
+            if backend_kind == 'openrouter' else {'reasoning_effort': options.get('reasoning_effort')} if backend_kind == 'anthropic' else {
             'reasoning_effort': (options.get('reasoning_effort') or 'medium'),
             'requested_service_tier': (options.get('service_tier') or 'priority')}),
         browser_mode=payload['mode'], conversation_id=payload.get('conversation_id'),
