@@ -33,6 +33,10 @@ ASSETS = ROOT / 'design/raven/outputs/raven'
 APP = Path(__file__).resolve().parent
 LOG = logging.getLogger('raven')
 FRIENDLY_ERROR = "Sorry — I couldn't finish that. Could you try again or rephrase?"
+
+
+class BusyError(ValueError):
+    """A refusal the user should see as written (also in demo mode), e.g. a window that is busy."""
 spec = importlib.util.spec_from_file_location('raven_preview', ASSETS / 'server.py')
 preview = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(preview)
@@ -57,6 +61,8 @@ class UserWindow:
         self.ready = threading.Event()
         self.error = None
         self.cdp_url = None
+        self.relaunching = False
+        self.stopping = False
         self.thread = threading.Thread(target=self.loop, daemon=True)
         self.thread.start()
         self.ready.wait(45)
@@ -105,152 +111,193 @@ class UserWindow:
                 sock.bind(('127.0.0.1', 0))
                 debug_port = sock.getsockname()[1]
             with sync_playwright() as pw:
-                extension = APP / 'extension'
-                if self.windows_browser:
-                    from apps.raven.windows_browser import launch_browser
-                    self.windows_chrome = launch_browser(
-                        ROOT / '.local/raven-windows' / str(self.port), extension, self.port, self.profile_dir)
-                    self.browser = pw.chromium.connect_over_cdp(self.windows_chrome.endpoint, timeout=30000)
-                    self.context = self.browser.contexts[0]
-                else:
-                    self.context = pw.chromium.launch_persistent_context(**demo_launch_options(
-                        user_data_dir=str(self.profile_dir or ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
-                        no_viewport=True,
-                        args=[f'--load-extension={extension}', f'--disable-extensions-except={extension}',
-                              f'--remote-debugging-port={debug_port}', '--remote-debugging-address=127.0.0.1',
-                              '--window-size=1440,1000', '--hide-crash-restore-bubble'],
-                        ignore_default_args=['--disable-extensions'],
-                        accept_downloads=False, service_workers='allow'))
-                page = self.context.pages[0] if self.context.pages else self.context.new_page()
-                try:
-                    # The persistent demo profile may hold app files cached by an older build.
-                    cache = self.context.new_cdp_session(page)
-                    cache.send('Network.clearBrowserCache')
-                    cache.detach()
-                except Exception:
-                    LOG.warning('Could not clear the demo browser cache', exc_info=True)
-                page.goto('https://example.com/')
-                from apps.raven.shared_browser import raven_worker
-                worker = raven_worker(self.context)
-                # Native Windows CfT can expose the worker before its extension APIs are bound.
-                for attempt in range(40):
-                    if worker.evaluate("() => !!(globalThis.chrome && chrome.sidePanel)"):
-                        break
-                    time.sleep(0.25)
-                    worker = raven_worker(self.context)
-                worker.evaluate("port => chrome.sidePanel.setOptions({path:'sidepanel.html?port='+port})", self.port)
-                extension_origin = worker.url.rsplit('/', 1)[0]
-                welcome = next((p for p in self.context.pages if p.url.endswith('/welcome.html')), None)
-                if welcome is None:
-                    welcome = self.context.new_page()
-                    welcome.goto(extension_origin + '/welcome.html')
-                welcome.locator('#open').click()
-                welcome.close()
-                page.bring_to_front()
-                if not self.windows_browser:
-                    self.browser = pw.chromium.connect_over_cdp(f'http://127.0.0.1:{debug_port}')
-                # Create the separate agent window during startup, before the
-                # user's window is presented. WSL can focus newly mapped windows
-                # even when Target.createTarget requests background:true.
-                self.background_contexts = []
-                self.helper_contexts = {}
-                self.new_background_window(page)
-                blank = ('about:blank', 'chrome://newtab/', 'chrome://new-tab-page/')
-                page.wait_for_timeout(1500)  # the side panel/welcome flow can still open a default tab
-                for extra in [p for p in self.context.pages if p is not page and p.url in blank]:
-                    extra.close()
-                page.bring_to_front()
-                self.cdp_url = self.windows_chrome.endpoint if self.windows_browser else f'http://127.0.0.1:{debug_port}'
-                self.ready.set()
                 while True:
+                    # Runs again when the user closes the Korp Chrome window (relaunch below).
+                    extension = APP / 'extension'
+                    if self.windows_browser:
+                        from apps.raven.windows_browser import launch_browser
+                        self.windows_chrome = launch_browser(
+                            ROOT / '.local/raven-windows' / str(self.port), extension, self.port, self.profile_dir)
+                        self.browser = pw.chromium.connect_over_cdp(self.windows_chrome.endpoint, timeout=30000)
+                        self.context = self.browser.contexts[0]
+                    else:
+                        self.context = pw.chromium.launch_persistent_context(**demo_launch_options(
+                            user_data_dir=str(self.profile_dir or ROOT / '.local/raven-demo-profile'), headless=False, channel='chromium',
+                            no_viewport=True,
+                            args=[f'--load-extension={extension}', f'--disable-extensions-except={extension}',
+                                  f'--remote-debugging-port={debug_port}', '--remote-debugging-address=127.0.0.1',
+                                  '--window-size=1440,1000', '--hide-crash-restore-bubble'],
+                            ignore_default_args=['--disable-extensions'],
+                            accept_downloads=False, service_workers='allow'))
+                    page = self.context.pages[0] if self.context.pages else self.context.new_page()
                     try:
-                        action, data, response = self.commands.get(timeout=0.1)
-                    except queue.Empty:
-                        self.context.pages[0].wait_for_timeout(50) if self.context.pages else None
-                        continue
-                    try:
-                        if action == 'worker-health':
-                            from apps.raven.shared_browser import raven_worker
-                            worker = raven_worker(self.context)
-                            response.put({'ok': bool(worker.evaluate("() => !!(globalThis.chrome && chrome.sidePanel && chrome.tabs)")),
-                                          'windows_browser': self.windows_browser})
-                        elif action == 'close':
-                            for context in self.background_contexts:
-                                context.close()
-                            if self.windows_browser:
-                                self.browser.new_browser_cdp_session().send('Browser.close')
-                            self.browser.close()
-                            if not self.windows_browser:
-                                self.context.close()
-                            else:
-                                self.windows_chrome.close()
-                            response.put(True)
+                        # The persistent demo profile may hold app files cached by an older build.
+                        cache = self.context.new_cdp_session(page)
+                        cache.send('Network.clearBrowserCache')
+                        cache.detach()
+                    except Exception:
+                        LOG.warning('Could not clear the demo browser cache', exc_info=True)
+                    page.goto('https://example.com/')
+                    from apps.raven.shared_browser import raven_worker
+                    worker = raven_worker(self.context)
+                    # Native Windows CfT can expose the worker before its extension APIs are bound.
+                    for attempt in range(40):
+                        if worker.evaluate("() => !!(globalThis.chrome && chrome.sidePanel)"):
                             break
-                        if action == 'background':
-                            pages = self.background_contexts[0].pages if self.background_contexts else []
-                            if not pages:
-                                # The user closed the agent window: make a new minimized one.
-                                self.new_background_window(self.context.pages[0])
-                                pages = self.background_contexts[0].pages
-                            response.put(target_id(pages[0].context, pages[0]))
-                        elif action == 'helper_window':
-                            self.new_background_window(self.context.pages[0], keep_others=True)
-                            response.put(self.background_target)
-                        elif action == 'helper_tab':
-                            tab = self.context.new_page()
-                            response.put(target_id(self.context, tab))
-                        elif action == 'close_helper_window':
-                            helper = self.helper_contexts.pop(data, None)
-                            if helper is not None:
-                                helper.close()
-                            response.put(True)
-                        elif action == 'close_helper_target':
-                            helper = self.helper_contexts.pop(data, None)
-                            if helper is not None:
-                                helper.close()
-                            for tab in list(self.context.pages):
-                                if not tab.is_closed() and target_id(self.context, tab) == data:
-                                    tab.close()
-                            response.put(True)
-                        elif action == 'tabs':
-                            from apps.raven.shared_browser import active_target
-                            active = active_target(self.context)
-                            rows = []
-                            for c in [self.context, *self.background_contexts, *self.helper_contexts.values()]:
-                              for p in c.pages:
-                                # The agent window's idle placeholder is not a page anyone visited.
-                                if p.is_closed() or p.url.startswith('chrome-extension:') or (
-                                        c is not self.context and p.url == 'about:blank'):
-                                    continue
-                                try:
-                                    tid = target_id(p.context, p)
-                                    rows.append(dict(tab_id=tid, url=p.url, title=p.title(),
-                                        owner='human' if c is self.context else 'agent', active=tid == active))
-                                except Exception:
-                                    if not p.is_closed():
-                                        raise
-                            response.put(rows)
-                        elif action == 'focus':
-                            for p in [p for c in [self.context, *self.background_contexts, *self.helper_contexts.values()] for p in c.pages]:
-                                if target_id(p.context, p) == data:
-                                    session = p.context.new_cdp_session(p)
-                                    wid = session.send('Browser.getWindowForTarget')['windowId']
-                                    bounds = session.send('Browser.getWindowBounds', {'windowId':wid})['bounds']
-                                    # Only un-minimize / bring the parked agent window on-screen; never
-                                    # touch a normal, maximized or fullscreen window of the user.
-                                    if bounds.get('windowState') == 'minimized':
-                                        session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'windowState':'normal'}})
+                        time.sleep(0.25)
+                        worker = raven_worker(self.context)
+                    worker.evaluate("port => chrome.sidePanel.setOptions({path:'sidepanel.html?port='+port})", self.port)
+                    extension_origin = worker.url.rsplit('/', 1)[0]
+                    welcome = next((p for p in self.context.pages if p.url.endswith('/welcome.html')), None)
+                    if welcome is None:
+                        welcome = self.context.new_page()
+                        welcome.goto(extension_origin + '/welcome.html')
+                    welcome.locator('#open').click()
+                    welcome.close()
+                    page.bring_to_front()
+                    if not self.windows_browser:
+                        self.browser = pw.chromium.connect_over_cdp(f'http://127.0.0.1:{debug_port}')
+                    # Create the separate agent window during startup, before the
+                    # user's window is presented. WSL can focus newly mapped windows
+                    # even when Target.createTarget requests background:true.
+                    self.background_contexts = []
+                    self.helper_contexts = {}
+                    self.new_background_window(page)
+                    blank = ('about:blank', 'chrome://newtab/', 'chrome://new-tab-page/')
+                    page.wait_for_timeout(1500)  # the side panel/welcome flow can still open a default tab
+                    for extra in [p for p in self.context.pages if p is not page and p.url in blank]:
+                        extra.close()
+                    page.bring_to_front()
+                    self.cdp_url = self.windows_chrome.endpoint if self.windows_browser else f'http://127.0.0.1:{debug_port}'
+                    self.relaunching = False
+                    self.ready.set()
+                    while True:
+                        try:
+                            action, data, response = self.commands.get(timeout=0.1)
+                        except queue.Empty:
+                            if not self.browser.is_connected() or not self.context.pages:
+                                # The user's window was closed (Chrome exits, or keeps running only for
+                                # the hidden agent window): relaunch Chrome with the side panel.
+                                break
+                            try:
+                                self.context.pages[0].wait_for_timeout(50) if self.context.pages else None
+                            except Exception:
+                                # A closed window fails page calls a few seconds before the
+                                # connection reports the disconnect; keep polling until it does.
+                                time.sleep(0.2)
+                            continue
+                        try:
+                            if action == 'worker-health':
+                                from apps.raven.shared_browser import raven_worker
+                                worker = raven_worker(self.context)
+                                response.put({'ok': bool(worker.evaluate("() => !!(globalThis.chrome && chrome.sidePanel && chrome.tabs)")),
+                                              'windows_browser': self.windows_browser})
+                            elif action == 'close':
+                                for context in self.background_contexts:
+                                    context.close()
+                                if self.windows_browser:
+                                    self.browser.new_browser_cdp_session().send('Browser.close')
+                                self.browser.close()
+                                if not self.windows_browser:
+                                    self.context.close()
+                                else:
+                                    self.windows_chrome.close()
+                                response.put(True)
+                                self.stopping = True
+                                break
+                            if action == 'background':
+                                pages = self.background_contexts[0].pages if self.background_contexts else []
+                                if not pages:
+                                    # The user closed the agent window: make a new minimized one.
+                                    self.new_background_window(self.context.pages[0])
+                                    pages = self.background_contexts[0].pages
+                                response.put(target_id(pages[0].context, pages[0]))
+                            elif action == 'helper_window':
+                                self.new_background_window(self.context.pages[0], keep_others=True)
+                                response.put(self.background_target)
+                            elif action == 'helper_tab':
+                                tab = self.context.new_page()
+                                response.put(target_id(self.context, tab))
+                            elif action == 'close_helper_window':
+                                helper = self.helper_contexts.pop(data, None)
+                                if helper is not None:
+                                    helper.close()
+                                response.put(True)
+                            elif action == 'close_helper_target':
+                                helper = self.helper_contexts.pop(data, None)
+                                if helper is not None:
+                                    helper.close()
+                                for tab in list(self.context.pages):
+                                    if not tab.is_closed() and target_id(self.context, tab) == data:
+                                        tab.close()
+                                response.put(True)
+                            elif action == 'tabs':
+                                from apps.raven.shared_browser import active_target
+                                active = active_target(self.context)
+                                rows = []
+                                for c in [self.context, *self.background_contexts, *self.helper_contexts.values()]:
+                                  for p in c.pages:
+                                    # The agent window's idle placeholder is not a page anyone visited.
+                                    if p.is_closed() or p.url.startswith('chrome-extension:') or (
+                                            c is not self.context and p.url == 'about:blank'):
+                                        continue
+                                    try:
+                                        tid = target_id(p.context, p)
+                                        rows.append(dict(tab_id=tid, url=p.url, title=p.title(),
+                                            owner='human' if c is self.context else 'agent', active=tid == active))
+                                    except Exception:
+                                        if not p.is_closed():
+                                            raise
+                                response.put(rows)
+                            elif action == 'focus':
+                                for p in [p for c in [self.context, *self.background_contexts, *self.helper_contexts.values()] for p in c.pages]:
+                                    if target_id(p.context, p) == data:
+                                        session = p.context.new_cdp_session(p)
+                                        wid = session.send('Browser.getWindowForTarget')['windowId']
                                         bounds = session.send('Browser.getWindowBounds', {'windowId':wid})['bounds']
-                                    if bounds.get('windowState') == 'normal' and (bounds.get('left', 0) < -5000 or bounds.get('top', 0) < -5000):
-                                        session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'left':80,'top':60}})
-                                    session.detach()
-                                    p.bring_to_front()
-                                    response.put(True)
-                                    break
-                            else:
-                                raise ValueError('Tab no longer exists')
-                    except Exception as exc:
-                        response.put(exc)
+                                        # Only un-minimize / bring the parked agent window on-screen; never
+                                        # touch a normal, maximized or fullscreen window of the user.
+                                        if bounds.get('windowState') == 'minimized':
+                                            session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'windowState':'normal'}})
+                                            bounds = session.send('Browser.getWindowBounds', {'windowId':wid})['bounds']
+                                        if bounds.get('windowState') == 'normal' and (bounds.get('left', 0) < -5000 or bounds.get('top', 0) < -5000):
+                                            session.send('Browser.setWindowBounds', {'windowId':wid,'bounds':{'left':80,'top':60}})
+                                        session.detach()
+                                        p.bring_to_front()
+                                        response.put(True)
+                                        break
+                                else:
+                                    raise ValueError('Tab no longer exists')
+                        except Exception as exc:
+                            response.put(exc)
+                    if self.stopping:
+                        break
+                    LOG.warning('The Korp Chrome window was closed; relaunching it')
+                    self.relaunching = True
+                    self.cdp_url = None
+                    try:
+                        if self.browser.is_connected():
+                            # Close the whole browser (and so its profile) before the relaunch.
+                            self.browser.new_browser_cdp_session().send('Browser.close')
+                        self.browser.close()
+                    except Exception:
+                        pass
+                    if self.windows_chrome is not None:
+                        try:
+                            self.windows_chrome.close()
+                        except Exception:
+                            pass
+                        self.windows_chrome = None
+                        # A new Chrome on the same profile can close at once if the old one is
+                        # still exiting (laptop handoff #4): wait for it, up to 15 s.
+                        from intent_browser.windows_browser import WindowsChrome
+                        for _ in range(15):
+                            try:
+                                WindowsChrome.powershell("if (Get-Process chrome -ErrorAction SilentlyContinue | "
+                                    "Where-Object { $_.Path -like '*raven-demo*' }) { exit 1 }")
+                                break
+                            except Exception:
+                                time.sleep(1)
         except Exception as exc:
             self.error = str(exc)
         finally:
@@ -483,19 +530,24 @@ class Service:
     def _submit(self, payload, scripted=None):
         with self.lock:
             payload = dict(payload)
+            if payload['mode'] in ('user_window', 'background_window') and getattr(self.window, 'relaunching', False):
+                raise BusyError('The Korp window was closed; Korp is reopening it. Try again in a moment.')
             if payload.get('_helper_of'):
                 pass
             elif payload['mode'] == 'background_window':
                 if not self.window:
                     raise ValueError('Start the backend with --user-window')
                 if any(not r.done and r.payload['mode'] == 'background_window' for r in self.runs.values()):
-                    raise ValueError('The background window already has an active task')
+                    raise BusyError('Korp is already working in the background window. Stop that task or wait for it to finish.')
                 payload['_background_target'] = self.window.call('background')
             if payload['mode'] == 'user_window' and not payload.get('_helper_of'):
                 if not self.window:
                     raise ValueError('Start the backend with --user-window')
                 if any(not r.done and r.payload['mode'] == 'user_window' for r in self.runs.values()):
-                    raise ValueError('The shared window already has an active task')
+                    raise BusyError('Korp is already working in another window. Stop that task or wait for it to finish.')
+            findings = getattr(self, '_flock_findings', {}).get(payload.get('conversation_id'))
+            if findings and not payload.get('_helper_of'):
+                payload['_helper_findings'] = '\n'.join(findings)
             if getattr(self, 'models', None) is not None:
                 preset, notice = self.choose_model(payload)
                 options = episode_options(preset)
@@ -616,7 +668,9 @@ class Service:
                     if run.done or run.cancelled:
                         return
                     run.retry_requested.clear()
-                    if run.attempt == 0:
+                    # A helper is not retried: a fresh attempt would restart its task from scratch
+                    # while the main agent believes it is still working. The main agent decides.
+                    if run.attempt == 0 and not run.payload.get('_helper_of'):
                         run.attempt += 1
                         # Reattach to the last live document rather than the user's newly focused tab.
                         active = next((t['tab_id'] for t in run.tabs if t.get('active')), None)
@@ -629,10 +683,13 @@ class Service:
                         self.start_attempt(run, scripted)
                         events = run._events
                         continue
+                    self.flock_helper_failed(run, failure)
                     run.emit({'type': 'error', 'message': FRIENDLY_ERROR})
                     run.emit({'type': 'done', 'stop_reason': 'error'})
                     return
             run.process.join(timeout=4)
+            if failure and not answered:
+                self.flock_helper_failed(run, failure)
             if demo and terminal:
                 run.emit(terminal)
             elif not run.done:
@@ -685,9 +742,22 @@ class Service:
             return
         if event['type'] == 'step' and event.get('summary'):
             parent.emit({'type': 'helper', 'action': 'step', 'id': run.run_id, 'summary': event['summary']})
+            helper.setdefault('steps', []).append(event['summary'])
         if event['type'] == 'final' and not helper['closed']:
             # A helper that answered with send_msg_to_user has finished: its answer is its report.
             self.flock_to_main(run.run_id, event.get('markdown', ''), final=True)
+
+    def flock_helper_failed(self, run, failure):
+        """Tell the main agent that a helper stopped with an error, instead of leaving it 'working'."""
+        if not run.payload.get('_helper_of'):
+            return
+        helper = self.flock_state()[0].get(run.run_id)
+        if not helper or helper['closed'] or helper.get('state') == 'finished':
+            return
+        steps = helper.get('steps', [])[-5:]
+        self.flock_to_main(run.run_id, f'This helper stopped with an error ({str(failure)[:200]}) before reporting. '
+            + (f"Its last steps: {'; '.join(steps)}. " if steps else '')
+            + 'Spawn a new helper if the part still matters, or continue without it.', final=True)
 
     def flock_to_main(self, helper_id, text, final=False):
         helpers, inbox, cond = self.flock_state()
@@ -700,6 +770,12 @@ class Service:
                 {'helper_id': helper_id, 'name': helper['name'], 'text': text, 'finished': final})
             cond.notify_all()
         parent = self.runs.get(helper['parent'])
+        conversation = parent and parent.payload.get('conversation_id')
+        if conversation:
+            # Kept for the conversation's next turn: a stopped main run would otherwise lose them.
+            findings = self.__dict__.setdefault('_flock_findings', {}).setdefault(conversation, [])
+            findings.append(f"{helper['name']}: {text[:1500]}")
+            del findings[:-12]
         if parent:
             parent.emit({'type': 'helper', 'action': 'reported', 'id': helper_id, 'name': helper['name']})
         return {'ok': True}
@@ -874,7 +950,7 @@ class Handler(preview.Handler):
     def json(self, data, status=200):
         if 'error' in data:
             LOG.error('HTTP %s %s: %s', status, self.path, data['error'])
-            if self.server.service.demo_mode:
+            if self.server.service.demo_mode and not data.get('user_facing'):
                 data = {**data, 'error': FRIENDLY_ERROR}
         body = json.dumps(data, ensure_ascii=False).encode()
         self.send_response(status)
@@ -1051,6 +1127,8 @@ class Handler(preview.Handler):
                 service.focus(parts[2])
                 return self.json({'ok': True})
             return self.json({'error': 'Unknown endpoint'}, 404)
+        except BusyError as exc:
+            return self.json({'error': str(exc), 'user_facing': True}, 409)
         except (ValueError, KeyError, TypeError) as exc:
             return self.json({'error': str(exc)}, 400)
         except Exception as exc:
@@ -1081,6 +1159,8 @@ def main():
                         help='Applies to presets without their own reasoning_effort')
     parser.add_argument('--service-tier', choices=['priority', 'default'], default='priority')
     args = parser.parse_args()
+    import faulthandler, signal
+    faulthandler.register(signal.SIGUSR1, all_threads=True)  # kill -USR1 <pid>: dump thread stacks to the log
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     server.daemon_threads = True
     server.service = Service(args.port, args.user_window, args.profile_dir,

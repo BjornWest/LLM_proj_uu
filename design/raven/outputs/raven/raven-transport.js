@@ -6,7 +6,7 @@
       this.baseURL=baseURL.replace(/\/$/,'');this.demoMode=true;
       this.ready=fetch(this.baseURL+'/api/health').then(r=>r.json()).then(h=>{this.demoMode=h.demo_mode!==false;}).catch(()=>{});
     }
-    errorMessage(error) {return this.demoMode ? "Sorry — I couldn't finish that. Could you try again or rephrase?" : (error.message || String(error));}
+    errorMessage(error) {return error.userFacing ? error.message : this.demoMode ? "Sorry — I couldn't finish that. Could you try again or rephrase?" : (error.message || String(error));}
     events(runId,{onEvent,onError}) {
       const stream=new EventSource(this.baseURL+`/api/tasks/${encodeURIComponent(runId)}/events`);
       let closed=false,recovering=false,timer=null,lastId=0;
@@ -31,7 +31,7 @@
     async request(path,body,{keepalive=false}={}) {
       await this.ready;
       const response=await fetch(this.baseURL+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{}),keepalive});
-      if(!response.ok){const data=await response.json();throw new Error(data.error || `Backend request failed (${response.status})`);}
+      if(!response.ok){const data=await response.json();const error=new Error(data.error || `Backend request failed (${response.status})`);error.userFacing=data.user_facing===true;throw error;}
       return response.json();
     }
     start(payload,{onEvent,onError}) {

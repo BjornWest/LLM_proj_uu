@@ -81,7 +81,7 @@ $p=Start-Process -FilePath $exe -ArgumentList $args -PassThru
             except OSError: return
             threading.Thread(target=self.bridge,args=(conn,),daemon=True).start()
     def bridge(self, conn):
-        script=f"$c=[System.Net.Sockets.TcpClient]::new('127.0.0.1',{self.port}); $n=$c.GetStream(); $i=[Console]::OpenStandardInput(); $o=[Console]::OpenStandardOutput(); $a=$i.CopyToAsync($n); $b=$n.CopyToAsync($o); [System.Threading.Tasks.Task]::WaitAny(@($a,$b)) | Out-Null; $c.Dispose()"
+        script=f"$c=[System.Net.Sockets.TcpClient]::new('127.0.0.1',{self.port}); $n=$c.GetStream(); $i=[Console]::OpenStandardInput(); $o=[Console]::OpenStandardOutput(); $a=$i.CopyToAsync($n); $b=$n.CopyToAsync($o); [System.Threading.Tasks.Task]::WaitAny(@($a,$b)) | Out-Null; $c.Dispose(); [Environment]::Exit(0)"
         p=subprocess.Popen(['powershell.exe','-NoProfile','-NonInteractive','-Command',script],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL);self.relays.append(p)
         def up():
             try:
@@ -94,7 +94,12 @@ $p=Start-Process -FilePath $exe -ArgumentList $args -PassThru
         try:
             while data:=os.read(p.stdout.fileno(),65536):conn.sendall(data)
         except OSError:pass
-        finally:conn.close()
+        finally:
+            # shutdown, not just close: the up() thread is blocked in recv on this socket, and on
+            # Linux close() alone sends no FIN then, so Playwright would never see Chrome go away.
+            try:conn.shutdown(socket.SHUT_RDWR)
+            except OSError:pass
+            conn.close();p.wait()
     @contextmanager
     def bind_environment(self):
         # Scope BrowserGym factory bindings; each task/chat keeps a distinct browser.

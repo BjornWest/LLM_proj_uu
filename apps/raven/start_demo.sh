@@ -11,7 +11,12 @@ eval "$(python3 -m apps.raven.paths --shell)" || exit 1
 P=$(ss -ltnp 2>/dev/null | grep ":$PORT " | grep -o 'pid=[0-9]*' | cut -d= -f2 | head -1)
 [ -n "$P" ] && kill "$P" && sleep 3
 powershell.exe -NoProfile -Command "Get-Process chrome -ErrorAction SilentlyContinue | Where-Object { \$_.Path -like '*raven-demo*' } | Stop-Process -Force" 2>/dev/null
-sleep 2
+# Wait (up to 15 s) until the old Chrome has really exited: a new one on the same profile
+# started while it is still shutting down can close straight away.
+for i in $(seq 1 15); do
+  powershell.exe -NoProfile -Command "if (Get-Process chrome -ErrorAction SilentlyContinue | Where-Object { \$_.Path -like '*raven-demo*' }) { exit 1 }" 2>/dev/null && break
+  sleep 1
+done
 export DISPLAY=${RAVEN_DISPLAY:-:99} TASK_SOURCE_BINDING=current OPENBLAS_NUM_THREADS=1
 # Linux-side browsers (background modes) use an invisible X display; start one if absent.
 if [ "$DISPLAY" = :99 ] && ! ss -xl 2>/dev/null | grep -q '/tmp/.X11-unix/X99' && command -v Xvfb >/dev/null; then
@@ -20,6 +25,8 @@ if [ "$DISPLAY" = :99 ] && ! ss -xl 2>/dev/null | grep -q '/tmp/.X11-unix/X99' &
 fi
 mkdir -p .local/raven-logs
 LOG=${RAVEN_LOG:-$PWD/.local/raven-logs/raven-$PORT.log}
+# Keep the previous run's log: it holds the evidence of whatever made you restart.
+[ -s "$LOG" ] && mv -f "$LOG" "$LOG.prev"
 # RAVEN_BOUNDED=0 (e.g. on the presentation laptop) runs without the workstation's cgroup launcher.
 BOUND=()
 [ "${RAVEN_BOUNDED:-1}" = 1 ] && BOUND=(python3 scripts/run_bounded_job.py --tasks 0 --memory-mib 6144 --)

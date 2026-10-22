@@ -14,12 +14,36 @@ from apps.raven.backend import Handler, Run, ThreadingHTTPServer
 from apps.raven.browser_launch import demo_launch_options
 
 
+class MockModels:
+    """One scripted preset, so the panel's /api/models call works against the mock."""
+    preset = {'id': 'offline-scripted-mock', 'label': 'Offline scripted mock', 'backend': 'scripted',
+              'model': 'offline-scripted-mock'}
+    override = None
+
+    def presets(self):
+        return [dict(self.preset)]
+
+    def get(self, preset_id):
+        return dict(self.preset) if preset_id == self.preset['id'] else None
+
+    def default(self):
+        return dict(self.preset)
+
+    def fallback(self):
+        return None
+
+    def public(self, preset, availability=True):
+        return {**{k: preset.get(k) for k in ('id', 'label', 'backend', 'model')},
+                **({'available': True} if availability else {})}
+
+
 class MockService:
     """Same served app and API handler; explicit scripted response, no episode/model."""
     demo_mode = True
     model = 'offline-scripted-mock'
     options = {'metadata': {'tags': ['scripted']}}
     window = None
+    models = MockModels()
 
     def __init__(self):
         self.runs = {}

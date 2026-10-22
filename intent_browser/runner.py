@@ -1419,7 +1419,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                                         batch_stop=batch_stop or 'human_message_pending'
                                     if confirmation is not None:
                                         batch_stop=batch_stop or human_browser.confirmation_guard(confirmation,obs)
-                                    else:
+                                    elif decision.name not in host_tools:
+                                        # Host tools (e.g. Korp flock) act outside the page, so changes
+                                        # in the agent's tab do not invalidate them.
                                         batch_stop=batch_stop or human_browser.guard(tab_ticket,
                                             None if targeted_check is not None else obs,decision=decision)
                                         if batch_stop=='tab_content_changed_since_decision':

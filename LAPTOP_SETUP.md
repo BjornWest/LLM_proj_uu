@@ -326,7 +326,8 @@ Raven extension (`--windows-browser`). This section is independent of sections
 
 ### Prerequisites
 
-- Windows 11 (or 10 21H2+) with WSL2 Ubuntu 24.04 (22.04 works with Python 3.11).
+- Windows 11 (or 10 21H2+) with WSL2 Ubuntu 24.04. On 22.04 (Python 3.10) install a
+  newer Python first, e.g. `uv python install 3.12`; the setup script finds it.
   Keep the checkout in the Linux filesystem, e.g. `~/code/LLM_proj_uu`.
 - WSL **interop** on (default): `powershell.exe` must run from WSL. The backend
   starts Chrome and relays its debugging port through PowerShell stdin/stdout,
@@ -345,8 +346,8 @@ cd ~/code
 git clone git@github.com:BjornWest/LLM_proj_uu.git   # skip if it exists
 cd LLM_proj_uu
 git status                                           # must be clean before switching
-git fetch origin claude/raven-demo-20261019
-git switch claude/raven-demo-20261019 && git pull --ff-only
+git fetch origin claude/korp-flock-20261022
+git switch claude/korp-flock-20261022 && git pull --ff-only
 ```
 
 ### 2. Run the setup script (idempotent; rerun after pulls)
@@ -405,8 +406,16 @@ Other locations: export `RAVEN_ENV_FILE=/path/to/.env`.
      ```
      Logs/known_hosts: `.local/raven-vast/`. Stop: `kill "$(cat .local/raven-vast/tunnel.pid)"`.
      vLLM must already be serving on the instance's port 8000.
-- **GPT-6.1 Sol** (the `sol` preset) needs the workstation's Codex subscription
-  bridge (Node, `pi`, Codex login) and is not set up on the laptop.
+- **Claude** (the `claude-sonnet` preset): `ANTHROPIC_API_KEY` in `.env` (a
+  workspace-scoped key; billed per token).
+- **Other self-hosted endpoints** (e.g. a Modal vLLM server with an API key): put the
+  key in `SELF_HOSTED_API_KEY`; Korp sends it as a Bearer token to every self-hosted preset.
+- **GPT-6.1 Sol** (the `sol` preset) uses the Codex subscription bridge and needs, on
+  the service's PATH: **Node >= 22.19** (for Pi 0.80.6), **Pi's own login**
+  (`~/.pi/agent/auth.json`; the Codex CLI login is separate) and a running **Codex
+  app-server daemon** (`codex app-server daemon start`). Without the daemon the quota
+  guard cannot read quota, the bridge returns HTTP 502 and the panel shows only the
+  generic error.
 
 ### 5. Start and verify
 
@@ -417,7 +426,8 @@ apps/raven/start_demo.sh 8770
 Chrome for Testing opens on the Windows desktop with the Raven side panel. The
 script stops an earlier service on that port and only Raven's own Chrome for
 Testing processes (never your normal Chrome), starts `Xvfb :99` for Linux-side
-background browsers when needed, and logs to `.local/raven-logs/raven-8770.log`.
+background browsers when needed, and logs to `.local/raven-logs/raven-8770.log`
+(the previous start's log is kept as `raven-8770.log.prev`).
 Verify:
 
 ```bash
@@ -455,6 +465,13 @@ panel (one real model call).
   `.local/raven-vast/tunnel-ssh.err` (`Permission denied (publickey)` means the
   laptop key is not on the instance).
 - `Raven did not start`: read the log path printed by `start_demo.sh`.
+- "Korp is already working in another window": only one task at a time can use
+  the shared window (and one the background window). Stop it, or wait.
+- You closed the Korp Chrome window: rerun `start_demo.sh` (tasks fail with "the Korp
+  window was closed" until then).
+- Trace viewer shows no Korp runs: Korp nests traces two levels down. Put
+  `{"project_root": "<repo>", "roots": [], "patterns": [".local/raven-runs/*/attempt-*"]}`
+  in `.local/trace-viewer/sources.json` and run `scripts/view_traces.py` without `--runs`.
 - On the workstation, `RAVEN_BOUNDED=1` (default without `.local/raven-demo.env`)
   runs the service under `scripts/run_bounded_job.py`.
 

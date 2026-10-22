@@ -22,7 +22,9 @@ else
   echo "skipped (RAVEN_SKIP_SUDO=1)"
 fi
 PY=$(command -v python3.12 || command -v python3.11 || true)
-[ -n "$PY" ] || { echo "Need python3.12 (or 3.11)"; exit 1; }
+# Ubuntu 22.04 ships 3.10: fall back to a uv-managed CPython (uv python install 3.12).
+[ -n "$PY" ] || PY=$(ls -d "$HOME"/.local/share/uv/python/cpython-3.1[12]*/bin/python3.1[12] 2>/dev/null | sort -V | tail -1)
+[ -n "$PY" ] || { echo "Need python3.12 (or 3.11), e.g. uv python install 3.12"; exit 1; }
 
 step "2/7 Virtualenv and Python requirements (.venv)"
 [ -x .venv/bin/python ] || "$PY" -m venv .venv
