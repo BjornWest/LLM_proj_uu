@@ -68,7 +68,7 @@ Korp uses; the recorded request is the wire request) except the native-API row.
 |---|---|
 | Exact recorded request | 1 of 5 (Spanish) |
 | Exact recorded request, native Messages API with summarized adaptive thinking | 2 of 5 (Spanish) |
-| No-observation base | 8 of 15 (German, Spanish, Arabic, Vietnamese); 6 of 10 within the batch used for the rows below |
+| No-observation base | 8 of 15 (German, Spanish, Arabic, Vietnamese); 6 of 10 within the batch of the next row |
 | No-observation base minus the system sentence "never infer it from your own name, the language of the message or website content" | 7 of 10 (German) |
 | **No-observation base minus only the appended language sentence** | **0 of 10** |
 | No-observation base minus every language instruction | 0 of 10 |
@@ -154,7 +154,8 @@ handle it, so it propagates and the episode fails instead of recapturing.
   first one after step 22 `goto('https://www.gsmarena.com/results.php3?…iphone+18+pro')`,
   whose load wait took only 0.03 s. GSMArena was serving a Cloudflare Turnstile check to
   the helpers, which reloads/redirects the page. A post-navigation reload changing the
-  loader id is the likely trigger. (The apple.com URL in the final `human_tab_transition`
+  loader id is the likely trigger (Turnstile not confirmed for this helper; its post-goto
+  preview was empty). (The apple.com URL in the final `human_tab_transition`
   record is stale metadata.)
 - `3ac2f263` attempt 1 (Qwen + SFT on Modal, example.com, single agent): trigger unknown;
   I did not determine which identity field changed. The preview took 1.9 s (item 7); the
@@ -171,7 +172,7 @@ the identity diff.
 
 CDP traffic goes through `powershell.exe` copying stdin/stdout to a TCP client
 (`intent_browser/windows_browser.py:83-85`). The per-frame phase `frame_owner_lookup`
-has a median of 0.11-0.22 s across today's traces (0.20-0.22 s in the flock runs); that
+has a median of 0.11-0.23 s across today's traces (0.12-0.23 s in the flock runs); that
 is a phase time, which may include more than one CDP round trip. Capture time grows with
 frame count:
 
@@ -182,7 +183,7 @@ frame count:
 | time.is, one capture | about 280 | 70 s |
 | Flock run, 5 agents sharing one Chrome | — | median 6-12 s per agent |
 
-Frame count does not explain everything: Kayak (8 frames) took 5-8 s with one agent, and
+Frame count does not explain everything: Kayak (8 frames) typically took 5-8 s with one agent, and
 samsung.com (7-11 frames) took 35-44 s in the flock run. The live clock on time.is is not
 the cause; almost no time goes to stability waits. The 2000 ms screenshot timeout
 (`intent_browser/visual_readiness.py:108,113`) is also easier to hit under this load
